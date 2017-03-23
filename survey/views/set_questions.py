@@ -308,6 +308,7 @@ def _render_question_view(request, batch, instance=None, prev_question=None):
         request.breadcrumbs(breadcrumbs)
     return response, context
 
+
 @permission_required('auth.can_view_batches')
 def assign(request, qset_id):
     batch = QuestionSet.get(id=qset_id)
@@ -318,12 +319,8 @@ def assign(request, qset_id):
         return HttpResponseRedirect(reverse('qset_questions_page', args=(batch.pk, )))
     if request.method == 'POST':
         data = dict(request.POST)
-        print data
         last_question = batch.last_question_inline()
-        lib_questions = QuestionTemplate.objects.filter(
-            identifier__in=data.get('identifier', ''))
-        # qset_class =
-        # print 'data: ', data, 'lib questions: ', lib_questions
+        lib_questions = QuestionTemplate.objects.filter(identifier__in=data.get('identifier', ''))
         if lib_questions:
             for lib_question in lib_questions:
                 question = Question.objects.create(identifier=lib_question.identifier,
@@ -336,8 +333,7 @@ def assign(request, qset_id):
                     QuestionOption.objects.create(
                         question=question, text=option.text, order=option.order)
                 if last_question:
-                    QuestionFlow.objects.create(
-                        question=last_question, next_question=question)
+                    QuestionFlow.objects.create(question=last_question, next_question=question)
                 else:
                     batch.start_question = question
                     batch.save()
@@ -346,10 +342,8 @@ def assign(request, qset_id):
         success_message = "Questions successfully assigned to %s: %s." % (batch.verbose_name(), batch.name.capitalize())
         messages.success(request, success_message)
         return HttpResponseRedirect(reverse('qset_questions_page', args=(batch.pk, )))
-    used_identifiers = [
-        question.identifier for question in batch.questions.all()]
-    library_questions = QuestionTemplate.objects.exclude(
-        identifier__in=used_identifiers).order_by('identifier')
+    used_identifiers = [question.identifier for question in batch.questions.all()]
+    library_questions = QuestionTemplate.objects.exclude(identifier__in=used_identifiers).order_by('identifier')
     question_filter_form = QuestionFilterForm()
 #     library_questions =  question_filter_form.filter(library_questions)
     breadcrumbs = Question.edit_breadcrumbs(qset=batch)
@@ -360,13 +354,10 @@ def assign(request, qset_id):
         else:
             page_name = 'Batch'
         request.breadcrumbs(breadcrumbs)
-
-
-    print breadcrumbs
     context = {'batch_questions_form': unicode(BatchQuestionsForm()), 'batch': batch,
                'button_label': 'Save', 'id': 'assign-question-to-batch-form',
                'library_questions': library_questions, 'question_filter_form': question_filter_form,
-               'page_name' : page_name
+               'page_name': page_name
                }
     return render(request, 'set_questions/assign.html',
                   context)

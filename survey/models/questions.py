@@ -367,6 +367,10 @@ class QuestionSet(CloneableMixin, BaseModel):   # can be qset, listing, responde
         return self.open_locations.filter(non_response=True, location__pk__in=[location.pk
                                                                                for location in locations]).exists()
 
+    def inline_flows(self):
+        return QuestionFlow.objects.filter(question__qset=self, validation_test__isnull=True,
+                                           next_question__isnull=False)
+
     @property
     def answer_types(self):
         access_channels = self.access_channels.values_list(
@@ -376,25 +380,23 @@ class QuestionSet(CloneableMixin, BaseModel):   # can be qset, listing, responde
 
     def next_inline(self, question, channel=ODKAccess.choice_name()):
         @cached_as(QuestionSet.objects.get(id=self.id), QuestionLoop.objects.filter(loop_starter__qset__id=self.id),
-                   Question.objects.filter(qset__id=self.id))
+                   Question.objects.filter(qset__id=self.id),
+                   self.inline_flows())
         def _next_inline():
-            qflows = QuestionFlow.objects.filter(question__qset=self, validation_test__isnull=True)
+            qflows = self.inline_flows()
             if qflows.exists():
                 return next_inline_question(question, qflows, AnswerAccessDefinition.answer_types(channel))
         return _next_inline()
 
     def last_question_inline(self):
-        qflows = QuestionFlow.objects.filter(
-            question__qset=self, validation_test__isnull=True)
+        qflows = self.inline_flows()
         if qflows.exists():
             return last_inline(self.start_question, qflows)
         else:
             return self.start_question
 
     def questions_inline(self):
-        qflows = QuestionFlow.objects.filter(
-            question__qset=self, validation_test__isnull=True)
-
+        qflows = self.inline_flows()
         @cached_as(QuestionSet.objects.get(id=self.id),
                    Question.objects.filter(qset__id=self.id),
                    QuestionFlow.objects.filter(question__qset__id=self.id),
@@ -584,8 +586,7 @@ def first_inline_flow_with_desc(question, desc):
             return question.flows.get(desc=desc)
         if question.connecting_flows.filter(desc=desc).exists():
             return None
-        iflow = question.flows.get(
-            validation_test__isnull=True, next_question__isnull=False)
+        iflow = question.flows.get(validation_test__isnull=True, next_question__isnull=False)
         return first_inline_flow_with_desc(iflow.next_question, desc)
     except QuestionFlow.DoesNotExist:
         return None

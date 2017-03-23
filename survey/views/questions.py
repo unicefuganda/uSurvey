@@ -166,8 +166,7 @@ def add_logic(request, batch_id, question_id):
         if logic_form.is_valid():
             logic_form.save()
             messages.success(request, 'Logic successfully added.')
-            response = HttpResponseRedirect(
-                '/batches/%s/questions/' % batch_id)
+            response = HttpResponseRedirect('/batches/%s/questions/' % batch_id)
     request.breadcrumbs([
         ('Surveys', reverse('survey_list_page')),
         (batch.survey.name, reverse('batch_index_page', args=(batch.survey.pk, ))),
