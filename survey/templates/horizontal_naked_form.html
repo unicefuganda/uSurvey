@@ -1,4 +1,6 @@
 {% load template_tags %}
+<div class="row">
+<div class="col-md-12">
 <table class="inline {{ class }}">
 <tr id="control-group">
 {% for field in a_form.visible_fields %}
@@ -22,6 +24,8 @@
 {% endfor %}
 </tr>
 </table>
+</div>
+</div>
 {% for hidden in a_form.hidden_fields %}
   {{ hidden }}
 {% endfor %}
