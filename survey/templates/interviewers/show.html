@@ -10,6 +10,9 @@
     font-weight: bold;
   }
   .btn-yellow{display: none !important;}
+  ._heading_color{
+    color: #09F;
+  }
   </style>
 
 <div class="container">
@@ -18,7 +21,7 @@
         <fieldset>
         {% if interviewer.odk_access %}
           <div id="legend">
-            <legend class="">Credentials</legend>
+            <legend class="_heading_color">Credentials</legend>
           </div>
      {% for access in interviewer.odk_access %}          
           <div class="control-group">
@@ -37,7 +40,7 @@
      {% endfor %}
      {% endif %}
       <div id="legend">
-            <legend class="">Profile</legend>
+            <legend class="_heading_color">Profile</legend>
           </div>
 
 
@@ -89,7 +92,7 @@
           </div>
 
           <div id="legend">
-            <legend class="">Survey Details</legend>
+            <legend class="_heading_color">Survey Details</legend>
           </div>
 {% for loc in interviewer.ea.parent_locations %}
           <div class="control-group">
@@ -140,7 +143,14 @@
 
 
 
-
+<style type="text/css">
+  .control-group {
+    margin-bottom: 10px !important;
+}
+.form-horizontal .control-label{
+  padding-top: 0px !important;
+}
+</style>
 
 
 

@@ -10,13 +10,16 @@
   .control-label{
     font-weight: bold;
   }
+  ._heading_color{
+    color: #09F;
+  }
 </style>
 <div class="container">
   <div class="row-fluid">
       <form class="form-horizontal">
         <fieldset>
           <div id="legend">
-            <legend class="">Profile</legend>
+            <legend class="_heading_color">Profile</legend>
           </div>
      
           <!-- Name -->
@@ -76,4 +79,12 @@
       </form>
       </div>
     </div>
+    <style type="text/css">
+  .control-group {
+    margin-bottom: 10px !important;
+}
+.form-horizontal .control-label{
+  padding-top: 0px !important;
+}
+</style>
 {% endblock %}

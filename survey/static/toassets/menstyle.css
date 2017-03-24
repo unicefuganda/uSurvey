@@ -5,7 +5,7 @@ header{position:relative;width:100%;background:#0099ff;}
 .logo a{color:#6DDB07;}
 nav{position:relative;width:1220px;-moz-width:1100px;}
 /*#cssmenu,#cssmenu ul,#cssmenu ul li,#cssmenu ul li a,#cssmenu #head-mobile{border:0;list-style:none;line-height:1;display:block;position:relative;-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box}*/
-#cssmenu,#cssmenu ul,#cssmenu ul li,#cssmenu ul li a,#cssmenu #head-mobile{
+/*#cssmenu,#cssmenu ul,#cssmenu ul li,#cssmenu ul li a,#cssmenu #head-mobile{
     border: 0 none;
     box-sizing: border-box;
     display: block;
@@ -14,11 +14,20 @@ nav{position:relative;width:1220px;-moz-width:1100px;}
     padding-top: 5px;
     position: relative;
     z-index: 9;
+}*/
+#cssmenu, #cssmenu ul, #cssmenu ul li, #cssmenu ul li a, #cssmenu #head-mobile {
+    border: 0 none;
+    box-sizing: border-box;
+    display: block;
+    list-style: outside none none;
+    position: relative;
+    background: #0099ff none repeat scroll 0 0 !important;
+    z-index: 9;
 }
 #cssmenu:after,#cssmenu > ul:after{content:".";display:block;clear:both;visibility:hidden;line-height:0;height:0}
 #cssmenu #head-mobile{display:none}
 #cssmenu{font-family:sans-serif;background:#0099ff}
-#cssmenu > ul > li{float:left}
+#cssmenu > ul > li{float:left;padding-top: 10px;}
 #cssmenu > ul > li > a{padding:17px;font-size:12px;letter-spacing:1px;text-decoration:none;color:#fff;font-weight:700;}
 #cssmenu > ul > li:hover > a,#cssmenu ul li.active a{color:yellow;}
 /*Removed Hover color*/
