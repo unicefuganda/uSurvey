@@ -160,9 +160,9 @@ class Answer(BaseModel):
     interview = models.ForeignKey(Interview, related_name='%(class)s', db_index=True)
     question = models.ForeignKey("Question", null=True, related_name="%(class)s",
                                  on_delete=models.PROTECT, db_index=True)
-    identifier = models.CharField(max_length=200)    # basically calculated field for reporting
-    as_text = models.CharField(max_length=200)      # basically calculated field for reporting
-    as_value = models.CharField(max_length=200)     # basically calculated field for reporting
+    identifier = models.CharField(max_length=200, db_index=True)    # basically calculated field for reporting
+    as_text = models.CharField(max_length=200, db_index=True)      # basically calculated field for reporting
+    as_value = models.CharField(max_length=200, db_index=True)     # basically calculated field for reporting
 
     @classmethod
     def create(cls, interview, question, answer, as_text=None, as_value=None):

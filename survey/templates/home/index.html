@@ -51,17 +51,21 @@
             margin-left: 384px;
              overflow: hidden;
         }
-       
-         #survey_map {
-    
-    height: 500px;
-    margin-left: auto;
-    margin-right: auto;
-    margin-top: 40px;
-    width: 500px;
-    z-index: 2;
-}
 
+        /*
+        1px solid #c5c5c6;
+        5px 5px 5px #dbddde;
+        */
+        #survey_map {
+            border: None;
+            box-shadow: None;
+            height: 500px;
+            margin-left: auto;
+            margin-right: auto;
+            width: 500px;
+            margin-top: 40px;
+            z-index: 2;    
+        }
 @media only screen and (max-width:767px) {
     #survey_map {
        width: 100%
@@ -164,9 +168,13 @@ width: 80%;
     <script type="text/javascript">
         <!--$("#survey_map").height($(document).height() * 0.7);-->
        var map = L.map('survey_map').setView([{{map_center}}], {{ zoom_level|default:6}}, {zoomControl: true, doubleClickZoom: false, scrollWheelZoom:false}),
+
     info = L.control(),
     //legend = L.control({position: 'bottomright'}),
     geojson;
+    map.dragging.disable();
+    map.touchZoom.disable();
+    map.doubleClickZoom.disable();
   osmAttrib='© uSurvey';
   var mapData = null;
 
@@ -367,6 +375,7 @@ function highlightAdminLevel(event){
         weight: 3,
         color:'#FF8200',
         dashArray: '',
+        //fillColor: '#95bee5',
         fillOpacity: 0.3
     })
    if (!L.Browser.ie && !L.Browser.opera) {
