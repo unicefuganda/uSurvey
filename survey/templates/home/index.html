@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 {% block extra_head %}
-	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.3/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.3/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js"></script>
 
 
@@ -8,6 +8,11 @@
         .map-show {
             width: 80%
             display: inline-block;
+        }
+
+        #indicators {
+            
+            
         }
 
         .map-legend {
@@ -46,6 +51,7 @@
             margin-left: 384px;
              overflow: hidden;
         }
+
         /*
         1px solid #c5c5c6;
         5px 5px 5px #dbddde;
@@ -64,8 +70,8 @@
     #survey_map {
        width: 100%
     }
-	</style>
-	<style>
+  </style>
+  <style>
 /*.info { padding: 6px 8px; font: 12px "Trebuchet MS",Open Sans, Helvetica, sans-serif; background: white; background: rgba(255,255,255,0.8); box-shadow: 0 0 15px rgba(0,0,0,0.2); border-radius: 5px; } */
 .info {
     background: rgba(255, 255, 255, 0.8) none repeat scroll 0 0;
@@ -80,6 +86,28 @@
 .info h4 { margin: 0 0 5px; color: #777; }
 .legend { text-align: left; line-height: 18px; color: #555; } .legend i { width: 18px; height: 18px; float: left; margin-right: 8px; opacity: 0.7;}
 .ptop{padding-top: 10px;}
+#map-legend{line-height: 20px;font-size: 13px;font-weight: bold;}
+#map-legend strong{line-height: 3em;
+
+font-family: MontserratBold, Arial, Helvetica, sans-serif;
+  font-size: 14px;
+  margin-bottom: 2px;
+  border-bottom: 1px solid;
+ color: #0099ff;
+        border-color: #0099ff;
+text-transform: uppercase;
+
+}
+#info-update{line-height: 20px;font-size: 13px;min-height: 260px;}
+#info-update h4{font-family: MontserratBold, Arial, Helvetica, sans-serif;
+  font-size: 16px;
+  margin-bottom: 2px;
+  border-bottom: 1px solid;
+ color: #FF8200;;
+        border-color: #FF8200;
+text-transform: uppercase;
+width: 80%;
+}
 </style>
 
 {% endblock %}
@@ -139,7 +167,8 @@
 {% block javascripts %}
     <script type="text/javascript">
         <!--$("#survey_map").height($(document).height() * 0.7);-->
-       var map = L.map('survey_map', {attributionControl:false, zoomControl: false, maxBoundsViscosity: 1.0}).setView([{{map_center}}], {{ zoom_level|default:6}}),
+       var map = L.map('survey_map').setView([{{map_center}}], {{ zoom_level|default:6}}, {zoomControl: true, doubleClickZoom: false, scrollWheelZoom:false}),
+
     info = L.control(),
     //legend = L.control({position: 'bottomright'}),
     geojson;
@@ -253,7 +282,7 @@ function getColorFor(rate) {
            rate > 20 && rate <= 40  ? '#FC4E2A' :
            rate > 0  && rate <= 20  ? '#FD8D3C' :
            rate == 0 ? '#FFFFFF':
-           '#307ECC';
+           '#8daedb';
     }
 
 function style(feature) {
@@ -264,7 +293,7 @@ function style(feature) {
             fillColor: getColorFor(grades[i-1]),
             weight: 2,
             opacity: 0.55,
-            color: '#FD8D3C',
+            color: '#fff',
             dashArray: '3',
             fillOpacity: 1
         };
@@ -295,7 +324,11 @@ function onEachFeature(feature, layer) {
 
 }
 
-
+info.onAdd = function (map) {
+  this._div = L.DomUtil.create('div', 'info');
+  this.update();
+  return this._div;
+};
 info.update = function (props) {
   var div = document.getElementById('info-update');
   div.innerHTML = '';
@@ -335,13 +368,12 @@ info.update = function (props) {
 
 
 //survey_selector.addTo(map)
-        //fillColor: '#307ECC',
 
 function highlightAdminLevel(event){
     var layer = event.target
     layer.setStyle({
         weight: 3,
-        color:'#666',
+        color:'#FF8200',
         dashArray: '',
         //fillColor: '#95bee5',
         fillOpacity: 0.3
@@ -361,6 +393,7 @@ function zoomAdminLevel(event){
     var adminLevel = layer.feature.properties['{{loc_field}}'];
     if(!adminLevel)
          adminLevel = layer.feature.properties['{{alt_loc_field}}'];
+    //alert('AdminLevel: ' + adminLevel);
 
 }
 
