@@ -4,8 +4,6 @@ import pandas as pd
 from django.db import connection
 from django.db.models import Q
 
-PDS_FETCH_CHUNKSIZE = 10000
-
 
 def normalize_query(query_string,
                     findterms=re.compile(r'"([^"]+)"|(\S+)').findall,
@@ -52,14 +50,10 @@ def get_filterset(objectset, query_string, search_fields):
     return objectset.distinct()
 
 
-
 def to_df(queryset, date_cols=[]):
     @cached_as(queryset)
     def _to_df(queryset, date_cols):
-        df = pd.DataFrame()
+        recors = []
         query, params = queryset.query.sql_with_params()
-        pd_fetch = pd.io.sql.read_sql_query
-        for chunk in pd_fetch(query, connection, params=params, parse_dates=date_cols, chunksize=PDS_FETCH_CHUNKSIZE):
-            df = df.append(chunk, ignore_index=True)
-        return df
+        return pd.io.sql.read_sql_query(query, connection, params=params, parse_dates=date_cols)
     return _to_df(queryset, date_cols)
