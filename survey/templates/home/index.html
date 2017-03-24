@@ -139,13 +139,12 @@ width: 80%;
         <table id="datatables" class="table table-striped table-bordered table-hover table-sort ">
 <!-- <table id="" class="table table-striped table-bordered table-hover dataTable no-footer" role="grid" aria-describedby="dynamic-table_info">
  -->
-         <!-- thead>
+         <thead>
                 <tr role="row">
-                    <th class="sorting" tabindex="0" aria-controls="dynamic-table" rowspan="1" colspan="1" aria-label="Price: activate to sort column ascending">Survey</th>
                     <th class="sorting" tabindex="0" aria-controls="dynamic-table" rowspan="1" colspan="1" aria-label="Domain: activate to sort column ascending">Indicator</th>
                     <th class="hidden-480 sorting" tabindex="0" aria-controls="dynamic-table" rowspan="1" colspan="1" aria-label="Clicks: activate to sort column ascending">Value</th>
                  </tr>
-            </thead -->
+            </thead>
             <tbody>
                 {% for indicator in display_indicators %}
                   <tr>
@@ -167,7 +166,7 @@ width: 80%;
 {% block javascripts %}
     <script type="text/javascript">
         <!--$("#survey_map").height($(document).height() * 0.7);-->
-       var map = L.map('survey_map').setView([{{map_center}}], {{ zoom_level|default:6}}, {zoomControl: true, doubleClickZoom: false, scrollWheelZoom:false}),
+       var map = L.map('survey_map', {zoomControl: false, doubleClickZoom: false, scrollWheelZoom:false, attributionControl: false}).setView([{{map_center}}], {{ zoom_level|default:6}}),
 
     info = L.control(),
     //legend = L.control({position: 'bottomright'}),
@@ -175,7 +174,8 @@ width: 80%;
     map.dragging.disable();
     map.touchZoom.disable();
     map.doubleClickZoom.disable();
-  osmAttrib='© uSurvey';
+  //osmAttrib=;
+    L.control.attribution({prefix: '© uSurvey'}).addTo(map);
   var mapData = null;
 
 $(function(){
@@ -325,9 +325,7 @@ function onEachFeature(feature, layer) {
 }
 
 info.onAdd = function (map) {
-  this._div = L.DomUtil.create('div', 'info');
-  this.update();
-  return this._div;
+
 };
 info.update = function (props) {
   var div = document.getElementById('info-update');
