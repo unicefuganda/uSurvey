@@ -31,7 +31,7 @@ def ussd_flow(request):
                 request.GET = request_data
             if request.method == 'POST':
                 request.POST = request_data
-            _response = get_access_details(request)
+            _response = respond(request)
             response = settings.USSD_RESPONSE_FORMAT % {'response': _response.content.strip()}
         else:
             response = 'Invalid mobile number for your region'
@@ -40,7 +40,7 @@ def ussd_flow(request):
     return HttpResponse(response, content_type='text/plain')
 
 
-def get_access_details(request):
+def respond(request):
     request_data = request.GET if request.method == 'GET' else request.POST
     if 'uid' in request_data:
         access_form = UserAccessForm(data=request_data)
