@@ -13,6 +13,9 @@
     {% block prefilter %}
 
     {% endblock %}
+    {% block postfilter %}
+
+{% endblock %}
     <div class="col-lg-12 col-xs-1 col-md-1 {{ class }} horizontal-filter">
         <div id="control-group">
             {% for field in a_form.visible_fields %}
@@ -51,9 +54,7 @@
         {% endif %}
 
 </div>
-{% block postfilter %}
 
-{% endblock %}
 
 </form>
     <script src="{{ STATIC_URL }}/js/jquery-2.0.0.min.js" type="text/javascript" charset="utf-8"></script>
