@@ -264,7 +264,7 @@
 </li>
 
 
-
+{% if user.is_authenticated %}
 <li><a href='#'>SETTINGS</a>
    <ul>      
       {% if user.is_superuser == True %}
@@ -283,6 +283,7 @@
       {% endif %}    
    </ul>
 </li>
+{% endif %}
 
 <li>
 {% has_super_powers request as has_powers %}
