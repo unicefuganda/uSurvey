@@ -357,6 +357,10 @@ MAP_CENTER = '1.34,32.683525'           # must be in format for log lat. see: ht
 MAP_ADMIN_LEVEL = 1      # 0 for country level, 1 first level below country, 2 for second level etc.
 MAP_ZOOM_LEVEL = 7
 
+USSD_MOBILE_NUMBER_FIELD = 'msisdn'             # for get or post request
+USSD_MSG_FIELD = 'ussdRequestString'            # for get or post request
+USSD_RESPONSE_FORMAT = 'responseString=%(response)s&action=1'
+
 RESULT_REFRESH_FREQ = 6
 MEMORIZE_TIMEOUT = 120
 

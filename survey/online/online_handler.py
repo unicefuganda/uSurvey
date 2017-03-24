@@ -41,16 +41,16 @@ class OnlineHandler(object):
         access = self.access
         slogger.debug('starting request with: %s' % locals())
         session_data = get_entry(access, REQUEST_SESSION, {})
-        slogger.info('fetched: %s. session data: %s' % (access.user_identifier, session_data))
+        slogger.debug('fetched: %s. session data: %s' % (access.user_identifier, session_data))
         response = self.respond(request, session_data)
-        slogger.info('the session %s, data: %s' % (access.user_identifier, session_data))
+        slogger.debug('the session %s, data: %s' % (access.user_identifier, session_data))
         if session_data:
             set_entry(access, REQUEST_SESSION, session_data)
-            slogger.info('updated: %s session data: %s' % (access.interviewer, session_data))
+            slogger.debug('updated: %s session data: %s' % (access.interviewer, session_data))
         else:
             # session data has been cleared then remove the session space
             delete_entry(access)
-            slogger.info('removed: %s session data' % access.id)
+            slogger.debug('removed: %s session data' % access.id)
         return response
 
     def respond(self, request, session_data):

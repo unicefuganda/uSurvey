@@ -1,11 +1,13 @@
 #!/usr/bin/env python
 __author__ = 'anthony <antsmc2@gmail.com>'
+import phonenumbers
+from django.conf import settings
 from django.utils import timezone
 from django.shortcuts import render
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from survey.models import (InterviewerAccess, QuestionLoop, QuestionSet, Answer, Question,
                            SurveyAllocation, AnswerAccessDefinition, ODKAccess)
 from survey.forms.answer import (get_answer_form, UserAccessForm,
@@ -13,7 +15,31 @@ from survey.forms.answer import (get_answer_form, UserAccessForm,
 from .online_handler import OnlineHandler, show_only_answer_form, get_display_format
 
 
-@login_required
+def ussd_flow(request):
+    request_data = request.GET if request.method == 'GET' else request.POST
+    request_data = request_data.copy()
+    request_data['format'] = 'text'
+    mobile = request_data.get(settings.USSD_MOBILE_NUMBER_FIELD, '')
+    response = ''
+    try:
+        pn = phonenumbers.parse(mobile, settings.COUNTRY_CODE)
+        if phonenumbers.is_valid_number_for_region(pn, settings.COUNTRY_CODE):
+            mobile = pn.national_number
+            request_data['uid'] = mobile
+            request_data['value'] = request_data.get(settings.USSD_MSG_FIELD, '')
+            if request.method == 'GET':
+                request.GET = request_data
+            if request.method == 'POST':
+                request.POST = request_data
+            _response = get_access_details(request)
+            response = settings.USSD_RESPONSE_FORMAT % {'response': _response.content.strip()}
+        else:
+            response = 'Invalid mobile number for your region'
+    except phonenumbers.NumberParseException:
+        response = 'Invalid mobile number'
+    return HttpResponse(response, content_type='text/plain')
+
+
 def get_access_details(request):
     request_data = request.GET if request.method == 'GET' else request.POST
     if 'uid' in request_data:

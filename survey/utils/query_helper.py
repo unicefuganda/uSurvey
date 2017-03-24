@@ -53,7 +53,6 @@ def get_filterset(objectset, query_string, search_fields):
 def to_df(queryset, date_cols=[]):
     @cached_as(queryset)
     def _to_df(queryset, date_cols):
-        recors = []
         query, params = queryset.query.sql_with_params()
         return pd.io.sql.read_sql_query(query, connection, params=params, parse_dates=date_cols)
     return _to_df(queryset, date_cols)

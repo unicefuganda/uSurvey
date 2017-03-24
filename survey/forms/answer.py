@@ -182,11 +182,15 @@ class AddMoreLoopForm(BaseSelectInterview, USSDSerializable):
 class UserAccessForm(forms.Form):
     uid = forms.CharField(label='Mobile/ODK ID', max_length=25)
 
+    def text_error(self):
+        if self.errors:
+            return self.errors['uid'][0]
+
     def clean_uid(self):
         try:
             access = InterviewerAccess.get(user_identifier=self.cleaned_data['uid'])
         except InterviewerAccess.DoesNotExist:
-            raise ValidationError('No such user')
+            raise ValidationError('No such interviewer')
         return access
 
 
