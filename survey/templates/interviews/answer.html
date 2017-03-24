@@ -1,22 +1,13 @@
 {% load template_tags %}
 {% if display_format == 'text' %}
-  {% if answer_form.errors %}
-      {{answer_form.text_error}}
-  {% endif %}
-   {% if interview %}
-      {{ answer_form.render_prepend_ussd }}
-      {% if 'prompt_user_loop' in loops %}
-         {% if loops.prompt_user_loop %}{{loops.prompt_user_loop}}{% else %}Do you want to add another Loop?{% endif %}
-         {{ answer_form.render_extra_ussd }}
-      {% else %}
-         {% build_question_text interview.last_question.text existing_answers as text %}
-         {% if text %}
-         {{text}} ({{interview.last_question.answer_type}})
-         {{ answer_form.render_extra_ussd }}
-         {% endif %}
-      {% endif %}
-   {% else %}
-Welcome {{access.interviewer.name}}!
+{% comment %} being careful about the spacing since the target is USSD or plain text {% endcomment %}
+{% if answer_form.errors %}{{answer_form.text_error}}{% endif %}
+{% if interview %}{% if 'prompt_user_loop' in loops %}{% if loops.prompt_user_loop %}{{loops.prompt_user_loop}}{% else %}Do you want to add another Loop?{% endif %}{{ answer_form.render_extra_ussd }}{% else %}{% build_question_text interview.last_question.text existing_answers as text %}
+{% if text %}{{text}} ({{interview.last_question.answer_type}})
+{{ answer_form.render_extra_ussd }}{% endif %}
+{% endif %}
+{% else %}
+{% if access %}Welcome {{access.interviewer.name}}!{% endif %}
 {{ answer_form.render_extra_ussd }}
     {% endif %}
 {% else %}
@@ -35,7 +26,7 @@ Welcome {{access.interviewer.name}}!
              </div>
            </div>
          <script src="{{STATIC_URL}}/js/jquery.countdown.js" type="text/javascript" charset="utf-8"></script>
-         <script src="{{STATIC_URL}}js/simulator.js" type="text/javascript" charset="utf-8"></script -->
+         <script src="{{STATIC_URL}}js/simulator.js" type="text/javascript" charset="utf-8"></script>
          {% endif %}
          {% endcomment %}
       </div>
