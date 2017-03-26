@@ -2,8 +2,8 @@ import pandas as pd
 from django.core.mail import EmailMessage
 from django.conf import settings
 from django.db.models.sql.datastructures import EmptyResultSet
-from survey.models import LocationTypeDetails, Location, LocationType, Household, HouseholdMember, \
-    HouseholdMemberGroup, Answer, MultiChoiceAnswer, MultiSelectAnswer, NumericalAnswer, QuestionOption, Interview
+from survey.models import (Location, LocationType, Answer, MultiChoiceAnswer, MultiSelectAnswer,
+                           NumericalAnswer, QuestionOption, Interview)
 from survey.utils.query_helper import to_df
 from datetime import datetime
 import StringIO

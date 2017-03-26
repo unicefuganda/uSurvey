@@ -1,13 +1,12 @@
 __author__ = 'anthony'
-
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.utils.safestring import mark_safe
 from django import forms
 from form_helper import FormOrderMixin
-from survey.models import Answer, Interview, VideoAnswer, AudioAnswer, ImageAnswer, TextAnswer, NumericalAnswer,\
-    MultiChoiceAnswer, MultiSelectAnswer, DateAnswer, SurveyAllocation, EnumerationArea, Survey, QuestionSet, \
-    Interviewer, InterviewerAccess, USSDAccess, QuestionOption
-from django.conf import settings
+from survey.models import (Answer, Interview, VideoAnswer, AudioAnswer, ImageAnswer, TextAnswer, NumericalAnswer,
+                           MultiChoiceAnswer, MultiSelectAnswer, DateAnswer, SurveyAllocation, EnumerationArea,
+                           Survey, QuestionSet, Interviewer, InterviewerAccess, USSDAccess, QuestionOption)
 
 
 class USSDSerializable(object):
@@ -16,9 +15,15 @@ class USSDSerializable(object):
         return ''
 
     def render_extra_ussd(self):
+        """Basically used by implementing classes to render ussd versions of their forms
+        :return:
+        """
         pass
 
     def render_extra_ussd_html(self):
+        """Basically used by implementing classes to render ussd Preview versions of their forms on HTML
+        :return:
+        """
         pass
 
     def text_error(self):
@@ -60,8 +65,7 @@ def get_answer_form(interview, access=None):
             if question.answer_type == MultiSelectAnswer.choice_name():
                 self.fields['value'] = forms.ModelMultipleChoiceField(queryset=question.options.all(),
                                                                       widget=forms.CheckboxSelectMultiple)
-            accept_types = {
-                            AudioAnswer.choice_name(): 'audio/*',
+            accept_types = {AudioAnswer.choice_name(): 'audio/*',
                             VideoAnswer.choice_name(): 'video/*',
                             ImageAnswer.choice_name(): 'image/*'
                             }
@@ -145,7 +149,7 @@ class AddMoreLoopForm(BaseSelectInterview, USSDSerializable):
             self.fields['value'] = forms.IntegerField()
         else:
             self.fields['value'] = forms.ChoiceField(choices=self.CHOICES, widget=forms.RadioSelect)
-
+        self.fields['value'].label = 'Answer'
 
     def render_extra_ussd(self):
         text = []
@@ -160,22 +164,6 @@ class AddMoreLoopForm(BaseSelectInterview, USSDSerializable):
     class Meta:
         model = Interview
         fields = []
-
-#
-# class TestFlowInterviewForm(BaseSelectInterview):
-#
-#     def __init__(self, request, access, qset, *args, **kwargs):
-#         super(TestFlowInterviewForm, self).__init__(request, access, *args, **kwargs)
-#         self.fields['survey'].queryset = Survey.objects.filter(pk__in=[sa.survey.pk for sa in
-#                                                                        self.interviewer.unfinished_assignments])
-#         self.fields['survey'].empty_label = 'Select Survey'
-#         self.fields['ea'].queryset = EnumerationArea.objects.filter(pk__in=[sa.allocation_ea.pk for sa in
-#                                                                             self.interviewer.unfinished_assignments])
-#         self.fields['ea'].empty_label = 'Select EA'
-#
-#     class Meta:
-#         model = Interview
-#         fields = ['survey', 'ea', ]
 
 
 class UserAccessForm(forms.Form):

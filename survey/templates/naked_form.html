@@ -1,21 +1,8 @@
 {% load template_tags %}
-{% for field in a_form.visible_fields %}
-
-  <!-- div class="element-input">
-      <label class="title" for="{{field.auto_id}}">{{field.label}}</label>
-      <div class="item-cont">
-          {{field}}
-          <span class="icon-place"></span>&nbsp;&nbsp;<span id="{{field.auto_id}}_tip" class="help tip">{{ field.help_text }}</span>
-          {% if field.errors %}
-            <label class="error" >
-                {% for error in field.errors %}
-                    {{ error}}
-                {% endfor %}
-             </label>
-        {% endif %}
-      </div>
-  </div -->
-  <style type="text/css">
+ <style type="text/css">
+     .controls {
+        margin-bottom: 20px;
+     }
     #id_gender{
       display: inline-block;
       vertical-align: middle;
@@ -54,15 +41,15 @@
     background: url('/static/img/iphone.png') no-repeat center;
     }
     .geni {
-    width:247px; 
-    margin:0px auto; 
-    padding-top:57px; 
-    padding-left:6px; 
+    width:247px;
+    margin:0px auto;
+    padding-top:57px;
+    padding-left:6px;
     z-index:1;
     }
     .exod {
     text-algin:center;
-    margin-bottom:5px;  
+    margin-bottom:5px;
     }
     #id_gender{
     display: inline-block;
@@ -96,7 +83,7 @@
     }
     .exod {
     text-algin:center;
-    margin-bottom:5px;  
+    margin-bottom:5px;
     }
 
 .int-part{margin-top: 10px;}
@@ -104,7 +91,7 @@
  .subh {
     color: #093;
     font-size: 13px;
-}
+ }
 
 /*.form-horizontal .control-label {
     line-height: 28px;
@@ -122,31 +109,22 @@
     width: 100%;
 }
 </style>
+{% for field in a_form.visible_fields %}
   <div id="{{field.auto_id}}-control-group" class="control-group int-part">
-      <!-- <br /><br /> -->
     <div class="controls {{ field|is_radio }}">
-    <!-- <label class="control-label" for="{{field.auto_id}}">{{field.label}}
-    </label>
-        {{field}} -->
-        <label class="control-label" for="{{field.auto_id}}">{{field.label}}
-    </label>
+        <label class="control-label" for="{{field.auto_id}}" style="padding: 0;">{{field.label}}</label>
     {% if field.name == 'ea' %}
-      
       <div class="row" style="padding-bottom:20px;">
         <div class="col-md-2 col-sm-1">
         </div>
         <div class="col-md-3 col-sm-2">
-        <strong>All EA's</strong><span style="margin-left: 100px;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><strong>Selected EA's</strong>
+            <strong>All EA's</strong><span style="margin-left: 100px;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><strong>Selected EA's</strong>
         </div>
         <div class="col-md-2 col-sm-1 "></div>
-        
       </div>
       {{field}}
-      
     {%else%}
-
        {{field}}
-
     {%endif%}
         {% if field.field.icons %}
             <div class="input-prepend" style="display: inline-block; border: none;">
@@ -168,7 +146,7 @@
             </div>
         {% endif %}
         {% if field.errors %}
-        <label class="error" style="color:red;" >
+        <label class="error" style="color:red; padding-bottom:10px; padding-top:10px;" >
             {% for error in field.errors %}
                 {{ error}}
             {% endfor %}

@@ -158,15 +158,6 @@ class Question(CloneableMixin, GenericQuestion):
         answers = self.multichoiceanswer.all()
         return self._format_answer(locations, answers, survey)
 
-    def _format_answer(self, locations, answers, survey):
-        question_options = self.options.all()
-        data = OrderedDict()
-        for location in locations:
-            households = Household.all_households_in(location, survey)
-            data[location] = {option.text: answers.filter(value=option, interview__householdmember__household__in=households).count() for option in
-                              question_options}
-        return data
-
     @property
     def loop_story(self):
         return self.qset.get_loop_story()[self.id]

@@ -1,6 +1,7 @@
 import string
 import re
 import redis
+from django.core.cache import cache
 from cacheops import cached_as
 from dateutil import relativedelta
 from datetime import date
@@ -11,8 +12,8 @@ from django.core.urlresolvers import reverse
 from survey.interviewer_configs import MONTHS
 from survey.models.helper_constants import CONDITIONS
 from survey.utils.views_helper import get_ancestors
-from survey.models import Survey, Question, Batch, Interviewer, MultiChoiceAnswer, \
-    GroupCondition, Answer, AnswerAccessDefinition, ODKAccess, HouseholdMember, SurveyAllocation
+from survey.models import (Survey, Question, Batch, Interviewer, MultiChoiceAnswer, Answer, AnswerAccessDefinition,
+                           ODKAccess, SurveyAllocation)
 from survey.models import AudioAnswer
 from survey.models import ImageAnswer
 from survey.models import QuestionSet
@@ -116,8 +117,6 @@ def get_value(obj, key):
         return getattr(obj, key)
     elif callable(obj):
         return obj(key)
-
-
 
 
 @register.filter
@@ -359,24 +358,6 @@ def get_sample_data_display(sample):
             pass
     question_context = template.Context(context)
     return template.Template(html.escape(naming_label)).render(question_context)
-
-
-
-@register.assignment_tag
-def get_odk_mem_question(question):
-    surname = HouseholdMember._meta.get_field('surname')
-    first_name = HouseholdMember._meta.get_field('first_name')
-    gender = HouseholdMember._meta.get_field('gender')
-    context = {
-        surname.verbose_name.upper().replace(' ', '_'):
-        mark_safe('<output value="/survey/household/householdMember/surname"/>'),
-        first_name.verbose_name.upper().replace(' ', '_'):
-        mark_safe('<output value="/survey/household/householdMember/firstName"/>'),
-        gender.verbose_name.upper().replace(' ', '_'):
-            mark_safe('<output value="/survey/household/householdMember/sex"/>'),
-    }
-    question_context = template.Context(context)
-    return template.Template(html.escape(question.text)).render(question_context)
 
 
 @register.assignment_tag

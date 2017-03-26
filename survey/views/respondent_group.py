@@ -1,22 +1,14 @@
 import json
-
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.contrib import messages
 from django.contrib.auth.decorators import permission_required
 from django.core.urlresolvers import reverse
-from survey.models import RespondentGroup, ParameterTemplate, GroupCondition,RespondentGroupCondition
-from survey.forms.group_condition import GroupConditionForm
+from survey.models import RespondentGroup, ParameterTemplate, RespondentGroupCondition
 from survey.forms.respondent_group import GroupForm
 from survey.utils.views_helper import contains_key
 from survey.utils.query_helper import get_filterset
-
-@permission_required('auth.can_view_household_groups')
-def conditions(request):
-    conditions = GroupCondition.objects.all().order_by('condition')
-    return render(request, 'respondent_groups/conditions/index.html',
-                  {'conditions': conditions, 'add_condition_url': 'new_group_condition', 'request': request})
 
 
 @permission_required('auth.can_view_interviewers')
@@ -26,44 +18,6 @@ def index(request):
     if request.GET.has_key('q'):
         groups = get_filterset(groups, request.GET['q'], search_fields)
     return render(request, 'respondent_groups/index.html', {'groups': groups, 'request': request})
-
-
-def _get_conditions_hash():
-    condition = GroupCondition.objects.all().latest('created')
-    return {'id': condition.id,
-            'value': "%s > %s > %s" % (condition.attribute, condition.condition, condition.value)}
-
-
-@permission_required('auth.can_view_household_groups')
-def add_condition(request):
-    response = None
-    condition_form = GroupConditionForm()
-
-    if request.is_ajax():
-        condition_form = GroupConditionForm(data=request.POST)
-        _process_condition_form(request, condition_form)
-        conditions = _get_conditions_hash()
-        return HttpResponse(json.dumps(conditions), content_type='application/json')
-
-    elif request.method == 'POST':
-        condition_form = GroupConditionForm(data=request.POST)
-        response = _process_condition_form(request, condition_form)
-    context = {'button_label': 'Save',
-               'title': 'New Criteria',
-               'id': 'add-condition-form',
-               'action': '/conditions/new/',
-               'request': request,
-               'condition_form': condition_form}
-
-    return response or render(request, 'respondent_groups/conditions/new.html', context)
-
-
-def has_valid_condition(data):
-    if contains_key(data, 'conditions'):
-        corresponding_condition = GroupCondition.objects.filter(
-            id=int(data['conditions']))
-        return corresponding_condition
-    return False
 
 
 def _process_condition_form(request, condition_form):
@@ -100,13 +54,11 @@ def add_group(request):
         response = _process_groupform(
             request, group_form, action='added')
     context = {'groups_form': group_form,
-               'conditions': GroupCondition.objects.all(),
                'title': "New Group",
                'button_label': 'Create',
                'id': 'add_group_form',
                'action': reverse('new_respondent_groups_page'),
                'cancel_url': reverse('respondent_groups_page'),
-               'condition_form': GroupConditionForm(),
                'parameter_questions': ParameterTemplate.objects.all(),
                'condition_title': "New Eligibility Criteria"}
     request.breadcrumbs([
@@ -116,45 +68,7 @@ def add_group(request):
 
 
 @permission_required('auth.can_view_household_groups')
-def details(request, group_id):
-    group = RespondentGroup.objects.get(id=group_id)
-    conditions = GroupCondition.objects.filter(groups__id=group_id)
-    if not conditions.exists():
-        messages.error(request, "No conditions in this group.")
-        return HttpResponseRedirect("/groups/")
-    return render(request, "household_member_groups/conditions/index.html",
-                  {'conditions': conditions, 'add_condition_url': 'new_condition_for_group', 'group': group})
-
-
-@permission_required('auth.can_view_household_groups')
-def add_group_condition(request, group_id):
-    condition_form = GroupConditionForm()
-    if request.method == 'POST':
-        condition_form = GroupConditionForm(data=request.POST)
-        if condition_form.is_valid():
-            try:
-                group = RespondentGroup.objects.get(id=group_id)
-                condition = condition_form.save()
-                condition.groups.add(group)
-                condition.save()
-                messages.success(request, "Criteria successfully added.")
-                redirect_url = '/groups/%s/' % group_id
-            except ObjectDoesNotExist:
-                messages.error(request, "Group does not exist.")
-                redirect_url = '/groups/'
-            return HttpResponseRedirect(redirect_url)
-
-    context = {'button_label': 'Create',
-               'title': 'New Criteria',
-               'id': 'add-condition-to-group-form',
-               'action': '/groups/%s/conditions/new/' % group_id,
-               'request': request,
-               'condition_form': condition_form}
-    return render(request, 'respondent_groups/conditions/new.html', context)
-
-
-@permission_required('auth.can_view_household_groups')
-def edit_group(request, group_id):    
+def edit_group(request, group_id):
     response = None
     group = RespondentGroup.objects.get(id=group_id)
     group_form = GroupForm(instance=group)
@@ -168,7 +82,6 @@ def edit_group(request, group_id):
                'id': 'add_group_form',
                'action': reverse('respondent_groups_edit', args=(group_id,)),
                'cancel_url': reverse('respondent_groups_page'),
-               'condition_form': GroupConditionForm(),
                'parameter_questions': ParameterTemplate.objects.all(),
                'condition_title': "New Eligibility Criteria"}
     request.breadcrumbs([
@@ -189,12 +102,7 @@ def delete_group(request, group_id):
         print err
         messages.success(request, "Group does not exist.")
     return HttpResponseRedirect("/groups/")
-    # member_group = RespondentGroup.objects.get(id=group_id)
-    # if RespondentGroup.objects.filter(name=member_group).exists():
-    #     messages.error(request, "Respondent Group cannot be deleted.")
-    # else:
-    #     member_group.delete()
-    # return HttpResponseRedirect('/groups/')
+
 
 @permission_required('auth.can_view_household_groups')
 def delete_condition(request, condition_id):

@@ -1,31 +1,38 @@
 from datetime import datetime
+import pytz
 import os
+import base64
+import random
 import logging
+from functools import wraps
 from django.template.loader import render_to_string
-from django.views.decorators.http import require_GET
+from django.views.decorators.http import require_GET, require_POST
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import csrf_exempt
-from django.shortcuts import get_object_or_404
-from django.shortcuts import render
+from django.shortcuts import render_to_response, get_object_or_404, render
 from django.http import HttpResponse, HttpResponseBadRequest, \
     HttpResponseRedirect, HttpResponseForbidden, Http404, StreamingHttpResponse
+from django.core.servers.basehttp import FileWrapper
+from django.core.files.storage import get_storage_class
 from django.contrib.auth.decorators import login_required, permission_required
+from django.core.urlresolvers import reverse
+from django.core.exceptions import PermissionDenied
 from django.conf import settings
-from django.template import Context
-from django.template import loader
-from survey.odk.utils.log import audit_log, Actions, logger
-from survey.odk.utils.odk_helper import get_survey_allocation, process_submission, disposition_ext_and_date, \
-    get_zipped_dir,  \
-    response_with_mimetype_and_name, OpenRosaResponseBadRequest, OpenRosaRequestForbidden, OpenRosaRequestConflict, \
-    OpenRosaResponseNotAllowed, OpenRosaResponse, OpenRosaResponseNotFound, OpenRosaServerError, \
-    BaseOpenRosaResponse, HttpResponseNotAuthorized, http_digest_interviewer_auth, NotEnoughData
-from survey.models import (Survey, Interviewer, Household, ODKSubmission, Answer, Batch, SurveyHouseholdListing,
-                           HouseholdListing, SurveyAllocation, ODKFileDownload, Interview, QuestionSet)
+from django.template import RequestContext, loader, Context
+from .utils.log import audit_log, Actions, logger
+from .utils.odk_helper import (get_survey_allocation, process_submission, disposition_ext_and_date, get_zipped_dir,
+                               response_with_mimetype_and_name, OpenRosaResponseBadRequest, OpenRosaRequestForbidden,
+                               OpenRosaRequestConflict, OpenRosaResponseNotAllowed, OpenRosaResponse,
+                               OpenRosaResponseNotFound, OpenRosaServerError, BaseOpenRosaResponse,
+                               HttpResponseNotAuthorized, http_digest_interviewer_auth, NotEnoughData)
+from survey.models import (Survey, Interviewer, ODKSubmission, Answer, Batch,
+                           SurveyAllocation, ODKFileDownload, Interview, QuestionSet)
 from survey.models import ListingSample
 from django.utils.translation import ugettext as _
+from django.contrib.sites.models import Site
 from survey.utils.query_helper import get_filterset
 from survey.models import BatchLocationStatus
-from survey.interviewer_configs import MESSAGES
+from survey.interviewer_configs import LEVEL_OF_EDUCATION, NUMBER_OF_HOUSEHOLD_PER_INTERVIEWER
 from collections import OrderedDict
 
 
@@ -52,7 +59,6 @@ def get_survey_xform(allocation):
         'survey': survey,
         'allocation': allocation,
         'survey_batches': batches,
-        'messages': MESSAGES,
         'loop_starters': loop_starters,
         'loop_enders': loop_enders,
         'loop_boundaries': loop_boundaries,
@@ -66,7 +72,6 @@ def get_qset_xform(interviewer, allocations, qset, ea_samples={}):
         'qset': qset,
         'stage': allocations[0].stage,
         'assignments': allocations,
-        'messages': MESSAGES,
         'answer_types': dict([(cls.__name__.lower(), cls.choice_name()) for cls in Answer.supported_answers()]),
         'ea_samples': ea_samples,
     })
@@ -204,7 +209,7 @@ def download_listing_xform(request):
     interviewer = request.user
     assignments = get_survey_allocation(interviewer)
     qset = assignments[0].survey.listing_form
-    OpenRosaResponseNotFound('No survey allocated')
+    response = OpenRosaResponseNotFound('No survey allocated')
     return _get_qset_response(request, interviewer, assignments, qset)
 
 
@@ -242,6 +247,7 @@ def submission(request):
     #get_object_or_404(Interviewer, mobile_number=username, odk_token=token)
     submission_date = datetime.now().isoformat()
     xml_file_list = []
+    html_response = False
     # request.FILES is a django.utils.datastructures.MultiValueDict
     # for each key we have a list of values
     try:

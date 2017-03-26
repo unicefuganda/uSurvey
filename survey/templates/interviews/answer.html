@@ -37,6 +37,7 @@
                <div id="answer_section" class="block">
                   <div class="previewstyle">
                      <h5>{{interview.question_set.name}}</h5>
+                     <br /><br />
                      {% if answer_form.errors %}
                      <div id="non_field_errors" class="alert alert-error">{{ answer_form.non_field_errors }}</div>
                      {%  endif %}
@@ -55,7 +56,6 @@
                               {% endfor %}
                            </div>
                            {%  endif %}
-                           <br>
                            {% csrf_token %}
                            {% if 'prompt_user_loop' in loops %}
                            <div class="subh">{% if loops.prompt_user_loop %}{{loops.prompt_user_loop}}{% else %}Do you want to add another Loop?{% endif %}</div>
@@ -66,11 +66,11 @@
                               {% endif %}
                            {% endif %}
                            <div id="id_uid-control-group" class="control-group" >
-                              <!-- <br /><br /> -->
                               <div class="controls exod">
                                  {% if access.choice_name == 'Ussd Access' %}
-                                 {{ answer_form.render_extra_ussd_html }}
+                                 <div>{{ answer_form.render_extra_ussd_html }}</div>
                                  {% endif %}
+                                 <br /><br />
                                  {% include "naked_form.html" with a_form=answer_form %}
                               </div>
                            </div>
