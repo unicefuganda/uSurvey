@@ -1,4 +1,3 @@
-from random import randint
 
 from lettuce import *
 from survey.models.householdgroups import HouseholdMemberGroup, GroupCondition

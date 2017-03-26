@@ -1,4 +1,3 @@
-from django.core import serializers
 from session_mgmt import manage
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt

@@ -1,13 +1,20 @@
-from datetime import date, datetime
 from django.test import TestCase
 from survey.models.locations import LocationType, Location
-from survey.models import HouseholdMemberGroup, LocationTypeDetails, GroupCondition, Backend, Interviewer, Household, Question, HouseholdMemberBatchCompletion, Batch, QuestionModule, EnumerationArea
+from survey.models import Backend
+from survey.models import Batch
+from survey.models import EnumerationArea
+from survey.models import GroupCondition
+from survey.models import Household
+from survey.models import HouseholdMemberBatchCompletion
+from survey.models import HouseholdMemberGroup
+from survey.models import Interviewer
+from survey.models import Question
+from survey.models import QuestionModule
 # from survey.models.batch_question_order import BatchQuestionOrder
 from survey.models.batch import Batch, BatchLocationStatus
 from survey.models.households import HouseholdMember, HouseholdListing, SurveyHouseholdListing
 from survey.models.surveys import Survey
 from django.db import IntegrityError
-from survey.models.questions import QuestionFlow
 
 
 class BatchTest(TestCase):
@@ -207,7 +214,7 @@ class BatchTest(TestCase):
         # BatchQuestionOrder.objects.create(question=question_2, batch=batch, order=2)
         # BatchQuestionOrder.objects.create(question=question_3, batch=batch, order=3)
 
-        batch_groups = [group_1, group_2, group_3]
+        [group_1, group_2, group_3]
         self.assertEqual(3, len(Question.objects.filter(batch=batch)))
         [self.assertIn(batch_group, Question.objects.filter(batch=batch).values_list('group__name'))
          for batch_group in Question.objects.filter(batch=batch).values_list('group__name')]

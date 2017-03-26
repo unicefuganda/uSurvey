@@ -1,8 +1,8 @@
 import os
 from django.core.files.uploadedfile import SimpleUploadedFile
 from survey.models.locations import *
-from survey.forms.upload_csv_file import UploadWeightsForm, UploadLocationsForm
-from survey.models import Survey, LocationTypeDetails
+from survey.forms.upload_csv_file import UploadLocationsForm
+from survey.models import LocationTypeDetails
 from survey.tests.base_test import BaseTest
 
 
@@ -112,7 +112,7 @@ class UploadLocationsFormTest(BaseTest):
                 ['region2', '002', 'district2', 'county2']]
 
         self.write_to_csv('wb', data)
-        file = open('test.csv', 'rb')
+        open('test.csv', 'rb')
         data_file = {'file': SimpleUploadedFile(
             self.filename, self.file.read())}
 

@@ -1,13 +1,9 @@
-from collections import OrderedDict
 from django.core.exceptions import ValidationError
-from django.db import IntegrityError
-from django.db.models import Q
 from django import forms
 from form_helper import FormOrderMixin
 from survey.models import Answer, MultiChoiceAnswer, MultiSelectAnswer, DateAnswer, QuestionFlow, \
     Question, TextArgument, NumericalAnswer, TextAnswer, TemplateOption
 from survey.models import QuestionLoop, FixedLoopCount, PreviousAnswerCount
-from survey.models.helper_constants import CONDITIONS
 
 
 
@@ -58,7 +54,7 @@ class LogicForm(forms.Form):
         self.fields['action'] = forms.ChoiceField(
             label='Then', choices=[], widget=forms.Select, required=True)
         flows = self.question.flows.all()
-        existing_nexts = [f.next_question.pk for f in flows if f.next_question]
+        [f.next_question.pk for f in flows if f.next_question]
         next_q_choices = [(q.pk, q.text) for q in batch.questions_inline(
         ) if q.pk is not self.question.pk]
         # and q.pk not in existing_nexts]
@@ -69,7 +65,7 @@ class LogicForm(forms.Form):
         #self.fields['next_question'].widget.attrs['class'] = 'chzn-select'
         self.fields['action'].choices = self.ACTIONS.items()
 
-        action_sent = data.get('action', None) if data else None
+        data.get('action', None) if data else None
 
     def clean_value(self):
 
@@ -119,9 +115,7 @@ class LogicForm(forms.Form):
         return self.cleaned_data.get('next_question', '')
 
     def clean(self):
-        field_name = ""
-        rule = []
-        desc = self._make_desc()
+        self._make_desc()
         flows = QuestionFlow.objects.filter(question=self.question)
 
         if len(flows) > 0:

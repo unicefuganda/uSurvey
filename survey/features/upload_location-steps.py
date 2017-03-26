@@ -9,7 +9,6 @@ from survey.features.page_objects.accounts import LoginPage
 from survey.features.page_objects.location_hierarchy import AddLocationHierarchyPage
 from survey.features.page_objects.uploads import UploadLocationsPage
 from survey.models import LocationTypeDetails
-from survey.tests.base_test import BaseTest
 
 
 def set_permissions(group, permissions_codename_list):

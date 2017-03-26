@@ -4,20 +4,17 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render
 from django.contrib import messages
 from django.conf import settings
-from django.utils.datastructures import MultiValueDictKeyError
-from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.decorators import login_required, permission_required
-from survey.models import Location, LocationType, SurveyAllocation, SurveyHouseholdListing
+from survey.models import LocationType
+from survey.models import SurveyAllocation
+from survey.models import SurveyHouseholdListing
 from survey.forms.householdHead import *
 from survey.forms.household import *
-from survey.models import Survey, EnumerationArea
 from survey.models.households import Household
 from survey.models.interviewer import Interviewer
-from survey.views.location_widget import LocationWidget
-from survey.utils.views_helper import contains_key
 from survey.utils.query_helper import get_filterset
 from django.core.urlresolvers import reverse
-from survey.forms.enumeration_area import EnumerationAreaForm, LocationsFilterForm
+from survey.forms.enumeration_area import LocationsFilterForm
 
 
 CREATE_HOUSEHOLD_DEFAULT_SELECT = ''

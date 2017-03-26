@@ -49,7 +49,7 @@ class ViewsHelperTest(TestCase):
 
         abim_son_son = Location.objects.create(
             name='KALAKALA', parent=abim_son, type=village)
-        expected_location_descendants = [abim, abim_son, abim_son_son]
+        [abim, abim_son, abim_son_son]
         self.assertIn(abim, get_descendants(abim))
 
     def test_get_descendants_when_include_self_is_false(self):

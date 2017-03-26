@@ -1,10 +1,7 @@
 import json
 from django.template.defaultfilters import slugify
-from datetime import date
 from django.test.client import Client
 from mock import *
-from django.utils.datastructures import MultiValueDictKeyError
-from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.models import User
 from survey.models.locations import *
 from survey.models import LocationTypeDetails, EnumerationArea, HouseholdListing

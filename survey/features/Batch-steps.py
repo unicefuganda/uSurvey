@@ -1,8 +1,10 @@
-from time import sleep
 from lettuce import *
 from rapidsms.contrib.locations.models import *
 
-from survey.features.page_objects.batches import BatchListPage, AddBatchPage, EditBatchPage, AssignQuestionToBatchPage, BatchShowPage
+from survey.features.page_objects.batches import AddBatchPage
+from survey.features.page_objects.batches import AssignQuestionToBatchPage
+from survey.features.page_objects.batches import BatchListPage
+from survey.features.page_objects.batches import EditBatchPage
 from survey.features.page_objects.question import BatchQuestionsListPage
 from survey.features.page_objects.root import HomePage
 from survey.investigator_configs import *

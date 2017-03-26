@@ -1,6 +1,3 @@
-from datetime import date, datetime
-from django.template.defaultfilters import slugify
-from django.test import TestCase
 from django.test.client import Client
 from django.contrib.auth.models import User, Group, Permission
 
@@ -17,7 +14,6 @@ from survey.models.interviewer import Interviewer
 from survey.models.questions import Question, QuestionOption
 from survey.models.surveys import Survey
 from survey.tests.base_test import BaseTest
-from django.http.request import QueryDict, MultiValueDict
 import django_rq
 
 
@@ -91,7 +87,7 @@ class ExcelDownloadTest(BaseTest):
 class ExcelDownloadViewTest(BaseTest):
 
     def test_get(self):
-        client = Client()
+        Client()
         raj = User.objects.create_user('Rajni', 'rajni@kant.com', 'I_Rock')
         user_without_permission = User.objects.create_user(
             username='useless', email='rajni@kant.com', password='I_Suck')
@@ -143,7 +139,7 @@ class ExcelDownloadViewTest(BaseTest):
         survey = Survey.objects.create(name='survey name', description='survey descrpition',
                                             sample_size=10)
         batch = Batch.objects.create(order=1, name="Batch A", survey=survey)
-        client = Client()
+        Client()
         raj = User.objects.create_user('Rajni', 'rajni@kant.com', 'I_Rock')
         user_without_permission = User.objects.create_user(
             username='useless', email='rajni@kant.com', password='I_Suck')
@@ -158,7 +154,7 @@ class ExcelDownloadViewTest(BaseTest):
         self.client.login(username='Rajni', password='I_Rock')
         url = '/aggregates/spreadsheet_report/?District=&County=&Subcounty=&Parish=&survey=%d&batch=%d&multi_option=1&action=Download+Spreadsheet' % (
             survey.id, batch.id)
-        response = self.client.get(url)
+        self.client.get(url)
         rq_queues = django_rq.get_queue('results-queue')
         keys = rq_queues.connection.keys()
         self.assertIn('rq:queue:results-queue', keys)
@@ -189,7 +185,7 @@ class ExcelDownloadViewTest(BaseTest):
         survey = Survey.objects.create(name='survey nam1e', description='survey descrpition',
                                             sample_size=10)
         batch = Batch.objects.create(order=11, name="Batch 1A", survey=survey)
-        client = Client()
+        Client()
         raj = User.objects.create_user('Rajni', 'rajni@kant.com', 'I_Rock')
         user_without_permission = User.objects.create_user(
             username='useless', email='rajni@kant.com', password='I_Suck')
@@ -204,7 +200,7 @@ class ExcelDownloadViewTest(BaseTest):
         self.client.login(username='Rajni', password='I_Rock')
         url = '/aggregates/spreadsheet_report/?District=&County=&Subcounty=&Parish=&survey=%d&batch=%d&multi_option=1&action=Email+Spreadsheet' % (
             survey.id, batch.id)
-        response = self.client.get(url)
+        self.client.get(url)
         keys = django_rq.get_queue('results-queue').connection.keys()
 
         self.assertIn('rq:queue:email', keys)
@@ -296,7 +292,7 @@ class ReportForCompletedInvestigatorTest(BaseTest):
         HouseholdMember.objects.create(surname="su234r", first_name='fir234', gender='MALE', date_of_birth="1988-01-01",
                                        household=household_2, survey_listing=survey_householdlisting,
                                        registrar=investigator_2, registration_channel="ODK Access")
-        expected_data = [investigator_1.name]
+        [investigator_1.name]
         unexpected_data = [investigator_2.name]
 
         post_data = {'survey': survey.id, 'batch': batch.id}

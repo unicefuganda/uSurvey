@@ -1,18 +1,12 @@
 import pandas as pd
-from django.core.mail import send_mail, EmailMessage
+from django.core.mail import EmailMessage
 from django.conf import settings
 from django.db.models.sql.datastructures import EmptyResultSet
 from survey.models import LocationTypeDetails, Location, LocationType, Household, HouseholdMember, \
     HouseholdMemberGroup, Answer, MultiChoiceAnswer, MultiSelectAnswer, NumericalAnswer, QuestionOption, Interview
-from survey.utils.views_helper import get_ancestors
 from survey.utils.query_helper import to_df
 from datetime import datetime
-import csv
 import StringIO
-import string
-from collections import OrderedDict
-import dateutils
-from survey.odk.utils.log import logger
 
 
 class ResultComposer:

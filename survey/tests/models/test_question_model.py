@@ -1,18 +1,10 @@
-from datetime import date
-from random import randint
-from django.core.exceptions import ValidationError
 
 from django.test import TestCase
-from survey.models.locations import LocationType, Location
-from survey.models import GroupCondition, HouseholdHead, QuestionModule, Indicator, Formula, Survey, EnumerationArea
+from survey.models import QuestionModule
 from django.db import IntegrityError
 from survey.models.batch import Batch
-from survey.models.backend import Backend
-from survey.models.households import Household, HouseholdMember
-from survey.models.interviewer import Interviewer
 from survey.models.questions import Question, QuestionOption
 from survey.models.householdgroups import HouseholdMemberGroup
-from survey.tests.base_test import BaseTest
 
 
 class QuestionTest(TestCase):

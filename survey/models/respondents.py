@@ -1,11 +1,10 @@
 __author__ = 'anthony <>'
 from django.db import models
-from model_utils.managers import InheritanceManager
 from survey.models.base import BaseModel
-from survey.models.generics import TemplateQuestion, TemplateOption
+from survey.models.generics import TemplateQuestion
 from survey.models.questions import Question, QuestionSet, QuestionOption, QuestionFlow
-from survey.models.question_templates import QuestionTemplate
-from survey.models.interviews import Answer, MultiChoiceAnswer, MultiSelectAnswer
+from survey.models.interviews import Answer
+from survey.models.interviews import MultiChoiceAnswer
 
 
 class ParameterTemplate(TemplateQuestion):
@@ -108,9 +107,7 @@ class SurveyParameterList(QuestionSet):             # basically used to tag surv
         param_list.questions.all().delete()
         # now create a new
         groups = RespondentGroup.objects.filter(questions__qset=batch)
-        template_questions = []
         question_ids = []
-        options = []
         # loop through groups to get required template parameters
         for group in groups:
             map(lambda condition: question_ids.append(condition.test_question.id), group.group_conditions.all())

@@ -1,7 +1,6 @@
 from django.test.client import Client
 from django.contrib.auth.models import User
 from survey.models.locations import *
-from survey.interviewer_configs import PRIME_LOCATION_TYPE
 
 from survey.tests.base_test import BaseTest
 

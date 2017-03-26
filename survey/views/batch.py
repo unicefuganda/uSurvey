@@ -5,14 +5,13 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib import messages
-from survey.interviewer_configs import *
-from survey.models import QuestionModule, QuestionLoop
+from survey.models import QuestionLoop
 from survey.models import Survey, Location, LocationType
-from survey.models import Survey, Batch, QuestionTemplate, QuestionFlow, QuestionOption
-from survey.models import BatchQuestion as Question
-from survey.forms.batch import BatchQuestionsForm
+from survey.models import Batch
+from survey.models import QuestionFlow
+from survey.models import Survey
 from survey.forms.question_set import BatchForm
-from survey.forms.filters import QuestionFilterForm, BatchOpenStatusFilterForm
+from survey.forms.filters import BatchOpenStatusFilterForm
 from .question_set import QuestionSetView
 from survey.utils.query_helper import get_filterset
 

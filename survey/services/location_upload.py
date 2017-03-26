@@ -1,7 +1,9 @@
 from django.template.defaultfilters import slugify
 # from rapidsms.contrib.locations.models import LocationType, Location
-from survey.models import LocationTypeDetails, UploadErrorLog, Location, LocationType, EnumerationArea
-from survey.models.locations import *
+from survey.models import EnumerationArea
+from survey.models import Location
+from survey.models import LocationType
+from survey.models import UploadErrorLog
 from survey.services.csv_uploader import UploadService
 from django.conf import settings
 

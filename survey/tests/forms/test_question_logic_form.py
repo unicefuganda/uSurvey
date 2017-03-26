@@ -1,9 +1,9 @@
-from datetime import datetime, date, timedelta
+from datetime import datetime
+from datetime import timedelta
 from django.test import TestCase
 from survey.models import QuestionFlow, Question, Survey, Batch, Answer, \
     QuestionModule, HouseholdMemberGroup, MultiSelectAnswer, MultiChoiceAnswer, \
     NumericalAnswer, TextArgument, TextAnswer, DateAnswer, QuestionOption
-from survey.models.backend import Backend
 from survey.forms.logic import LogicForm
 
 
@@ -90,10 +90,8 @@ class LogicFormTest(TestCase):
                 return
             except QuestionFlow.DoesNotExist:
                 self.assertTrue(False, 'flow not existing')
-                pass
             except TextArgument:
                 self.assertTrue(False, 'text agrunments not saved')
-                pass
         else:
             self.assertTrue(False, 'Invalid form %s' % l.errors)
         self.assertTrue(False)
@@ -144,10 +142,8 @@ class LogicFormTest(TestCase):
                 return
             except QuestionFlow.DoesNotExist:
                 self.assertTrue(False, 'flow not existing')
-                pass
             except TextArgument:
                 self.assertTrue(False, 'text agrunments not saved')
-                pass
         else:
             self.assertTrue(False, 'Invalid form: %s' % l.errors)
         self.assertTrue(False)
@@ -198,10 +194,8 @@ class LogicFormTest(TestCase):
                 return
             except QuestionFlow.DoesNotExist:
                 self.assertTrue(False, 'flow not existing')
-                pass
             except TextArgument:
                 self.assertTrue(False, 'text agrunments not saved')
-                pass
         else:
             self.assertTrue(False, 'Invalid form')
         self.assertTrue(False)
@@ -260,10 +254,8 @@ class LogicFormTest(TestCase):
                 return
             except QuestionFlow.DoesNotExist:
                 self.assertTrue(False, 'flow not existing')
-                pass
             except TextArgument:
                 self.assertTrue(False, 'text agrunments not saved')
-                pass
         else:
             self.assertTrue(False, 'Invalid form')
         self.assertTrue(False)
@@ -320,10 +312,8 @@ class LogicFormTest(TestCase):
                 return
             except QuestionFlow.DoesNotExist:
                 self.assertTrue(False, 'flow not existing')
-                pass
             except TextArgument:
                 self.assertTrue(False, 'text agrunments not saved')
-                pass
         else:
             self.assertTrue(False, 'Invalid form')
         self.assertTrue(False)
@@ -374,11 +364,9 @@ class LogicFormTest(TestCase):
                 return
             except QuestionFlow.DoesNotExist:
                 self.assertTrue(False, 'form valid but flow not existing')
-                pass
             except TextArgument:
                 self.assertTrue(
                     False, 'form valid but text agrunments not saved')
-                pass
         else:
             self.assertTrue(True)
 
@@ -437,11 +425,9 @@ class LogicFormTest(TestCase):
                 return
             except QuestionFlow.DoesNotExist:
                 self.assertTrue(False, 'form valid flow not existing')
-                pass
             except TextArgument:
                 self.assertTrue(
                     False, 'Form valid but text agrunments not saved')
-                pass
         else:
             self.assertTrue(True)
 
@@ -500,10 +486,8 @@ class LogicFormTest(TestCase):
                 return
             except QuestionFlow.DoesNotExist:
                 self.assertTrue(False, 'form valid flow not existing')
-                pass
             except TextArgument:
                 self.assertTrue(
                     False, 'Form valid but text agrunments not saved')
-                pass
         else:
             self.assertTrue(True)

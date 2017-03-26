@@ -1,12 +1,12 @@
 import datetime
 from django.contrib.auth.models import User
 from django.test import Client
-from mock import patch
 from survey.models.locations import *
 from survey.forms.upload_csv_file import UploadWeightsForm
-from survey.models import LocationWeight, Survey, UploadErrorLog, LocationTypeDetails
+from survey.models import LocationTypeDetails
+from survey.models import Survey
+from survey.models import UploadErrorLog
 from survey.tests.base_test import BaseTest
-from survey.views.location_widget import LocationWidget
 from django.utils.timezone import utc
 
 

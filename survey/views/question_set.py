@@ -1,31 +1,25 @@
-import ast
 import os
 import json
-from django.core.exceptions import ObjectDoesNotExist
 from django.utils.safestring import mark_safe
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseNotAllowed, HttpResponseNotFound
 from django.shortcuts import render, get_object_or_404
-from django.core.serializers.json import DjangoJSONEncoder
 from django.core.urlresolvers import reverse
 from django.contrib import messages
 from django.contrib.auth.decorators import permission_required, login_required
 from django.utils.decorators import method_decorator
-from django.forms import ValidationError
 from django.conf import settings
-from survey.services.export_interviewers import ExportInterviewersService
 from survey.models import Survey, Location, LocationType, QuestionSet, ListingTemplate, Batch, \
     Question, QuestionTemplate, QuestionOption, QuestionFlow, Answer
-from survey.forms.surveys import SurveyForm
-from survey.views.custom_decorators import handle_object_does_not_exist
 from survey.utils.query_helper import get_filterset
-from survey.models import EnumerationArea, LocationType, Location, BatchCommencement, SurveyHouseholdListing
+from survey.models import LocationType
 from survey.models import Interview
-from survey.forms.enumeration_area import EnumerationAreaForm, LocationsFilterForm
+from survey.forms.enumeration_area import LocationsFilterForm
 from survey.forms.question_set import get_question_set_form
 from survey.forms.question import get_question_form
-from survey.forms.filters import QuestionFilterForm, QuestionSetResultsFilterForm, SurveyResultsFilterForm
+from survey.forms.filters import QuestionSetResultsFilterForm
+from survey.forms.filters import SurveyResultsFilterForm
 from survey.odk.utils.odk_helper import get_zipped_dir
-from survey.services.results_download_service import ResultsDownloadService, ResultComposer
+from survey.services.results_download_service import ResultsDownloadService
 
 model = QuestionSet
 QuestionsForm = get_question_form(Question)
@@ -203,7 +197,7 @@ def listing_entries(request, qset_id):
         listing_qset = ListingTemplate.get(pk=qset_id)
         surveys = listing_qset.survey_settings.all()
         request.breadcrumbs(listing_qset.edit_breadcrumbs(qset=listing_qset))
-        params = request.GET
+        request.GET
         search_fields = ['name', ]
         if request.GET.has_key('q'):
             surveys = get_filterset(surveys, request.GET['q'], search_fields)

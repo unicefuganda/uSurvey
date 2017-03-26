@@ -5,7 +5,6 @@ from django.test.client import Client
 from survey.models.locations import Location, LocationType
 from survey.forms.householdMember import HouseholdMemberForm
 from survey.models.households import HouseholdMember, HouseholdHead, Household, HouseholdListing, SurveyHouseholdListing
-from survey.models.backend import Backend
 from survey.models.interviewer import Interviewer
 from survey.tests.base_test import BaseTest
 from survey.models import EnumerationArea, Survey

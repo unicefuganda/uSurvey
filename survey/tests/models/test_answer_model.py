@@ -2,7 +2,6 @@ from django.test import TestCase
 from survey.models import EnumerationArea
 
 from survey.models.batch import Batch
-from survey.models.backend import Backend
 from survey.models.households import Household, HouseholdListing, HouseholdMember, SurveyHouseholdListing
 from survey.models.interviewer import Interviewer
 from survey.models.surveys import Survey

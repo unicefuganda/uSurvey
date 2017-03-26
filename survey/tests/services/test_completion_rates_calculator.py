@@ -1,11 +1,8 @@
-from datetime import date, datetime
-from django.template.defaultfilters import slugify
-from mock import patch
 from survey.models.locations import *
 from survey.models import Batch, Interviewer, Household, Question, Backend, Survey, HouseholdMemberBatchCompletion, EnumerationArea, \
     HouseholdListing, SurveyHouseholdListing, QuestionModule, HouseholdMemberGroup
 from survey.models.households import HouseholdMember
-from survey.services.completion_rates_calculator import BatchCompletionRates, BatchLocationCompletionRates, BatchHighLevelLocationsCompletionRates, BatchSurveyCompletionRates
+from survey.services.completion_rates_calculator import BatchCompletionRates
 from survey.tests.base_test import BaseTest
 
 

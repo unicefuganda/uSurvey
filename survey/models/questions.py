@@ -1,23 +1,16 @@
-import os
 import copy
-import string
-from django_rq import job
 from collections import OrderedDict
 from ordered_set import OrderedSet
 from cacheops import cached_as
-from cacheops import invalidate_obj, invalidate_all
+from cacheops import invalidate_obj
 from django_cloneable import CloneableMixin
-from django.conf import settings
-from django.core.exceptions import ObjectDoesNotExist, ValidationError
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.core.urlresolvers import reverse
-from mptt.models import MPTTModel, TreeForeignKey
 from model_utils.managers import InheritanceManager
 from survey.models.interviews import Answer, MultiChoiceAnswer, MultiSelectAnswer, NumericalAnswer, AutoResponse
-from survey.models.householdgroups import HouseholdMemberGroup
 from survey.models.access_channels import USSDAccess, InterviewerAccess
 from survey.models.base import BaseModel
-from survey.models.households import Household
 from survey.models.generics import GenericQuestion
 from survey.models.interviews import AnswerAccessDefinition
 from survey.models.access_channels import ODKAccess
@@ -150,7 +143,7 @@ class Question(CloneableMixin, GenericQuestion):
 
     @classmethod
     def new_breadcrumbs(cls, **kwargs):
-        breadcrumbs = cls.index_breadcrumbs(**kwargs)
+        cls.index_breadcrumbs(**kwargs)
         return cls.edit_breadcrumbs(**kwargs)
 
     @classmethod
@@ -459,7 +452,7 @@ class QuestionSet(CloneableMixin, BaseModel):   # can be qset, listing, responde
         # @cached_as(Question.objects.filter(qset__id=self.id)) # to find out best caching for this.
         def _flow_questions():
             inline_ques = self.questions_inline()
-            questions = OrderedSet(inline_ques)
+            OrderedSet(inline_ques)
             flow_questions = OrderedSet()
             for ques in inline_ques:
                 flow_questions.append(ques)

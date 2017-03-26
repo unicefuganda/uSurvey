@@ -1,12 +1,12 @@
 from django.contrib.auth.models import User
 from django.test import Client
-from mock import patch
 from survey.models.locations import *
 from survey.forms.upload_csv_file import UploadEAForm
-from survey.models import Survey, LocationTypeDetails, EnumerationArea, Batch
+from survey.models import EnumerationArea
+from survey.models import LocationTypeDetails
+from survey.models import Survey
 from survey.services.ea_upload import UploadEACSVLayoutHelper
 from survey.tests.base_test import BaseTest
-from django.utils.timezone import utc
 
 
 class UploadWeightsTest(BaseTest):

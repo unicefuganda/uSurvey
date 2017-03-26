@@ -1,9 +1,9 @@
 import os
-from django.conf.urls import patterns, include, url
+from django.conf.urls import patterns
+from django.conf.urls import url
 from django.contrib.auth.decorators import permission_required, login_required
 from django.contrib.auth.forms import PasswordChangeForm
 from django.views.generic import TemplateView
-from django.conf import settings
 from survey.models import ListingTemplate, Batch, ParameterTemplate, QuestionTemplate
 
 from django.views.static import serve as staticserve

@@ -1,16 +1,16 @@
-import json
 
 from django.test.client import Client
 from mock import *
-from django.template.defaultfilters import slugify
 from survey.models.locations import *
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
-from django.conf import settings
-from survey.models import Backend, Household, LocationTypeDetails, EnumerationArea, Survey, ODKAccess, USSDAccess
+from survey.models import Backend
+from survey.models import EnumerationArea
+from survey.models import ODKAccess
+from survey.models import Survey
+from survey.models import USSDAccess
 from survey.models.interviewer import Interviewer
 from survey.tests.base_test import BaseTest
-from survey.forms.interviewer import InterviewerForm
 from survey.models.formula import *
 
 

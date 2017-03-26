@@ -9,7 +9,6 @@ from survey.models import Indicator
 from survey.models.formula import Formula
 from survey.services.simple_indicator_service import SimpleIndicatorService
 from survey.forms.enumeration_area import LocationsFilterForm
-from survey.utils.views_helper import contains_key
 
 
 def _process_new_request(request, formula_form, new_formula_url, indicator):
@@ -82,8 +81,6 @@ def delete(request, indicator_id, formula_id):
 
 @permission_required('auth.can_view_batches')
 def simple_indicator(request, indicator_id):
-    hierarchy_limit = 2
-    selected_location = None
     params = request.GET or request.POST
     locations_filter = LocationsFilterForm(data=params)
     first_level_location_analyzed = Location.objects.filter(
@@ -98,7 +95,6 @@ def simple_indicator(request, indicator_id):
     ])
     if locations_filter.last_location_selected:
         first_level_location_analyzed = locations_filter.last_location_selected
-        selected_location = first_level_location_analyzed
     formula = formula[0]
     indicator_service = SimpleIndicatorService(
         formula, first_level_location_analyzed)

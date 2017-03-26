@@ -1,5 +1,5 @@
 from django.conf import settings
-from survey.models import Question, QuestionTemplate
+from survey.models import Question
 
 
 class ExportQuestionsService:
@@ -74,7 +74,7 @@ def get_model_as_dump(model_class, **query_crtiteria):
     # following numenclacure header definition for model class to be call by modelclass_EXPORT_HEADERS in settings
     report_details = getattr(settings, '%s_EXPORT_HEADERS' % model_class._name__)
     headers = ','.join(report_details.values())
-    _formatted_responses = [headers, ]
+    [headers, ]
     keys = report_details.keys()
     if 'id' not in keys:
         keys.insert(0, 'id')

@@ -1,6 +1,6 @@
 import os
 from survey.models.locations import *
-from survey.models import LocationTypeDetails, UploadErrorLog
+from survey.models import LocationTypeDetails
 from survey.services.location_upload import UploadLocation
 from survey.tests.base_test import BaseTest
 

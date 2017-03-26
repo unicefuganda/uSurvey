@@ -1,21 +1,15 @@
-import os
 import string
 from datetime import datetime
 from django_rq import job
 from django.contrib.auth.models import User
 from dateutil.parser import parse as extract_date
 from django.conf import settings
-from django.core.exceptions import ObjectDoesNotExist, ValidationError
+from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models.signals import post_save
-from django.dispatch import receiver
-from django import template
 from django.db.models import Max
 from survey.models.base import BaseModel
 from survey.models.access_channels import InterviewerAccess, ODKAccess, USSDAccess
 from survey.models.locations import Point
-from survey.models.surveys import Survey
-from survey.interviewer_configs import MESSAGES
 from survey.utils.decorators import static_var
 
 
@@ -687,10 +681,7 @@ class GeopointAnswer(Answer):
 
 
 class NonResponseAnswer(BaseModel):
-    household = models.ForeignKey(
-        'Household', related_name='non_response_answers')
-    survey_listing = models.ForeignKey(
-        'SurveyHouseholdListing', related_name='non_response_answers')
+    interview = models.ForeignKey(Interview, related_name='non_response_answers', db_index=True)
     value = models.CharField(max_length=200, blank=False, null=False)
     interviewer = models.ForeignKey(
         "Interviewer", null=True, related_name='non_response_answers')

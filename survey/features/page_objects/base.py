@@ -1,5 +1,4 @@
 # vim: ai ts=4 sts=4 et sw=4 encoding=utf-8
-from random import randint
 from time import sleep
 from django.core.urlresolvers import reverse
 from lettuce.django import django_url

@@ -1,11 +1,7 @@
 #!/usr/bin/env python
 __author__ = 'anthony <antsmc2@gmail.com>'
-import uuid
 from django.utils import timezone
 from django.shortcuts import render
-from django.utils.decorators import method_decorator
-from django.core.urlresolvers import reverse
-from django.http import HttpResponseRedirect
 from survey.models import (InterviewerAccess, QuestionLoop, QuestionSet, Answer, Question,
                            SurveyAllocation, AnswerAccessDefinition, ODKAccess, Interviewer, Interview)
 from survey.forms.answer import (get_answer_form, UserAccessForm, UssdTimeoutForm,
@@ -76,7 +72,6 @@ class OnlineHandler(object):
         :param session_data:
         :return:
         """
-        pass
 
     def respond_interview(self, request, interview, session_data):
         initial = {}
@@ -91,7 +86,6 @@ class OnlineHandler(object):
         if str(session_data['last_question']) == str(interview.last_question.id):
             answer_form = get_answer_form(interview, access)(request_data, request.FILES)
             if answer_form.is_valid():
-                commit = True
                 answer = answer_form.save()     # even for test data, to make sure the answer can actually save
                 # decided to keep both as text and as value
                 session_data['answers'][interview.last_question.identifier] = answer

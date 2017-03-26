@@ -2,9 +2,7 @@
 from rapidsms.contrib.locations.models import Location
 from survey.features.page_objects.base import PageObject
 from survey.investigator_configs import MONTHS
-from survey.models import EnumerationArea
 from survey.models.investigator import Investigator
-from lettuce.django import django_url
 
 
 class NewHouseholdPage(PageObject):

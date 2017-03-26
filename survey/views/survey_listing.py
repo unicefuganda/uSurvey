@@ -1,5 +1,3 @@
-from django.http import HttpResponseRedirect
-from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import permission_required
 from survey.models import ListingTemplate
 from .question_set import QuestionSetView

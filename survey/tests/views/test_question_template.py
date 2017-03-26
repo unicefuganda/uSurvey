@@ -1,17 +1,10 @@
-import json
 from django.test.client import Client
 from django.contrib.auth.models import User
-from mock import patch
-from survey.models.locations import *
-from survey.forms.logic import LogicForm
-from survey.forms.filters import QuestionFilterForm
 from survey.models.batch import Batch
 from survey.models import QuestionModule, Survey
-from survey.models.questions import Question, QuestionOption, QuestionFlow
+from survey.models.questions import Question
 
 from survey.tests.base_test import BaseTest
-from survey.forms.question import QuestionForm
-from survey.forms.filters import MAX_NUMBER_OF_QUESTION_DISPLAYED_PER_PAGE, DEFAULT_NUMBER_OF_QUESTION_DISPLAYED_PER_PAGE
 from survey.models.householdgroups import HouseholdMemberGroup
 
 

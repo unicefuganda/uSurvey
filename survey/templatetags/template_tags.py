@@ -1,7 +1,6 @@
 import string
 import re
 import redis
-from collections import OrderedDict
 from cacheops import cached_as
 from dateutil import relativedelta
 from datetime import date
@@ -9,15 +8,15 @@ import json
 import inspect
 from django import template
 from django.core.urlresolvers import reverse
-from django.conf import settings
 from survey.interviewer_configs import MONTHS
 from survey.models.helper_constants import CONDITIONS
 from survey.utils.views_helper import get_ancestors
 from survey.models import Survey, Question, Batch, Interviewer, MultiChoiceAnswer, \
     GroupCondition, Answer, AnswerAccessDefinition, ODKAccess, HouseholdMember, SurveyAllocation
-from survey.models import VideoAnswer, AudioAnswer, ImageAnswer, QuestionSet, SurveyParameterList
-from survey.odk.utils.log import logger
-from django.core.exceptions import ObjectDoesNotExist
+from survey.models import AudioAnswer
+from survey.models import ImageAnswer
+from survey.models import QuestionSet
+from survey.models import VideoAnswer
 from django.utils.safestring import mark_safe
 from django.utils import html
 from survey.forms.logic import LogicForm

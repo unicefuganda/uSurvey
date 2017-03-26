@@ -5,7 +5,6 @@ from survey.features.page_objects.indicators import ListIndicatorPage, SimpleInd
 from survey.models import HouseholdMemberGroup, Indicator, LocationTypeDetails, EnumerationArea
 from survey.models.households import HouseholdHead, Household
 from survey.models.backend import Backend
-from survey.models.interviewer import Interviewer
 from survey.models.formula import *
 from survey.models.questions import Question, QuestionOption
 

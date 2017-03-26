@@ -1,22 +1,14 @@
 import ast
-from functools import wraps
-from django.utils import timezone
-from django.core.exceptions import ObjectDoesNotExist
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
 from django.core.urlresolvers import reverse
 from django.contrib import messages
 from django.contrib.auth.decorators import permission_required, login_required
-from django.conf import settings
 from survey.models import Survey, Location, LocationType, Batch, RandomizationCriterion, \
     Interview, QuestionFlow, Question
 from survey.forms.surveys import SurveyForm, SamplingCriterionForm
 from survey.views.custom_decorators import handle_object_does_not_exist
 from survey.utils.query_helper import get_filterset
-from survey.models import EnumerationArea, LocationType, Location, BatchCommencement, SurveyHouseholdListing
-from survey.models import WebAccess, SurveyAllocation, Interviewer
-from survey.forms.enumeration_area import EnumerationAreaForm, LocationsFilterForm
-from survey.forms.answer import get_answer_form
 
 
 @permission_required('auth.can_view_batches')

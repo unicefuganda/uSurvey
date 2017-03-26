@@ -1,4 +1,4 @@
-from datetime import date, timedelta, datetime
+from django.utils import timezone
 from django.conf import settings
 from django.core.validators import MinLengthValidator, MaxLengthValidator, MinValueValidator, MaxValueValidator
 from django.db import models
@@ -10,19 +10,17 @@ from survey.models.interviews import Interview
 import random
 from django.core.exceptions import ValidationError
 from dateutil.relativedelta import relativedelta
-from survey.models.household_batch_completion import HouseSurveyCompletion, HouseholdBatchCompletion
-from survey.models.households import Household, SurveyHouseholdListing, HouseholdListing, RandomSelection
 from survey.utils.sms import send_sms
 
 
 def validate_min_date_of_birth(value):
-    if relativedelta(datetime.utcnow().date(), value).years < INTERVIEWER_MIN_AGE:
+    if relativedelta(timezone.now().date(), value).years < INTERVIEWER_MIN_AGE:
         raise ValidationError(
             'interviewers must be at most %s years' % INTERVIEWER_MIN_AGE)
 
 
 def validate_max_date_of_birth(value):
-    if relativedelta(datetime.utcnow().date(), value).years > INTERVIEWER_MAX_AGE:
+    if relativedelta(timezone.now().date(), value).years > INTERVIEWER_MAX_AGE:
         raise ValidationError(
             'interviewers must not be at more than %s years' % INTERVIEWER_MAX_AGE)
 
@@ -59,19 +57,7 @@ class Interviewer(BaseModel):
 
     @property
     def age(self):
-        return relativedelta(datetime.utcnow().date(), self.date_of_birth).years
-
-    def total_households_completed(self, survey=None):
-        try:
-            if survey is None:
-                survey = self.assignments.get(
-                    status=SurveyAllocation.PENDING).survey
-            return HouseSurveyCompletion.objects.filter(survey=survey, interviewer=self).distinct().count()
-        except:
-            return 0
-
-    def total_households_batch_completed(self, batch):
-        return HouseholdBatchCompletion.objects.filter(batch=batch, interviewer=self).distinct().count()
+        return relativedelta(timezone.now().date(), self.date_of_birth).years
 
     def completed_batch_or_survey(self, survey, batch):
         if survey and not batch:

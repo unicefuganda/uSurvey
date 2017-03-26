@@ -7,13 +7,13 @@ from django.contrib import messages
 from django.conf import settings
 from survey.forms.filters import SurveyBatchFilterForm
 from survey.forms.aggregates import InterviewerReportForm
-from survey.models import Survey, Interviewer
-from survey.models import Batch, LocationType, Household
+from survey.models import Survey
+from survey.models import Batch
+from survey.models import LocationType
 from survey.services.results_download_service import ResultsDownloadService, ResultComposer
 from survey.utils.views_helper import contains_key
 from survey.forms.enumeration_area import LocationsFilterForm
 from django.core.urlresolvers import reverse
-from survey.utils.zip import InMemoryZip
 from django_rq import job, get_scheduler
 from rq import get_current_job
 import json

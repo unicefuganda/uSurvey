@@ -25,7 +25,7 @@ class ImportCountriesTest(BaseTest):
 
         self.write_to_csv('wb', self.data)
         self.filename = 'test.csv'
-        file = open(self.filename, 'rb')
+        open(self.filename, 'rb')
         self.importer = FakeCommand()
         self.country = LocationType.objects.create(
             name='Country', slug='country')

@@ -5,11 +5,12 @@ from django.contrib import messages
 from django.contrib.auth.decorators import permission_required, login_required
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
-from survey.models import LocationType, Location
+from survey.models import LocationType
 from survey.forms.upload_csv_file import UploadWeightsForm
-from survey.models import LocationWeight, LocationTypeDetails, UploadErrorLog, Survey
+from survey.models import LocationWeight
+from survey.models import Survey
+from survey.models import UploadErrorLog
 from survey.forms.enumeration_area import LocationsFilterForm
-from survey.views.location_widget import LocationWidget
 from survey.utils.views_helper import contains_key
 from django.core.urlresolvers import reverse
 from django_rq import job
@@ -48,7 +49,6 @@ def list_weights(request):
     location_weights = LocationWeight.objects.all()
     surveys = Survey.objects.all()
     survey = None
-    selected_location = None
     params = request.GET or request.POST
     location_filter_form = LocationsFilterForm(data=params)
     if contains_key(params, 'survey'):

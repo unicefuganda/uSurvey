@@ -1,9 +1,9 @@
 __author__ = 'anthony'
 from django.conf import settings
 from channels.routing import route
-from channels import Channel, Group
-from channels.sessions import channel_session
-from channels.auth import http_session_user, channel_session_user, channel_session_user_from_http
+from channels import Group
+from channels.auth import channel_session_user
+from channels.auth import channel_session_user_from_http
 
 
 def get_group_path(user, path):

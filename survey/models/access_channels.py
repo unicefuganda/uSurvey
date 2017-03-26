@@ -1,10 +1,8 @@
-import datetime
 from django.conf import settings
 from django.db import models
 from survey.models.base import BaseModel
 from model_utils.managers import InheritanceManager
 from django.utils.safestring import mark_safe
-from django.contrib.auth.models import User
 
 DEFAULT_TOKEN = getattr(settings, 'DEFAULT_TOKEN', "12345")
 

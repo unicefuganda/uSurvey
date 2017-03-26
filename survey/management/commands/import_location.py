@@ -1,10 +1,9 @@
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
 from survey.models import Location, LocationType, EnumerationArea
 from django.template.defaultfilters import slugify
 import csv
 import string
 from django.db import transaction
-from mptt.models import MPTTModel, TreeForeignKey
 import datetime
 
 
@@ -18,10 +17,8 @@ class Command(BaseCommand):
         csv_file = csv.reader(open(args[0], "rb"))
         headers = csv_file.next()
         location_types = []
-        last_entry_empty = False
         if not headers[-1].strip():
             headers.pop(-1)
-            last_entry_empty = True
         has_ea = False
         if headers[-1].lower().replace('name', '') == 'ea':
             has_ea = True
@@ -35,7 +32,6 @@ class Command(BaseCommand):
             location_types.append(location_type)
         total_divisions = len(location_types)
         count = 0
-        country = None
         for row in csv_file:
             parent = None
             if len(row) < total_divisions:

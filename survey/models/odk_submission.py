@@ -5,7 +5,6 @@ from django.db import models
 from survey.models.base import BaseModel
 from survey.models.interviewer import Interviewer
 from survey.models.surveys import Survey
-from survey.models.interviews import  Interview
 from survey.models.enumeration_area import EnumerationArea
 from survey.models.questions import QuestionSet
 

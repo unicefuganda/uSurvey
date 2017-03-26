@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from random import randint
 from datetime import date
-from time import sleep
 
 from lettuce import *
 

@@ -410,7 +410,7 @@ ONLINE_SURVEY_TIME_OUT = 50000
 ##end USSD config ##
 # Importing server specific settings
 try:
-    from localsettings import *
+    from .localsettings import *
 except ImportError:
     pass
 

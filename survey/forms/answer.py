@@ -4,7 +4,6 @@ from django.core.exceptions import ValidationError
 from django.utils.safestring import mark_safe
 from django import forms
 from form_helper import FormOrderMixin
-from survey.forms.widgets import InlineRadioSelect
 from survey.models import Answer, Interview, VideoAnswer, AudioAnswer, ImageAnswer, TextAnswer, NumericalAnswer,\
     MultiChoiceAnswer, MultiSelectAnswer, DateAnswer, SurveyAllocation, EnumerationArea, Survey, QuestionSet, \
     Interviewer, InterviewerAccess, USSDAccess, QuestionOption

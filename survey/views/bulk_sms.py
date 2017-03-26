@@ -6,7 +6,6 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.core.urlresolvers import reverse
 from django.contrib import messages
 
-from survey.interviewer_configs import *
 from survey.models.interviewer import Interviewer
 
 

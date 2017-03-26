@@ -1,23 +1,14 @@
 from datetime import date, datetime
-import decimal
 import os
-import re
-import copy
-import zipfile
 import pytz
 from lxml import etree
-from collections import OrderedDict
 from django.http import HttpResponse, HttpResponseNotFound, StreamingHttpResponse
 from django.core.servers.basehttp import FileWrapper
 from django.core.files.storage import get_storage_class
 from django.conf import settings
-from django.shortcuts import render
 from django import template
 from django.utils import timezone
-from survey.templatetags.template_tags import get_node_path
-from django.db import transaction
-from django.shortcuts import get_object_or_404
-from djangohttpdigest.digest import Digestor, parse_authorization_header
+from djangohttpdigest.digest import Digestor
 from djangohttpdigest.authentication import SimpleHardcodedAuthenticator
 from django.utils.translation import ugettext as _
 from survey.models import Survey, Interviewer, Interview, SurveyAllocation, ODKAccess, QuestionSet, \
@@ -27,8 +18,6 @@ from survey.odk.utils.log import logger
 from functools import wraps
 from survey.utils.zip import InMemoryZip
 from django.contrib.sites.models import Site
-from dateutils import relativedelta
-from django.db.utils import IntegrityError
 from django_rq import job, get_connection
 
 
@@ -228,7 +217,6 @@ def process_submission(interviewer, xml_file, media_files=[], request=None):
     survey_tree = _get_tree_from_blob(xml_blob)
     form_id = _get_form_id(survey_tree)
     instance_id = _get_instance_id(survey_tree)
-    description = ''
     qset = _get_qset(survey_tree)
     survey_allocation = _get_allocation(interviewer, survey_tree)
     # first things first. save the submission incase all else background task fails... enables recover

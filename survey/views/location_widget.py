@@ -1,5 +1,7 @@
 from django.utils.datastructures import SortedDict
-from survey.models import LocationTypeDetails, EnumerationArea, Location, LocationType
+from survey.models import EnumerationArea
+from survey.models import Location
+from survey.models import LocationType
 
 
 class LocationWidget(object):

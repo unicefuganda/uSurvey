@@ -1,5 +1,3 @@
-from time import sleep
-from django.utils.datastructures import SortedDict
 from lettuce import step, world
 from survey.features.page_objects.indicators import NewIndicatorPage, ListIndicatorPage
 from survey.models import QuestionModule, Batch, Indicator

@@ -1,11 +1,10 @@
 #!/usr/bin/env python
 __author__ = 'anthony <antsmc2@gmail.com>'
 import pandas as pd
-from django.core.management.base import BaseCommand, CommandError
-from django.template.defaultfilters import slugify
-from django.db import transaction
+from django.core.management.base import BaseCommand
 from survey.models import QuestionSet, Survey, Interview, Answer
-from survey.models import WebAccess, Interviewer, EnumerationArea
+from survey.models import EnumerationArea
+from survey.models import Interviewer
 
 
 def save_interview(row, interviewer, odk_access, survey, qset, questions, eas={}):

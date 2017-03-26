@@ -1,12 +1,14 @@
 import random
 from django import forms
-from cacheops import cached_as
 from django import template
 from django.template.defaultfilters import slugify
 from django.forms import ModelForm
 from survey.models import Indicator, QuestionSet, QuestionModule, Survey, QuestionOption, IndicatorVariableCriteria, \
     IndicatorVariable
-from survey.models import BatchQuestion, Question, Answer, MultiChoiceAnswer, MultiSelectAnswer, NumericalAnswer
+from survey.models import Answer
+from survey.models import MultiChoiceAnswer
+from survey.models import MultiSelectAnswer
+from survey.models import Question
 from django.core.exceptions import ValidationError
 from survey.forms.form_helper import FormOrderMixin
 from survey.forms.form_helper import IconName

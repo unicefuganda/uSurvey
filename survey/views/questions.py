@@ -1,9 +1,5 @@
 import json
-import re
-from collections import OrderedDict
 from django.core.urlresolvers import reverse
-from django.core import serializers
-from django.core.serializers.json import DjangoJSONEncoder
 from django.shortcuts import render, get_object_or_404
 from django.contrib import messages
 from django.http import HttpResponseRedirect, HttpResponse
@@ -17,7 +13,6 @@ from survey.services.export_questions import get_batch_question_as_dump
 from survey.utils.query_helper import get_filterset
 from survey.views.custom_decorators import not_allowed_when_batch_is_open
 from survey.forms.logic import LogicForm
-from django.conf import settings
 
 
 ADD_LOGIC_ON_OPEN_BATCH_ERROR_MESSAGE = "Logics cannot be added while the batch is open."
@@ -56,7 +51,7 @@ def index(request, batch_id):
     else:
         question_filter_form = QuestionFilterForm(batch=batch)
     #question_library =  question_filter_form.filter(QuestionTemplate.objects.all())
-    question_form = QuestionForm(batch)
+    QuestionForm(batch)
 
     request.breadcrumbs([
         ('Surveys', reverse('survey_list_page')),
@@ -342,8 +337,6 @@ def submit(request, batch_id):
         question_graph = json.loads(data)
         nodes = {}
         connections = {}
-        targets = []
-        root_question = None
         for item in question_graph:
             if item.get('identifier', False):
                 question, _ = Question.objects.get_or_create(identifier=item['identifier'],

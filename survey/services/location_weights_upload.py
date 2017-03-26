@@ -1,7 +1,5 @@
-from django.utils.timezone import utc
 from survey.models import LocationWeight, UploadErrorLog, Location
 from survey.services.csv_uploader import UploadService
-from survey.models.locations import *
 
 
 class UploadLocationWeights(UploadService):

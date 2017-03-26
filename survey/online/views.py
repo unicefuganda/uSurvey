@@ -2,12 +2,9 @@
 __author__ = 'anthony <antsmc2@gmail.com>'
 import phonenumbers
 from django.conf import settings
-from django.utils import timezone
 from django.shortcuts import render
-from django.utils.decorators import method_decorator
-from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponse
 from survey.models import (InterviewerAccess, QuestionLoop, QuestionSet, Answer, Question,
                            SurveyAllocation, AnswerAccessDefinition, ODKAccess)
 from survey.forms.answer import (get_answer_form, UserAccessForm,
@@ -65,7 +62,7 @@ class OnlineInterview(OnlineHandler):
 
     def respond(self, request, session_data):
         access = self.access
-        interviewer = access.interviewer
+        access.interviewer
         # check if there is any active interview, if yes, ask interview last question
         interview = session_data.get('interview', None)
         # if interview is Non show select EA form

@@ -1,4 +1,3 @@
-from random import randint
 
 from lettuce import *
 from survey.features.page_objects.batches import BatchListPage, AddBatchPage

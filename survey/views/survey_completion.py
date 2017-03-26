@@ -1,18 +1,17 @@
 import json
 import ast
-from django.contrib import messages
-from django.utils.datastructures import SortedDict
 from django.contrib.auth.decorators import login_required, permission_required
 from django.core.serializers.json import DjangoJSONEncoder
 from django.http import HttpResponse
 from django.shortcuts import render, get_object_or_404
-from survey.models import Location, LocationType, Indicator, Answer, QuestionOption
+from survey.models import Indicator
+from survey.models import Location
+from survey.models import LocationType
 from survey.forms.enumeration_area import LocationsFilterForm as LocFilterForm
 from survey.forms.filters import LocationFilterForm
 from survey.models import Survey, Interviewer, SurveyAllocation, Household, Batch, EnumerationArea, Interview
 from survey.services.completion_rates_calculator import BatchLocationCompletionRates, \
     BatchHighLevelLocationsCompletionRates, BatchSurveyCompletionRates
-from survey.views.location_widget import LocationWidget
 from survey.utils.views_helper import contains_key, is_not_digit_nor_empty
 from survey.utils.query_helper import get_filterset
 from django.core.urlresolvers import reverse
@@ -36,7 +35,7 @@ def is_valid(params):
 def survey_completion_summary(request, household_id, batch_id):
     household = get_object_or_404(Household, pk=household_id)
     batch = get_object_or_404(Batch, pk=batch_id)
-    survey = batch.survey
+    batch.survey
     ea = household.listing.ea
     allocations = SurveyAllocation.objects.filter(
         allocation_ea=ea, survey=batch.survey)
@@ -147,13 +146,11 @@ def completion_json(request, survey_id):
             location_type = country.get_descendants()[settings.MAP_ADMIN_LEVEL - 1]
         else:
             location_type = LocationType.largest_unit()
-        divider = 1.0
         completion_rates = {}
-        has_sampling = survey.has_sampling
-        is_open = survey.is_open()
+        survey.has_sampling
+        survey.is_open()
         #basically get interviews count
         for location in location_type.locations.all():
-            description = 'Percentage Responses'
             total_eas = EnumerationArea.under_(location).count()
             total_interviews = Interview.interviews_in(location, survey).distinct('id').count()
             active_eas = Interview.interviews_in(location, survey).distinct('ea').count()
@@ -204,8 +201,6 @@ def survey_indicators(request):
 @permission_required('survey.view_completed_survey')
 def show_interviewer_completion_summary(request):
     params = request.GET
-    selected_location = None
-    selected_ea = None
     interviewers = Interviewer.objects.order_by('id')
     search_fields = ['name', 'ea__name']
     if request.GET.has_key('q'):

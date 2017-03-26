@@ -155,7 +155,7 @@ class LocationWidgetTest(BaseTest):
 
         location_widget = LocationWidget(
             selected_location=bukoto, ea=ea1, level=3)
-        widget_data = location_widget.get_ea_data()
+        location_widget.get_ea_data()
         # self.assertEqual(2, len(widget_data))
         # self.assertIn(ea1, widget_data)
         # self.assertIn(ea2, widget_data)
@@ -182,7 +182,7 @@ class LocationWidgetTest(BaseTest):
 
         location_widget = LocationWidget(
             selected_location=bukoto, ea=ea1, level=2)
-        widget_data = location_widget.get_ea_data()
+        location_widget.get_ea_data()
 
         # self.assertEqual(2, len(widget_data))
         # self.assertIn(ea1, widget_data)
@@ -213,7 +213,7 @@ class LocationWidgetTest(BaseTest):
 
         location_widget = LocationWidget(
             selected_location=bukoto, ea=ea1, level=2)
-        widget_data = location_widget.get_ea_data()
+        location_widget.get_ea_data()
 
         # self.assertEqual(3, len(widget_data))
         # self.assertIn(ea1, widget_data)

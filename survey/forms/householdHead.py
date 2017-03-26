@@ -1,8 +1,7 @@
-from datetime import datetime
 from django import forms
-from django.forms import ModelForm, DateInput
+from django.forms import ModelForm
 from survey.models.households import HouseholdHead
-from survey.interviewer_configs import OCCUPATION, MONTHS
+from survey.interviewer_configs import OCCUPATION
 from widgets import InlineRadioSelect
 from django.conf import settings
 from django.core.exceptions import ValidationError

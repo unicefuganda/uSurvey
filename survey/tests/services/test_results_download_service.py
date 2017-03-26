@@ -1,4 +1,3 @@
-from datetime import date
 from survey.models.locations import *
 from survey.models import Survey, HouseholdMember, Batch, Interviewer, Backend, HouseholdMemberGroup, \
     QuestionModule, Question, LocationTypeDetails, QuestionOption, GroupCondition, EnumerationArea, \
@@ -139,7 +138,6 @@ class ResultsDownloadServiceTest(BaseTest):
             ea=self.ea, list_registrar=self.investigator, initial_survey=self.survey)
         survey_householdlisting1 = SurveyHouseholdListing.objects.create(
             listing=household_listing1, survey=self.survey)
-        AGE = '24'
         general_group = HouseholdMemberGroup.objects.create(
             name="GENERAL", order=2)
 
@@ -171,9 +169,8 @@ class ResultsDownloadServiceTest(BaseTest):
                                                           registrar=self.investigator, registration_channel="ODK Access")
         result_down_load_service = ResultsDownloadService(batch=self.batch)
         age = '28'
-        age_14 = '15'
         household1 = household_head_1.surname + '-' + household_head_1.first_name
-        member1 = member_1.surname + '-' + member_1.first_name
+        member_1.surname + '-' + member_1.first_name
         household2 = household_head_2.surname + '-' + household_head_2.first_name
         expected_csv_data = [
             [u'Kampala', unicode(ea.name), household_head_1.household.house_number, household1, age,  '01-01-1988',
@@ -229,7 +226,7 @@ class ResultsDownloadServiceTest(BaseTest):
         self.assertEqual(header_structure, headers)
 
         AGE = '28'
-        household1 = household_head_1.surname + '-' + household_head_1.first_name
+        household_head_1.surname + '-' + household_head_1.first_name
         household2 = household_head_2.surname + '-' + household_head_2.first_name
         household3 = household_head_3.surname + '-' + household_head_3.first_name
         household4 = household_head_4.surname + '-' + household_head_4.first_name

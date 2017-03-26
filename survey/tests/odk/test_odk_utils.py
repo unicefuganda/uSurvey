@@ -1,14 +1,11 @@
 __author__ = 'Eswar'
 
-from django.test.client import Client
-from django.contrib.auth.models import User
 from django.test import TestCase
 from survey.models.batch import Batch
 from survey.models import GroupCondition, HouseholdHead, QuestionModule, Indicator, Formula, Survey, EnumerationArea, \
     HouseholdMemberGroup, InterviewerAccess, NumericalAnswer
 
 from survey.models.locations import *
-from survey.tests.base_test import BaseTest
 from survey.odk.utils.odk_helper import *
 
 

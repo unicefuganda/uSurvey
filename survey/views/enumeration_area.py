@@ -4,9 +4,7 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.core.serializers.json import DjangoJSONEncoder
 from django.shortcuts import render, get_object_or_404
 from django.core.urlresolvers import reverse
-from django.conf import settings
 from survey.models import EnumerationArea, LocationType, Location
-from django.utils.timezone import utc
 from survey.forms.upload_csv_file import UploadEAForm
 from survey.forms.enumeration_area import EnumerationAreaForm, LocationsFilterForm
 from survey.services.ea_upload import UploadEACSVLayoutHelper

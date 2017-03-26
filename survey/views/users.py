@@ -3,9 +3,8 @@ import json
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.contrib import messages
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required, permission_required
-from django.db.models import Q
 from survey.interviewer_configs import *
 from survey.forms.users import *
 from survey.models.users import UserProfile

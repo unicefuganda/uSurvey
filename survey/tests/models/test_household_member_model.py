@@ -1,15 +1,15 @@
-from datetime import date, datetime, timedelta
 
-from django.template.defaultfilters import slugify
 from survey.models.locations import *
-from django.utils.timezone import utc
-from mock import patch
 
-from survey.models import Batch, Question, HouseholdMemberBatchCompletion, NumericalAnswer, MultiChoiceAnswer, QuestionOption, Survey, EnumerationArea
+from survey.models import Batch
+from survey.models import EnumerationArea
+from survey.models import Survey
 # from survey.models.batch_question_order import BatchQuestionOrder
-from survey.models.householdgroups import HouseholdMemberGroup, GroupCondition
-from survey.models.households import HouseholdMember, Household, HouseholdHead, HouseholdListing, SurveyHouseholdListing
-from survey.models.backend import Backend
+from survey.models.householdgroups import HouseholdMemberGroup
+from survey.models.households import Household
+from survey.models.households import HouseholdListing
+from survey.models.households import HouseholdMember
+from survey.models.households import SurveyHouseholdListing
 from survey.models.interviewer import Interviewer
 from survey.tests.base_test import BaseTest
 

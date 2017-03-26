@@ -2,11 +2,17 @@ import re
 from django.core.exceptions import ValidationError
 from django.forms import ModelForm
 from django import forms
-from survey.models import RandomizationCriterion, CriterionTestArgument, QuestionOption, ListingTemplate
-from survey.models import Answer, NumericalAnswer, TextAnswer, MultiChoiceAnswer, Interview
+from survey.models import ListingTemplate
+from survey.models import QuestionOption
+from survey.models import RandomizationCriterion
+from survey.models import Answer
+from survey.models import Interview
+from survey.models import MultiChoiceAnswer
 from survey.forms.widgets import InlineRadioSelect
 from survey.forms.form_helper import FormOrderMixin
-from survey.models import Survey, BatchCommencement, SurveyHouseholdListing, AnswerAccessDefinition, USSDAccess
+from survey.models import AnswerAccessDefinition
+from survey.models import Survey
+from survey.models import USSDAccess
 
 
 class SurveyForm(ModelForm, FormOrderMixin):    

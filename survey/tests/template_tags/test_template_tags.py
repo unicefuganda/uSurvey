@@ -1,6 +1,12 @@
 from datetime import date
 from django.test import TestCase
-from survey.models import Batch, Survey, LocationTypeDetails, EnumerationArea, Household, HouseholdListing, SurveyHouseholdListing, QuestionModule
+from survey.models import Batch
+from survey.models import EnumerationArea
+from survey.models import Household
+from survey.models import HouseholdListing
+from survey.models import LocationTypeDetails
+from survey.models import QuestionModule
+from survey.models import Survey
 from survey.templatetags.template_tags import *
 from survey.views.location_widget import LocationWidget
 from survey.models.locations import *
@@ -165,7 +171,7 @@ class TemplateTagsTest(TestCase):
             all_open_locations, kampala))
 
     def setUp(self):
-        locate = LocationType.objects.create()
+        LocationType.objects.create()
 
     def test_knows_ea_is_selected_given_location_data(self):
         country = LocationType.objects.create(name="Country", slug='country')

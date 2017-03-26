@@ -6,11 +6,8 @@ from django.db import models
 from django.db.models import Count
 from django.utils.datastructures import SortedDict
 from survey.models.base import BaseModel
-from survey.models.question_module import QuestionModule
 from survey.models.interviews import MultiChoiceAnswer, Answer
 from survey.models.surveys import Survey
-from survey.models.batch import Batch
-from survey.models.batch_questions import BatchQuestion
 from survey.models.questions import Question, QuestionSet
 from survey.models.interviews import Interview
 from survey.models.locations import Location
@@ -83,12 +80,10 @@ class Indicator(BaseModel):
         :param kxargs:
         :return:
         """
-        tabulated_data = SortedDict()
-        context = {}
+        SortedDict()
         variable_names = self.active_variables()
         # options = self.parameter.options.order_by('order')
         # answer_class = Answer.get_class(self.parameter.answer_type)
-        kwargs = {}
         report = {}
         for child_location in locations:
             target_locations = child_location.get_leafnodes(include_self=True)

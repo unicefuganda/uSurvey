@@ -1,5 +1,4 @@
 from django.db import models
-from survey.models.base import BaseModel
 from survey.models.generics import TemplateQuestion
 
 

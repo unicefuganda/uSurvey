@@ -3,7 +3,6 @@ from survey.models.locations import *
 from survey.models import Survey, UploadErrorLog, EnumerationArea, LocationTypeDetails
 from survey.services.ea_upload import UploadEA, UploadEACSVLayoutHelper
 from survey.tests.base_test import BaseTest
-from django.utils.timezone import utc
 
 
 class EAUploadTest(BaseTest):

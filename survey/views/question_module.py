@@ -1,9 +1,9 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from survey.forms.question_module_form import QuestionModuleForm
-from survey.models import QuestionModule, Question
+from survey.models import QuestionModule
 from django.core.urlresolvers import reverse
 from survey.utils.query_helper import get_filterset
 

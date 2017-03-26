@@ -1,8 +1,6 @@
 from django.db import models
 from django_cloneable import CloneableMixin
 from survey.models.base import BaseModel
-from django.core.validators import MinValueValidator, MaxValueValidator
-from survey.models.locations import Location, LocationType
 
 
 
@@ -105,7 +103,6 @@ class Survey(CloneableMixin, BaseModel):
 
     def deep_clone(self):
         from survey.models import Batch
-        from survey.models import Question, QuestionFlow
         # first clone this survey
         survey = self.clone(attrs={'name': '%s-copy' % self.name})
         # not create survey batches for this one

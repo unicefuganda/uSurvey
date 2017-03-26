@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import datetime
-from time import sleep
 from lettuce import *
 from django.utils.datastructures import SortedDict
 from rapidsms.contrib.locations.models import *

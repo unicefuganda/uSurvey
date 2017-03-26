@@ -2,20 +2,15 @@
     In the cache, paths as follows
     /interviewer/pk/locals  -- current cached variables of on going task (shall mostly be usd
 '''
-from calendar import monthrange
-from django.core import serializers
 from survey.models import Interviewer, Interview, Survey, EnumerationArea, \
     Household, HouseholdMember, HouseholdHead, USSDAccess, SurveyAllocation, SurveyHouseholdListing, \
     HouseMemberSurveyCompletion, HouseholdMemberBatchCompletion, HouseholdBatchCompletion, ODKAccess
 from django import template
-from django.core.cache import cache
 from django.conf import settings
-from survey.interviewer_configs import LEVEL_OF_EDUCATION, MONTHS, MESSAGES
+from survey.interviewer_configs import MESSAGES
 from collections import OrderedDict
-import calendar
-from datetime import time, date, datetime
+from datetime import datetime
 from django.core.exceptions import ValidationError
-from django.db.models.signals import post_save
 from dateutil.relativedelta import relativedelta
 from utils import *
 from django.db.models import Max

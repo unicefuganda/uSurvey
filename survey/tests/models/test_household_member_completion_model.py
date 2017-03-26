@@ -1,9 +1,13 @@
 from django.test import TestCase
-from survey.models import Batch, Interviewer, Backend, Household, Survey, LocationTypeDetails
+from survey.models import Batch
+from survey.models import Household
+from survey.models import Interviewer
+from survey.models import Survey
 from survey.models.household_batch_completion import HouseholdBatchCompletion
 from survey.models.locations import Location, LocationType
 from survey.models import EnumerationArea
-from survey.models.households import Household, HouseholdListing, HouseholdMember, SurveyHouseholdListing
+from survey.models.households import Household
+from survey.models.households import HouseholdListing
 
 
 class HouseholdMemberBatchCompletionTest(TestCase):

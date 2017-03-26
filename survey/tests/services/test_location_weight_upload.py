@@ -3,7 +3,6 @@ from survey.models.locations import *
 from survey.models import Survey, UploadErrorLog, LocationWeight
 from survey.services.location_weights_upload import UploadLocationWeights
 from survey.tests.base_test import BaseTest
-from django.utils.timezone import utc
 
 
 class LocationWeightUploadHelper(BaseTest):

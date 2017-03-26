@@ -1,4 +1,3 @@
-from datetime import date
 from django.test.testcases import TestCase
 from survey.forms.surveys import SurveyForm
 from survey.models import Survey
@@ -50,7 +49,7 @@ class SurveyFormTest(TestCase):
 
         form_data['name'] = 'Survey 1'
         form_data['description'] = 'Survey 1 details'
-        another_survey = Survey.objects.create(**form_data)
+        Survey.objects.create(**form_data)
 
         survey_form = SurveyForm(instance=survey, data=form_data)
         self.assertFalse(survey_form.is_valid())

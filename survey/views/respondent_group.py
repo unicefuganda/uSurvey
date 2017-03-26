@@ -9,9 +9,6 @@ from django.core.urlresolvers import reverse
 from survey.models import RespondentGroup, ParameterTemplate, GroupCondition,RespondentGroupCondition
 from survey.forms.group_condition import GroupConditionForm
 from survey.forms.respondent_group import GroupForm
-from survey.forms.question_module_form import QuestionModuleForm
-from survey.models.question_templates import QuestionTemplate
-from survey.models import QuestionModule, Question
 from survey.utils.views_helper import contains_key
 from survey.utils.query_helper import get_filterset
 
@@ -201,10 +198,9 @@ def delete_group(request, group_id):
 
 @permission_required('auth.can_view_household_groups')
 def delete_condition(request, condition_id):
-  group_id=""
   try:
     respondent_group_condition = RespondentGroupCondition.objects.filter(id=condition_id).values_list("respondent_group__id")
-    group_id=respondent_group_condition[0][0]
+    respondent_group_condition[0][0]
     RespondentGroupCondition.objects.get(id=condition_id).delete()
   except Exception,err:
     print err

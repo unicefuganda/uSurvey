@@ -1,8 +1,11 @@
-import string
 from django import forms
 from django.forms import ModelForm
-from survey.models import Interviewer, ODKAccess, USSDAccess, BatchLocationStatus, Survey, EnumerationArea, SurveyAllocation
-from django.forms.models import inlineformset_factory
+from survey.models import EnumerationArea
+from survey.models import Interviewer
+from survey.models import ODKAccess
+from survey.models import Survey
+from survey.models import SurveyAllocation
+from survey.models import USSDAccess
 from django.conf import settings
 from django.core.exceptions import ValidationError
 import phonenumbers

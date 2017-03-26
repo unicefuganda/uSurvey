@@ -1,18 +1,12 @@
-from datetime import date, datetime, timedelta
 
 from django.test import TestCase
-from mock import patch
-from django.db import IntegrityError, DatabaseError
-from django.template.defaultfilters import slugify
-from survey.models import HouseholdHead, EnumerationArea, LocationTypeDetails
+from survey.models import EnumerationArea
 from survey.models.locations import *
-from survey.models.batch import Batch
-from survey.models.household_batch_completion import HouseholdMemberBatchCompletion
 from survey.models.backend import Backend
 from survey.models.households import Household, HouseholdMember
 from survey.models.interviewer import Interviewer
-from survey.models.questions import Question
-from survey.models import NumericalAnswer, HouseholdListing, SurveyHouseholdListing
+from survey.models import HouseholdListing
+from survey.models import SurveyHouseholdListing
 from survey.models.householdgroups import HouseholdMemberGroup, GroupCondition
 from survey.models.surveys import Survey
 

@@ -1,8 +1,8 @@
 from django import forms
 from django.core.exceptions import ValidationError
 from django.template.defaultfilters import slugify
-from survey.models import Location, LocationType
-from survey.models import Survey, LocationTypeDetails
+from survey.models import LocationType
+from survey.models import Survey
 from survey.services.csv_uploader import CSVUploader, UploadService
 from survey.services.location_upload import UploadLocation
 from survey.services.location_weights_upload import UploadLocationWeights
@@ -59,7 +59,7 @@ class UploadLocationsForm(UploadCSVFileForm):
             header = header.strip()
             if not header.endswith('Code'):
                 header = header.replace('Name', '')
-                location_type = self.clean_location_type(header)
+                self.clean_location_type(header)
         self.clean_headers_location_type_order(headers)
         return self.cleaned_data
 

@@ -11,7 +11,8 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "mics.settings")
 import django
 django.setup()
 
-from survey.models import Survey, Interviewer, LocationType
+from survey.models import LocationType
+from survey.models import Survey
 from survey.services.completion_rates_calculator import BatchLocationCompletionRates,\
     BatchHighLevelLocationsCompletionRates, BatchSurveyCompletionRates
 import json

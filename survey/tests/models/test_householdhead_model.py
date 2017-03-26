@@ -1,9 +1,11 @@
-from datetime import date
 from django.test import TestCase
-from django.template.defaultfilters import slugify
 from survey.models.locations import LocationType, Location
-from survey.models import Interviewer, Backend, EnumerationArea
-from survey.models.households import HouseholdHead, Household, HouseholdMember, HouseholdListing, SurveyHouseholdListing
+from survey.models import EnumerationArea
+from survey.models import Interviewer
+from survey.models.households import Household
+from survey.models.households import HouseholdHead
+from survey.models.households import HouseholdListing
+from survey.models.households import SurveyHouseholdListing
 from survey.models.surveys import Survey
 
 

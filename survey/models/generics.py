@@ -2,7 +2,7 @@ __author__ = 'anthony <>'
 from model_utils.managers import InheritanceManager
 from django.db import models
 from survey.models.base import BaseModel
-from survey.models.interviews import Answer, MultiChoiceAnswer, MultiSelectAnswer
+from survey.models.interviews import Answer
 
 
 class GenericQuestion(BaseModel):

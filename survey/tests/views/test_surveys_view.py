@@ -1,8 +1,9 @@
-import json
 from django.test.client import Client
 from django.contrib.auth.models import User
 from survey.models.locations import *
-from survey.models import Batch, Interviewer, Backend, EnumerationArea
+from survey.models import Batch
+from survey.models import EnumerationArea
+from survey.models import Interviewer
 from survey.models.surveys import Survey
 from survey.forms.surveys import SurveyForm
 from survey.tests.base_test import BaseTest
@@ -134,7 +135,6 @@ class SurveyViewTest(BaseTest):
 
         self.assertRedirects(
             response, '/surveys/', status_code=302, target_status_code=200, msg_prefix='')
-        success_message = "Survey cannot be deleted."
 
     def test_should_throw_error_if_deleting_non_existing_survey(self):
         message = "Survey does not exist."
@@ -158,7 +158,6 @@ class SurveyViewTest(BaseTest):
         response = self.client.get('/surveys/%s/delete/' % survey.id)
         self.assertRedirects(
             response, '/surveys/', status_code=302, target_status_code=200, msg_prefix='')
-        error_message = "Survey cannot be deleted."
 
     def test_survey_does_not_exist(self):
         message = "Survey does not exist."

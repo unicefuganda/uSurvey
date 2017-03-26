@@ -112,7 +112,6 @@ class ListingSample(BaseModel):
                                                          question_set=from_survey.listing_form).values_list('id',
                                                                                                             flat=True)
         #valid_interviews = set(valid_interviews)
-        qs = None
         # now get the interviews that meet the randomization criteria
         for criterion in to_survey.randomization_criteria.all():  # need to optimize this
             answer_type = criterion.listing_question.answer_type

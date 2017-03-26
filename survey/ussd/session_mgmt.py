@@ -7,10 +7,9 @@
 '''
 
 from survey.models import USSDAccess
-from django.core import serializers
-from django.core.cache import cache
 from functools import wraps
-from utils import reads_from_cache, refreshes_cache, saves_to_cache, ONGOING_COMMAND_NP
+from utils import ONGOING_COMMAND_NP
+from utils import reads_from_cache
 import flows
 
 

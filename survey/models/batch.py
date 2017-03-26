@@ -1,22 +1,15 @@
 from ordered_set import OrderedSet
-from collections import OrderedDict
-from cacheops import cached_as, invalidate_obj
+from cacheops import invalidate_obj
 from django.core.urlresolvers import reverse
-from django.conf import settings
 from django.db import models
 from django.db.models import Max
 from survey.models.locations import Location
 from survey.models.surveys import Survey
 from survey.models.base import BaseModel
-from survey.utils.views_helper import get_descendants
-from survey.models.questions import QuestionFlow, QuestionSet, Question
+from survey.models.questions import QuestionSet
 from survey.models.batch_questions import BatchQuestion
-from survey.forms.logic import LogicForm
 from survey.models.access_channels import InterviewerAccess
 # from survey.models.enumeration_area import EnumerationArea
-from survey.models.interviews import AnswerAccessDefinition, Answer
-from survey.models.access_channels import ODKAccess
-from django.core.exceptions import ValidationError
 
 
 class Batch(QuestionSet):

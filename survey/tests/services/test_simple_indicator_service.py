@@ -1,4 +1,3 @@
-from random import randint
 from survey.models.locations import *
 from survey.models import Backend, Interviewer, QuestionModule, Question, QuestionOption, Indicator, Formula, \
     Household, HouseholdHead, Batch, MultiChoiceAnswer, HouseholdMemberGroup, Survey, GroupCondition, EnumerationArea, HouseholdListing, \

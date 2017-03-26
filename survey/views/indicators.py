@@ -1,18 +1,19 @@
 import json
 import plotly.offline as opy
 import plotly.graph_objs as go
-from django import template
 from django.utils.safestring import mark_safe
-from django.utils.datastructures import SortedDict
 from django.contrib import messages
 from django.contrib.auth.decorators import permission_required, login_required
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render, get_object_or_404
 from django.core.urlresolvers import reverse
-from survey.models import LocationType, Location, MultiChoiceAnswer, Interview
+from survey.models import Location
 from survey.forms.indicator import IndicatorForm, IndicatorVariableForm, IndicatorFormulaeForm
 from survey.forms.filters import IndicatorFilterForm
-from survey.models import Indicator, Survey, Answer, IndicatorVariable, IndicatorVariableCriteria
+from survey.models import Indicator
+from survey.models import IndicatorVariable
+from survey.models import IndicatorVariableCriteria
+from survey.models import Survey
 from survey.forms.enumeration_area import LocationsFilterForm
 
 
@@ -255,7 +256,6 @@ def indicator_formula(request, indicator_id):
 
 
 def _retrieve_data_frame(request, indicator_id):
-    hierarchy_limit = 2
     selected_location = Location.objects.get(parent__isnull=True)
     params = request.GET or request.POST
     locations_filter = LocationsFilterForm(data=params)

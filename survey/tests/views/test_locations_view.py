@@ -3,7 +3,6 @@ import json
 from django.test.client import Client
 from survey.models.locations import *
 from django.contrib.auth.models import User
-from survey.models import LocationTypeDetails, EnumerationArea
 
 from survey.tests.base_test import BaseTest
 

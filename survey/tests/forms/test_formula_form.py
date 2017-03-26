@@ -57,8 +57,8 @@ class FormulaFormTest(TestCase):
     def test_should_have_only_questions_for_batch_in_numerator_and_denominator_for_percentage_indicator_in_module(self):
         formula_form = FormulaForm(indicator=self.percentage_indicator)
 
-        all_batch_questions = [self.question_1, self.question_2]
-        questions_not_in_batch = [self.question_3, self.question_4]
+        [self.question_1, self.question_2]
+        [self.question_3, self.question_4]
 
         self.assertIn((self.group.id, self.group.name),
                       formula_form.fields['groups'].choices)
@@ -66,7 +66,7 @@ class FormulaFormTest(TestCase):
     def test_should_have_only_questions_for_batch_in_count_for_count_indicator(self):
         formula_form = FormulaForm(indicator=self.count_indicator)
 
-        all_batch_questions = [self.question_1, self.question_2]
+        [self.question_1, self.question_2]
         questions_not_in_batch = [self.question_3, self.question_4]
         [self.assertNotIn((question.id, question.text), formula_form.fields[
                           'count'].choices) for question in questions_not_in_batch]

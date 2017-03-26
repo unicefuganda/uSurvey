@@ -159,7 +159,6 @@ class HouseholdMemberGroupTest(BaseTest):
 
     def test_add_group_with_already_existing_group(self):
         hmg_1 = GroupCondition.objects.create(value="some string")
-        some_irrelevant_number = '1'
         data = {'name': 'aged between 15 and 49',
                 'order': 1,
                 'conditions': [hmg_1.id]}

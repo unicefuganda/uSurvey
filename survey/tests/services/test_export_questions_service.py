@@ -1,4 +1,4 @@
-from survey.services.export_questions import ExportQuestionsService, get_batch_question_as_dump, get_question_template_as_dump
+from survey.services.export_questions import ExportQuestionsService
 
 from survey.tests.base_test import BaseTest
 from survey.models import Question, QuestionOption, HouseholdMemberGroup, Batch, QuestionModule

@@ -1,16 +1,13 @@
-from datetime import date
 from django.test.client import Client
 from django.contrib.auth.models import User
 from survey.models.locations import *
-from survey.interviewer_configs import PRIME_LOCATION_TYPE
 from survey.models import HouseholdMemberGroup, QuestionModule, Interviewer, GroupCondition, \
     EnumerationArea, QuestionTemplate, NumericalAnswer, TextAnswer, MultiChoiceAnswer, QuestionOption, TemplateOption
-from survey.models.households import HouseholdMember, Household
 from survey.models.surveys import Survey
 from survey.models.questions import Question, QuestionFlow
 from survey.models.batch import Batch
 from survey.tests.base_test import BaseTest
-from survey.forms.batch import BatchForm, BatchQuestionsForm
+from survey.forms.batch import BatchForm
 from django.core.urlresolvers import reverse
 import json
 

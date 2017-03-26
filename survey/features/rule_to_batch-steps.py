@@ -2,7 +2,8 @@ from time import sleep
 from lettuce import *
 from survey.features.page_objects.question import BatchQuestionsListPage
 from survey.features.page_objects.rules import AddLogicToBatchQuestionPage
-from survey.models import Question, AnswerRule, BatchQuestionOrder
+from survey.models import BatchQuestionOrder
+from survey.models import Question
 from survey.models.question import QuestionOption
 
 

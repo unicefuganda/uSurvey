@@ -1,6 +1,5 @@
 __author__ = 'anthony'
 import os
-import sys
 import logging
 from django.conf import settings
 from logging import handlers

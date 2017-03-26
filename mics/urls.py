@@ -1,4 +1,5 @@
-from django.conf.urls import patterns, include, url
+from django.conf.urls import include
+from django.conf.urls import patterns
 from django.contrib import admin
 from survey.urls import urlpatterns as survey_urls
 from django.conf import settings

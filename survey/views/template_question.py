@@ -1,6 +1,4 @@
 import json
-import re
-from collections import OrderedDict
 from django.core.serializers.json import DjangoJSONEncoder
 from django.shortcuts import render, get_object_or_404
 from django.contrib import messages
@@ -12,7 +10,6 @@ from survey.forms.question_template import QuestionTemplateForm
 from survey.services.export_questions import get_question_template_as_dump
 from survey.utils.query_helper import get_filterset
 from django.core.urlresolvers import reverse
-from django.conf import settings
 
 
 @permission_required('auth.can_view_batches')

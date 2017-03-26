@@ -1,5 +1,4 @@
 from random import randint
-from time import sleep
 
 from lettuce import *
 from django.contrib.auth.models import User, Group

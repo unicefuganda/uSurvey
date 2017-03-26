@@ -1,4 +1,3 @@
-from random import randint
 from time import sleep
 from lettuce import *
 from rapidsms.contrib.locations.models import Location

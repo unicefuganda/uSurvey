@@ -7,15 +7,14 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
 from django.conf import settings
 from django.forms.models import inlineformset_factory
-from survey.interviewer_configs import *
 from survey.forms.interviewer import InterviewerForm, USSDAccessForm, ODKAccessForm
-from survey.models import EnumerationArea, LocationType, Location
-from survey.models import Interviewer, USSDAccess, ODKAccess
-from survey.utils.views_helper import contains_key
+from survey.models import EnumerationArea
+from survey.models import LocationType
+from survey.models import Interviewer
+from survey.models import USSDAccess
 from survey.services.export_interviewers import ExportInterviewersService
 from survey.utils.query_helper import get_filterset
-from survey.forms.enumeration_area import EnumerationAreaForm, LocationsFilterForm
-from survey.models import Location
+from survey.forms.enumeration_area import LocationsFilterForm
 
 CREATE_INTERVIEWER_DEFAULT_SELECT = ''
 LIST_INTERVIEWER_DEFAULT_SELECT = 'All'

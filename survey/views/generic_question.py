@@ -1,24 +1,19 @@
 import json
-import re
-from collections import OrderedDict
 from django.core.urlresolvers import reverse
-from django.core import serializers
-from django.core.serializers.json import DjangoJSONEncoder
 from django.shortcuts import render, get_object_or_404
 from django.contrib import messages
 from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth.decorators import permission_required
 from survey.forms.filters import BatchQuestionFilterForm as QuestionFilterForm,  \
     MAX_NUMBER_OF_QUESTION_DISPLAYED_PER_PAGE, DEFAULT_NUMBER_OF_QUESTION_DISPLAYED_PER_PAGE
-from survey.models import BatchQuestion, Question
+from survey.models import Question
 from survey.models import Batch, QuestionTemplate, QuestionFlow, TextArgument, TemplateOption
 from survey.forms.question import QuestionForm, BatchQuestionForm  # , QuestionFlowForm
-from survey.forms.filters import QuestionFilterForm, BatchQuestionFilterForm
+from survey.forms.filters import QuestionFilterForm
 from survey.services.export_questions import get_batch_question_as_dump
 from survey.utils.query_helper import get_filterset
 from survey.views.custom_decorators import not_allowed_when_batch_is_open
 from survey.forms.logic import LogicForm
-from django.conf import settings
 
 
 class QuestionView(object):
@@ -56,7 +51,7 @@ class QuestionView(object):
             question_filter_form = QuestionFilterForm(qset=batch)
         #question_library =  question_filter_form.filter(QuestionTemplate.objects.all())
 
-        question_form = QuestionForm(batch)
+        QuestionForm(batch)
 
         request.breadcrumbs([
             ('Surveys', reverse('survey_list_page')),
@@ -340,8 +335,6 @@ class QuestionView(object):
             question_graph = json.loads(data)
             nodes = {}
             connections = {}
-            targets = []
-            root_question = None
             for item in question_graph:
                 if item.get('identifier', False):
                     question, _ = Question.objects.get_or_create(identifier=item['identifier'],

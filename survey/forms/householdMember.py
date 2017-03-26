@@ -1,4 +1,4 @@
-from django.forms import ModelForm, DateInput
+from django.forms import ModelForm
 from django import forms
 from survey.models.households import HouseholdMember
 from django.conf import settings

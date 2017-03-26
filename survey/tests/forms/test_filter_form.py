@@ -1,7 +1,13 @@
 from django.test import TestCase
 from survey.models.locations import *
-from survey.forms.filters import QuestionFilterForm, IndicatorFilterForm, LocationFilterForm, SurveyBatchFilterForm
-from survey.models import Question, QuestionModule, HouseholdMemberGroup, Indicator, Batch, Survey, EnumerationArea
+from survey.forms.filters import IndicatorFilterForm
+from survey.forms.filters import QuestionFilterForm
+from survey.forms.filters import SurveyBatchFilterForm
+from survey.models import Batch
+from survey.models import EnumerationArea
+from survey.models import HouseholdMemberGroup
+from survey.models import QuestionModule
+from survey.models import Survey
 
 
 class QuestionFilterFormTest(TestCase):

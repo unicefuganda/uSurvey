@@ -3,7 +3,7 @@ from survey.models.locations import Location
 from survey.models import BaseModel
 from django.db import models
 from survey.models.surveys import Survey
-from survey.models.batch import Batch, BatchLocationStatus
+from survey.models.batch import BatchLocationStatus
 
 
 class EnumerationArea(BaseModel):

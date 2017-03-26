@@ -1,15 +1,10 @@
-from django.template.defaultfilters import slugify
-from datetime import date, datetime, timedelta
 from django.test import TestCase
-from mock import patch
 from survey.models.locations import *
 from survey.models import HouseholdMemberGroup, GroupCondition, Question, Batch, HouseholdMemberBatchCompletion, \
     NumericalAnswer, Survey, EnumerationArea, QuestionModule
 # from survey.models.batch_question_order import BatchQuestionOrder
 from survey.models.households import Household, HouseholdListing, HouseholdMember, SurveyHouseholdListing
-from survey.models.backend import Backend
 from survey.models.interviewer import Interviewer
-from django.utils.timezone import utc
 
 
 class HouseholdTest(TestCase):

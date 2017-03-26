@@ -1,7 +1,5 @@
 from django import forms
-from django.core.exceptions import ValidationError
 from django.forms import ModelForm, Form
-from django.conf import settings
 from survey.models import EnumerationArea, Location, LocationType
 from django.http import QueryDict
 

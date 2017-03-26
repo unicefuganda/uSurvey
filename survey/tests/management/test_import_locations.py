@@ -3,7 +3,6 @@ from survey.models.locations import *
 from survey.models import LocationTypeDetails
 from survey.management.commands.import_location import Command
 from survey.tests.base_test import BaseTest
-from mock import patch
 from survey.management.commands import *
 
 
@@ -29,7 +28,7 @@ class ImportLocationTest(BaseTest):
 
         self.write_to_csv('wb', self.data)
         self.filename = 'test.csv'
-        file = open(self.filename, 'rb')
+        open(self.filename, 'rb')
         self.importer = FakeCommand()
         self.region = LocationType.objects.create(
             name='Region1', slug='region')

@@ -1,9 +1,8 @@
-from datetime import date
 from random import randint
 
 from survey.models.locations import Location, LocationType
 from survey.models import Batch, HouseholdMemberGroup, QuestionModule, HouseholdListing, GroupCondition, Question, Formula, Backend, Interviewer, Household, QuestionOption, Survey, EnumerationArea
-from survey.models import HouseholdHead, LocationTypeDetails
+from survey.models import HouseholdHead
 from survey.models.households import HouseholdMember, SurveyHouseholdListing
 from survey.tests.base_test import BaseTest
 from survey.models.question_module import QuestionModule

@@ -1,19 +1,18 @@
 import json
-import re
-from collections import OrderedDict
 from django.core.urlresolvers import reverse
-from django.core import serializers
-from django.core.serializers.json import DjangoJSONEncoder
 from django.shortcuts import render, get_object_or_404
 from django.contrib import messages
 from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth.decorators import permission_required
-from django.conf import settings
 from survey.forms.filters import QuestionFilterForm,  \
     MAX_NUMBER_OF_QUESTION_DISPLAYED_PER_PAGE, DEFAULT_NUMBER_OF_QUESTION_DISPLAYED_PER_PAGE
 from survey.models import Question, QuestionSet
-from survey.models import Batch, QuestionTemplate, QuestionFlow, TextArgument, TemplateOption, QuestionSet
-from survey.models import QuestionModule, QuestionOption, QuestionLoop, ODKAccess
+from survey.models import QuestionFlow
+from survey.models import QuestionSet
+from survey.models import QuestionTemplate
+from survey.models import TemplateOption
+from survey.models import QuestionLoop
+from survey.models import QuestionOption
 from survey.forms.question import get_question_form  # , QuestionFlowForm
 from survey.forms.batch import BatchQuestionsForm
 from survey.services.export_questions import get_question_as_dump
@@ -176,7 +175,6 @@ def add_logic(request, qset_id, question_id):
 def manage_loop(request, question_id):
     question = Question.get(id=question_id)
     batch = QuestionSet.get(pk=question.qset.pk)
-    response = None
     cancel_url = '../'
     existing_loop = getattr(question, 'loop_started', None)
     looping_form = LoopingForm(question, instance=existing_loop)
