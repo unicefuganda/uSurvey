@@ -1,8 +1,7 @@
 {% extends "layout.html" %}
 {% block extra_head %}
-  <link rel="stylesheet" href="/static/css/leaflet.css" />
-<script src="/static/js/leaflet.js"></script>
-   
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.3/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js"></script>
 {% endblock %}
 {% block title %}
   Survey Map
@@ -286,8 +285,7 @@ function updateLegend(max) {
     step = max/5.
     var div = document.getElementById('map-legend');
     div.innerHTML = '';
-    div.innerHTML += "<strong>Interview per EA</strong><br />"
-        + '<i class="map-legend" style="background:' + getColorFor(null) + '"></i>'+ " Survey not opened<br/>";
+    div.innerHTML += '<i class="map-legend" style="background:' + getColorFor(null) + '"></i>'+ " Survey not opened<br/>";
     for (var i = 0; i < 4; i++) {
         div.innerHTML += '<i class="map-legend" style="background:' + getColorFor(grades[i]) + ';"></i> ';
         div.innerHTML += Math.floor(i*step) +" &mdash; "+ Math.floor((i + 1)*step) + "<br/>";
@@ -315,7 +313,7 @@ function getCompletionFor(){
               feature.properties.rate = {'value': 0, description: ''};
         });
        //update legend
-        //updateLegend(max_rate);
+        updateLegend(max_rate);
        geojson = L.geoJson(mapData, {style: style, onEachFeature: onEachFeature}).addTo(map);
     });
 
