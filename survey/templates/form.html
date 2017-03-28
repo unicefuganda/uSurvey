@@ -41,7 +41,7 @@
     padding-left: 5px;
     padding-bottom: 1px;">Cancel</a>
     {% else %}
-      <a href="#" class="btn btn-primary" name="cancel_button" id="cancel_{{ id }}" class="cancel">Cancel</a>
+      <a href="{% url 'enumeration_area_home' %}" class="btn btn-primary" name="cancel_button" id="cancel_{{ id }}" class="cancel">Cancel</a>
     {% endif %}
   </div>
     {% endblock %}
