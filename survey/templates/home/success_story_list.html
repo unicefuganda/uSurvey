@@ -1,0 +1,166 @@
+{% extends "page_with_table.html" %}
+{% load template_tags %}
+{% load pagination_tags %}
+{% autopaginate surveys 50 %}
+{% block title %}
+  Success Stories List
+{% endblock %}
+{% block search %}
+{% endblock %}
+{% block extra_head %}
+<link rel="stylesheet" href="{{ STATIC_URL }}css/awesomplete.css" />
+<script src="{{ STATIC_URL }}js/awesomplete.min.js" async></script>
+<style type="text/css">
+.dataTables_wrapper .row {
+    margin: 0!important;
+    display: none !important;
+  }
+    .status {
+        width: 50px !important;
+    }
+#red_circle  {
+    /*background: #d12a09 none repeat scroll 0 0;
+    border-radius: 70px;
+    height: 10px;
+    margin-top: 5px;
+    width: 10px;*/
+    background: #a3a3a3 none repeat scroll 0 0;
+    border: 1px solid #000;
+    margin-top: 5px;
+    border-radius: 70px;
+    height: 10px;
+    width: 10px;
+    margin-left: 15px;
+}
+#green_circle {
+    background: #009948 none repeat scroll 0 0;
+    border-radius: 70px;
+    height: 10px;
+    margin-top: 5px;
+    text-align: center;
+    width: 10px;
+    margin-left: 15px;
+}
+#amber_circle {
+    background: #ffcc00 none repeat scroll 0 0;
+    border-radius: 70px;
+    height: 10px;
+    margin-top: 5px;
+    width: 10px;
+    margin-left: 15px;
+}
+
+.dataTables_scrollBody{
+                          height: 330px !important;
+                        }
+</style>
+{% endblock %}
+
+{% block page_actions %}
+<!-- Start LEGENDS -->
+<!-- <div style="margin-right: 200px">
+<span style="padding-left:25px; font-family:Open Sans; font-size:12px; color:gray;"><i class="fa fa-circle" aria-hidden="true"> Not Started</i></span>
+<span style="padding-left:8px; font-family:Open Sans; font-size:12px; color:green;"><i class="fa fa-circle" aria-hidden="true"> Ongoing</i></span>
+<span style="padding-left:8px; font-family:Open Sans; font-size:12px; color:#ff6600;"><i class="fa fa-circle" aria-hidden="true"> Completed</i></span>
+</div> -->
+<!-- End LEGENDS -->
+
+<div class="col-lg-12">
+        <a href="{% url 'success_story_new' %}" class="btn btn-white btn-warning btn-bold" >
+          <i class="ace-icon fa fa-plus bigger-120"></i>
+												Create New Success Story
+											</a>
+                      </div>
+
+{% endblock %}
+    {% block table_head %}
+    <br>
+      <tr>
+        <th class="status sorting">
+            SNo
+        </th>
+        <th class="sorting">
+          Name
+        </th>
+        
+        <th  style="background-image: None;">
+          Actions
+        </th>
+      </tr>
+    {% endblock %}
+    {% block table_body %}
+    {% has_super_powers request as has_powers %}
+    {% for each in ss_list %}
+        <tr>
+         <td>
+              {{forloop.counter}}
+          </td>
+          <td>
+            <a href="{% url 'success_story_edit' each.id %}">{{ each.name }}</a>
+          </td>
+         
+         
+          <td width="10%">
+            <div class="">
+                <div class="inline pos-rel">
+                       <button class="btn btn-minier btn-yellow dropdown-toggle" data-toggle="dropdown" data-position="auto">
+                           <i class="usur-icon fa fa-caret-down icon-only bigger-120"></i>
+                       </button>
+                        <ul class="dropdown-menu dropdown-only-icon dropdown-yellow dropdown-menu-right dropdown-caret dropdown-close">
+                            <li>
+                                <a href="{% url 'success_story_edit' each.id %}" class="tooltip-info" data-rel="tooltip" title="" data-original-title="Edit"><span class="blue"><i class="usur-icon fa fa-pencil-square-o bigger-120"></i>Edit</span></a>
+                            </li>
+                            
+                            <li>
+                                <a href="" class="tooltip-info" data-toggle="modal" data-rel="tooltip" title="" data-original-title="Delete"><span class="red"><i class="usur-icon fa fa-trash bigger-120"></i>Delete</span></a>
+                            </li>
+                            
+                            
+                                
+                            </li>
+                        </ul>
+                </div>
+            </div>
+          </td>
+        </tr>
+      {% endfor %}
+    {% endblock %}
+    {% block post_table %}
+    
+    {% endblock %}
+
+
+{% block javascripts %}
+<link rel="stylesheet" href="{{ STATIC_URL }}css/dataTables.bootstrap.css" type="text/css">
+<script type="text/javascript" src="https://code.jquery.com/jquery-1.12.4.js"></script>
+<script src="{{ STATIC_URL }}/js/jquery.dataTables.js"></script>
+<script src="{{ STATIC_URL }}/js/dataTables.bootstrap.js" type="text/javascript" charset="utf-8"></script>
+<script src="{{STATIC_URL}}js/jquery.validate.js" type="text/javascript" charset="utf-8"></script>
+    <script src="{{STATIC_URL}}js/survey.js" type="text/javascript" charset="utf-8"></script>
+    <script type="text/javascript">            
+            $(document).ready(function() {
+          
+    $('#datatables').DataTable( {
+        "scrollY":        "250px",
+        "scrollX":        '100%',
+        "scrollCollapse": true,
+        "paging":         true,
+        'aoColumnDefs': [{
+        'bSortable': false,
+        'aTargets': [-1] /* 1st one, start by the right */
+    }]
+    } );
+} );
+  </script>
+    <!-- <link rel="stylesheet" href="{{ STATIC_URL }}assets/formoid-solid-blue.css"> -->
+          <script src="{{STATIC_URL}}js/type-auto-suggest.js" type="text/javascript" charset="utf-8"></script>
+        <script type="text/javascript">
+                $(function(){
+                    init_fields();
+                    $('#id_random_sample_label').on('keyup', function(){
+                       make_suggestions('#id_random_sample_label', "{% url 'qset_identifiers' %}?id=" + $('#id_listing_form').val());
+                       this.focus();
+                    });
+                });
+            </script>
+{% endblock %}

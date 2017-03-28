@@ -23,7 +23,7 @@ from survey.models.upload_error_logs import UploadErrorLog
 from survey.models.users import UserProfile
 from survey.models.question_module import QuestionModule
 from survey.models.indicators import Indicator, IndicatorVariableCriteria, IndicatorVariable
-from survey.models.about_us_content import AboutUs
+from survey.models.about_us_content import AboutUs,SuccessStories
 from survey.models.odk_submission import ODKSubmission, Attachment, ODKFileDownload
 from survey.models.formula import Formula
 from survey.models.interviews import AnswerAccessDefinition

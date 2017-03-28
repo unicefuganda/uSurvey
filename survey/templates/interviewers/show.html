@@ -11,7 +11,8 @@
   }
   .btn-yellow{display: none !important;}
   ._heading_color{
-    color: #09F;
+  color: #034b94;
+
   }
   </style>
 
@@ -21,24 +22,48 @@
         <fieldset>
         {% if interviewer.odk_access %}
           <div id="legend">
-            <legend class="_heading_color">Credentials</legend>
+            <legend class="_heading_color">ODK Access</legend>
           </div>
-     {% for access in interviewer.odk_access %}          
+     {% for access in interviewer.odk_access %}
+          <table>
+            <tr>
+              <td>
+                <div class="control-group">
+                  <label class="control-label"  for="username">ODK ID</label>
+                  <div class="controls">
+                    {{ access.user_identifier }}
+                  </div>
+                </div>
+                
+              </td>
+              <td>
+                <div class="control-group">
+                  <label class="control-label"  for="username">ODK Token</label>
+                  <div class="controls">
+                    {{ access.odk_token }}
+                  </div>
+                </div>
+                
+              </td>
+            </tr>
+          </table>        
+          
+
+          
+     {% endfor %}
+     {% endif %}
+     <div id="legend">
+            <legend class="_heading_color">USSD Access</legend>
+          </div>
+            {% for access in interviewer.ussd_access %}
           <div class="control-group">
-            <label class="control-label"  for="username">ODK ID</label>
+            <label class="control-label"  for="username">Mobile Number</label>
             <div class="controls">
               {{ access.user_identifier }}
             </div>
           </div>
+          {% endfor %} 
 
-          <div class="control-group">
-            <label class="control-label"  for="username">ODK Token</label>
-            <div class="controls">
-              {{ access.odk_token }}
-            </div>
-          </div>
-     {% endfor %}
-     {% endif %}
       <div id="legend">
             <legend class="_heading_color">Profile</legend>
           </div>
@@ -51,14 +76,7 @@
             </div>
           </div>
 
-{% for access in interviewer.ussd_access %}
-          <div class="control-group">
-            <label class="control-label"  for="username">Mobile Number</label>
-            <div class="controls">
-              {{ access.user_identifier }}
-            </div>
-          </div>
-{% endfor %}          
+         
           <div class="control-group">
             <label class="control-label"  for="username">Date Of Birth</label>
             <div class="controls">
@@ -114,12 +132,7 @@
               {{ interviewer.survey_name }}
             </div>
           </div>
-          <div class="control-group">
-            <label class="control-label"  for="username">Total Households</label>
-            <div class="controls">
-              {{ interviewer.ea.total_households }}
-            </div>
-          </div>
+          
         </fieldset>
       </form>
       <form class="form-horizontal">
@@ -149,6 +162,23 @@
 }
 .form-horizontal .control-label{
   padding-top: 0px !important;
+}
+legend {
+    -moz-border-bottom-colors: none;
+    -moz-border-left-colors: none;
+    -moz-border-right-colors: none;
+    -moz-border-top-colors: none;
+    border-color: currentcolor currentcolor #c3a0d9;
+    border-image: none;
+    border-style: none none solid;
+    border-width: 0 0 1px;
+    color: #333333;
+    display: block;
+    font-size: 21px;
+    line-height: 40px;
+    margin-bottom: 20px;
+    padding: 0;
+    width: 100%;
 }
 </style>
 

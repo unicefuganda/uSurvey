@@ -1,0 +1,44 @@
+{% extends "layout.html" %}
+
+{% block content %}
+  <h3>
+  {% block title %}
+    Success Stories Form
+   {% endblock %}
+</h3><br/><br/>
+    <form method="post" accept-charset="utf-8" class="horizontal-form">
+      {% csrf_token %}
+
+      <table width="100%" >
+        <tr>
+          <td><label>Name</label></td>
+          <td>{{form.name}}
+          <label class="error">{{form.name.errors}}</label>
+          </td>
+
+        </tr>
+        <tr height="5">
+          <td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td><label>Content</label></td>
+          <td>{{form.content}}
+          <label class="error">{{form.content.errors}}</label>
+          </td>
+        </tr>
+      </table>
+
+
+
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary" name="save_button">Save</button>
+        <a href="{% url 'about_page' %}" class="btn btn-primary" name="cancel_button">Cancel</a>
+      </div>
+    </form>
+{% endblock %}
+{% block javascripts %}
+    <script src="{{STATIC_URL}}ckeditor/ckeditor.js" type="text/javascript" charset="utf-8"></script>
+    <script>
+        CKEDITOR.replace( 'content-editor' );
+    </script>
+{% endblock %}

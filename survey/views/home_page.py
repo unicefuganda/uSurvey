@@ -3,8 +3,8 @@ from django.contrib.auth.decorators import permission_required
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.contrib.auth import logout
-from survey.forms.aboutus_form import AboutUsForm
-from survey.models import Survey, AboutUs, Indicator
+from survey.forms.aboutus_form import AboutUsForm, SuccessStoriesForm
+from survey.models import Survey, AboutUs, Indicator, SuccessStories
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
 from django.core.urlresolvers import reverse
@@ -79,6 +79,36 @@ def deactivate_super_powers(request):
     views_helper.deactivate_super_powers(request)
     messages.info(request, 'Super powers deactivated!')
     return HttpResponseRedirect(reverse('home_page'))
+
+
+def success_story_list(request):
+    ss_list  = SuccessStories.objects.all()
+    return render(request, 'home/success_story_list.html', {'ss_list': ss_list})
+
+def success_story_delete(request,id=None):
+    if id:
+        instance = SuccessStories.objects.get(id=id)
+        instance.delete()
+        messages.info(request, 'Success story have been Deleted') 
+    return HttpResponseRedirect(reverse('success_story_list'))
+
+def success_story_form(request,id=None, instance=None):
+    if id:
+        instance = SuccessStories.objects.get(id=id)
+    if request.method == 'POST':
+        form = SuccessStoriesForm(request.POST, instance=instance)
+        if form.is_valid():
+            form.save()
+            if id == None:
+                messages.info(request, 'New Success story have been saved') 
+            else:
+                messages.info(request, 'Success story have been saved') 
+            return HttpResponseRedirect(reverse('success_story_list'))
+        else:
+            print form.errors
+    else:
+        form = SuccessStoriesForm(instance=instance)
+    return render(request, 'home/success_story_form.html', {'form': form})
 
 
 

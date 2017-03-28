@@ -21,36 +21,128 @@
    width: 220px !important;
    height: 25px !important; 
   }
-  #id_password2, #id_username, #id_first_name, #id_last_name{
+  #id_username{width: 220px !important;
+   height: 25px !important;
+margin-left: 0px !important;
+ }
+ #id_country_code{width: 40px !important;
+   height: 25px !important;
+margin-left: 0px !important;
+text-align: center;
+ }
+  #id_password2, #id_first_name, #id_last_name{
    width: 220px !important;
    height: 25px !important; 
   }
   #id_mobile_number{
-    width: 195px !important;
+    width: 175px !important;
+    height: 25px !important; 
   }
+  .control-label{
+    font-weight: bold;
+  }
+  .btn-yellow{display: none !important;}
+  ._heading_color{
+  color: #034b94;
+
+  }
+    margin-bottom: 10px !important;
+}
+.form-horizontal .control-label{
+  padding-top: 0px !important;
+}
+legend {
+    -moz-border-bottom-colors: none;
+    -moz-border-left-colors: none;
+    -moz-border-right-colors: none;
+    -moz-border-top-colors: none;
+    border-color: currentcolor currentcolor #c3a0d9;
+    border-image: none;
+    border-style: none none solid;
+    border-width: 0 0 1px;
+    color: #333333;
+    display: block;
+    font-size: 16px;
+    line-height: 40px;
+    margin-bottom: 20px;
+    padding: 0;
+    width: 100%;
+}
 </style>
-{% for field in form.visible_fields %}
+<div id="legend">
+    <legend class="_heading_color">User Credentials</legend>
+  </div>
+
   <div class="control-group">
-    <label class="control-label col-md-4" for="{{field.auto_id}}">{{field.label}}</label>
-    <div class="controls {{ field|is_radio }} col-md-8">
-      {% if field.label_tag|is_mobile_number %}
-       <div class="ccode">
-           <span class="add-on">{{ country_phone_code }}</span>
-      {% endif %}
-      {{field}} <label class="error">
-        {% if field.errors %}
-            {% for error in field.errors %}
-                {{ error}}
-            {% endfor %}
-        {% endif %}
-         </label>
-      {% if field.label_tag|is_mobile_number %}
-        </div>
-      {% endif %}
+    <label class="control-label col-md-4">{{form.username.label}}</label>
+    <div class="controls col-md-8">
+      {{form.username}}
+      <label class="error">{{form.username.errors}}</label>
     </div>
   </div>
-{% endfor %}
+  <div class="control-group">
+    <label class="control-label col-md-4">{{form.password1.label}}</label>
+    <div class="controls col-md-8">
+      {{form.password1}}
+      <label class="error">{{form.password1.errors}}</label>
+    </div>
+  </div>
+  <div class="control-group">
+    <label class="control-label col-md-4">{{form.password2.label}}</label>
+    <div class="controls col-md-8">
+      {{form.password2}}
+      <label class="error">{{form.password2.errors}}</label>
+    </div>
+  </div>
+  <div id="legend">
+    <legend class="_heading_color">User Details</legend>
+  </div>
+  <div class="control-group">
+    <label class="control-label col-md-4">{{form.first_name.label}}</label>
+    <div class="controls col-md-8">
+      {{form.first_name}}
+      <label class="error">{{form.first_name.errors}}</label>
+    </div>
+  </div>
+
+<div class="control-group">
+    <label class="control-label col-md-4">{{form.last_name.label}}</label>
+    <div class="controls col-md-8">
+      {{form.last_name}}
+      <label class="error">{{form.last_name.errors}}</label>
+    </div>
+  </div>
+
+  <div class="control-group">
+    <label class="control-label col-md-4">{{form.email.label}}</label>
+    <div class="controls col-md-8">
+      {{form.email}}
+      <label class="error">{{form.email.errors}}</label>
+    </div>
+  </div>
+  <div class="control-group">
+    <label class="control-label col-md-4">{{form.mobile_number.label}}</label>
+    <div class="controls col-md-8">
+       <div class="ccode">
+           <span class="add-on"><input type="text" readonly="readonly" value="{{ country_phone_code }}" size="10" id="id_country_code"></span>
+            <span>{{form.mobile_number}}</span>
+      <label class="error">{{form.mobile_number.errors}}</label>
+    </div>
+  </div>
+  </div>
+  <div class="control-group">
+    <label class="control-label col-md-4">{{form.groups.label}}</label>
+    <div class="controls col-md-8">
+      {{form.groups}}
+      <label class="error">{{form.groups.errors}}</label>
+    </div>
+  </div>
+
+
 
 {% for hidden in form.hidden_fields %}
   {{ hidden }}
 {% endfor %}
+<style type="text/css">
+  .dataTables_wrapper select{width: 225px !important;}
+</style>
