@@ -47,7 +47,7 @@
             box-shadow: None;
             min-height: 500px;
             margin-bottom: 130px;
-            width: 500px;
+            width: 750px;
             margin-left: auto;
             margin-right: auto;
             
@@ -184,7 +184,7 @@ font-size: .9em;
                             </div>
                         </td>
                         <td style="width:10%">
-                            <p style="margin-top:-13px; margin-left:5px;font-weight:bold" class="text-success">{{ indicator.country_wide_value }}%</p>
+                            <p style="margin-top:-13px; margin-left:5px;font-weight:bold" class="text-success">{{ indicator.country_wide_value }}</p>
                         </td>
                     </tr>
                     {% endfor %}
@@ -235,6 +235,7 @@ font-size: .9em;
     map.dragging.disable();
     map.touchZoom.disable();
     map.doubleClickZoom.disable();
+
   //osmAttrib=;
     L.control.attribution({prefix: '© uSurvey'}).addTo(map);
   var mapData = null;
