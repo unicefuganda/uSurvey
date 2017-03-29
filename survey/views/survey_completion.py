@@ -36,6 +36,34 @@ def __get_parent_level_locations():
 
 @login_required
 @permission_required('auth.can_view_aggregates')
+def indicators_json(request):
+    in_kwargs = {'display_on_dashboard': True}
+    if request.GET.get('survey'):
+        in_kwargs['survey__id'] = request.GET['survey']
+    indicators = Indicator.objects.filter(**in_kwargs).order_by('name')
+
+    @cached_as(indicators)
+    def get_result_json():
+        """Basically fetch all indicators as per the map level info
+        :return:
+        """
+        indicator_details = {}
+        country = LocationType.objects.get(parent__isnull=True)
+        if hasattr(settings, 'MAP_ADMIN_LEVEL'):
+            location_type = country.get_descendants()[settings.MAP_ADMIN_LEVEL - 1]
+        else:
+            location_type = LocationType.largest_unit()
+        for indicator in indicators:
+            indicator_df = indicator.get_data(location_type.locations.all())
+            indicator_details[indicator.name] = dict(zip(indicator_df.index.str.upper(),
+                                                         indicator_df[indicator.REPORT_FIELD_NAME]))
+        return json.dumps(indicator_details, cls=DjangoJSONEncoder)
+    json_dump = get_result_json()
+    return HttpResponse(json_dump, content_type='application/json')
+
+
+@login_required
+@permission_required('auth.can_view_aggregates')
 def completion_json(request, survey_id):
     @cached_as(Survey.objects.filter(id=survey_id))
     def get_result_json():

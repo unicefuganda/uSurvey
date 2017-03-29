@@ -166,46 +166,46 @@ font-size: .9em;
   </style>
 <div id="home_display">
     <ul class="nav nav-tabs center-block rathna-nav">
-    <li class="active"><a data-toggle="tab" href="#locations-tab">LOCATIONS</a></li>
-        <li ><a data-toggle="tab" href="#statistics-tab">INDICATORS</a></li>
+    <li class="active"><a data-toggle="tab" href="#loc-stats-tab">LOCATIONS</a></li>
+        <li ><a data-toggle="tab" href="#indicators-tab">INDICATORS</a></li>
         
     </ul>
     <div class="tab-content r_tab-content">
-        <div id="statistics-tab" class="tab-pane fade">
-            <div id="rat-update">
-                <table style="width:100%; margin-top:20px;">
-                {% for indicator in display_indicators %}
-                    <tr>
-                        <td style="width:90%">
-                            <div class="progress">
-                                <div class="progress-bar progress-bar-success " role="progressbar" aria-valuenow="{{ indicator.country_wide_value }}" aria-valuemin="0" aria-valuemax="100" style="width:{{ indicator.country_wide_value }}%">
-                                    <span>{{ indicator.name }}</span>
-                                </div>
-                            </div>
-                        </td>
-                        <td style="width:10%">
-                            <p style="margin-top:-13px; margin-left:5px;font-weight:bold" class="text-success">{{ indicator.country_wide_value }}</p>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                    
-                </table>
-            </div>
-        </div>
-        <div id="locations-tab" class="tab-pane fade in active">
+        <div id="locations-tab">
             <div class="row r-row">
-                <div class="col-md-3">
-                    <div id="map-controls" style="padding: 10px;">{{map_filter}}</div>
-                    <div id="info-update"></div>
-                    <br/>
-                    <h3 class="rat_h3" style="margin-left: 8px;">INTERVIEW PER EA</h3>
-                    <div id="map-legend">
-                        <i class="map-legend" style="background:#8daedb"></i> Survey not opened<br>
-                        <i class="map-legend" style="background:#FD8D3C;"></i> 0 — 5<br>
-                        <i class="map-legend" style="background:#FC4E2A;"></i> 5 — 10<br>
-                        <i class="map-legend" style="background:#E31A1C;"></i> 10 — 15<br>
-                        <i class="map-legend" style="background:#BD0026;"></i> 15 — 20<br>
-                        <i class="map-legend" style="background:#800026"></i> 20 and Above
+                <div  class="col-md-3">
+                    <div id="indicators-tab" class="tab-pane fade">
+                        <table style="width:100%; margin-top:20px;" id="indicator-table">
+                        {% for indicator in display_indicators %}
+                            <tr>
+                                <td style="width:90%">
+                                    <div class="progress">
+                                        <div class="progress-bar progress-bar-success " role="progressbar" aria-valuenow="{{ indicator.country_wide_value }}" aria-valuemin="0" aria-valuemax="100" style="width:{{ indicator.country_wide_value }}%">
+                                            <span>{{ indicator.name }}</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td style="width:10%">
+                                    <p style="margin-top:-13px; margin-left:5px;font-weight:bold" class="text-success">{{ indicator.country_wide_value }}</p>
+                                </td>
+                            </tr>
+                        {% endfor %}
+
+                        </table>
+                    </div>
+                    <div id="loc-stats-tab" class="tab-pane fade  in active">
+                        <div id="map-controls" style="padding: 10px;">{{map_filter}}</div>
+                        <div id="info-update"></div>
+                        <br/>
+                        <h3 class="rat_h3" style="margin-left: 8px;">INTERVIEW PER EA</h3>
+                        <div id="map-legend">
+                            <i class="map-legend" style="background:#8daedb"></i> Survey not opened<br>
+                            <i class="map-legend" style="background:#FD8D3C;"></i> 0 — 5<br>
+                            <i class="map-legend" style="background:#FC4E2A;"></i> 5 — 10<br>
+                            <i class="map-legend" style="background:#E31A1C;"></i> 10 — 15<br>
+                            <i class="map-legend" style="background:#BD0026;"></i> 15 — 20<br>
+                            <i class="map-legend" style="background:#800026"></i> 20 and Above
+                        </div>
                     </div>
                 </div>
                 <div class="col-md-9">
@@ -226,11 +226,11 @@ font-size: .9em;
 
 {% block javascripts %}
     <script type="text/javascript">
-        <!--$("#survey_map").height($(document).height() * 0.7);-->
-       var map = L.map('survey_map', {zoomControl: false, doubleClickZoom: false, scrollWheelZoom:false, attributionControl: false}).setView([{{map_center}}], {{ zoom_level|default:6}}),
+       var map = L.map('survey_map', {zoomControl: true, doubleClickZoom: false, scrollWheelZoom:false, attributionControl: false}).setView([{{map_center}}], {{ zoom_level|default:6}}),
 
     info = L.control(),
     //legend = L.control({position: 'bottomright'}),
+    indicatorData = {},
     geojson;
     map.dragging.disable();
     map.touchZoom.disable();
@@ -243,8 +243,10 @@ font-size: .9em;
 $(function(){
     $("#id_survey").on('change', function(){
         getCompletionFor();
+        load_indicators();
     });
     loadInitialMap();
+    load_indicators();
 });
 
 
@@ -320,12 +322,22 @@ function getCompletionFor(){
 
 }
 
+function load_indicators(){
+    var indicator_url = "{% url 'survey_indicators' %}";
+    if($("#id_survey").val())
+        indicator_url = indicator_url + "?survey=" + $("#id_survey").val();
+    $.getJSON(indicator_url, function (data) {
+         indicatorData = data;
+      });
+}
+
 function loadInitialMap(){
     $.getJSON("{{shape_file_uri}}", function (data) {
          mapData = data;
          resetMap();
       });
 }
+
 
 
 function resetMap() {
@@ -385,9 +397,37 @@ function onEachFeature(feature, layer) {
 
 }
 
+getIndicatorHtml = function(name, property) {
+    var indicatorValue = indicatorData[name][property];
+    if(indicatorValue)
+        return '<tr>\
+                <td style="width:90%">\
+                    <div class="progress">\
+                        <div class="progress-bar progress-bar-success " role="progressbar" aria-valuenow="' +  indicatorValue + '" aria-valuemin="0" aria-valuemax="100" style="width:"' +  indicatorValue + '%">\
+                            <span>' + name + '</span>\
+                        </div>\
+                    </div>\
+                </td>\
+                <td style="width:10%">\
+                    <p style="margin-top:-13px; margin-left:5px;font-weight:bold" class="text-success">'  +  indicatorValue + '</p>\
+                </td>\
+            </tr>';
+    return '';
+}
+
+
+updateIndicators = function(property) {
+     var indicatorTable = document.getElementById('indicator-table');
+     indicatorTable.html = '<h3 class="rat_h3" style="margin-left: 8px;">'+property+ '</h3>';
+     for (var name in indicatorData){
+        indicatorTable.html += getIndicatorHtml(name, property);
+     }
+}
+
 info.onAdd = function (map) {
 
 };
+
 info.update = function (props) {
   var div = document.getElementById('info-update');
   div.innerHTML = '';
@@ -397,6 +437,7 @@ info.update = function (props) {
         property = props['{{alt_loc_field}}'];
     if(property) {
        property = property.toUpperCase();
+       updateIndicators(property);
         if('total_eas' in props.rate){
             rate = props.rate.value >-1 ? props.rate.value: 'Survey not opened.';
              div.innerHTML = '<table class="rathna_table">\
