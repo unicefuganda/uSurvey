@@ -163,6 +163,17 @@ font-size: .9em;
     margin-right: 4px !important;
     width: 220px !important;
 }
+
+#displays {
+   position: relative;
+}
+
+#indicators-tab, #loc-stats-tab {
+   position: absolute;
+   display: block;
+   width: 100%;
+}
+
   </style>
 <div id="home_display">
     <ul class="nav nav-tabs center-block rathna-nav">
@@ -170,10 +181,12 @@ font-size: .9em;
         <li ><a data-toggle="tab" href="#indicators-tab">INDICATORS</a></li>
         
     </ul>
+
     <div class="tab-content r_tab-content">
         <div id="locations-tab">
             <div class="row r-row">
-                <div  class="col-md-3">
+                <div id="displays" class="col-md-3">
+                    <div id="map-controls" style="padding: 10px; ">{{map_filter}}</div>
                     <div id="indicators-tab" class="tab-pane fade">
                         <table style="width:100%; margin-top:20px;" id="indicator-table">
                         {% for indicator in display_indicators %}
@@ -194,7 +207,6 @@ font-size: .9em;
                         </table>
                     </div>
                     <div id="loc-stats-tab" class="tab-pane fade  in active">
-                        <div id="map-controls" style="padding: 10px;">{{map_filter}}</div>
                         <div id="info-update"></div>
                         <br/>
                         <h3 class="rat_h3" style="margin-left: 8px;">INTERVIEW PER EA</h3>
@@ -399,28 +411,34 @@ function onEachFeature(feature, layer) {
 
 getIndicatorHtml = function(name, property) {
     var indicatorValue = indicatorData[name][property];
-    if(indicatorValue)
-        return '<tr>\
-                <td style="width:90%">\
-                    <div class="progress">\
-                        <div class="progress-bar progress-bar-success " role="progressbar" aria-valuenow="' +  indicatorValue + '" aria-valuemin="0" aria-valuemax="100" style="width:"' +  indicatorValue + '%">\
-                            <span>' + name + '</span>\
-                        </div>\
+    var displayValue = 'N/A';
+    if(indicatorValue) {
+        indicatorValue = indicatorValue.toFixed(1);
+        displayValue = indicatorValue;
+    }
+    else {
+        indicatorValue = 0.0;
+    }
+    return '<tr>\
+            <td style="width:90%">\
+                <div class="progress">\
+                    <div class="progress-bar progress-bar-success " role="progressbar" aria-valuenow="' +  indicatorValue + '" aria-valuemin="0" aria-valuemax="100" style="width:' +  indicatorValue + '%">\
+                        <span>' + name + '</span>\
                     </div>\
-                </td>\
-                <td style="width:10%">\
-                    <p style="margin-top:-13px; margin-left:5px;font-weight:bold" class="text-success">'  +  indicatorValue + '</p>\
-                </td>\
-            </tr>';
-    return '';
+                </div>\
+            </td>\
+            <td style="width:10%">\
+                <p style="margin-top:-13px; margin-left:5px;font-weight:bold" class="text-success">'  +  displayValue + '</p>\
+            </td>\
+        </tr>';
 }
 
 
 updateIndicators = function(property) {
      var indicatorTable = document.getElementById('indicator-table');
-     indicatorTable.html = '<h3 class="rat_h3" style="margin-left: 8px;">'+property+ '</h3>';
+     indicatorTable.innerHTML = '<h3 class="rat_h3" style="margin-left: 8px;">'+property+ '</h3>';
      for (var name in indicatorData){
-        indicatorTable.html += getIndicatorHtml(name, property);
+        indicatorTable.innerHTML += getIndicatorHtml(name, property);
      }
 }
 
