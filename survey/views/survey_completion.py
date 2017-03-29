@@ -54,7 +54,7 @@ def indicators_json(request):
         else:
             location_type = LocationType.largest_unit()
         for indicator in indicators:
-            indicator_df = indicator.get_data(location_type.locations.all())
+            indicator_df = indicator.get_data(location_type.locations.all()).fillna(value='null')
             indicator_details[indicator.name] = dict(zip(indicator_df.index.str.upper(),
                                                          indicator_df[indicator.REPORT_FIELD_NAME]))
         return json.dumps(indicator_details, cls=DjangoJSONEncoder)
