@@ -243,6 +243,8 @@ font-size: .9em;
     info = L.control(),
     //legend = L.control({position: 'bottomright'}),
     indicatorData = {},
+    indicatorTable = document.getElementById('indicator-table'),
+    countryIndicator = indicatorTable.innerHTML,
     geojson;
     map.dragging.disable();
     map.touchZoom.disable();
@@ -435,7 +437,6 @@ getIndicatorHtml = function(name, property) {
 
 
 updateIndicators = function(property) {
-     var indicatorTable = document.getElementById('indicator-table');
      indicatorTable.innerHTML = '<h3 class="rat_h3" style="margin-left: 8px;">'+property+ '</h3>';
      for (var name in indicatorData){
         indicatorTable.innerHTML += getIndicatorHtml(name, property);
@@ -553,7 +554,8 @@ function zoomAdminLevel(event){
 }
 
 function resetAdminLevelHighlight(event){
-    geojson.resetStyle(event.target)
+    geojson.resetStyle(event.target);
+    indicatorTable.innerHTML = countryIndicator;
 }
 
     </script>
