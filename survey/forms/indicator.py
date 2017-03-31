@@ -42,6 +42,7 @@ class IndicatorForm(ModelForm, FormOrderMixin):
                                           'delete': {'data-toggle': "modal", 'data-target': "#remove-selected-variable",
                                                      'id': 'delete_variable', 'title': 'Delete Variable'}
                                           }
+        self.fields['formulae'].icons = {'check': {'id': 'validate', 'title': 'Validate'}, }
         if self.data.get('survey'):
             self.fields['question_set'].queryset = Survey.get(pk=self.data['survey']).qsets
         self.fields['name'].label = 'Indicator'
@@ -50,12 +51,13 @@ class IndicatorForm(ModelForm, FormOrderMixin):
     def available_variables(self):
         var_ids = []
         if hasattr(self.data, 'getlist'):
-            var_ids.extend(IndicatorVariable.objects.filter(id__in=self.data.getlist('variables')
+            var_ids.extend(IndicatorVariable.objects.filter(id__in=
+                                                            self.data.getlist('variables') or self.data.getlist(
+                                                                'variables[]')
                                                             ).values_list('id', flat=True))
         if self.instance:
             var_ids.extend(self.instance.variables.values_list('id', flat=True))
         return IndicatorVariable.objects.filter(id__in=var_ids)
-
 
     def clean(self):
         super(IndicatorForm, self).clean()
@@ -69,20 +71,20 @@ class IndicatorForm(ModelForm, FormOrderMixin):
         return self.cleaned_data
 
     def clean_formulae(self):
-        if self.instance.pk:
-            from asteval import Interpreter
-            aeval = Interpreter()
-            selected_vars = IndicatorVariable.objects.filter(id__in=self.data.getlist('variables'))
-            # basically substitute all place holders with random values just to see if it gives a valid math answer
-            context = dict([(v.name, random.randint(1, 10000)) for v in selected_vars])
-            try:
-                question_context = template.Context(context)
-                math_string = template.Template(self.cleaned_data['formulae']).render(question_context)
-            except template.TemplateSyntaxError:
-                raise ValidationError('Only alpha numeric characters and under score are allowed as place holders')
-            aeval(math_string)
-            if len(aeval.error) > 0:
-               raise ValidationError(aeval.error[-1].get_error()[1])
+        from asteval import Interpreter
+        aeval = Interpreter()
+        variable_ids = self.data.getlist('variables') or self.data.getlist('variables[]')
+        selected_vars = IndicatorVariable.objects.filter(id__in=variable_ids)
+        # basically substitute all place holders with random values just to see if it gives a valid math answer
+        context = dict([(v.name, random.randint(1, 10000)) for v in selected_vars])
+        try:
+            question_context = template.Context(context)
+            math_string = template.Template(self.cleaned_data['formulae']).render(question_context)
+        except template.TemplateSyntaxError:
+            raise ValidationError('Only alpha numeric characters and under score are allowed as place holders')
+        aeval(math_string)
+        if len(aeval.error) > 0:
+           raise ValidationError(aeval.error[-1].get_error()[1])
         return self.cleaned_data['formulae']
 
     class Meta:
@@ -247,14 +249,18 @@ class IndicatorFormulaeForm(forms.ModelForm):
         fields = ['formulae', ]
 
     def clean_formulae(self):
-        if self.instance.pk:
-            from asteval import Interpreter
-            aeval = Interpreter()
-            # basically substitute all place holders with 1 and see if it gives a valid math function
-            context = dict([(v.name, 1) for v in self.instance.variables.all()])
+        from asteval import Interpreter
+        aeval = Interpreter()
+        variable_ids = self.data.getlist('variables') or self.data.getlist('variables[]')
+        selected_vars = IndicatorVariable.objects.filter(id__in=variable_ids)
+        # basically substitute all place holders with random values just to see if it gives a valid math answer
+        context = dict([(v.name, random.randint(1, 10000)) for v in selected_vars])
+        try:
             question_context = template.Context(context)
-            math_string =  template.Template(self.cleaned_data['formulae']).render(question_context)
-            aeval(math_string)
-            if len(aeval.error) > 0:
-               raise ValidationError(aeval.error[-1].get_error()[1])
+            math_string = template.Template(self.cleaned_data['formulae']).render(question_context)
+        except template.TemplateSyntaxError:
+            raise ValidationError('Only alpha numeric characters and under score are allowed as place holders')
+        aeval(math_string)
+        if len(aeval.error) > 0:
+           raise ValidationError(aeval.error[-1].get_error()[1])
         return self.cleaned_data['formulae']

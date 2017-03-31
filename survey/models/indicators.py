@@ -32,9 +32,9 @@ class Indicator(BaseModel):
 
     @property
     def eqset(self):
-        '''Returns the exactt question set for this indicator
+        """Returns the exactt question set for this indicator
         :return:
-        '''
+        """
         return QuestionSet.get(id=self.question_set.id)
 
     def is_percentage_indicator(self):

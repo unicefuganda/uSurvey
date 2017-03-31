@@ -140,6 +140,43 @@ $('#math_validate').on('click', function() {
             });
         return true;
      });
+     $('#validate').click(function() {
+        var url = "{% url 'validate_formulae' %}";
+        var validation_data = {'variables': $('#id_variables').val(), 'formulae': $('#id_formulae').val() };
+        $.ajax({
+                url : url,
+                type: "GET",
+                'data': validation_data,
+                dataType : "json",
+                success: function( data ){
+                    if(data.valid){
+                        $('#validate').html('<span style="color:green">\
+                                <i class="fa fa-check"></i>\
+                            </span>');
+                    }
+                    else {
+                        $('#validate').html('<span style="color:red">\
+                                <i class="fa fa-times"></i>\
+                            </span>');
+                    }
+                    setTimeout(function(){
+                        $('#validate').html('<span style="color:orange">\
+                                <i class="fa fa-exclamation-triangle"></i>\
+                            </span>');
+                    }, 2000);
+
+                }
+            });
+        $('#validate').html('<span style="color:orange">\
+                                <i class="fa fa-exclamation-triangle"></i><span class="checking" />\
+                            </span>');
+        i = 0;
+        setInterval(function() {
+          i = ++i % 4;
+          $("#validate .checking").text("Checking" + Array(i+1).join("."));
+        }, 1000);
+        return true;
+     });
      $('#button').click(function() {
         $('#id_variables option').prop('selected', true);
         {% if indicator_form.instance.pk %}
