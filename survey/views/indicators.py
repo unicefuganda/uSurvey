@@ -4,7 +4,7 @@ import plotly.graph_objs as go
 from django.utils.safestring import mark_safe
 from django.contrib import messages
 from django.contrib.auth.decorators import permission_required, login_required
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponseRedirect, HttpResponse, JsonResponse
 from django.shortcuts import render, get_object_or_404
 from django.core.urlresolvers import reverse
 from survey.models import Location
@@ -96,6 +96,11 @@ def delete(request, indicator_id):
     return HttpResponseRedirect('/indicators/')
 
 
+def validate_formulae(request):
+    request_data = request.GET if request.method == 'GET' else request.POST
+    return JsonResponse({'valid': IndicatorFormulaeForm(data=request_data).is_valid()})
+
+
 @login_required
 @permission_required('auth.can_view_household_groups')
 def add_indicator_variable(request, indicator_id):
@@ -146,6 +151,7 @@ def ajax_edit_indicator_variable(request):
     if request.is_ajax():
         variable_id = request.GET.get('id')
         return edit_indicator_variable(request, variable_id)
+
 
 @login_required
 @permission_required('auth.can_view_household_groups')
@@ -228,11 +234,11 @@ def variables(request):
     # return questions before last question
     if request.GET.get('id', None):
         indicator = Indicator.get(pk=request.GET.get('id', None))
-        json_dump = json.dumps(list(indicator.variables.values_list('name', flat=True)))
+        response = list(indicator.variables.values_list('name', flat=True))
     else:
         var_ids = request.GET.getlist('var_id[]')
-        json_dump = json.dumps(list(IndicatorVariable.objects.filter(id__in=var_ids).values_list('name', flat=True)))
-    return HttpResponse(json_dump, content_type='application/json')
+        response = list(IndicatorVariable.objects.filter(id__in=var_ids).values_list('name', flat=True))
+    return JsonResponse(response)
 
 
 @login_required
