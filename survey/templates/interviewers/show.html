@@ -12,7 +12,6 @@
   .btn-yellow{display: none !important;}
   ._heading_color{
   color: #034b94;
-
   }
   </style>
 
@@ -20,52 +19,8 @@
   <div class="row-fluid">
       <form class="form-horizontal">
         <fieldset>
-        {% if interviewer.odk_access %}
-          <div id="legend">
-            <legend class="_heading_color">ODK Access</legend>
-          </div>
-     {% for access in interviewer.odk_access %}
-          <table>
-            <tr>
-              <td>
-                <div class="control-group">
-                  <label class="control-label"  for="username">ODK ID</label>
-                  <div class="controls">
-                    {{ access.user_identifier }}
-                  </div>
-                </div>
-                
-              </td>
-              <td>
-                <div class="control-group">
-                  <label class="control-label"  for="username">ODK Token</label>
-                  <div class="controls">
-                    {{ access.odk_token }}
-                  </div>
-                </div>
-                
-              </td>
-            </tr>
-          </table>        
-          
-
-          
-     {% endfor %}
-     {% endif %}
-     <div id="legend">
-            <legend class="_heading_color">USSD Access</legend>
-          </div>
-            {% for access in interviewer.ussd_access %}
-          <div class="control-group">
-            <label class="control-label"  for="username">Mobile Number</label>
-            <div class="controls">
-              {{ access.user_identifier }}
-            </div>
-          </div>
-          {% endfor %} 
-
-      <div id="legend">
-            <legend class="_heading_color">Profile</legend>
+        <div id="legend">
+            <legend class="_heading_color">Interviewer Details</legend>
           </div>
 
 
@@ -132,14 +87,60 @@
               {{ interviewer.survey_name }}
             </div>
           </div>
+        {% if interviewer.odk_access %}
+          <div id="legend">
+            <legend class="_heading_color">ODK Access</legend>
+          </div>
+     {% for access in interviewer.odk_access %}
+          <table>
+            <tr>
+              <td>
+                <div class="control-group">
+                  <label class="control-label"  for="username">ODK ID</label>
+                  <div class="controls">
+                    {{ access.user_identifier }}
+                  </div>
+                </div>
+                
+              </td>
+              <td>
+                <div class="control-group">
+                  <label class="control-label"  for="username">ODK Token</label>
+                  <div class="controls">
+                    {{ access.odk_token }}
+                  </div>
+                </div>
+                
+              </td>
+            </tr>
+          </table>        
+          
+
+          
+     {% endfor %}
+     {% endif %}
+     <div id="legend">
+            <legend class="_heading_color">USSD Access</legend>
+          </div>
+            {% for access in interviewer.ussd_access %}
+          <div class="control-group">
+            <label class="control-label"  for="username">Mobile Number</label>
+            <div class="controls">
+              {{ access.user_identifier }}
+            </div>
+          </div>
+          {% endfor %} 
+
+          
           
         </fieldset>
       </form>
       <form class="form-horizontal">
         <fieldset>          
           <div class="cancel-btn" style="text-align: center;">
+          <a href="{% url 'edit_interviewer_page' interviewer.id %}" class="btn btn-primary"> Edit</a>
         {% if cancel_url %}
-            <a href="{{ cancel_url }}" class="btn btn-primary"><i class="icon-chevron-left icon-white"></i> Back</a>
+            <a href="{{ cancel_url }}" class="btn btn-primary"> Back</a>
         {% else %}
             <a href="javascript:window.history.back()" class="btn btn-inverse"><i
                     class="icon-chevron-left icon-white" style="background-color: #307ecc"></i> Back</a>

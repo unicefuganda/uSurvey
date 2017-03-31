@@ -36,7 +36,7 @@ def new(request):
     return render(request, 'enumeration_area/new.html',
                   {'enumeration_area_form': enumeration_area_form, 'locations_filter': locations_filter, 'title': 'New Enumeration Area', 'button_label': 'Create',
                    'action': reverse('new_enumeration_area_page', args=()),
-                   'location_filter_types': LocationType.in_between()})
+                   'location_filter_types': LocationType.in_between(),'redirect_url':'/enumeration_area'})
 
 
 @permission_required('auth.can_view_batches')

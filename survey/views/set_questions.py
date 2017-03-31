@@ -355,7 +355,8 @@ def assign(request, qset_id):
     context = {'batch_questions_form': unicode(BatchQuestionsForm()), 'batch': batch,
                'button_label': 'Save', 'id': 'assign-question-to-batch-form',
                'library_questions': library_questions, 'question_filter_form': question_filter_form,
-               'page_name': page_name
+               'page_name': page_name,
+               'redirect_url':'/qsets/%s/questions/'%qset_id
                }
     return render(request, 'set_questions/assign.html',
                   context)
