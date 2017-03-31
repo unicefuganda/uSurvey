@@ -112,13 +112,13 @@
 {% for field in a_form.visible_fields %}
   <div id="{{field.auto_id}}-control-group" class="control-group int-part">
     <div class="controls {{ field|is_radio }}">
-        <label class="control-label" for="{{field.auto_id}}" style="padding: 0;">{{field.label}}</label>
+        <label class="control-label" for="{{field.auto_id}}" style="padding: 5px;">{{field.label}}</label>
     {% if field.name == 'ea' %}
       <div class="row" style="padding-bottom:20px;">
         <div class="col-md-2 col-sm-1">
         </div>
         <div class="col-md-3 col-sm-2">
-            <strong>All EA's</strong><span style="margin-left: 100px;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><strong>Selected EA's</strong>
+            <strong>All EAs</strong><span style="margin-left: 100px;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><strong>Selected EAs</strong>
         </div>
         <div class="col-md-2 col-sm-1 "></div>
       </div>
