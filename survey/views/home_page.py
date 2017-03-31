@@ -44,7 +44,7 @@ def about(request):
         about_us_content = AboutUs.objects.create(
             content="No content available yet !!")
 
-    return render(request, 'home/about.html', {'about_content': about_us_content})
+    return render(request, 'main/about.html', {'about_content': about_us_content})
 
 
 @permission_required('auth.can_view_users')

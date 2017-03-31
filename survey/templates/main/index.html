@@ -63,7 +63,7 @@
          <header class="headerFix">
             <div class="logo pull-left">
                <div class="logoImg">               
-                  <a href="#"><img src="{{ STATIC_URL }}toassets/Logo_Main.png" alt="uSurvey"></a>
+                  <a href="/"><img src="{{ STATIC_URL }}toassets/Logo_Main.png" alt="uSurvey"></a>
                </div>
             </div>
             <!-- <nav class="mainMenu pull-left">
@@ -100,10 +100,10 @@
 <div class="button"></div>
 <ul>
 <!-- <li class='active'><a href='#'>HOME</a></li> -->
-<li><a href="#">HOME</a></li>
-<li><a href="#">DISCOVER</a></li>
-<li><a href="#">CONTACT</a></li>                  
-<li><a href="{% url 'about_page' %}">ABOUT</a></li>
+<li><a href="/" class="home">HOME</a></li>
+<li><a href="{% url 'discover' %}" class="discover">DISCOVER</a></li>
+<li><a href="{% url 'contact' %}" class="contact">CONTACT</a></li>                  
+<li><a href="{% url 'about_page' %}" class="about">ABOUT</a></li>
 {% if user.is_authenticated %}
                    <li id="menu-item-181" class="ulogin menu-item menu-item-type-post_type menu-item-object-page menu-item-181 pull-right"><a href="{% url 'home_page' %}">SURVEY</a></li>         
 {% else %}
@@ -280,9 +280,11 @@
       <script type="text/javascript" src="{{ STATIC_URL }}toassets/modernizr.js"></script>
      <style type="text/css">
        .commonSection {    
-     padding: 0px 0 0px !important; 
-    
+     padding: 0px 0 0px !important;} 
+     #cssmenu > ul > li .home {
+    color: yellow;
 }
+    
      </style>
    </body>
 </html>
