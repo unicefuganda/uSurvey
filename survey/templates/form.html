@@ -15,6 +15,9 @@
 {% endblock %}
 
 <style type="text/css">
+.control-group {
+    margin-bottom: -20px !important;
+}
   .dataTables_wrapper .id_repeat_logic{width: 450px !important;}
 
   .dataTables_wrapper select {
@@ -41,7 +44,7 @@
     padding-left: 5px;
     padding-bottom: 1px;">Cancel</a>
     {% else %}
-      <a href="{% url 'enumeration_area_home' %}" class="btn btn-primary" name="cancel_button" id="cancel_{{ id }}" class="cancel">Cancel</a>
+      <a href="{{ redirect_url }}" class="btn btn-primary" name="cancel_button" id="cancel_{{ id }}" class="cancel">Cancel</a>
     {% endif %}
   </div>
     {% endblock %}
