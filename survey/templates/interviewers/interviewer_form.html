@@ -64,5 +64,30 @@
             });
         })
     </script>
+    <script type="text/javascript">
+      {% if mode == 'view' %}
+        $("#id_name").attr("readonly","readonly");
+        $("#id_date_of_birth").attr("readonly","readonly");
+        $("#id_gender_0").attr("disabled","disabled");
+        $("#id_gender_1").attr("disabled","disabled");
+        $("#id_level_of_education").attr("disabled","disabled");
+        $("#id_language").attr("disabled","disabled");
+        $("#id_survey").attr("disabled","disabled");
+
+        $("#id_user_identifier").attr("readonly","readonly");
+        $("#id_is_active").attr("disabled","disabled");
+        $("#id_odk_token").attr("readonly","readonly");
+        
+        $("#id_District").attr("disabled","disabled");
+        $("#id_County").attr("disabled","disabled");
+        $("#id_Subcounty").attr("disabled","disabled");
+        $("#id_Parish").attr("disabled","disabled");
+
+        $("#button").text('Edit');
+        $("#button").attr({"type":"button","onclick":"window.location.href='{% url 'edit_interviewer_page' interviewer_id %}'"});
+        $(".add-row").attr("href",'');
+        
+      {%endif%}
+    </script>
 
 {% endblock %}

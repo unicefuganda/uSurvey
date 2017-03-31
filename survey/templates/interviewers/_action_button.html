@@ -20,7 +20,7 @@
            </button>
             <ul class="dropdown-menu dropdown-only-icon dropdown-yellow dropdown-menu-right dropdown-caret dropdown-close">
                 <li>
-                    <a href="{% url 'edit_interviewer_page'  interviewer.id %}" class="tooltip-info" data-rel="tooltip" title="" data-original-title="Edit"><span class="blue"><i class="usur-icon fa fa-pencil-square-o bigger-120"></i>Edit</span></a>
+                    <a href="{% url 'view_interviewer_page'  interviewer.id 'view' %}" class="tooltip-info" data-rel="tooltip" title="" data-original-title="Edit"><span class="blue"><i class="usur-icon fa fa-eye bigger-120"></i>View Details</span></a>
                 </li>
                 {% if interviewer.has_access %}
                 <li><a href="#unblock_interviewer_{{interviewer.id}}" id="unblock_interviewer" data-toggle="modal" class="tooltip-success" data-rel="tooltip" title=""><span class="red"><i class="usur-icon fa fa-language bigger-120"></i>UnBlock</span></a></li>

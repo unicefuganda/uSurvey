@@ -71,8 +71,17 @@
         padding: 3px;
     }
 
-    .dataTables_wrapper input[type="search"], .dataTables_wrapper input[type="text"], .dataTables_wrapper select {    margin-bottom: 0 !important;    margin-left: 4px!important;    margin-right: 4px!important;    margin-top: 0px !important;    padding: 3px !important;    width: 245px!important; line-height: 22px;
-}
+    .dataTables_wrapper input[type="search"],
+    .dataTables_wrapper input[type="text"],
+    .dataTables_wrapper select {
+        margin-bottom: 0 !important;
+        margin-left: 4px!important;
+        margin-right: 4px!important;
+        margin-top: 0px !important;
+        padding: 3px !important;
+        width: 245px!important;
+        line-height: 22px;
+    }
 </style>
 
 
@@ -140,43 +149,8 @@ $('#math_validate').on('click', function() {
             });
         return true;
      });
-     $('#validate').click(function() {
-        var url = "{% url 'validate_formulae' %}";
-        var validation_data = {'variables': $('#id_variables').val(), 'formulae': $('#id_formulae').val() };
-        $.ajax({
-                url : url,
-                type: "GET",
-                'data': validation_data,
-                dataType : "json",
-                success: function( data ){
-                    if(data.valid){
-                        $('#validate').html('<span style="color:green">\
-                                <i class="fa fa-check"></i>\
-                            </span>');
-                    }
-                    else {
-                        $('#validate').html('<span style="color:red">\
-                                <i class="fa fa-times"></i>\
-                            </span>');
-                    }
-                    setTimeout(function(){
-                        $('#validate').html('<span style="color:orange">\
-                                <i class="fa fa-exclamation-triangle"></i>\
-                            </span>');
-                    }, 2000);
-
-                }
-            });
-        $('#validate').html('<span style="color:orange">\
-                                <i class="fa fa-exclamation-triangle"></i><span class="checking" />\
-                            </span>');
-        i = 0;
-        setInterval(function() {
-          i = ++i % 4;
-          $("#validate .checking").text("Checking" + Array(i+1).join("."));
-        }, 1000);
-        return true;
-     });
+     $('#validate').click(validate_formulae);
+     $('#id_formulae').change(validate_formulae);
      $('#button').click(function() {
         $('#id_variables option').prop('selected', true);
         {% if indicator_form.instance.pk %}
@@ -201,6 +175,37 @@ $('#math_validate').on('click', function() {
             $('#add_new_variable').show();
         else
             $('#add_new_variable').hide();
+     }
+    function validate_formulae() {
+        var url = "{% url 'validate_formulae' %}";
+        var validation_data = {'variables': $('#id_variables').val(), 'formulae': $('#id_formulae').val() };
+        $.ajax({
+                url : url,
+                type: "GET",
+                'data': validation_data,
+                dataType : "json",
+                success: function( data ){
+                    if(data.valid){
+                        $('#validate').html('<span style="color:green">\
+                                <i class="fa fa-check"></i>\
+                            </span>');
+                    }
+                    else {
+                        $('#validate').html('<span style="color:red">\
+                                <i class="fa fa-times"></i>\
+                            </span>');
+                    }
+                }
+            });
+        $('#validate').html('<span style="color:orange">\
+                                <i class="fa fa-exclamation-triangle"></i><span class="checking" />\
+                            </span>');
+        i = 0;
+        setInterval(function() {
+          i = ++i % 4;
+          $("#validate .checking").text("Checking" + Array(i+1).join("."));
+        }, 1000);
+        return true;
      }
     function update_test_question_dropdown(data) {
         $('#id_test_question').append('<option value="">Question-Code'+id_text_delim+'Text</option>');

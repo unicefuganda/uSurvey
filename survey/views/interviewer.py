@@ -25,7 +25,7 @@ def _add_error_response_message(interviewer, request, action_text):
     messages.error(request, error_message + "See errors below.")
 
 
-def _create_or_edit(request, action_text, interviewer=None):
+def _create_or_edit(request, action_text, interviewer_id=None, interviewer=None):
     extra = 1
     request.breadcrumbs([
         ('Interviewers', reverse('interviewers_page')),
@@ -91,7 +91,10 @@ def _create_or_edit(request, action_text, interviewer=None):
         'cancel_url': redirect_url,
         'locations_filter': locations_filter,
         'location_filter_types': loc_types,
-        'loading_text': "Creating..."})
+        'loading_text': "Creating...",
+        'mode':action_text,
+        'interviewer_id':interviewer_id
+        })
 
 
 @login_required
@@ -102,8 +105,8 @@ def new_interviewer(request):
 
 @login_required
 @permission_required('auth.can_view_interviewers')
-def edit_interviewer(request, interviewer_id):
-    return _create_or_edit(request, 'Edit', interviewer=get_object_or_404(Interviewer, pk=interviewer_id))
+def edit_interviewer(request, interviewer_id=None, mode=None):
+    return _create_or_edit(request, mode, interviewer_id, interviewer=get_object_or_404(Interviewer, pk=interviewer_id))
 
 
 @login_required

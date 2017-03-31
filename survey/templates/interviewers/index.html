@@ -64,7 +64,7 @@
         {% for interviewer in interviewers %}
           <tr>
             <td>
-              <a href="{% url 'show_interviewer_page' interviewer.pk %}">{{ interviewer.name }}</a>
+              {{ interviewer.name }}
             </td>
             <td>
               {{ interviewer.ussd_access | display_list}}
