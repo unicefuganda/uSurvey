@@ -184,7 +184,7 @@
             <div class="fw-row">
                <div class="col-md-12"><br/>
                 <h3>About {% if user.is_authenticated %}<a class="btn btn-primary submit btn-sm" href="{% url 'edit_about_page' %}" ><i class="fa fa-edit"> Edit</i></a>{%endif%}</h3><br/>
-                  {{about_content.content|safe}}
+                  <div class="about-content">{{about_content.content|safe}}</div>
                </div>
             </div>
          </div>
@@ -223,6 +223,14 @@
 }
  #cssmenu > ul > li .about {
     color: yellow;
+
+  }
+
+  .about-content, .about-content p {font-size: 14px;line-height: 24px;margin-bottom: 0px;margin-top: 8px;}
+  .about-content p b{line-height: 20px;margin-bottom: 0px;}
+  .about-content p, .about-content ul li{text-align: justify;}
+  .about-content ol li{font-size: 14px;}
+  .about-content h5{font-size: 16px;line-height: 30px;}
      </style>
    </body>
 </html>
