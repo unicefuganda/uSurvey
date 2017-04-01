@@ -170,7 +170,7 @@
             width: 100% !important;
             background: transparent !important;
         }
-    
+
         #indicators-tab, #loc-stats-tab {
            position: absolute;
            display: block;
@@ -312,7 +312,7 @@ function updateLegend(max) {
         max = 25;       //just to make sure it is divisible into 5 places.
     step = max/5.
     var div = document.getElementById('map-legend');
-    div.innerHTML = '';
+    div.innerHTML = '<h4>Legend</h4><br />';
     div.innerHTML += '<i class="map-legend" style="background:' + getColorFor(null) + '"></i>'+ " No Data<br/>";
     for (var i = 0; i < 4; i++) {
         div.innerHTML += '<i class="map-legend" style="background:' + getColorFor(grades[i]) + ';"></i> ';
