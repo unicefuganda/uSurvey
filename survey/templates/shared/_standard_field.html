@@ -1,3 +1,6 @@
+        {% if field.name == 'next_question' %}
+        	<a class="btn btn-primary" data-toggle="modal" data-target="#add_sub_question_modal" name="add_subquestion_button" id="add_subquestion"><i class="fa fa-plus"></i> Add Subquestion</a>&nbsp;&nbsp;
+        {%endif%}
         {{field}} <label class="error">
         {% if field.errors %}
             {% for error in field.errors %}

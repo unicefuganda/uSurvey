@@ -12,7 +12,7 @@
     .form-horizontal {
         margin-top: 5px;
     }
-    .form-horizontal .control-label {
+    .form-horizontal .control-label-2 {
     padding-top: 7px !important;
     margin-bottom: 0;
     text-align: right;
@@ -35,12 +35,12 @@
                 </div>
             {% endif %}
             <div class="control-group">
-            <label class="control-label col-md-4" for="{{field.auto_id}}">{{field.label}}</label>
-            <div class="controls {{ field|is_radio }} col-md-8">
+            <label class="control-label-2 col-md-3" for="{{field.auto_id}}">{{field.label}}</label>
+            <div class="controls {{ field|is_radio }} col-md-9">
         {% endif %}
         {% include 'shared/_standard_field.html' with field=field %}
     {% endfor %}
-    <a class="btn btn-primary" data-toggle="modal" data-target="#add_sub_question_modal" name="add_subquestion_button" id="add_subquestion"><i class="icon-plus"></i>Add Subquestion</a>
+    
     </div>
     </div>
 
@@ -83,5 +83,12 @@
     <script src="{{STATIC_URL}}js/questions.js" type="text/javascript" charset="utf-8"></script>
 
 
+<style type="text/css">
+ #id_value{width: 220px !important;
+   height: 25px !important;
+margin-left: 0px !important;
+ }
 
+ #id_next_question, .select2-container .selection .select2-selection{border-left: 3px solid #0577e0;}
+</style>
 {% endblock %}
