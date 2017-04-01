@@ -85,7 +85,8 @@ $("#id_module option[value='']").text("--Select Module--");
 </script>
 
 <script type="text/javascript">
-var newOptions = {
+
+/*var newOptions = {
     "Select Option" : "",
     "Date Answer": "Date Answer",
     "Text Answer": "Text Answer",
@@ -101,7 +102,19 @@ $.each(newOptions, function(key,value) {
 
 {% if questionform.answer_type.value %}
   $("#id_answer_type").val('{{questionform.answer_type.value}}').attr("selected", "selected");
-  //$(".controls>a").hide();
+  $(".controls>a").hide();
 {%endif%}
+*/
+
+
+$("#id_text").attr({"cols":29});
 </script>
+
+
+<style type="text/css">
+  #id_identifier{width: 264px !important;
+height: 25px !important;
+margin-left: 0px !important; }
+.dataTables_wrapper select {margin-left: 0px !important;}
+</style>
 {% endblock %}

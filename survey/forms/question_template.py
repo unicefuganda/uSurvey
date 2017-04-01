@@ -30,8 +30,8 @@ def get_question_templates_form(model_class):
                 self.answer_map[defi.answer_type] = self.answer_map.get(
                     defi.answer_type, [])
                 self.answer_map[defi.answer_type].append(defi.channel)
-            self.order_fields(['module', 'text',
-                                    'identifier', 'answer_type'])
+            self.order_fields(['module', 'identifier','text',
+                                     'answer_type'])
 
         class Meta:
             model = model_class
