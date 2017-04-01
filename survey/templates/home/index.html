@@ -426,7 +426,7 @@ getIndicatorHtml = function(name, property) {
     var indicatorValue = indicatorData[name][property];
     var displayValue = 'N/A';
     if(indicatorValue) {
-        indicatorValue = indicatorValue.toFixed(1);
+        indicatorValue = parseFloat(indicatorValue).toFixed(1);
         displayValue = indicatorValue;
     }
     else {
