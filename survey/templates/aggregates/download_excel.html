@@ -41,6 +41,12 @@ $(function(){
 
 	    });
   	{% endfor %}
+  	i = 0;
+        setInterval(function() {
+          i = ++i % 4;
+          $("#validate .checking").text("Downloading11" + Array(i+1).join("."));
+        }, 1000);
+        return true;
   	});
 </script>
   {% endblock %}

@@ -196,7 +196,7 @@ font-size: .9em;
                     <div id="indicators-tab" class="tab-pane fade">
                         <table style="width:100%; margin-top:20px;" id="indicator-table">
                         {% for indicator in display_indicators %}
-                            <tr>
+                            <tr class="surveys survey-{{indicator.survey.id}}">
                                 <td style="width:90%">
                                     <div class="progress">
                                         <div class="progress-bar progress-bar-success " role="progressbar" aria-valuenow="{{ indicator.country_wide_value }}" aria-valuemin="0" aria-valuemax="100" style="width:{{ indicator.country_wide_value }}%">
@@ -264,6 +264,8 @@ $(function(){
     $("#id_survey").on('change', function(){
         getCompletionFor();
         load_indicators();
+        $('surveys').show();
+        $('survey-'+this.val()).hide();
     });
     loadInitialMap();
     load_indicators();
@@ -465,54 +467,53 @@ info.update = function (props) {
        updateIndicators(property);
         if('total_eas' in props.rate){
             rate = props.rate.value >-1 ? props.rate.value: 'Survey not opened.';
-             div.innerHTML = '<h3 class="rat_h3_2" style="margin-left: 8px;">District</h3>  \
-             <table class="rathna_table">\
-<thead>\
-    <tr>\
-        <th colspan="2" class="text-left">\
-            <h3 class="rat_h3_1">'+property+'</h3>\
-        </th>\
-    </tr>\
-</thead>\
-<tbody>\
-    <tr class="r_heading" style="border-bottom:1px solid #ccc">\
-        <th >'+props.rate.total_interviews+'</th>\
-        <th>'+props.rate.total_eas+'</th>\
-    </tr>\
-    <tr>\
-        <td >Interviews</td>\
-        <td >Total EAs</td>\
-    </tr>\
-    <tr class="r_heading" style="border-bottom:1px solid #ccc">\
-        <th>'+props.rate.value+'</th>\
-        <th>'+props.rate.active_eas+'</th>\
-    </tr>\
-    <tr class="r_heading" >\
-        <td >Interviews (Per EA)</td>\
-        <td >Interviewed EAs</td>\
-    </tr>\
-    <tr class="r_heading" style="border-bottom:1px solid #ccc">\
-        <th >'+props.rate.per_active_ea+'</th>\
-        <th></th>\
-    </tr>\
-    <tr class="r_heading" >\
-        <td >Per Interviewed EA (Ave)</td>\
-        <td></td>\
-    </tr>\
-</tbody>\
-</table>';
+             div.innerHTML = '<table class="rathna_table">\
+                                <thead>\
+                                    <tr>\
+                                        <th colspan="2" class="text-left">\
+                                            <h3 class="rat_h3_1">'+property+'</h3>\
+                                        </th>\
+                                    </tr>\
+                                </thead>\
+                                <tbody>\
+                                    <tr class="r_heading" style="border-bottom:1px solid #ccc">\
+                                        <th >'+props.rate.total_interviews+'</th>\
+                                        <th>'+props.rate.total_eas+'</th>\
+                                    </tr>\
+                                    <tr>\
+                                        <td >Interviews</td>\
+                                        <td >Total EAs</td>\
+                                    </tr>\
+                                    <tr class="r_heading" style="border-bottom:1px solid #ccc">\
+                                        <th>'+props.rate.value+'</th>\
+                                        <th>'+props.rate.active_eas+'</th>\
+                                    </tr>\
+                                    <tr class="r_heading" >\
+                                        <td >Interviews (Per EA)</td>\
+                                        <td >Interviewed EAs</td>\
+                                    </tr>\
+                                    <tr class="r_heading" style="border-bottom:1px solid #ccc">\
+                                        <th >'+props.rate.per_active_ea+'</th>\
+                                        <th></th>\
+                                    </tr>\
+                                    <tr class="r_heading" >\
+                                        <td >Per Interviewed EA (Ave)</td>\
+                                        <td></td>\
+                                    </tr>\
+                                </tbody>\
+                                </table>';
 
         }
         else{
-             div.innerHTML = '<h3 class="rat_h3_2" style="margin-left: 8px;">District</h3> \
-             \<table class="rathna_table">\
-<thead>\
-    <tr>\
-        <th colspan="2" class="text-left">\
-            <h3 class="rat_h3_1">'+property+'</h3>\
-        </th>\
-    </tr>\
-</thead></table>';
+             div.innerHTML = '<table class="rathna_table">\
+                                <thead>\
+                                    <tr>\
+                                        <th colspan="2" class="text-left">\
+                                            <h3 class="rat_h3_1">'+property+'</h3>\
+                                        </th>\
+                                    </tr>\
+                                </thead>\
+                              </table>';
         }
     }
   }
