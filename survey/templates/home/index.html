@@ -38,143 +38,144 @@
              overflow: hidden;
         }
 
-        /*
-        1px solid #c5c5c6;
-        5px 5px 5px #dbddde;
-        */
+
+        #displays {
+           position: relative;
+           width: 18%;
+        }
         #survey_map {
             border: None;
             box-shadow: None;
             min-height: 500px;
             margin-bottom: 130px;
-            width: 750px;
+            width: 79%;
             margin-left: auto;
             margin-right: auto;
             
             z-index: 2;    
         }
-@media only screen and (max-width:767px) {
-    #survey_map {
-       width: 100%
-    }
-}
+        @media only screen and (max-width:767px) {
+            #survey_map {
+               width: 100%
+            }
+        }
 
 
-  .rathna_table>tbody>tr>td, .rathna_table>tbody>tr>th, .rathna_table>tfoot>tr>td, .rathna_table>tfoot>tr>th, .rathna_table>thead>tr>td, .rathna_table>thead>tr>th {
-    padding:1px 8px !important;
-    line-height: 1.42857143;
-    vertical-align: top;
-    border-top: none !important;
-}
-#info-update{min-height: 230px;}
-#info-update .rathna_table>thead>tr>th {
-    vertical-align: bottom;
-    border-bottom: none !important;
-}
-.info-count {
-    font-size: 2em !important;
-    padding-right: 10px !important;
-    padding-bottom: 5px !important;
-    line-height: 100% !important;
-    font-family: MontserratBold, Arial, Helvetica, sans-serif !important;
-}
-.rathna-nav> li, .nav-pills > li {
-    float:none;
-    display:inline-block;
-    *display:inline; /* ie7 fix */
-     zoom:1; /* hasLayout ie7 trigger */
-}
+          .rathna_table>tbody>tr>td, .rathna_table>tbody>tr>th, .rathna_table>tfoot>tr>td, .rathna_table>tfoot>tr>th, .rathna_table>thead>tr>td, .rathna_table>thead>tr>th {
+            padding:1px 8px !important;
+            line-height: 1.42857143;
+            vertical-align: top;
+            border-top: none !important;
+        }
+        #info-update{min-height: 230px;}
+        #info-update .rathna_table>thead>tr>th {
+            vertical-align: bottom;
+            border-bottom: none !important;
+        }
+        .info-count {
+            font-size: 2em !important;
+            padding-right: 10px !important;
+            padding-bottom: 5px !important;
+            line-height: 100% !important;
+            font-family: MontserratBold, Arial, Helvetica, sans-serif !important;
+        }
+        .rathna-nav> li, .nav-pills > li {
+            float:none;
+            display:inline-block;
+            *display:inline; /* ie7 fix */
+             zoom:1; /* hasLayout ie7 trigger */
+        }
 
-.rathna-nav, .rathna-nav {
-    text-align:center;
-}
-.progress {
-  position: relative;
-}
+        .rathna-nav, .rathna-nav {
+            text-align:center;
+        }
+        .progress {
+          position: relative;
+        }
 
-.progress span {
-    position: absolute;
-    display: block;
-    width: 100%;
-    color: black;
-}
-#map-legend {
-    line-height: 20px;
-    font-size: 13px;
-    font-weight: bold;
-    margin-left: 10px;
+        .progress span {
+            position: absolute;
+            display: block;
+            width: 100%;
+            color: black;
+        }
+        #map-legend {
+            line-height: 20px;
+            font-size: 13px;
+            font-weight: bold;
+            margin-left: 10px;
 
-}
-.map-legend {
-    width: 16px;
-    height: 16px;
-    display: inline-block;
-}
-.rathna-nav{
-border-bottom:none !important;
+        }
+        .map-legend {
+            width: 16px;
+            height: 16px;
+            display: inline-block;
+            border: 1px solid;
+            //border-color: #1ba6e1;
 
-}
-.rathna-nav li a{
- background:#ccc;
-}
-.rathna-nav>li>a {
-    margin-right: 0px !important; 
-    line-height: 1.42857143;
-    border: 1px solid transparent;
-    border-radius: 4px 4px 0 0;
-    color:#fff !important;
-}
-.rathna-nav>li.active>a, .nav-tabs>li.active>a:focus, .nav-tabs>li.active>a:hover {
-    color: #fff !important;
-    cursor: default;
-    background:#0099ff;
-    border: 1px solid #ddd;
-    border-bottom-color: transparent;
-}
-.rathna-nav>li>a {
-    position: relative;
-    display: block;
-    padding: 5px 15px;
-}
-.r_heading th{
+        }
+        .rathna-nav{
+        border-bottom:none !important;
 
-    font-size: 18px;
-    width: 50%;
-    position: relative;
-    top: 4px;
-}
-.r_heading td{
-font-size: .9em;
-    padding-right: 10px;
-}
-.r_tab-content{
-    border: none !important;
-}
-.r-row{
-    background: none !important;
-    border: none !important
-}
-.rat_h3_3{font-size: 16px;color: #034b94;font-weight: bold;margin-bottom: 8px;}
-.rat_h3_1{color:#FF8200; margin-bottom: 10px;font-size: 17px;}
-.rat_h3_2{color:#034b94; margin-bottom: 10px;font-size: 17px;}
-#id_survey{border-left: 3px solid #0577e0;}
-#id_survey{
-    margin-bottom: 25px !important;
-    margin-left: 0px !important;
-    padding: 6px !important;
-    margin-right: 4px !important;
-    width: 300px !important;
-}
+        }
+        .rathna-nav li a{
+         background:#ccc;
+        }
+        .rathna-nav>li>a {
+            margin-right: 0px !important;
+            line-height: 1.42857143;
+            border: 1px solid transparent;
+            border-radius: 4px 4px 0 0;
+            color:#fff !important;
+        }
+        .rathna-nav>li.active>a, .nav-tabs>li.active>a:focus, .nav-tabs>li.active>a:hover {
+            color: #fff !important;
+            cursor: default;
+            background:#0099ff;
+            border: 1px solid #ddd;
+            border-bottom-color: transparent;
+        }
+        .rathna-nav>li>a {
+            position: relative;
+            display: block;
+            padding: 5px 15px;
+        }
+        .r_heading th{
 
-#displays {
-   position: relative;
-}
+            font-size: 18px;
+            width: 50%;
+            position: relative;
+            top: 4px;
+        }
+        .r_heading td{
+        font-size: .9em;
+            padding-right: 10px;
+        }
+        .r_tab-content{
+            border: none !important;
+        }
+        .r-row{
+            background: none !important;
+            border: none !important
+        }
+        .rat_h3_3{font-size: 16px;color: #034b94;font-weight: bold;margin-bottom: 8px;}
+        .rat_h3_1{color:#FF8200; margin-bottom: 10px;font-size: 17px;}
+        .rat_h3_2{color:#034b94; margin-bottom: 10px;font-size: 17px;}
+        #id_survey{border-left: 3px solid #0577e0;}
+        #id_survey{
+            margin-bottom: 25px !important;
+            margin-left: 0px !important;
+            padding: 6px !important;
+            margin-right: 4px !important;
+            width: 100% !important;
+        }
 
-#indicators-tab, #loc-stats-tab {
-   position: absolute;
-   display: block;
-   width: 100%;
-}
+
+        #indicators-tab, #loc-stats-tab {
+           position: absolute;
+           display: block;
+           width: 100%;
+        }
 
 
   </style>
@@ -196,7 +197,7 @@ font-size: .9em;
                     <div id="indicators-tab" class="tab-pane fade">
                         <table style="width:100%; margin-top:20px;" id="indicator-table">
                         {% for indicator in display_indicators %}
-                            <tr class="surveys survey-{{indicator.survey.id}}">
+                            <tr class="indicators indicator-{{indicator.survey.id}}">
                                 <td style="width:90%">
                                     <div class="progress">
                                         <div class="progress-bar progress-bar-success " role="progressbar" aria-valuenow="{{ indicator.country_wide_value }}" aria-valuemin="0" aria-valuemax="100" style="width:{{ indicator.country_wide_value }}%">
@@ -215,14 +216,7 @@ font-size: .9em;
                     <div id="loc-stats-tab" class="tab-pane fade  in active">
                         <div id="info-update"></div>
                         <br/>
-                        <h3 class="rat_h3_2" style="margin-left: 8px;">INTERVIEW PER EA</h3>
                         <div id="map-legend">
-                            <i class="map-legend" style="background:#8daedb"></i> Survey not opened<br>
-                            <i class="map-legend" style="background:#FD8D3C;"></i> 0 — 5<br>
-                            <i class="map-legend" style="background:#FC4E2A;"></i> 5 — 10<br>
-                            <i class="map-legend" style="background:#E31A1C;"></i> 10 — 15<br>
-                            <i class="map-legend" style="background:#BD0026;"></i> 15 — 20<br>
-                            <i class="map-legend" style="background:#800026"></i> 20 and Above
                         </div>
                     </div>
                 </div>
@@ -249,6 +243,7 @@ font-size: .9em;
     info = L.control(),
     //legend = L.control({position: 'bottomright'}),
     indicatorData = {},
+    indicatorSurveys = { {% for indicator in display_indicators %} '{{indicator.name}}': '{{indicator.survey.id}}', {% endfor %} },
     indicatorTable = document.getElementById('indicator-table'),
     countryIndicator = indicatorTable.innerHTML,
     geojson;
@@ -262,15 +257,23 @@ font-size: .9em;
 
 $(function(){
     $("#id_survey").on('change', function(){
+        resetMap();
         getCompletionFor();
-        load_indicators();
-        $('surveys').show();
-        $('survey-'+this.val()).hide();
+        refreshIndicatorDisplay();
     });
     loadInitialMap();
     load_indicators();
 });
 
+
+function refreshIndicatorDisplay() {
+    if($("#id_survey").val()) {
+        $('.indicators').hide();
+        $('.indicator-'+$("#id_survey").val()).show();
+    }
+    else
+        $('.indicators').show();
+}
 
 
 var legend = null;
@@ -310,7 +313,7 @@ function updateLegend(max) {
     step = max/5.
     var div = document.getElementById('map-legend');
     div.innerHTML = '';
-    div.innerHTML += '<i class="map-legend" style="background:' + getColorFor(null) + '"></i>'+ " Survey not opened<br/>";
+    div.innerHTML += '<i class="map-legend" style="background:' + getColorFor(null) + '"></i>'+ " No Data<br/>";
     for (var i = 0; i < 4; i++) {
         div.innerHTML += '<i class="map-legend" style="background:' + getColorFor(grades[i]) + ';"></i> ';
         div.innerHTML += Math.floor(i*step) +" &mdash; "+ Math.floor((i + 1)*step) + "<br/>";
@@ -371,13 +374,14 @@ function resetMap() {
 
 
 function getColorFor(rate) {
-    return rate > 80 && rate <= 100 ? '#800026' :
-           rate > 60 && rate <= 80  ? '#BD0026' :
-           rate > 40 && rate <= 60  ? '#E31A1C' :
-           rate > 20 && rate <= 40  ? '#FC4E2A' :
-           rate > 0  && rate <= 20  ? '#FD8D3C' :
-           rate == 0 ? '#FFFFFF':
-           '#29bc69';
+    if(rate === undefined || rate === null)
+        return '#FFFFFF';
+    return rate <= grades[0] ? '#FD8D3C' :
+           rate <= grades[1]  ? '#FC4E2A' :
+           rate <= grades[2]  ? '#E31A1C' :
+           rate <= grades[3]  ?  '#BD0026':
+           rate <= grades[4]  ? '#800026':
+           '#800000';
     }
 
 function style(feature) {
@@ -388,7 +392,7 @@ function style(feature) {
             fillColor: getColorFor(grades[i-1]),
             weight: 2,
             opacity: 0.55,
-            color: '#fff',
+            color: '#1ba6e1',
             dashArray: '3',
             fillOpacity: 1
         };
@@ -429,10 +433,11 @@ getIndicatorHtml = function(name, property) {
     else {
         indicatorValue = 0.0;
     }
-    return '<tr>\
+    return '<tr class="indicators indicator-' + indicatorSurveys[name] +'">\
             <td style="width:90%">\
                 <div class="progress">\
-                    <div class="progress-bar progress-bar-success " role="progressbar" aria-valuenow="' +  indicatorValue + '" aria-valuemin="0" aria-valuemax="100" style="width:' +  indicatorValue + '%">\
+                    <div class="progress-bar progress-bar-success " role="progressbar" aria-valuenow="' +
+                    indicatorValue + '" aria-valuemin="0" aria-valuemax="100" style="width:' +  indicatorValue + '%">\
                         <span>' + name + '</span>\
                     </div>\
                 </div>\
@@ -449,6 +454,7 @@ updateIndicators = function(property) {
      for (var name in indicatorData){
         indicatorTable.innerHTML += getIndicatorHtml(name, property);
      }
+     refreshIndicatorDisplay();
 }
 
 info.onAdd = function (map) {
@@ -466,7 +472,7 @@ info.update = function (props) {
        property = property.toUpperCase();
        updateIndicators(property);
         if('total_eas' in props.rate){
-            rate = props.rate.value >-1 ? props.rate.value: 'Survey not opened.';
+            rate = props.rate.value >-1 ? props.rate.value: 'No Data.';
              div.innerHTML = '<table class="rathna_table">\
                                 <thead>\
                                     <tr>\
@@ -520,18 +526,6 @@ info.update = function (props) {
 };
 
 
-<!--var survey_selector = L.control({position: 'topleft'});-->
-
-    <!--survey_selector.onAdd = function(map){-->
-        <!--var selector_div = L.DomUtil.create('div', 'survey');-->
-        <!--var surveysHtml = $('#map_filter');-->
-        <!--$(selector_div).html(surveysHtml.html());-->
-        <!--$(surveysHtml).removeAttr('class', 'hide')-->
-        <!--$(surveysHtml).remove()-->
-        <!--return selector_div;-->
-    <!--}-->
-
-
 //survey_selector.addTo(map)
 
 function highlightAdminLevel(event){
@@ -558,13 +552,14 @@ function zoomAdminLevel(event){
     var adminLevel = layer.feature.properties['{{loc_field}}'];
     if(!adminLevel)
          adminLevel = layer.feature.properties['{{alt_loc_field}}'];
-    //alert('AdminLevel: ' + adminLevel);
+    //console.info('AdminLevel: ' + adminLevel);
 
 }
 
 function resetAdminLevelHighlight(event){
     geojson.resetStyle(event.target);
     indicatorTable.innerHTML = countryIndicator;
+    refreshIndicatorDisplay();
 }
 
     </script>
