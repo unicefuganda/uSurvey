@@ -7,7 +7,7 @@
     margin: 0!important;
     display: none !important;
   }
-  .form-horizontal .control-label {
+  .form-horizontal .control-label-1 {
     padding-top: 7px !important;
     margin-bottom: 0;
     text-align: right;  
@@ -38,7 +38,7 @@ text-align: center;
     width: 175px !important;
     height: 25px !important; 
   }
-  .control-label{
+  .control-label-1{
     font-weight: bold;
   }
   .btn-yellow{display: none !important;}
@@ -48,7 +48,7 @@ text-align: center;
   }
     margin-bottom: 10px !important;
 }
-.form-horizontal .control-label{
+.form-horizontal .control-label-1{
   padding-top: 0px !important;
 }
 legend {
@@ -68,27 +68,28 @@ legend {
     padding: 0;
     width: 100%;
 }
+.controls{margin-bottom: 15px;}
 </style>
 <div id="legend">
     <legend class="_heading_color">User Credentials</legend>
   </div>
 
   <div class="control-group">
-    <label class="control-label col-md-4">{{form.username.label}}</label>
+    <label class="control-label-1 col-md-4">{{form.username.label}}</label>
     <div class="controls col-md-8">
       {{form.username}}
       <label class="error">{{form.username.errors}}</label>
     </div>
   </div>
   <div class="control-group">
-    <label class="control-label col-md-4">{{form.password1.label}}</label>
+    <label class="control-label-1 col-md-4">{{form.password1.label}}</label>
     <div class="controls col-md-8">
       {{form.password1}}
       <label class="error">{{form.password1.errors}}</label>
     </div>
   </div>
   <div class="control-group">
-    <label class="control-label col-md-4">{{form.password2.label}}</label>
+    <label class="control-label-1 col-md-4">{{form.password2.label}}</label>
     <div class="controls col-md-8">
       {{form.password2}}
       <label class="error">{{form.password2.errors}}</label>
@@ -98,7 +99,7 @@ legend {
     <legend class="_heading_color">User Details</legend>
   </div>
   <div class="control-group">
-    <label class="control-label col-md-4">{{form.first_name.label}}</label>
+    <label class="control-label-1 col-md-4">{{form.first_name.label}}</label>
     <div class="controls col-md-8">
       {{form.first_name}}
       <label class="error">{{form.first_name.errors}}</label>
@@ -106,7 +107,7 @@ legend {
   </div>
 
 <div class="control-group">
-    <label class="control-label col-md-4">{{form.last_name.label}}</label>
+    <label class="control-label-1 col-md-4">{{form.last_name.label}}</label>
     <div class="controls col-md-8">
       {{form.last_name}}
       <label class="error">{{form.last_name.errors}}</label>
@@ -114,14 +115,14 @@ legend {
   </div>
 
   <div class="control-group">
-    <label class="control-label col-md-4">{{form.email.label}}</label>
+    <label class="control-label-1 col-md-4">{{form.email.label}}</label>
     <div class="controls col-md-8">
       {{form.email}}
       <label class="error">{{form.email.errors}}</label>
     </div>
   </div>
   <div class="control-group">
-    <label class="control-label col-md-4">{{form.mobile_number.label}}</label>
+    <label class="control-label-1 col-md-4">{{form.mobile_number.label}}</label>
     <div class="controls col-md-8">
        <div class="ccode">
            <span class="add-on"><input type="text" readonly="readonly" value="{{ country_phone_code }}" size="10" id="id_country_code"></span>
@@ -131,7 +132,7 @@ legend {
   </div>
   </div>
   <div class="control-group">
-    <label class="control-label col-md-4">{{form.groups.label}}</label>
+    <label class="control-label-1 col-md-4">{{form.groups.label}}</label>
     <div class="controls col-md-8">
       {{form.groups}}
       <label class="error">{{form.groups.errors}}</label>

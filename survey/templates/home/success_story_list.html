@@ -79,8 +79,14 @@
         <th class="status sorting">
             SNo
         </th>
+        <th class="status sorting">
+            Image
+        </th>
         <th class="sorting">
           Name
+        </th>
+        <th class="sorting">
+          Date
         </th>
         
         <th  style="background-image: None;">
@@ -92,15 +98,18 @@
     {% has_super_powers request as has_powers %}
     {% for each in ss_list %}
         <tr>
+
          <td>
               {{forloop.counter}}
           </td>
+          <td ><img src="/media/{{each.image}}" class="img-thumbnail"></td>
           <td>
             <a href="{% url 'success_story_edit' each.id %}">{{ each.name }}</a>
           </td>
+          <td>{{each.modified}}</td>
          
          
-          <td width="10%">
+          <td width="6%">
             <div class="">
                 <div class="inline pos-rel">
                        <button class="btn btn-minier btn-yellow dropdown-toggle" data-toggle="dropdown" data-position="auto">
@@ -112,7 +121,7 @@
                             </li>
                             
                             <li>
-                                <a href="" class="tooltip-info" data-toggle="modal" data-rel="tooltip" title="" data-original-title="Delete"><span class="red"><i class="usur-icon fa fa-trash bigger-120"></i>Delete</span></a>
+                                <a href="{% url 'success_story_delete' each.id %}" class="tooltip-info" data-toggle="modal" data-rel="tooltip" title="" data-original-title="Delete"><span class="red"><i class="usur-icon fa fa-trash bigger-120"></i>Delete</span></a>
                             </li>
                             
                             

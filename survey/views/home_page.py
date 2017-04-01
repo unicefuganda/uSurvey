@@ -81,9 +81,14 @@ def deactivate_super_powers(request):
     return HttpResponseRedirect(reverse('home_page'))
 
 
+def home_success_story_list(request):
+    ss_list  = SuccessStories.objects.all()
+    return render(request, 'main/home_success_story_list.html', {'ss_list': ss_list})
+
 def success_story_list(request):
     ss_list  = SuccessStories.objects.all()
     return render(request, 'home/success_story_list.html', {'ss_list': ss_list})
+
 
 def success_story_delete(request,id=None):
     if id:
@@ -96,9 +101,9 @@ def success_story_form(request,id=None, instance=None):
     if id:
         instance = SuccessStories.objects.get(id=id)
     if request.method == 'POST':
-        form = SuccessStoriesForm(request.POST, instance=instance)
+        form = SuccessStoriesForm(request.POST, request.FILES, instance=instance)
         if form.is_valid():
-            form.save()
+            instance = form.save()
             if id == None:
                 messages.info(request, 'New Success story have been saved') 
             else:
