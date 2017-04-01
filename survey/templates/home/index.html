@@ -238,7 +238,7 @@
 
 {% block javascripts %}
     <script type="text/javascript">
-       var map = L.map('survey_map', {zoomControl: true, doubleClickZoom: false, scrollWheelZoom:false, attributionControl: false}).setView([{{map_center}}], {{ zoom_level|default:6}}),
+       var map = L.map('survey_map', {zoomControl: true, doubleClickZoom: false, scrollWheelZoom: false, attributionControl: false}).setView([{{map_center}}], {{ zoom_level|default:6}}),
 
     info = L.control(),
     //legend = L.control({position: 'bottomright'}),
@@ -247,7 +247,8 @@
     indicatorTable = document.getElementById('indicator-table'),
     countryIndicator = indicatorTable.innerHTML,
     geojson;
-    //map.dragging.disable();
+    map.dragging.disable();
+    map.on('click', function(){});
     map.touchZoom.disable();
     map.doubleClickZoom.disable();
 
@@ -290,7 +291,7 @@ function updateLegend2(max) {
     legend.onAdd = function (map) {
         var div = L.DomUtil.create('div', 'info legend');
         div.innerHTML = '';
-        div.innerHTML += "<strong>Interview per EA</strong><br />"
+        div.innerHTML += "<strong>Respondent per EA</strong><br />"
             + '<i style="background:' + getColorFor(null) + '"></i>'+ " Survey not opened<br/>";
         for (var i = 0; i < 4; i++) {
             div.innerHTML += '<i style="background:' + getColorFor(grades[i]) + '"></i> ';
@@ -312,7 +313,7 @@ function updateLegend(max) {
         max = 25;       //just to make sure it is divisible into 5 places.
     step = max/5.
     var div = document.getElementById('map-legend');
-    div.innerHTML = '<h4>Interview Per EA</h4><br />';
+    div.innerHTML = '<h4>Respondent Per EA</h4><br />';
     div.innerHTML += '<i class="map-legend" style="background:' + getColorFor(null) + '"></i>'+ " No Data<br/>";
     for (var i = 0; i < 4; i++) {
         div.innerHTML += '<i class="map-legend" style="background:' + getColorFor(grades[i]) + ';"></i> ';
@@ -389,7 +390,7 @@ function style(feature) {
    try {
         return {
             fillColor: getColorFor(grades[i-1]),
-            weight: 2,
+            weight: 1,
             opacity: 0.55,
             color: '#1ba6e1',
             fillOpacity: 1
