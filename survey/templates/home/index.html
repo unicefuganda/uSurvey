@@ -313,9 +313,9 @@ function updateLegend(max) {
         max = 25;       //just to make sure it is divisible into 5 places.
     step = max/5.
     var div = document.getElementById('map-legend');
-    div.innerHTML = '<h4>Respondent Per EA</h4><br />';
+    div.innerHTML = '<h4>Ave. (Respondents/EA)</h4><br />';
     div.innerHTML += '<i class="map-legend" style="background:' + getColorFor(null) + '"></i>'+ " No Data<br/>";
-    for (var i = 0; i < 4; i++) {
+    for (var i = 0; i < grades.length-1; i++) {
         div.innerHTML += '<i class="map-legend" style="background:' + getColorFor(grades[i]) + ';"></i> ';
         div.innerHTML += Math.floor(i*step) +" &mdash; "+ Math.floor((i + 1)*step) + "<br/>";
     }
