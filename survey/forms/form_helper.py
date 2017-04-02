@@ -1,5 +1,6 @@
 __author__ = 'anthony <>'
 from collections import OrderedDict
+from django import forms
 
 
 class FormOrderMixin(object):
@@ -24,6 +25,15 @@ class FormOrderMixin(object):
                 pass
         fields.update(self.fields)  # add remaining fields in original order
         self.fields = fields
+
+
+def get_form_field_no_validation(fieldname):
+    class FieldNoValidation(fieldname):
+
+        def clean(self, value):
+            return value
+
+    return FieldNoValidation
 
 
 class IconName(object):

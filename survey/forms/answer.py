@@ -3,7 +3,7 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.utils.safestring import mark_safe
 from django import forms
-from form_helper import FormOrderMixin
+from form_helper import FormOrderMixin, get_form_field_no_validation
 from survey.models import (Answer, Interview, VideoAnswer, AudioAnswer, ImageAnswer, TextAnswer, NumericalAnswer,
                            MultiChoiceAnswer, MultiSelectAnswer, DateAnswer, SurveyAllocation, EnumerationArea,
                            Survey, QuestionSet, Interviewer, InterviewerAccess, USSDAccess, QuestionOption,
@@ -57,11 +57,9 @@ def get_answer_form(interview, access=None):
                                                                                      'class': 'datepicker'},
                                                                               format=settings.DATE_FORMAT))
             if question.answer_type == GeopointAnswer.choice_name():
-                self.fields['value'] = forms.CharField(label='Answer',
-                                                       widget=forms.DateInput(attrs={'placeholder': 'Lat[space4]'
-                                                                                                    'Long[space4]'
-                                                                                                    'Precision',
-                                                                                     }))
+                model_field = get_form_field_no_validation(forms.CharField)
+                self.fields['value'] = model_field(label='Answer', widget=forms.TextInput(attrs={'placeholder': 'Lat[space4]Long[space4'
+                                                                                  'Altitude[space4]Precision'}))
             if question.answer_type == MultiChoiceAnswer.choice_name() and \
                             access.choice_name() == USSDAccess.choice_name():
                 self.fields['value'] = forms.IntegerField()
@@ -80,6 +78,15 @@ def get_answer_form(interview, access=None):
                 self.fields['value'].widget.attrs = {'accept': accept_types.get(question.answer_type,
                                                                                 '|'.join(accept_types.values()))}
             self.fields['value'].label = 'Answer'
+
+        def full_clean(self):
+            try:
+                return super(AnswerForm, self).full_clean()
+            except ValueError:
+                if question.answer_type == GeopointAnswer.choice_name():
+                    self.cleaned_data['value'] = self.data['value']
+                else:
+                    raise
 
         def render_extra_ussd(self):
             text = []
@@ -104,6 +111,18 @@ def get_answer_form(interview, access=None):
                     self.cleaned_data['value'] = question.options.get(order=self.cleaned_data['value'])
                 except QuestionOption.DoesNotExist:
                     raise ValidationError('Please select a valid option')
+            if question.answer_type == GeopointAnswer.choice_name():
+                float_entries = self.cleaned_data['value'].split(' ')
+                valid = False
+                try:
+                    map(lambda entry: float(entry), float_entries)
+                    if len(float_entries) == 4:
+                        valid = True
+                except:
+                    pass
+                if not valid:
+                    raise ValidationError('Please enter in format: lat[space]long[space]altitude[space]precision')
+
             return self.cleaned_data['value']
 
         def save(self, *args, **kwargs):

@@ -4,7 +4,7 @@
  {% endif %}
  {{ field }}
  {% if field.errors %}
-   <label class="error">
+   <label class="error" style="word-wrap: break-word;">
        {% for error in field.errors %}
            {{ error}}
        {% endfor %}
