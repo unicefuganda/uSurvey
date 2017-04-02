@@ -5,10 +5,8 @@ from django.conf import settings
 from django.shortcuts import render
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse
-from survey.models import (InterviewerAccess, QuestionLoop, QuestionSet, Answer, Question,
-                           SurveyAllocation, AnswerAccessDefinition, ODKAccess)
-from survey.forms.answer import (get_answer_form, UserAccessForm,
-                                 SurveyAllocationForm, SelectBatchForm, AddMoreLoopForm)
+from survey.models import SurveyAllocation
+from survey.forms.answer import (UserAccessForm, SurveyAllocationForm, SelectBatchForm, AddMoreLoopForm)
 from .online_handler import OnlineHandler, show_only_answer_form, get_display_format
 
 
@@ -17,7 +15,6 @@ def ussd_flow(request):
     request_data = request_data.copy()
     request_data['format'] = 'text'
     mobile = request_data.get(settings.USSD_MOBILE_NUMBER_FIELD, '')
-    response = ''
     try:
         pn = phonenumbers.parse(mobile, settings.COUNTRY_CODE)
         if phonenumbers.is_valid_number_for_region(pn, settings.COUNTRY_CODE):
@@ -62,7 +59,6 @@ class OnlineInterview(OnlineHandler):
 
     def respond(self, request, session_data):
         access = self.access
-        access.interviewer
         # check if there is any active interview, if yes, ask interview last question
         interview = session_data.get('interview', None)
         # if interview is Non show select EA form
@@ -88,9 +84,8 @@ class OnlineInterview(OnlineHandler):
         2`. Select Batch if survey is ready for batch collection, else skip this step and select available listing/batch
         3. Move to interview questions.
         This func is expected to be called only when survey is open
-        :param online_view:
+        :param self:
         :param request:
-        :param access:
         :param session_data:
         :return:
         """
@@ -147,6 +142,3 @@ class OnlineInterview(OnlineHandler):
             context['display_format'] = get_display_format(request)
             return render(request, template_file, context)
         return render(request, 'interviews/new.html', context)
-
-
-

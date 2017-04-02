@@ -1,7 +1,8 @@
 {% extends "layout.html" %}
 {% load template_tags %}
 {% load pagination_tags %}
-{% block extra_css %}
+{% block extra_head %}
+    <link rel="stylesheet" href="{{ STATIC_URL }}assets/formstyleres.css" />
     <style type="text/css">
 
         div.row-fluid {

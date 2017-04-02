@@ -6,7 +6,8 @@ from django import forms
 from form_helper import FormOrderMixin
 from survey.models import (Answer, Interview, VideoAnswer, AudioAnswer, ImageAnswer, TextAnswer, NumericalAnswer,
                            MultiChoiceAnswer, MultiSelectAnswer, DateAnswer, SurveyAllocation, EnumerationArea,
-                           Survey, QuestionSet, Interviewer, InterviewerAccess, USSDAccess, QuestionOption)
+                           Survey, QuestionSet, Interviewer, InterviewerAccess, USSDAccess, QuestionOption,
+                           GeopointAnswer)
 
 
 class USSDSerializable(object):
@@ -55,6 +56,12 @@ def get_answer_form(interview, access=None):
                                                        widget=forms.DateInput(attrs={'placeholder': 'Date Of Birth',
                                                                                      'class': 'datepicker'},
                                                                               format=settings.DATE_FORMAT))
+            if question.answer_type == GeopointAnswer.choice_name():
+                self.fields['value'] = forms.CharField(label='Answer',
+                                                       widget=forms.DateInput(attrs={'placeholder': 'Lat[space4]'
+                                                                                                    'Long[space4]'
+                                                                                                    'Precision',
+                                                                                     }))
             if question.answer_type == MultiChoiceAnswer.choice_name() and \
                             access.choice_name() == USSDAccess.choice_name():
                 self.fields['value'] = forms.IntegerField()

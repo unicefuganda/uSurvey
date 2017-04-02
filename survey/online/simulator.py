@@ -36,9 +36,8 @@ class SimulatorView(OnlineHandler):
 
     def start_interview(self, request, session_data):
         """Just create a mock interview and move on.
-        :param online_view:
+        :param self:
         :param request:
-        :param access:
         :param session_data:
         :return:
         """

@@ -30,8 +30,8 @@ class OnlineHandler(object):
 
     def handle_session(self, request):
         """
+        :param self
         :param request
-        :param access_id
         :return:
         """
         access = self.access
@@ -39,6 +39,7 @@ class OnlineHandler(object):
         session_data = get_entry(access, REQUEST_SESSION, {})
         slogger.debug('fetched: %s. session data: %s' % (access.user_identifier, session_data))
         response = self.respond(request, session_data)
+        session_data = {}
         slogger.debug('the session %s, data: %s' % (access.user_identifier, session_data))
         if session_data:
             set_entry(access, REQUEST_SESSION, session_data)

@@ -5,26 +5,7 @@
 {% endblock %}
 
 {% block extra_head %}
-<style>
-.subh {
-
-   font-size:18px;
-   color:#093;
-
-
-  }
-   .previewstyle {
-        border: 1px solid #307ecc;
-        height: 100%;
-        min-height: 300px;
-        text-align: center;
-        width: 100%;
-    }
-
-.form-horizontal .form-actions {
-    text-align: center;
-}
-</style>
+<link rel="stylesheet" href="{{ STATIC_URL }}assets/formstyleres.css" />
 {% endblock %}
 {% block content %}
 {% include "interviews/new_interview.html" %}
