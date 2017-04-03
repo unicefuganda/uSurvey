@@ -13,7 +13,7 @@
 {% endif %}
 {% endblock %}
 {% else %}
-<div class="row">
+<div class="row" id="preview-container">
    <div class="row">
       <div class="col-md-3">
          {% comment %}
@@ -51,7 +51,11 @@
                                   <div class="page-content">
                                       <div id="pages_maincontent">
                                               {% block preview_title %}
-                                               <h2 class="page_title">{{interview.question_set.name|default:'Data Entry'}}</h2>
+                                                {% if title %}
+                                                   <h2 class="page_title">{{interview.question_set.name|default:title }}</h2>
+                                                {% else %}
+                                                    <h2 class="page_title">{{interview.question_set.name|default:'Data Entry'}}</h2>
+                                                {% endif %}
                                               {% endblock %}
                                                 {% if answer_form.non_field_errors %}
                                                 <br /><br />
@@ -90,7 +94,7 @@
                                                                    {% include "bland_form.html" with a_form=answer_form %}
                                                                 </div>
                                                                 <br />
-                                                                <input name="submit" class="form_submit submit" id="submit" value="Send" type="submit">
+                                                                <input name="submit" class="form_submit submit" id="submit" value="Go" type="submit">
                                                              {% endblock %}
                                                          </form>
                                                      {% endblock %}
@@ -116,7 +120,7 @@
       width: 100%;
       height: 639px;
       margin: -50px auto auto;
-      background: url('/static/img/iphone-sim.png') no-repeat center;
+      background: url('{{STATIC_URL}}img/iphone-sim.png') no-repeat center;
    }
    .geni {
       width:247px;
