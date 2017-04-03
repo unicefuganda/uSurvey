@@ -14,6 +14,6 @@ def content_file_name(instance, filename):
 	return os.path.join('media/success-stories',filename)
 
 class SuccessStories(BaseModel):
-	name = models.CharField(max_length=20)
+	name = models.CharField(max_length=100)
 	content = models.TextField(null=False, blank=False)
 	image = models.FileField(upload_to=content_file_name)
