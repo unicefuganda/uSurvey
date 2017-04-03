@@ -122,7 +122,7 @@ xmlns:jr="http://openrosa.org/javarosa">
 		<group>
 			{% for ea_id, samples in ea_samples.items %}
 			   {% if samples %}
-					<select ref="/qset/qset{{qset.pk}}/sampleData/iq{{ ea_id }}">
+					<select1 ref="/qset/qset{{qset.pk}}/sampleData/iq{{ ea_id }}">
 						<label>Select Sample</label>
 						{% for sample in samples %}
 						{% get_sample_data_display sample as  sample_label %}
@@ -131,7 +131,7 @@ xmlns:jr="http://openrosa.org/javarosa">
 							<value>{{ sample.interview.pk }}</value>
 						</item>
 						{% endfor %}
-					</select>
+					</select1>
 				{% endif %}
 			{% endfor %}
 		</group>

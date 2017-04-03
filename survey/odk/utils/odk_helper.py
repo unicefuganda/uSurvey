@@ -86,7 +86,8 @@ def process_answers(xml, qset, access_channel, question_map, survey_allocation, 
             # the following looks ugly but ./sampleData/selectedSample is calculated in xform by a concat of
             # sampleData/iq{{ ea_id }} values with -. See question_set.xml binding for ./sampleData/selectedSample
             # if for some reason more than one interview value is reflected, choose the first one
-            reference_interview = _get_nodes('./sampleData/selectedSample', answers_node)[0].text.split('-')[0]
+            reference_interview = _get_nodes('./sampleData/selectedSample',
+                                             answers_node)[0].text.strip('-').split('-')[0]
         # map(lambda node: answers.extend(get_answers(node, qset, question_map)), question_answers_node.getchildren())
         # map(lambda node: survey_parameters.extend(get_answers(node, qset, question_map)),
         #     survey_parameters_node.getchildren())
