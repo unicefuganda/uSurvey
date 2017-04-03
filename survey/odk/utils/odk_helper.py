@@ -214,7 +214,10 @@ def process_submission(interviewer, xml_file, media_files=[], request=None):
     """extracts and saves the collected data from associated xform.
     """
     media_files = dict([(os.path.basename(f.name), f) for f in media_files])
-    xml_blob = xml_file.read()
+    return process_xml(interviewer, xml_file.read(), media_files=media_files, request=request)
+
+
+def process_xml(interviewer, xml_blob, media_files=[], request=None):
     survey_tree = _get_tree_from_blob(xml_blob)
     form_id = _get_form_id(survey_tree)
     instance_id = _get_instance_id(survey_tree)
