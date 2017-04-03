@@ -130,6 +130,8 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     "django.contrib.messages.context_processors.messages",
     "survey.context_processor.context_extras",
     "django.core.context_processors.request",
+    'django.core.context_processors.request',
+    'responsive.context_processors.device'
 )
 
 MIDDLEWARE_CLASSES = [
@@ -140,6 +142,7 @@ MIDDLEWARE_CLASSES = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'pagination_bootstrap.middleware.PaginationMiddleware',
     'breadcrumbs.middleware.BreadcrumbsMiddleware',
+    'responsive.middleware.ResponsiveMiddleware'
     # Uncomment the next line for simple clickjacking protection:
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
@@ -174,7 +177,8 @@ INSTALLED_APPS = [
     'django_rq',
     'django_rq_dashboard',
     'channels',
-    'macros'
+    'macros',
+    'responsive'
     # Uncomment the next line to enable the admin:
     # 'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:

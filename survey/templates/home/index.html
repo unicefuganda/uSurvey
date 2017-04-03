@@ -11,7 +11,7 @@
 <style>
 
      .map-show {
-            width: 80%
+            width: 80%;
             display: inline-block;
         }
 
@@ -44,8 +44,8 @@
            width: 18%;
         }
         #survey_map {
-            border: None;
-            box-shadow: None;
+            border: none;
+            box-shadow: none;
             min-height: 500px;
             margin-bottom: 130px;
             width: 79%;
@@ -56,8 +56,18 @@
         }
         @media only screen and (max-width:767px) {
             #survey_map {
-               width: 100%
+               width: 100%;
+               margin-bottom: 10px;
+               min-height:400px;
+               margin-left: 60px;
             }
+             #displays {
+           position: relative;
+           width: 100%;
+        }
+
+
+
         }
 
 
@@ -111,7 +121,7 @@
             height: 16px;
             display: inline-block;
             border: 1px solid;
-            //border-color: #1ba6e1;
+            border-color: #1ba6e1;
 
         }
         .rathna-nav{
@@ -159,7 +169,7 @@
             border: none !important
         }
         .rat_h3_3{font-size: 16px;color: #034b94;font-weight: bold;margin-bottom: 8px;}
-        .rat_h3_1{color:#FF8200; margin-bottom: 10px;font-size: 17px; margin-top: 40px;}
+        .rat_h3_1{color:#FF8200; margin-bottom: 10px;font-size: 17px;}
         .rat_h3_2{color:#034b94; margin-bottom: 10px;font-size: 17px;}
         #id_survey{border-left: 3px solid #0577e0;}
         #id_survey{
@@ -185,7 +195,64 @@
         <li ><a data-toggle="tab" href="#indicators-tab">INDICATORS</a></li>
         
     </ul>
+ {% if device.is_small %}
 
+    <div class="tab-content r_tab-content">
+        <div id="locations-tab">
+            <div class="row r-row">
+                <div class="col-md-9">
+                    <div class="map-show">
+                        <div id="survey_map" class="center-block"></div>
+                    </div>
+                    
+                </div>
+                
+                <div id="displays" class="col-md-3">
+                    <div id="map-controls" >
+                        <div class="rat_h3_3">Survey</div>
+                        {{map_filter}}
+                    </div>
+                    <div id="indicators-tab" class="tab-pane fade">
+                        <table style="width:100%; margin-top:20px;" id="indicator-table">
+                        {% for indicator in display_indicators %}
+                            <tr class="indicators indicator-{{indicator.survey.id}}">
+                                <td style="width:90%">
+                                    <div class="progress">
+                                        <div class="progress-bar progress-bar-success " role="progressbar" aria-valuenow="{{ indicator.country_wide_value }}" aria-valuemin="0" aria-valuemax="100" style="width:{{ indicator.country_wide_value }}%">
+                                            <span>{{ indicator.name }}</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td style="width:10%">
+                                    <p style="margin-top:-13px; margin-left:5px;font-weight:bold" class="text-success">{{ indicator.country_wide_value }}</p>
+                                </td>
+                            </tr>
+                        {% endfor %}
+
+                        </table>
+                    </div>
+                    <div id="loc-stats-tab" class="tab-pane fade  in active">
+                       
+                    <div class="row" style="background: none !important">
+                        <div class="col-md-6 col-xs-6">
+                        <div id="info-update">{% include 'page_loader.html' %}</div>
+                        </div>
+                        <div class="col-md-6 col-xs-6">
+                            <div id="map-legend">
+                            </div>
+                        </div>
+                    </div>
+
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+       
+    </div>
+
+
+ {%else%}
     <div class="tab-content r_tab-content">
         <div id="locations-tab">
             <div class="row r-row">
@@ -230,6 +297,10 @@
         </div>
        
     </div>
+
+
+{%endif%}
+
 </div>
 
 
