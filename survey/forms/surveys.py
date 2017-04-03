@@ -77,6 +77,21 @@ class SurveyForm(ModelForm, FormOrderMixin):
             self.cleaned_data['random_sample_label'] = self.clean_random_sample_label()
         return cleaned_data
 
+    def clean_listing_form(self):
+        if not self.cleaned_data.get('listing_form') and  not self.cleaned_data.get('preferred_listing'):
+            raise ValidationError('Required')
+        if self.cleaned_data.get('listing_form')  and self.cleaned_data.get('preferred_listing'):
+            raise ValidationError('Chose Either listing_form/preferred_listing ')
+        return self.cleaned_data['listing_form']
+
+    def clean_preferred_listing(self):
+        if not self.cleaned_data.get('listing_form') and  not self.cleaned_data.get('preferred_listing'):
+            raise ValidationError('Required')
+        if self.cleaned_data.get('listing_form')  and self.cleaned_data.get('preferred_listing'):
+            raise ValidationError('Chose Either listing_form/preferred_listing ')
+
+        return self.cleaned_data['preferred_listing']
+
     def clean_name(self):
         name = self.cleaned_data['name']
         survey = Survey.objects.filter(name=name)
