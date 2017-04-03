@@ -144,12 +144,10 @@ def save_answers(qset, access_channel, question_map, answers, survey_allocation,
             interview.interview_channel = access_channel
             interview.save()
         except Interview.DoesNotExist:
-            interview, _ = Interview.objects.get_or_create(survey=survey, question_set=qset,
-                                                           ea=ea,
-                                                           interviewer=interviewer,
-                                                           interview_channel=access_channel,
-                                                           closure_date=timezone.now(),
-                                                           interview_reference_id=reference_interview)
+            interview = Interview.objects.create(survey=survey, question_set=qset,
+                                                 ea=ea, interviewer=interviewer, interview_channel=access_channel,
+                                                 closure_date=timezone.now(),
+                                                 interview_reference_id=reference_interview)
         map(lambda (q_id, answer): _save_answer(interview, q_id, answer), record.items())
         if survey_parameters:
             map(lambda (q_id, answer): _save_answer(interview, q_id, answer), survey_parameters.items())

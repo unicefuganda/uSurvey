@@ -8,6 +8,23 @@
         div.row-fluid {
             display: none;
         }
+       .iphone_bg {
+          margin: 0 auto auto !important;
+       }
+       .modal-dialog {
+          float: right;
+          margin-top: 100px;
+          background-color: rgba(0, 0, 0, 0) !important;
+       }
+
+       div.modal-body, .modal-body div {
+            background-color: rgba(0, 0, 0, 0) !important;
+       }
+
+       div.previewstyle, .previewstyle div {
+            background-color: #fff  !important;
+        }
+
     </style>
 {% endblock %}
 {% block title %}
@@ -53,17 +70,19 @@
 <div class="modal fade" id="test_flow" tabindex="-1" role="dialog"  aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
-              <div class="modal-header" style="background-color: #3498DB;border-top: 1px solid #70B6E5;border-bottom: 5px solid #2372A7;" >
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h4 class="modal-title" style="color: #fff">Preview</h4>
-              </div>
               <div class="modal-body">
-                {% include "interviews/new_interview.html" with action=batch.id|get_url_with_ids:"test_qset_flow" %}
+                {% include "interviews/new_interview.html" with action=batch.id|get_url_with_ids:"test_qset_flow" title="Preview" %}
               </div>
             </div><!-- /.modal-content -->
         </div><!-- /.modal-dialog -->
       </div><!-- /.modal -->
-
+    <script type="text/javascript">
+    $(document).ready(function(){
+        var img = new Image();
+        img.src = $('.iphone_bg').first().css('background-image').replace(/url\(|\)$|"/ig, '');
+        $('.modal-dialog, .modal-content, .iphone_bg').width(img.width);
+      });
+    </script>
     {% if batch %}
         <form method="post" accept-charset="utf-8" action="{% url 'qset_update_question_order_page' batch.id %}">
         {% csrf_token %}
