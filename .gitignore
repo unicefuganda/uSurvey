@@ -52,4 +52,6 @@ tags
 submissions/*
 answerFiles/*
 survey/static/admin/*
+survey/migrations/*
+menusession.log*
 

@@ -82,6 +82,11 @@
     <script src="{{STATIC_URL}}js/logic.js" type="text/javascript" charset="utf-8"></script>
     <script src="{{STATIC_URL}}js/questions.js" type="text/javascript" charset="utf-8"></script>
 
+    <script type="text/javascript">
+   $(document).ready(function(){
+     $('.controls textarea ').after($('<span id="text-counter"></span>'));
+     });
+</script>
 
 <style type="text/css">
  #id_value{width: 220px !important;
@@ -90,5 +95,17 @@ margin-left: 0px !important;
  }
 
  #id_next_question, .select2-container .selection .select2-selection{border-left: 3px solid #0577e0;}
+
+  #text-counter{
+      margin-left: 10px !important;font-size: 11px;
+   }
+   #id_answer_type{margin-left: 4px !important;}
 </style>
+
+
+
+
+
+
+
 {% endblock %}

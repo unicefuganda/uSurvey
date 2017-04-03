@@ -68,10 +68,10 @@
 {% endblock %}
 {% block content %}
 
-<div class="modal fade" id="test_flow" tabindex="-1" role="dialog"  aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-              <div class="modal-body">
+<div class="modal fade" id="test_flow" tabindex="-1" role="dialog"  aria-hidden="true" style="background: none !important;box-shadow: none !important;">
+        <div class="modal-dialog" style="background: none !important;">
+            <div class="modal-content" style="background: none !important;box-shadow: none !important; border: none !important;">
+              <div class="modal-body test_flow_modal" style="background: none !important;">
                 {% include "interviews/new_interview.html" with action=batch.id|get_url_with_ids:"test_qset_flow" title="Preview" %}
               </div>
             </div><!-- /.modal-content -->
@@ -314,5 +314,8 @@
         <script src="{{ STATIC_URL }}js/jquery.tablednd.js" type="text/javascript" charset="utf-8"></script>
         <script src="{{ STATIC_URL }}js/batch_questions.js" type="text/javascript" charset="utf-8"></script>
     {% endif %}
-    <script src="{{ STATIC_URL }}js/questions.js" type="text/javascript" charset="utf-8"></script>    
+    <script src="{{ STATIC_URL }}js/questions.js" type="text/javascript" charset="utf-8"></script>    <style type="text/css">
+        
+         .dataTables_wrapper .row:last-child{border: none !important;}
+    </style>
 {% endblock %}
