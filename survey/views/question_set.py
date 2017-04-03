@@ -127,11 +127,15 @@ def delete_qset_listingform(request, question_id):
 def view_data(request, qset_id):
     qset = QuestionSet.get(pk=qset_id)
     request.breadcrumbs(qset.edit_breadcrumbs(qset=qset))
+    disabled_fields = []
     request.GET = request.GET.copy()
     request.GET['question_set'] = qset_id
+    disabled_fields.append('question_set')
     if hasattr(qset, 'survey'):
         request.GET['survey'] = qset.survey.id
-    return _view_qset_data(request, qset.__class__, Interview.objects.filter(question_set__id=qset_id))
+        disabled_fields.append('survey')
+    return _view_qset_data(request, qset.__class__, Interview.objects.filter(question_set__id=qset_id),
+                           disabled_fields=disabled_fields)
 
 
 
@@ -149,9 +153,9 @@ def view_batch_data(request):
     return _view_qset_data(request, Batch, interviews)
 
 
-def _view_qset_data(request, model_class, interviews):
+def _view_qset_data(request, model_class, interviews, disabled_fields=[]):
     params = request.GET if request.method == 'GET' else request.POST
-    survey_filter = SurveyResultsFilterForm(model_class, data=params)
+    survey_filter = SurveyResultsFilterForm(model_class, disabled_fields=disabled_fields, data=params)
     locations_filter = LocationsFilterForm(data=request.GET, include_ea=True)
     selected_qset = None
     survey = None

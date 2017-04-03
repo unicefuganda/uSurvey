@@ -145,6 +145,7 @@ $('#math_validate').on('click', function() {
                     $('#variable-form-body').html(data);
                     $('#add_variable').modal('show');
                     resetAll();
+                    $('#clear_variable_button').hide();
                 }
             });
         return true;
@@ -178,6 +179,7 @@ $('#math_validate').on('click', function() {
      }
     function validate_formulae() {
         var url = "{% url 'validate_formulae' %}";
+        $('#id_variables option').prop('selected', true);
         var validation_data = {'variables': $('#id_variables').val(), 'formulae': $('#id_formulae').val() };
         $.ajax({
                 url : url,
@@ -187,12 +189,12 @@ $('#math_validate').on('click', function() {
                 success: function( data ){
                     if(data.valid){
                         $('#validate').html('<span style="color:green">\
-                                <i class="fa fa-check"></i>\
+                                <i class="fa fa-check"></i>&nbsp;valid\
                             </span>');
                     }
                     else {
                         $('#validate').html('<span style="color:red">\
-                                <i class="fa fa-times"></i>\
+                                <i class="fa fa-times"></i>&nbsp;invalid\
                             </span>');
                     }
                 }

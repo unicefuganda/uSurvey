@@ -225,19 +225,22 @@ class SurveyResultsFilterForm(forms.Form):
     survey = forms.ModelChoiceField(queryset=Survey.objects.all(), required=False)
     question_set = forms.ModelChoiceField(queryset=QuestionSet.objects.all(), required=False)
 
-    def __init__(self, model_class, *args, **kwargs):
+    def __init__(self, model_class, disabled_fields=[], *args, **kwargs):
         super(SurveyResultsFilterForm, self).__init__(*args, **kwargs)
         self.fields['question_set'].label = model_class.verbose_name()
         self.fields['question_set'].widget.attrs['class'] = 'chzn-select'
+        self.fields['question_set'].widget.attrs['disabled'] = 'question_set' in disabled_fields
         self.fields['survey'].widget.attrs['class'] = 'chzn-select'
+        self.fields['survey'].widget.attrs['disabled'] = 'survey' in disabled_fields
         model_queryset = model_class.objects.all()
         self.fields['question_set'].queryset = model_queryset
         if self.data.get('survey', None) and model_class == ListingTemplate:
-            self.fields['question_set'].queryset = model_queryset.filter(survey_settings__id=
-                                                                                  self.data['survey'])
+            self.fields['question_set'].queryset = model_queryset.filter(survey_settings__id=self.data['survey'])
         elif self.data.get('survey', None) and model_class == Batch:
             self.fields['question_set'].queryset = model_queryset.filter(survey__id=self.data['survey'])
-
+        elif 'question_set' in disabled_fields and (self.data.get('question_set', None)
+                                                    and model_class == ListingTemplate):
+            self.fields['survey'].queryset = Survey.objects.filter(listing_form__id=self.data['question_set'])
 
     def get_interviews(self, interviews=Interview.objects):
         kwargs = {}

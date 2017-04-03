@@ -238,7 +238,7 @@ def variables(request):
     else:
         var_ids = request.GET.getlist('var_id[]')
         response = list(IndicatorVariable.objects.filter(id__in=var_ids).values_list('name', flat=True))
-    return JsonResponse(response)
+    return JsonResponse(response, safe=False)
 
 
 @login_required

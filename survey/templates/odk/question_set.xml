@@ -69,7 +69,7 @@ xmlns:jr="http://openrosa.org/javarosa">
   <bind nodeset="/qset/surveyAllocation" type="select1" required="true()" />
 	{% if ea_samples %}
 		<bind nodeset="/qset/qset{{qset.pk}}/sampleData/selectedSample" type="string" readonly="true()"
-				calculate="concat({% for ea_id in ea_samples %}/qset/qset{{qset.pk}}/sampleData/iq{{ ea_id }},'-',{% endfor %}'')"/>
+				calculate="concat({% for ea_id in ea_samples %}/qset/qset{{qset.pk}}/sampleData/iq{{ ea_id }},{% if not forloop.last %}'-',{% endif %}{% endfor %}'')"/>
 		{% for ea_id, samples in ea_samples.items %}
 			{% is_relevant_sample ea_id assignments as  relevant_sample_context %}
 			<bind nodeset="/qset/qset{{qset.pk}}/sampleData/iq{{ ea_id }}" type="select1" required="true()"  relevant="{{ relevant_sample_context }}"/>

@@ -343,10 +343,10 @@ class QuestionSet(CloneableMixin, BaseModel):   # can be qset, listing, responde
         return QuestionFlow.objects.filter(question__qset__pk=self.pk, desc=LogicForm.SKIP_TO).exists()
 
     def non_response_enabled(self, ea):
-        locations = set()
+        locations = []
         ea_locations = ea.locations.all()
         if ea_locations:
-            map(lambda loc: locations.update(
+            map(lambda loc: locations.extend(
                 loc.get_ancestors(include_self=True)), ea_locations)
         return self.open_locations.filter(non_response=True, location__pk__in=[location.pk
                                                                                for location in locations]).exists()
@@ -406,7 +406,7 @@ class QuestionSet(CloneableMixin, BaseModel):   # can be qset, listing, responde
                 break
         if q_index is None:
             raise ValidationError('%s not inline' % question.identifier)
-        return set(inlines[:idx])
+        return OrderedSet(inlines[:idx])
 
     def upcoming_inlines(self, question):
         inlines = list(self.questions_inline())
@@ -417,7 +417,7 @@ class QuestionSet(CloneableMixin, BaseModel):   # can be qset, listing, responde
                 break
         if q_index is None:
             raise ValidationError('%s not inline' % question.identifier)
-        return set(inlines[q_index:])
+        return OrderedSet(inlines[q_index:])
 
     def inlines_between(self, start_question, end_question):
         inlines = list(self.questions_inline())
@@ -433,7 +433,7 @@ class QuestionSet(CloneableMixin, BaseModel):   # can be qset, listing, responde
                 break
         if start_index is None or end_index is None:
             raise ValidationError('%s not inline' % start_question.identifier)
-        return set(inlines[start_index:end_index])
+        return OrderedSet(inlines[start_index:end_index])
 
     def zombie_questions(self):
         return Question.zombies(self)

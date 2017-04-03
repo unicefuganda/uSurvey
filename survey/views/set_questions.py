@@ -2,6 +2,7 @@ import json
 from django.core.urlresolvers import reverse
 from django.shortcuts import render, get_object_or_404
 from django.contrib import messages
+from django.core.exceptions import ValidationError
 from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth.decorators import permission_required
 from survey.forms.filters import QuestionFilterForm,  \
@@ -270,8 +271,16 @@ def _process_question_form(request, batch, response, question_form):
 
 
 def _render_question_view(request, batch, instance=None, prev_question=None):
-    if prev_question is None:
+    if instance is None and prev_question is None:
         prev_question = batch.last_question_inline()
+    elif prev_question is None:
+        try:
+            prev_inlines = instance.previous_inlines()
+            prev_question = list(batch.previous_inlines(instance))[-1]
+        except ValidationError:
+            pass
+
+
     button_label = 'Create'
     options = None
     response = None

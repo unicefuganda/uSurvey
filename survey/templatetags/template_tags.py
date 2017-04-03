@@ -328,7 +328,7 @@ def has_super_powers(request):
 @register.assignment_tag
 def is_relevant_sample(ea_id, assignments):
     ea_assignmts = assignments.filter(allocation_ea__id=ea_id)
-    return ' or '.join(["selected(/qset/surveyAllocation, '%s')" % a.pk for a in ea_assignmts ])
+    return ' or '.join(["selected(/qset/surveyAllocation, '%s')" % a.allocation_ea.name for a in ea_assignmts ])
 
 
 @register.assignment_tag

@@ -3,7 +3,7 @@ from django.forms import ModelForm, ValidationError
 import re
 from django.conf import settings
 from survey.models import (QuestionTemplate, TemplateOption, Answer, QuestionModule, MultiChoiceAnswer,
-                           MultiSelectAnswer, QuestionFlow, AnswerAccessDefinition)
+                           MultiSelectAnswer, QuestionFlow, AnswerAccessDefinition, USSDAccess)
 from survey.models import ParameterTemplate
 from survey.forms.form_helper import FormOrderMixin
 
@@ -17,21 +17,21 @@ def get_question_templates_form(model_class):
 
         def __init__(self,  *args, **kwargs):
             super(TemplateForm, self).__init__(*args, **kwargs)
-            self.fields.keyOrder = ['module', 'text',
-                                    'identifier', 'answer_type']
             instance = kwargs.get('instance', None)
             if instance:
                 self.help_text = ' and '.join(
                     AnswerAccessDefinition.access_channels(instance.answer_type))
                 self.fields['answer_type'].help_text = self.help_text
-            self.answer_map = {}
-            definitions = AnswerAccessDefinition.objects.all()
-            for defi in definitions:
-                self.answer_map[defi.answer_type] = self.answer_map.get(
-                    defi.answer_type, [])
-                self.answer_map[defi.answer_type].append(defi.channel)
-            self.order_fields(['module', 'identifier','text',
-                                     'answer_type'])
+            self.fields['answer_type'].choices = [(name, name) for name in
+                                                  AnswerAccessDefinition.answer_types(USSDAccess.choice_name())]
+            self.answer_map = {}            # key,val pair of supported access channels for each answer type
+            # not much needed since we are only restricting to USSD access
+            definitions = AnswerAccessDefinition.objects.filter()
+            for definiton in definitions:
+                self.answer_map[definiton.answer_type] = self.answer_map.get(
+                    definiton.answer_type, [])
+                self.answer_map[definiton.answer_type].append(definiton.channel)
+            self.order_fields(['module', 'identifier', 'text', 'answer_type'])
 
         class Meta:
             model = model_class
