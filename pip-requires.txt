@@ -41,3 +41,4 @@ django-debug-toolbar
 asteval
 plotly
 line_profiler
+django-responsive2
