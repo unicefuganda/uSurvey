@@ -186,35 +186,44 @@
                 <h3>SUCCESS STORIES
                 {% if user.is_authenticated %}<a class="btn btn-primary submit btn-sm" href="{% url 'success_story_list' %}" ><i class="fa fa-table"> List</i></a>{%endif%}
 
-                </h3><br/>
-                 
+                </h3><br/><br/>
+            
 
+            {% for each in ss_list %}  
 
-                <div class="row">
-  <div class="col-md-4">
-   <img src="http://127.0.0.1:8000/static/images/real.png" class="img-responsive">
+                {% if not forloop.counter|divisibleby:2 %}   
+<div class="row">
+  <div class="col-md-2">
+   <img src="/media/{{each.image}}" class="img-responsive">
   </div>
-  <div class="col-md-8">
-  <h2>Leveraging ICT</h2>
-  <p>Using mobile phones to collect data often leads to more efficient processing times and informed decision-making. Additionally, it presents new opportunities to deploy surveys remotely while providing results in real-time.</p>
-  <p>Using mobile phones to collect data often leads to more efficient processing times and informed decision-making. Additionally, it presents new opportunities to deploy surveys remotely while providing results in real-time.</p>
-  <p>Using mobile phones to collect data often leads to more efficient processing times and informed decision-making. Additionally, it presents new opportunities to deploy surveys remotely while providing results in real-time.</p>
+  <div class="col-md-10">
+  <h4>{{each.name}}</h4>
+  {{each.content|safe}}
+  <br/>
+ 
+
   </div>
   </div>
+  <hr/>
+   {%else%}
    <div class="row">
-   <div class="col-md-8">
-  <h2>Leveraging ICT</h2>
-  <p>Using mobile phones to collect data often leads to more efficient processing times and informed decision-making. Additionally, it presents new opportunities to deploy surveys remotely while providing results in real-time.</p>
-  <p>Using mobile phones to collect data often leads to more efficient processing times and informed decision-making. Additionally, it presents new opportunities to deploy surveys remotely while providing results in real-time.</p>
-  <p>Using mobile phones to collect data often leads to more efficient processing times and informed decision-making. Additionally, it presents new opportunities to deploy surveys remotely while providing results in real-time.</p>
-  </div>
-  <div class="col-md-4">
-   <img src="http://127.0.0.1:8000/static/images/real.png" class="img-responsive">
-  </div>
+  
+  <div class="col-md-10">
+  <h4>{{each.name}}</h4>
+  {{each.content|safe}}
+  <br/>
+  
+
   
   </div>
+  <div class="col-md-2">
+   <img src="/media/{{each.image}}" class="img-responsive">
+  </div>
+  </div>
+  <hr/>
+  {%endif%}
 
-
+{%endfor%}
 
 
 
