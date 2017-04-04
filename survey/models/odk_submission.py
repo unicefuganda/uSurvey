@@ -52,7 +52,7 @@ class ODKSubmission(BaseModel):
             submissions_node = etree.Element('submissions')
             tree.insert(0, submissions_node)
         try:
-            submission_id_nodes = tree.xpath('//qset/submissions/id')[0]
+            submission_id_node = tree.xpath('//qset/submissions/id')[0]
         except IndexError:
             submission_id_node = etree.Element('id')
             submissions_node.insert(0, submission_id_node)
