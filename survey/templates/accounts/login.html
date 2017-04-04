@@ -125,12 +125,12 @@ text-align: center;">
                                <!-- <label  for="inputPassword" style="color: #fff">{{ form.password.label_tag }}</label> -->
                               {{ form.password }}
                             </div>
-                            <div class="form-check">
+                            <div class="form-check" >
                                 <input id="check" type="checkbox">
-                                <label for="check">
+                                <!-- <label for="check">
                                 <i class="icon md-check-2"></i>
-                                Remember me</label>
-                                <a href="{% url 'password_reset' %}">Forgot password?</a>
+                                Remember me</label> -->
+                                <a style='margin-right: 100px;' href="{% url 'password_reset' %}">Forgot password?</a>
                             </div>
                             <div class="form-submit-1">
                                 <input value="Sign In" class="mc-btn btn-style-1" type="submit">
