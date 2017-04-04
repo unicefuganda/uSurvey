@@ -489,7 +489,7 @@ getIndicatorHtml = function(name, property) {
         indicatorValue = 0.0;
     }
     html = '<div class="indicators indicator-' + indicatorSurveys[name] +'">\
-                <h3><span class="indicator-name">' + name + '</span><span class="indicator-value">' +  indicatorValue + '</span></h3>\
+                <h4><span class="indicator-name">' + name + '</span><span class="indicator-value">' +  indicatorValue + '</span></h4>\
                 <div class="indicator-breakdown">';
     for(variable in propertySummary) {
         if(variable != '{{indicator_reports_field}}')
