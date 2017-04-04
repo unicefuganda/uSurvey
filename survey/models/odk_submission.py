@@ -49,14 +49,22 @@ class ODKSubmission(BaseModel):
         try:
             submissions_node = tree.xpath('//qset/submissions')[0]
         except IndexError:
-            submissions_node = etree.Element('submissions', id=str(self.id))
+            submissions_node = etree.Element('submissions')
             tree.insert(0, submissions_node)
-        submission_id_node = tree.xpath('//qset/submissions/@id')
-        if len(submission_id_node) == 0 or not submission_id_node[0].strip():
-            submissions_node.id = str(self.id)
-        last_modified_node = etree.Element('last_modified')
+        try:
+            submission_id_nodes = tree.xpath('//qset/submissions/id')[0]
+        except IndexError:
+            submission_id_node = etree.Element('id')
+            submissions_node.insert(0, submission_id_node)
+        submission_id_node.text = str(self.id)
+        try:
+            dates_node = tree.xpath('//qset/submissions/dates')[0]
+        except IndexError:
+            dates_node = etree.Element('dates')
+            submissions_node.insert(0, dates_node)
+        last_modified_node = etree.Element('lastModified')
         last_modified_node.text = str(self.modified)
-        submissions_node.insert(0, last_modified_node)
+        dates_node.insert(0, last_modified_node)
         self.xml = etree.tostring(tree)
 
     def save(self, *args, **kwargs):

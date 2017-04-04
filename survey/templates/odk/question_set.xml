@@ -20,7 +20,12 @@ xmlns:jr="http://openrosa.org/javarosa">
        <instanceID />
        <instanceName />
      </meta>
-	 <submissions id="" />
+	 <submissions>
+		 <id />
+		 <dates>
+			 <lastModified />
+		 </dates>
+	 </submissions>
 	   <type>{{ stage }}</type> {% comment %} basically tells if it's listing or survey data. status may change {% endcomment %}
 	   <surveyAllocation />
 	   <qset{{ qset.pk }}>

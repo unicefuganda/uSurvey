@@ -28,12 +28,11 @@ DEFAULT_CONTENT_TYPE = 'text/xml; charset=utf-8'
 INSTANCE_ID_PATH = '//qset/meta/instanceID'
 INSTANCE_NAME_PATH = '//qset/meta/instanceName'
 FORM_ID_PATH = '//qset/@id'
-SUBMISSIONS_ID_PATH = '//qset/submissions/@id'
+SUBMISSIONS_ID_PATH = '//qset/submissions/id'
 # ONLY_HOUSEHOLD_PATH = '//qset/onlyHousehold'
 FORM_TYPE_PATH = '//qset/type'
 FORM_ASSIGNMENT_PATH = '//qset/surveyAllocation'
 ANSWER_NODE_PATH = '//qset/qset{{ qset_id }}'
-INTERVIEW_ID_PATH = '//qset/interview'
 # default content length for submission requests
 DEFAULT_CONTENT_LENGTH = 10000000
 MAX_DISPLAY_PER_COLLECTOR = 1000
@@ -60,10 +59,6 @@ def _get_nodes(search_path, tree=None, xml_string=None):
     except Exception, ex:
         logger.error('Error retrieving path: %s, Desc: %s' %
                      (search_path, str(ex)))
-
-
-def _get_interview_id(survey_tree):
-    return _get_nodes(INTERVIEW_ID_PATH, tree=survey_tree)[0].text
 
 
 @job('odk', connection=get_connection())
@@ -104,7 +99,7 @@ def process_answers(xml, qset, access_channel, question_map, survey_allocation, 
             raise NotEnoughData()
         created_interviews = save_answers(qset, access_channel, question_map, answers, survey_allocation,
                                           survey_parameters=survey_parameters, reference_interview=reference_interview,
-                                          media_files=media_files, interview_id=_get_interview_id(survey_tree))
+                                          media_files=media_files)
         if survey.has_sampling:
             survey_allocation.stage = SurveyAllocation.SURVEY
             survey_allocation.save()
@@ -136,23 +131,17 @@ def get_answers(node, qset, question_map):
 
 
 def save_answers(qset, access_channel, question_map, answers, survey_allocation, survey_parameters=None,
-                 reference_interview=None, media_files=None, interview_id=None):
+                 reference_interview=None, media_files=None):
     survey = survey_allocation.survey
     ea = survey_allocation.allocation_ea
     interviewer = access_channel.interviewer
     interviews = []
 
     def _save_record(record):
-        try:
-            interview = Interview.objects.get(id=interview_id)
-            interview.interviewer = interviewer
-            interview.interview_channel = access_channel
-            interview.save()
-        except Interview.DoesNotExist:
-            interview = Interview.objects.create(survey=survey, question_set=qset,
-                                                 ea=ea, interviewer=interviewer, interview_channel=access_channel,
-                                                 closure_date=timezone.now(),
-                                                 interview_reference_id=reference_interview)
+        interview = Interview.objects.create(survey=survey, question_set=qset,
+                                             ea=ea, interviewer=interviewer, interview_channel=access_channel,
+                                             closure_date=timezone.now(),
+                                             interview_reference_id=reference_interview)
         interviews.append(interview)
         map(lambda (q_id, answer): _save_answer(interview, q_id, answer), record.items())
         if survey_parameters:
@@ -206,8 +195,7 @@ def _get_form_id(survey_tree):
 
 
 def _get_submission_id(survey_tree):
-    return _get_nodes(SUBMISSIONS_ID_PATH, tree=survey_tree)[0]
-
+    return _get_nodes(SUBMISSIONS_ID_PATH, tree=survey_tree)[0].text.strip()
 
 
 def _get_qset(survey_tree):
