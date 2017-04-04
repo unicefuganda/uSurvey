@@ -70,8 +70,11 @@ class Indicator(BaseModel):
         return Template(self.formulae).render(Context(dict([(name, name) for name in self.active_variables()])))
 
     def country_wide_value(self):
+        return self.country_wide_report()[self.REPORT_FIELD_NAME]
+
+    def country_wide_report(self):
         country = Location.country()
-        return self.get_data([country, ])['[IndicatorValue]'][0]
+        return self.get_data([country, ]).transpose().to_dict()[country.name]
 
     def get_data(self, locations, *args, **kxargs):
         """Used to get the compute indicator values.

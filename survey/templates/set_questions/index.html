@@ -277,6 +277,7 @@
     {% endfor %}
     </tbody>
 </table>
+{% paginate %}
 {% if batch and batch.interviews.count == 0 %}
     <button type="submit" href="#batch_{{batch.pk}}" data-toggle="modal" class="btn btn-primary pull-right" name="save_button" {% if batch.has_loop or batch.has_skip %}onclick="return false;"{% endif %}>Update Question Order</button>
       {% if batch.has_loop or batch.has_skip %}

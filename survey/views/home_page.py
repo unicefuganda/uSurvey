@@ -30,7 +30,8 @@ def home(request):
                                                'map_center': settings.MAP_CENTER,
                                                'zoom_level': settings.MAP_ZOOM_LEVEL,
                                                'display_indicators':
-                                                   Indicator.objects.filter(**in_kwargs).order_by('name')})
+                                                   Indicator.objects.filter(**in_kwargs).order_by('name'),
+                                               'indicator_reports_field': Indicator.REPORT_FIELD_NAME})
 
 
 def index(request):
