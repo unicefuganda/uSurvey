@@ -288,6 +288,12 @@ class QuestionSet(CloneableMixin, BaseModel):   # can be qset, listing, responde
     description = models.CharField(max_length=300, blank=True, null=True)
     start_question = models.OneToOneField(Question, related_name='starter_%(class)s',
                                           null=True, blank=True, on_delete=models.SET_NULL)
+    @property
+    def to_exact(self):
+        """This one basically means exact question set. Should retrieve batch, Listing template, etc
+        :return:
+        """
+        return self.get(pk=self.pk)
 
     @classmethod
     def question_model(cls):

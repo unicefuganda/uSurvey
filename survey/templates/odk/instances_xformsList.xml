@@ -1,30 +1,27 @@
 <?xml version='1.0' encoding='UTF-8' ?>
 <xforms xmlns="http://openrosa.org/xforms/xformsList">
     {% load template_tags %}
-{% with interviews.0.question_set.start_question as start_question %}
-{% for interview in interviews %}
+{% for submission in submissions %}
     <xform>
-        {% get_download_url request 'download_odk_interviews' interview as interview_download_url %}
-        {% if interview.qset.survey %}
-            {% get_download_url request 'download_odk_batch_form' interview.question_set as download_url %}
+        {% get_download_url request 'download_odk_submission' submission as submission_download_url %}
+        {% if submission.question_set.to_exact.survey %}
+            {% get_download_url request 'download_odk_batch_form' submission.question_set as download_url %}
         {% else %}
             {% get_download_url request 'download_odk_listing_form' as download_url %}
         {% endif %}
-        <formID>{{ interview.question_set.id }}</formID>
-        <name>Interview-{{ interview.question_set.name }}</name>
+        <formID>{{ submission.form_id }}</formID>
+        <name>{{ submission.survey.name }} - {{ submission.question_set.name }}</name>
         <majorMinorVersion/>
         <version/>
         <hash />
-        <descriptionText> Interview-{{ interview.question_set.name }}</descriptionText>
+        <descriptionText>{{ submission.survey.name }} - {{ submission.question_set.name }}</descriptionText>
         <downloadUrl> {{ download_url }} </downloadUrl>
         <manifestUrl></manifestUrl>
-        <instanceID>{{ interview.instance_id }}</instanceID>
-        {% get_answer start_question interview as answer %}
-        <instanceName>{{ answer }} - {{interview.question_set.name}} - {{assignment.ea.name}} </instanceName>
+        <instanceID>{{submission.instance_id }}</instanceID>
+        <instanceName>{{ submission.instance_name }} </instanceName>
        <instanceUrl>
-             {{ interview_download_url }}
+             {{ submission_download_url }}
         </instanceUrl>
     </xform>
  {% endfor %}
-{% endwith %}
 </xforms>
