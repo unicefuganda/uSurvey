@@ -96,6 +96,7 @@
     {% endblock %}
     {% block table_body %}
     {% has_super_powers request as has_powers %}
+    {% autopaginate ss_list max_display_per_page %}
     {% for each in ss_list %}
         <tr>
 
@@ -172,4 +173,5 @@
                     });
                 });
             </script>
+{% include 'max_display_per_page_form.html' %}
 {% endblock %}

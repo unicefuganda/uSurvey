@@ -19,7 +19,7 @@
 {% endblock %}
 {% block content %}
 {% load pagination_tags %}
-{% autopaginate interviews 5[0 %}
+{% autopaginate interviews max_display_per_page %}
 <br>
 <div style="overflow-x:auto; width: 100%;">
 <table id="datatables" class="table table-striped table-bordered table-hover table-sort ">
@@ -73,4 +73,5 @@
 <script src="{{ STATIC_URL }}/js/jquery.dataTables.js"></script>
 <script src="{{ STATIC_URL }}/js/dataTables.bootstrap.js" type="text/javascript" charset="utf-8"></script>
   <script src="{{STATIC_URL}}js/location-widget.js" type="text/javascript" charset="utf-8"></script>
+  {% include 'max_display_per_page_form.html' %}
 {% endblock %}

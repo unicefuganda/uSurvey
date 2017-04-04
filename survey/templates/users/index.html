@@ -15,7 +15,7 @@
 {% endblock %}
 {% block content %}
 {% load pagination_tags %}
-{% autopaginate users 30 %}
+{% autopaginate users max_display_per_page %}
 {% load template_tags %}
         <!-- <table class="table table-striped table-bordered table-hover table-sort"> -->
         <table id="" class="table table-striped table-bordered table-hover dataTable no-footer table-sort" role="grid" aria-describedby="dynamic-table_info">
@@ -81,4 +81,5 @@
             </tbody>
         </table>
     {% paginate %}
+    {% include 'max_display_per_page_form.html' %}
 {% endblock %}

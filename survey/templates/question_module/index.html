@@ -86,7 +86,7 @@
         {% endfor %}
         </tbody>
     </table>    
-    {% autopaginate question_modules 10 %}
+    {% autopaginate question_modules max_display_per_page %}
     {% paginate %}
 {% endblock %}
 
@@ -111,5 +111,6 @@
     }]
     } );
 } );
-</script>            
+</script>      
+{% include 'max_display_per_page_form.html' %}      
         {% endblock %}

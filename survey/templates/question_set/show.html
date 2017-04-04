@@ -5,7 +5,7 @@
 {% endblock %}
 {% block content %}
 {% load pagination_tags %}
-{% autopaginate enumeration_areas 50 %}
+{% autopaginate enumeration_areas max_display_per_page %}
     {% include "horizontal_filter_form.html" with a_form=locations_filter no_button=True filter_id='loc_filter' %}
 <br>
 
@@ -107,4 +107,5 @@
         });
     });
   </script>
+{% include 'max_display_per_page_form.html' %}
 {% endblock %}

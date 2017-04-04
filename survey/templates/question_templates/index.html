@@ -144,7 +144,7 @@
     {% endfor %}
     </tbody>
 </table>
-    {% autopaginate questions 10 %}
+    {% autopaginate questions max_display_per_page %}
     {% paginate %}
 {% endblock %}
 
@@ -182,4 +182,5 @@
     $('#datatables').DataTable();
 } );
         </script>
+        {% include 'max_display_per_page_form.html' %}
 {% endblock %}

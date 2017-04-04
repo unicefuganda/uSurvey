@@ -5,7 +5,7 @@
 {% block content %}
     {% load pagination_tags %}
     {% load template_tags %}
-    {% autopaginate households 50 %}
+    {% autopaginate households max_display_per_page %}
         {% include "horizontal_filter_form.html" with a_form=locations_filter no_button=True filter_id='location_filter' %}
 <br />
 <div>
@@ -113,5 +113,5 @@
         });
     });
   </script>
-
+{% include 'max_display_per_page_form.html' %}
 {% endblock %}

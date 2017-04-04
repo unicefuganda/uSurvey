@@ -22,7 +22,7 @@
 {% load pagination_tags %}
 {% include "search_form.html" %}
 {% load template_tags %}
-{% autopaginate variables 50 %}
+{% autopaginate variables max_display_per_page %}
 </div>
  <br />
  <div style="overflow-x: auto; overflow-y: auto; width: 100%;">
@@ -123,4 +123,5 @@
 });
 } );
         </script>
+{% include 'max_display_per_page_form.html' %}
 {% endblock %}

@@ -67,15 +67,15 @@
           <i class="ace-icon fa fa-plus bigger-120"></i>
                         Create New {{ model.verbose_name }}
                       </button>
-                      </div>
+                      
 
 {% endblock %}
 {% block content %}
 {% load pagination_tags %}
 {% include "search_form.html" %}
 {% load template_tags %}
-{% autopaginate question_sets 50 %}
-</div>
+{% autopaginate question_sets max_display_per_page %}
+
  <br />
   <table id="datatables" class="table table-striped table-bordered table-hover dataTable no-footer" role="grid" aria-describedby="dynamic-table_info">
     <thead>
@@ -212,4 +212,5 @@
     } );
 } );
   </script>
+{% include 'max_display_per_page_form.html' %}
 {% endblock %}

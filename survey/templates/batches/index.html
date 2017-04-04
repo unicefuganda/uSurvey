@@ -4,7 +4,7 @@
 {% endblock %}
 {% block content %}
 {% load pagination_tags %}
-{% autopaginate batches 50 %}
+{% autopaginate batches max_display_per_page %}
 {% load template_tags %}
  <a href="#new_batch" data-toggle="modal" class="btn btn_primary pull-right" id="add_batch"><i class="icon-plus"></i> Add Batch</a>
   <br class="clear"/>
@@ -63,5 +63,7 @@
     </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
 
+
+{% include 'max_display_per_page_form.html' %}
 {% paginate %}
 {% endblock %}

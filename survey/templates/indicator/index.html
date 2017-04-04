@@ -142,7 +142,7 @@
         {% endfor %}
         </tbody>
     </table>    
-    {% autopaginate indicators 10 %}
+    {% autopaginate indicators max_display_per_page %}
     {% paginate %}
 {% endblock %}
 {% block javascripts %}
@@ -167,4 +167,5 @@
 } );
 </script>
 <script src="{{ STATIC_URL }}js/indicator.js" type="text/javascript" charset="utf-8"></script>
+{% include 'max_display_per_page_form.html' %}
 {% endblock %}

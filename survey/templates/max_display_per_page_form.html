@@ -1,0 +1,14 @@
+<script type="text/javascript">
+$(document).ready(function() {  
+		// on change load page
+        $('#ea_length').on('change', function() {
+            var ea_length = $('#ea_length :selected').text();
+            window.location = "?max_display_per_page="+ea_length;
+        });
+        
+    	$("select[name='datatables_length']").change(function(){
+            var ea_length = $("select[name='datatables_length'] :selected").val();
+            window.location = "?max_display_per_page="+ea_length;
+        });
+    });
+</script>

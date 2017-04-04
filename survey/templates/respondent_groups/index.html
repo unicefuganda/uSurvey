@@ -39,7 +39,7 @@
 
     {% block table_head %}
     {% load pagination_tags %}
-    {% autopaginate groups 10 %}
+    {% autopaginate groups max_display_per_page %}
     <br>
       <tr>
         <th class="sorting">
@@ -112,6 +112,7 @@
     } );
 } );
   </script>
+  {% include 'max_display_per_page_form.html' %}
 {% endblock %}
 
 

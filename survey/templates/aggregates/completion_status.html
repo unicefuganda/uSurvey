@@ -25,7 +25,7 @@
    {% load pagination_tags %}
 
   {% if completion_rates %}
-    {% autopaginate completion_rates.attributes 50 %}
+    {% autopaginate completion_rates.attributes max_display_per_page %}
 
     <table class="table table-striped table-bordered table-sort">
       <thead>
@@ -55,4 +55,5 @@
 {% block javascripts %}
   <script src="{{STATIC_URL}}/js/location-widget.js" type="text/javascript" charset="utf-8"></script>
   <script src="{{STATIC_URL}}/js/survey_status.js" type="text/javascript" charset="utf-8"></script>
+  {% include 'max_display_per_page_form.html' %}
 {% endblock %}

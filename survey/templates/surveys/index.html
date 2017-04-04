@@ -1,7 +1,7 @@
 {% extends "page_with_table.html" %}
 {% load template_tags %}
 {% load pagination_tags %}
-{% autopaginate surveys 50 %}
+{% autopaginate surveys max_display_per_page %}
 {% block title %}
   Survey List
 {% endblock %}
@@ -218,4 +218,5 @@
                     });
                 });
             </script>
+{% include 'max_display_per_page_form.html' %}
 {% endblock %}
