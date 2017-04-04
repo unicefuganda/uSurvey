@@ -11,7 +11,7 @@ from survey.models.questions import QuestionSet
 
 
 class ODKFileDownload(BaseModel):
-    assignment = models.ManyToManyField('SurveyAllocation', related_name='file_downloads')
+    assignments = models.ManyToManyField('SurveyAllocation', related_name='file_downloads')
 
 
 class ODKSubmission(BaseModel):
