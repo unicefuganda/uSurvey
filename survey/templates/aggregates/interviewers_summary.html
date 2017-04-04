@@ -11,7 +11,7 @@
 {% block content %}
 {% load pagination_tags %}
 {% include "search_form.html" %}
-{% autopaginate interviewers 50 %}
+{% autopaginate interviewers max_display_per_page %}
 
 </div>
 
