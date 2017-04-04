@@ -208,7 +208,7 @@ def _get_qset_response(request, interviewer, assignments, qset, ea_samples={}):
         survey = assignments[0].survey       # all assignemnts are of same survey
         download = ODKFileDownload.objects.create()
         # record file downloads for all eas of this inviewer
-        map(lambda assignment: download.add(assignment), assignments)
+        map(lambda assignment: download.objects.add(assignment), assignments)
         qset_xform = get_qset_xform(interviewer, assignments, qset, ea_samples=ea_samples)
         form_id = 'allocation-%s-%s' % (survey.id, interviewer.id)
         audit = {
