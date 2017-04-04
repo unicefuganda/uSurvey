@@ -1,4 +1,5 @@
 import os
+from lxml import etree
 import mimetypes
 from django.conf import settings
 from django.db import models
@@ -10,7 +11,7 @@ from survey.models.questions import QuestionSet
 
 
 class ODKFileDownload(BaseModel):
-    assignment = models.ForeignKey('SurveyAllocation', related_name='file_downloads')
+    assignment = models.ManyToManyField('SurveyAllocation', related_name='file_downloads')
 
 
 class ODKSubmission(BaseModel):
@@ -24,8 +25,11 @@ class ODKSubmission(BaseModel):
     form_id = models.CharField(max_length=256)
     description = models.CharField(max_length=256, null=True, blank=True)
     instance_id = models.CharField(max_length=256)
+    instance_name = models.CharField(max_length=256, null=True, blank=True)
     xml = models.TextField()
     status = models.IntegerField(choices=[( STARTED, 'Started'), (COMPLETED, 'Completed')], default=STARTED)
+    # this keeps track of all interviews entries created as a result of this submisssion
+    interviews = models.ManyToManyField('Interview', related_name='odk_submissions')
 
     class Meta:
         app_label = 'survey'
@@ -39,6 +43,27 @@ class ODKSubmission(BaseModel):
             attach, created = Attachment.objects.get_or_create(submission=self,
                                                                media_file=f,
                                                                mimetype=content_type)
+
+    def update_submission(self):
+        tree = etree.fromstring(self.xml)
+        try:
+            submissions_node = tree.xpath('//qset/submissions')[0]
+        except IndexError:
+            submissions_node = etree.Element('submissions', id=str(self.id))
+            tree.insert(0, submissions_node)
+        submission_id_node = tree.xpath('//qset/submissions/@id')
+        if len(submission_id_node) == 0 or not submission_id_node[0].strip():
+            submissions_node.id = str(self.id)
+        last_modified_node = etree.Element('last_modified')
+        last_modified_node.text = str(self.modified)
+        submissions_node.insert(0, last_modified_node)
+        self.xml = etree.tostring(tree)
+
+    def save(self, *args, **kwargs):
+        if self.pk:
+            self.update_submission()
+        return super(ODKSubmission, self).save(*args, **kwargs)
+
 
 
 def upload_to(attachment, filename):

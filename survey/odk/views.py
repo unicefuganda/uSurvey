@@ -107,13 +107,16 @@ def submission_list(request):
 @require_GET
 def instances_form_list(request):
     """ This is where ODK Collect gets its download list.
+    Get all ODK submissions for this EA and survey
     """
     interviewer = request.user
     interviews = Interview.objects.filter(ea__in=[a.allocation_ea for a in interviewer.unfinished_assignments],
                                           survey=interviewer.unfinished_assignments.first().survey)
+    submissions = ODKSubmission.objects.filter(ea__in=[a.allocation_ea for a in interviewer.unfinished_assignments],
+                                               survey=interviewer.unfinished_assignments.first().survey)
     content = render_to_string("odk/instances_xformsList.xml", {
         'interviewer': interviewer,
-        'interviews': interviews,
+        'submissions': submissions,
         'request': request,
     })
     response = BaseOpenRosaResponse(content)
@@ -122,27 +125,13 @@ def instances_form_list(request):
 
 
 @http_digest_interviewer_auth
-def download_odk_interviews(request, interview_id):
+def download_odk_submissions(request, submission_id):
     interviewer = request.user
-    interview = Interview.get(pk=interview_id)
-    answers_dict = {}
-    map(lambda a: answers_dict.update({a.question.pk: a.as_value}), interview.answer.all())
-    survey = interview.survey
-    ea = interview.ea
-    ea_samples = {}
-    assignments = get_survey_allocation(interviewer)
-    if survey.has_sampling:
-       ea_samples[ea.pk] = ListingSample.samples(survey, ea)
-    content = render_to_string("odk/instances.xml", {
-        'interviewer': interviewer,
-        'interview': interview,
-        'qset': QuestionSet.get(pk=interview.question_set.pk),
-        'assignment': assignments[0],           # intentional let it fail if nothing
-        'request': request,
-        'answers_dict': answers_dict,
-        'SurveyAllocation': SurveyAllocation,
-    })
-    response = BaseOpenRosaResponse(content)
+    submission = get_object_or_404(ODKSubmission,  # check if the interviewer authorized for this submission EA!
+                                   pk=submission_id, ea__in=[a.allocation_ea for a in
+                                                             interviewer.unfinished_assignments])
+
+    response = BaseOpenRosaResponse(submission.xml)
     response.status_code = 200
     return response
 
@@ -217,12 +206,9 @@ def _get_qset_response(request, interviewer, assignments, qset, ea_samples={}):
     response = OpenRosaResponseNotFound('No survey allocated')
     if assignments.count():
         survey = assignments[0].survey       # all assignemnts are of same survey
-        downloads = []
+        download = ODKFileDownload.objects.create()
         # record file downloads for all eas of this inviewer
-        map(lambda assignment: downloads.append(ODKFileDownload(assignment=assignment)),
-        assignments
-        )
-        ODKFileDownload.objects.bulk_create(downloads)
+        map(lambda assignment: download.add(assignment), assignments)
         qset_xform = get_qset_xform(interviewer, assignments, qset, ea_samples=ea_samples)
         form_id = 'allocation-%s-%s' % (survey.id, interviewer.id)
         audit = {

@@ -26,7 +26,9 @@ HTTP_OPEN_ROSA_VERSION_HEADER = 'HTTP_X_OPENROSA_VERSION'
 OPEN_ROSA_VERSION = '1.0'
 DEFAULT_CONTENT_TYPE = 'text/xml; charset=utf-8'
 INSTANCE_ID_PATH = '//qset/meta/instanceID'
+INSTANCE_NAME_PATH = '//qset/meta/instanceName'
 FORM_ID_PATH = '//qset/@id'
+SUBMISSIONS_ID_PATH = '//qset/submissions/@id'
 # ONLY_HOUSEHOLD_PATH = '//qset/onlyHousehold'
 FORM_TYPE_PATH = '//qset/type'
 FORM_ASSIGNMENT_PATH = '//qset/surveyAllocation'
@@ -100,13 +102,15 @@ def process_answers(xml, qset, access_channel, question_map, survey_allocation, 
         if survey_allocation.stage in [None, SurveyAllocation.LISTING] and \
                 survey.has_sampling and survey.sample_size > len(answers):
             raise NotEnoughData()
-        save_answers(qset, access_channel, question_map, answers, survey_allocation,
-                     survey_parameters=survey_parameters, reference_interview=reference_interview,
-                     media_files=media_files, interview_id=_get_interview_id(survey_tree))
+        created_interviews = save_answers(qset, access_channel, question_map, answers, survey_allocation,
+                                          survey_parameters=survey_parameters, reference_interview=reference_interview,
+                                          media_files=media_files, interview_id=_get_interview_id(survey_tree))
         if survey.has_sampling:
             survey_allocation.stage = SurveyAllocation.SURVEY
             survey_allocation.save()
     submission.status = ODKSubmission.COMPLETED
+    submission.interviews.delete()          # wipe off the old interviews for this submission
+    map(lambda interview: submission.add(interview), created_interviews)    # update with present interviews
     submission.save()
     submission.save_attachments(media_files)
 
@@ -136,6 +140,7 @@ def save_answers(qset, access_channel, question_map, answers, survey_allocation,
     survey = survey_allocation.survey
     ea = survey_allocation.allocation_ea
     interviewer = access_channel.interviewer
+    interviews = []
 
     def _save_record(record):
         try:
@@ -148,6 +153,7 @@ def save_answers(qset, access_channel, question_map, answers, survey_allocation,
                                                  ea=ea, interviewer=interviewer, interview_channel=access_channel,
                                                  closure_date=timezone.now(),
                                                  interview_reference_id=reference_interview)
+        interviews.append(interview)
         map(lambda (q_id, answer): _save_answer(interview, q_id, answer), record.items())
         if survey_parameters:
             map(lambda (q_id, answer): _save_answer(interview, q_id, answer), survey_parameters.items())
@@ -167,6 +173,7 @@ def save_answers(qset, access_channel, question_map, answers, survey_allocation,
             except Exception, ex:
                 print 'exception: %s' % str(ex)
     map(_save_record, answers)
+    return interviews
 
 
 def _update_answer_dict(question, answer, answers):
@@ -190,8 +197,17 @@ def _get_instance_id(survey_tree):
     return _get_nodes(INSTANCE_ID_PATH, tree=survey_tree)[0].text
 
 
+def _get_instance_name(survey_tree):
+    return _get_nodes(INSTANCE_NAME_PATH, tree=survey_tree)[0].text
+
+
 def _get_form_id(survey_tree):
-    return _get_nodes(FORM_ID_PATH, tree=survey_tree)
+    return _get_nodes(FORM_ID_PATH, tree=survey_tree)[0]
+
+
+def _get_submission_id(survey_tree):
+    return _get_nodes(SUBMISSIONS_ID_PATH, tree=survey_tree)[0]
+
 
 
 def _get_qset(survey_tree):
@@ -218,13 +234,20 @@ def process_submission(interviewer, xml_file, media_files=[], request=None):
 def process_xml(interviewer, xml_blob, media_files=[], request=None):
     survey_tree = _get_tree_from_blob(xml_blob)
     form_id = _get_form_id(survey_tree)
+    submission_id = _get_submission_id(survey_tree)
     instance_id = _get_instance_id(survey_tree)
+    instance_name = _get_instance_name(survey_tree)
     qset = _get_qset(survey_tree)
     survey_allocation = _get_allocation(interviewer, survey_tree)
-    # first things first. save the submission incase all else background task fails... enables recover
-    submission = ODKSubmission.objects.create(interviewer=interviewer, survey=survey_allocation.survey,
-                                              question_set=qset, ea=survey_allocation.allocation_ea, form_id=form_id,
-                                              xml=xml_blob, instance_id=instance_id)
+    # since interviewers may have downloaded this submission file before, fetch old instance if exists
+    if submission_id:
+        submission = ODKSubmission.objects.get(id=submission_id)
+    else:
+        # first things first. save the submission incase all else background task fails... enables recover
+        submission = ODKSubmission.objects.create(interviewer=interviewer, survey=survey_allocation.survey,
+                                                  question_set=qset, ea=survey_allocation.allocation_ea,
+                                                  form_id=form_id, xml=xml_blob, instance_id=instance_id,
+                                                  instance_name=instance_name)
     question_map = dict([(str(q.pk), q) for q in qset.flow_questions])
     access_channel = ODKAccess.objects.get(interviewer=interviewer)
     # process_answers.delay(xml_blob, qset, interviewer, question_map, survey_allocation, submission)
