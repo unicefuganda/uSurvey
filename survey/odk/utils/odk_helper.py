@@ -29,7 +29,6 @@ INSTANCE_ID_PATH = '//qset/meta/instanceID'
 INSTANCE_NAME_PATH = '//qset/meta/instanceName'
 FORM_ID_PATH = '//qset/@id'
 SUBMISSIONS_ID_PATH = '//qset/submissions/id'
-# ONLY_HOUSEHOLD_PATH = '//qset/onlyHousehold'
 FORM_TYPE_PATH = '//qset/type'
 FORM_ASSIGNMENT_PATH = '//qset/surveyAllocation'
 ANSWER_NODE_PATH = '//qset/qset{{ qset_id }}'
@@ -105,7 +104,7 @@ def process_answers(xml, qset, access_channel, question_map, survey_allocation, 
             survey_allocation.save()
     submission.status = ODKSubmission.COMPLETED
     submission.interviews.all().delete()          # wipe off the old interviews for this submission
-    map(lambda interview: submission.add(interview), created_interviews)    # update with present interviews
+    map(lambda interview: submission.interviews.add(interview), created_interviews)    # update with present interviews
     submission.save()
     submission.save_attachments(media_files)
 
