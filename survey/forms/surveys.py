@@ -84,13 +84,13 @@ class SurveyForm(ModelForm, FormOrderMixin):
             raise ValidationError('Chose Either listing_form/preferred_listing ')
         return self.cleaned_data['listing_form']
 
-    def clean_preferred_listing(self):
-        if not self.cleaned_data.get('listing_form') and  not self.cleaned_data.get('preferred_listing'):
-            raise ValidationError('Required')
-        if self.cleaned_data.get('listing_form')  and self.cleaned_data.get('preferred_listing'):
-            raise ValidationError('Chose Either listing_form/preferred_listing ')
+    # def clean_preferred_listing(self):
+    #     if not self.cleaned_data.get('listing_form') and  not self.cleaned_data.get('preferred_listing'):
+    #         raise ValidationError('Required')
+    #     if self.cleaned_data.get('listing_form')  and self.cleaned_data.get('preferred_listing'):
+    #         raise ValidationError('Chose Either listing_form/preferred_listing ')
 
-        return self.cleaned_data['preferred_listing']
+    #     return self.cleaned_data['preferred_listing']
 
     def clean_name(self):
         name = self.cleaned_data['name']
