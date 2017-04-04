@@ -473,6 +473,21 @@
       <script type="text/javascript" src="{{ STATIC_URL }}toassets/theme.js"></script>
       <script src="{{ STATIC_URL }}multi-select/jquery.multi-select.js" type="text/javascript" charset="utf-8"></script>
       <script src="{{ STATIC_URL }}js/question_options.js" type="text/javascript" charset="utf-8"></script>
+      <script type="text/javascript">
+        $(document).ready(function() {
+          $('.dataTable').DataTable( {
+              "scrollY":        "250px",
+              "scrollX":        '100%',
+              "scrollCollapse": true,
+              "paging":         false,
+              'aoColumnDefs': [{
+              'bSortable': false,
+              "bPaginate": false,
+              'aTargets': [-1] /* 1st one, start by the right */
+          }]
+          });
+});
+</script>
 
 	<!-- script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.js"></script>
 	<script src="harvesthq-chosen-12a7a11/chosen/chosen.jquery.js"></script -->

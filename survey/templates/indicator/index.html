@@ -151,21 +151,6 @@
 
 <script src="{{ STATIC_URL }}/js/jquery.dataTables.js"></script>
 <script src="{{ STATIC_URL }}/js/dataTables.bootstrap.js" type="text/javascript" charset="utf-8"></script>
-<script type="text/javascript">
-        $(document).ready(function() {
-          
-    $('#datatables').DataTable( {
-        "scrollY":        "250px",
-        "scrollX":        '100%',
-        "scrollCollapse": true,
-        "paging":         true,
-        'aoColumnDefs': [{
-        'bSortable': false,
-        'aTargets': [-1] /* 1st one, start by the right */
-    }]
-    } );
-} );
-</script>
 <script src="{{ STATIC_URL }}js/indicator.js" type="text/javascript" charset="utf-8"></script>
 {% include 'max_display_per_page_form.html' %}
 {% endblock %}
