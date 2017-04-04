@@ -273,7 +273,7 @@ SURVEY_REDIS_KEY = "/usurvey/completion_rates/%(survey_id)s"
 
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 
-TABLE_ENTRY_PER_PAGINATION = 100
+TABLE_ENTRY_PER_PAGINATION = 2
 
 
 INSTALLED_BACKENDS = {
