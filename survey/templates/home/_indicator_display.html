@@ -1,0 +1,16 @@
+<div id="indicators-tab" class="tab-pane fade">
+    <div  id="indicator-table">
+        {% for indicator in display_indicators %}
+            <div class="indicators indicator-{{indicator.survey.id}}">
+                <div class="indicator-header"><h4><span class="indicator-name">{{ indicator.name }}</span><span class="indicator-value">{{ indicator.country_wide_value }}</span></h4></div>
+                <div class="indicator-breakdown">
+                    {% for key, value in indicator.country_wide_report.items %}
+                        {% if key != indicator_reports_field %}
+                            <div class="indicator-desc"><span class="variable-name">{{key}}</span><span class="variable-val">{{value}}</span></div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>

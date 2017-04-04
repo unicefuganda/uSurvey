@@ -9,7 +9,29 @@
 {% block content %}
 
 <style>
+      .indicator-name {
 
+        }
+     .indicator-value {
+
+        }
+     .indicator-desc {
+
+        }
+     .variable-name {
+            border-right: 2px #00f;
+        }
+    .variable-val {
+
+        }
+    #displays, #indicators-tab, #locations-tab, .chzn-select  {
+        z-index: 10;
+    }
+
+    #indicators-tab span {
+        display: inline-block;
+        padding: 10px;
+    }
      .map-show {
             width: 80%;
             display: inline-block;
@@ -41,17 +63,16 @@
 
         #displays {
            position: relative;
-           width: 18%;
+           width: 25%;
         }
         #survey_map {
             border: none;
             box-shadow: none;
-            min-height: 500px;
+            min-height: 600px;
             margin-bottom: 130px;
-            width: 79%;
+            width: 85%;
             margin-left: auto;
             margin-right: auto;
-            
             z-index: 2;    
         }
         @media only screen and (max-width:767px) {
@@ -69,6 +90,7 @@
 
 
         }
+
 
 
           .rathna_table>tbody>tr>td, .rathna_table>tbody>tr>th, .rathna_table>tfoot>tr>td, .rathna_table>tfoot>tr>th, .rathna_table>thead>tr>td, .rathna_table>thead>tr>th {
@@ -212,25 +234,7 @@
                         <div class="rat_h3_3">Survey</div>
                         {{map_filter}}
                     </div>
-                    <div id="indicators-tab" class="tab-pane fade">
-                        <table style="width:100%; margin-top:20px;" id="indicator-table">
-                        {% for indicator in display_indicators %}
-                            <tr class="indicators indicator-{{indicator.survey.id}}">
-                                <td style="width:90%">
-                                    <div class="progress">
-                                        <div class="progress-bar progress-bar-success " role="progressbar" aria-valuenow="{{ indicator.country_wide_value }}" aria-valuemin="0" aria-valuemax="100" style="width:{{ indicator.country_wide_value }}%">
-                                            <span>{{ indicator.name }}</span>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td style="width:10%">
-                                    <p style="margin-top:-13px; margin-left:5px;font-weight:bold" class="text-success">{{ indicator.country_wide_value }}</p>
-                                </td>
-                            </tr>
-                        {% endfor %}
-
-                        </table>
-                    </div>
+                    {% include "home/_indicator_display.html" %}
                     <div id="loc-stats-tab" class="tab-pane fade  in active">
                        
                     <div class="row" style="background: none !important">
@@ -261,25 +265,7 @@
                         <div class="rat_h3_3">Survey</div>
                         {{map_filter}}
                     </div>
-                    <div id="indicators-tab" class="tab-pane fade">
-                        <table style="width:100%; margin-top:20px;" id="indicator-table">
-                        {% for indicator in display_indicators %}
-                            <tr class="indicators indicator-{{indicator.survey.id}}">
-                                <td style="width:90%">
-                                    <div class="progress">
-                                        <div class="progress-bar progress-bar-success " role="progressbar" aria-valuenow="{{ indicator.country_wide_value }}" aria-valuemin="0" aria-valuemax="100" style="width:{{ indicator.country_wide_value }}%">
-                                            <span>{{ indicator.name }}</span>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td style="width:10%">
-                                    <p style="margin-top:-13px; margin-left:5px;font-weight:bold" class="text-success">{{ indicator.country_wide_value }}</p>
-                                </td>
-                            </tr>
-                        {% endfor %}
-
-                        </table>
-                    </div>
+                    {% include "home/_indicator_display.html" %}
                     <div id="loc-stats-tab" class="tab-pane fade  in active">
                         <div id="info-update">{% include 'page_loader.html' %}</div>
                         <br/>
@@ -319,7 +305,6 @@
     countryIndicator = indicatorTable.innerHTML,
     geojson;
     map.dragging.disable();
-    map.on('click', function(){});
     map.touchZoom.disable();
     map.doubleClickZoom.disable();
 
@@ -487,14 +472,14 @@ function onEachFeature(feature, layer) {
     }*/
     layer.on({
       mouseover: highlightAdminLevel,
-      click: zoomAdminLevel,
       mouseout: resetAdminLevelHighlight
   });
 
 }
 
 getIndicatorHtml = function(name, property) {
-    var indicatorValue = indicatorData[name][property];
+    var propertySummary = indicatorData[name][property];
+    var indicatorValue = propertySummary['{{indicator_reports_field}}'];
     var displayValue = 'N/A';
     if(indicatorValue) {
         indicatorValue = parseFloat(indicatorValue).toFixed(1);
@@ -503,19 +488,17 @@ getIndicatorHtml = function(name, property) {
     else {
         indicatorValue = 0.0;
     }
-    return '<tr class="indicators indicator-' + indicatorSurveys[name] +'">\
-            <td style="width:90%">\
-                <div class="progress">\
-                    <div class="progress-bar progress-bar-success " role="progressbar" aria-valuenow="' +
-                    indicatorValue + '" aria-valuemin="0" aria-valuemax="100" style="width:' +  indicatorValue + '%">\
-                        <span>' + name + '</span>\
-                    </div>\
-                </div>\
-            </td>\
-            <td style="width:10%">\
-                <p style="margin-top:-13px; margin-left:5px;font-weight:bold" class="text-success">'  +  displayValue + '</p>\
-            </td>\
-        </tr>';
+    html = '<div class="indicators indicator-' + indicatorSurveys[name] +'">\
+                <h4><span class="indicator-name">' + name + '</span><span class="indicator-value">' +  indicatorValue + '</span></h4>\
+                <div class="indicator-breakdown">';
+    for(variable in propertySummary) {
+        if(variable != '{{indicator_reports_field}}')
+            html += '<div class="indicator-desc"><span class="variable-name">' + variable +
+                    '</span><span class="variable-val">'+ propertySummary[variable] + '</span></div>';
+    }
+    html +=  '</div>\
+            </div>';
+    return html;
 }
 
 
