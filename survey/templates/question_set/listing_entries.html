@@ -57,16 +57,5 @@
 
     <script src="{{STATIC_URL}}js/questions.js" type="text/javascript" charset="utf-8"></script>
     <script src="{{STATIC_URL}}js/jquery.validate.js" type="text/javascript" charset="utf-8"></script>
-    <script type="text/javascript">            
-            $(document).ready(function() {
-    $('#datatables').DataTable(
-{
-   'aoColumnDefs': [{
-        'bSortable': false,
-        'aTargets': [-1] /* 1st one, start by the right */
-    }]
-});
-} );
-        </script>
   {% include 'max_display_per_page_form.html' %}
 {% endblock %}

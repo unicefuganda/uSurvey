@@ -151,22 +151,6 @@
 {% block javascripts %}
 <link rel="stylesheet" href="{{ STATIC_URL }}css/dataTables.bootstrap.css" type="text/css">
 <script type="text/javascript" src="https://code.jquery.com/jquery-1.12.4.js"></script>
-
-            <script type="text/javascript">            
-            $(document).ready(function() {
-          
-    $('#datatables').DataTable( {
-        "scrollY":        "250px",
-        "scrollX":        '100%',
-        "scrollCollapse": true,
-        "paging":         true,
-        'aoColumnDefs': [{
-        'bSortable': false,
-        'aTargets': [-1] /* 1st one, start by the right */
-    }]
-    } );
-} );
-  </script>
 <link rel="stylesheet" href="{{ STATIC_URL }}css/dataTables.bootstrap.css" type="text/css">
 <script type="text/javascript" src="https://code.jquery.com/jquery-1.12.4.js"></script>
 
