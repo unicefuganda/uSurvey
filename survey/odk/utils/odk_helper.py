@@ -104,7 +104,7 @@ def process_answers(xml, qset, access_channel, question_map, survey_allocation, 
             survey_allocation.stage = SurveyAllocation.SURVEY
             survey_allocation.save()
     submission.status = ODKSubmission.COMPLETED
-    submission.interviews.delete()          # wipe off the old interviews for this submission
+    submission.interviews.all().delete()          # wipe off the old interviews for this submission
     map(lambda interview: submission.add(interview), created_interviews)    # update with present interviews
     submission.save()
     submission.save_attachments(media_files)
