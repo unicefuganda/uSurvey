@@ -118,7 +118,8 @@
             <div class="clearfix"></div>
          </header>
          <div class="fw-page-builder-content">
-
+<!-- <div class="container-fluid"> -->
+                     <div>
          <div class="sp-slideshow">
       
         <input id="button-1" name="radio-set" class="sp-selector-1" checked="checked" type="radio">
@@ -227,19 +228,19 @@
               <div class="col-md-4">
                 <div class="icon-box lg-icon t-center light-gry-border rect-angles">
                   <span><span><span><span><span><span><span><span><span><i ><img src="{{ STATIC_URL }}images/ussd.png" width="115" height="86"></i>
-                  <h4 class="uppercase" style="color:#0059d0;">USSD & ODK CHANNELS</h4><p class="m-b-3">uSurvey enables real-time data collection and storage using mobile device (tablet/phone) through via USSD and ODK channels...</p><a class="btn main-bg uppercase" href="{% url 'about_page' %}">READ More</a></span></span></span></span></span></span></span></span></span>                  
+                  <h4 class="uppercase" style="color:#0059d0;">USSD & ODK CHANNELS</h4><p class="m-b-3">uSurvey enables real-time data collection and storage using mobile device (tablet/phone) through via USSD and ODK channels...</p><a class="btn main-bg uppercase" href="{% url 'about_page' %}#ussd">READ More</a></span></span></span></span></span></span></span></span></span>                  
                 </div>
               </div>
               <div class="col-md-4">
                 <div class="icon-box lg-icon t-center light-gry-border rect-angles">
                   <span><span><span><span><span><span><span><span><span><i><img src="{{ STATIC_URL }}images/real.png" width="167" height="86"></i>
-                  <h4 class="uppercase" style="color:#0059d0;">REAL TIME MONITORING</h4><p class="m-b-3">uSurvey eliminates the use of paper questionnaires and associated delays in the release of survey results oftentimes due to the time...</p><a class="btn main-bg uppercase" href="{% url 'about_page' %}">READ More</a></span></span></span></span></span></span></span></span></span>                  
+                  <h4 class="uppercase" style="color:#0059d0;">REAL TIME MONITORING</h4><p class="m-b-3">uSurvey eliminates the use of paper questionnaires and associated delays in the release of survey results oftentimes...</p><a class="btn main-bg uppercase" href="{% url 'about_page' %}#real">READ More</a></span></span></span></span></span></span></span></span></span>                  
                 </div>
               </div>
               <div class="col-md-4">
                 <div class="icon-box lg-icon t-center light-gry-border rect-angles">
                   <span><span><span><span><span><span><span><span><span><i ><img src="{{ STATIC_URL }}images/oupput.png" width="169" height="86"></i>
-                  <h4 class="uppercase" style="color:#0059d0;">SAMPLE & CENSUS SURVEY</h4><p class="m-b-3">uSurvey possesses in-built capabilities to randomly select a representative sample from a population of interest...</p><a class="btn main-bg uppercase" href="{% url 'about_page' %}">READ More</a></span></span></span></span></span></span></span></span></span>
+                  <h4 class="uppercase" style="color:#0059d0;">SAMPLE & CENSUS SURVEY</h4><p class="m-b-3">uSurvey possesses in-built capabilities to randomly select a representative sample from a population of interest...</p><a class="btn main-bg uppercase" href="{% url 'about_page' %}#sample">READ More</a></span></span></span></span></span></span></span></span></span>
                 </div>
               </div>
               
@@ -247,14 +248,11 @@
           </div> 
           </div>
         </div>
-          
-      </div>        
-  
-      <section class="project-section">
+          <section class="project-section">
         <div class="container">
           <div class="theme-title">
             <h5>Users' feedback</h5>
-            <h3>Testimonials</h3>
+            <h3>Success Stories</h3>
             <span></span>
           </div> <!-- /.theme-title -->
 
@@ -266,13 +264,13 @@
                     <img src="{{ STATIC_URL }}success/images/project/1.jpg" alt="Image">
                     <div class="opacity"></div> <!-- /.opacity -->
                     <ul class="icon">
-                      <li><a href="#" class="tran3s" title="Share Item"><i class="fa fa-share" aria-hidden="true"></i></a></li>
-                      <li><a href="#" class="tran3s" title="View details"><i class="fa fa-link" aria-hidden="true"></i></a></li>
-                      <li><a href="#" class="tran3s fancybox" title="Zoom View"><i class="fa fa-camera-retro" aria-hidden="true"></i></a></li>
+                      <!-- <li><a href="#" class="tran3s" title="Share Item"><i class="fa fa-share" aria-hidden="true"></i></a></li> -->
+                      <li><a href="{% url 'home_success_story_list' %}" class="tran3s" title="View details"><i class="fa fa-external-link" aria-hidden="true"></i></a></li>
+                      <!-- <li><a href="#" class="tran3s fancybox" title="Zoom View"><i class="fa fa-camera-retro" aria-hidden="true"></i></a></li> -->
                     </ul>
                   </div> <!-- /.img -->
                   <div class="text">
-                    <h4><a href="#" class="tran3s">Leveraging ICT</a></h4>
+                    <h4><a href="{% url 'home_success_story_list' %}" class="tran3s">Leveraging ICT</a></h4>
                     <p>Using mobile phones to collect data often leads to more efficient processing times and informed decision-making. Additionally, it presents new opportunities to deploy surveys remotely while providing results in real-time.</p>
                   
                   </div> <!-- /.text -->
@@ -284,13 +282,13 @@
                     <img src="{{ STATIC_URL }}success/images/project/2.jpg" alt="Image">
                     <div class="opacity"></div> <!-- /.opacity -->
                     <ul class="icon">
-                      <li><a href="#" class="tran3s" title="Share Item"><i class="fa fa-share" aria-hidden="true"></i></a></li>
-                      <li><a href="#" class="tran3s" title="View details"><i class="fa fa-link" aria-hidden="true"></i></a></li>
-                      <li><a href="#" class="tran3s fancybox" title="Zoom View"><i class="fa fa-camera-retro" aria-hidden="true"></i></a></li>
+                      <!-- <li><a href="#" class="tran3s" title="Share Item"><i class="fa fa-share" aria-hidden="true"></i></a></li> -->
+                      <li><a href="{% url 'home_success_story_list' %}" class="tran3s" title="View details"><i class="fa fa-external-link" aria-hidden="true"></i></a></li>
+                      <!-- <li><a href="#" class="tran3s fancybox" title="Zoom View"><i class="fa fa-camera-retro" aria-hidden="true"></i></a></li> -->
                     </ul>
                   </div> <!-- /.img -->
                   <div class="text">
-                    <h4><a href="#" class="tran3s">Surveying made Easy</a></h4>
+                    <h4><a href="{% url 'home_success_story_list' %}" class="tran3s">Surveying made Easy</a></h4>
                     <p>Ms. Flavia Ouma, Senior IT Officer of Uganda Bureau of Statistics (UBOS) demonstrating the uSurvey application to a field worker during the field testing of the system for Female Genital </p>
                     
                   </div> <!-- /.text -->
@@ -302,13 +300,13 @@
                     <img src="{{ STATIC_URL }}success/images/project/3.png" alt="Image">
                     <div class="opacity"></div> <!-- /.opacity -->
                     <ul class="icon">
-                      <li><a href="#" class="tran3s" title="Share Item"><i class="fa fa-share" aria-hidden="true"></i></a></li>
-                      <li><a href="#" class="tran3s" title="View details"><i class="fa fa-link" aria-hidden="true"></i></a></li>
-                      <li><a href="#" class="tran3s fancybox" title="Zoom View"><i class="fa fa-camera-retro" aria-hidden="true"></i></a></li>
+                      <!-- <li><a href="#" class="tran3s" title="Share Item"><i class="fa fa-share" aria-hidden="true"></i></a></li> -->
+                      <li><a href="{% url 'home_success_story_list' %}" class="tran3s" title="View details"><i class="fa fa-external-link" aria-hidden="true"></i></a></li>
+                      <!-- <li><a href="#" class="tran3s fancybox" title="Zoom View"><i class="fa fa-camera-retro" aria-hidden="true"></i></a></li> -->
                     </ul>
                   </div> <!-- /.img -->
                   <div class="text">
-                    <h4><a href="#" class="tran3s">Use of uSurvey in Uganda</a></h4>
+                    <h4><a href="{% url 'home_success_story_list' %}" class="tran3s">Use of uSurvey in Uganda</a></h4>
                     <p>Maiden use of the system in early 2016 enabled UNICEF and UBOS to obtain real-time data from 4,500 respondents, allowing for a presentation of preliminary results just three days after the fieldwork...</p>
                   
                   </div> <!-- /.text -->
@@ -320,13 +318,13 @@
                     <img src="{{ STATIC_URL }}success/images/project/12.png" alt="Image">
                     <div class="opacity"></div> <!-- /.opacity -->
                     <ul class="icon">
-                      <li><a href="#" class="tran3s" title="Share Item"><i class="fa fa-share" aria-hidden="true"></i></a></li>
-                      <li><a href="#" class="tran3s" title="View details"><i class="fa fa-link" aria-hidden="true"></i></a></li>
-                      <li><a href="#" class="tran3s fancybox" title="Zoom View"><i class="fa fa-camera-retro" aria-hidden="true"></i></a></li>
+                      <!-- <li><a href="#" class="tran3s" title="Share Item"><i class="fa fa-share" aria-hidden="true"></i></a></li> -->
+                      <li><a href="{% url 'home_success_story_list' %}" class="tran3s" title="View details"><i class="fa fa-external-link" aria-hidden="true"></i></a></li>
+                      <!-- <li><a href="#" class="tran3s fancybox" title="Zoom View"><i class="fa fa-camera-retro" aria-hidden="true"></i></a></li> -->
                     </ul>
                   </div> <!-- /.img -->
                   <div class="text">
-                  <h4><a href="#" class="tran3s">Business Advantages of uSurvey</a></h4>
+                  <h4><a href="{% url 'home_success_story_list' %}" class="tran3s">Business Advantages of uSurvey</a></h4>
                     <p>Generic system that can be used for any survey or census with defined parameters during survey set-up (uSurvey has a bank of standard questions that can be added to)</p>
                   </div> <!-- /.text -->
                 </div> <!-- /.single-project -->
@@ -355,18 +353,16 @@
     <!-- Theme js -->
     <script type="text/javascript" src="{{ STATIC_URL }}success/js/theme.js"></script>
     
-       <!--ss end-->    
-
-
+       <!--ss end-->  
+      </div>          
 </div>
 
       <footer class="footerArea">
          <section class="copyRight">
             <div class="container">
                <div class="row">
-                  <div class="col-lg-12 col-sm-12 col-xs-12 text-center">
-                     <span><img src="{{ STATIC_URL }}toassets/bottomfooter_logo.jpg"></span>
-                     <p style="padding-bottom:43px;font-size:10px;">Copyright © 2016 <a href="#">UNICEF</a><span> and UBOS</span> </p>
+                  <div class="col-lg-12 col-sm-12 col-xs-12 text-center">  
+                  <p style="padding-bottom:43px;font-size:10px;"><span><img src="{{ STATIC_URL }}toassets/bottomfooter_logo.jpg"></span>Copyright © 2016 <a href="#">UNICEF</a><span> and UBOS</span> </p>
                   </div>
                   <div class="topSocial pull-right">
                      <ul>
