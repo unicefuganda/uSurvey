@@ -367,10 +367,10 @@ function updateLegend2(max) {
 function updateLegend(max) {
     if(max < 25)
         max = 25;       //just to make sure it is divisible into 5 places.
-    step = max/5.
+    step = max/5;
     var div = document.getElementById('map-legend');
     div.innerHTML = '<h4>Ave. (Respondents/EA)</h4><br />';
-    div.innerHTML += '<i class="map-legend" style="background:' + getColorFor(null) + '"></i>'+ " No Data<br/>";
+    div.innerHTML += '<i class="map-legend" style="background:' + getColorFor() + '"></i>'+ " No Data<br/>";
     for (var i = 0; i < grades.length-1; i++) {
         div.innerHTML += '<i class="map-legend" style="background:' + getColorFor(grades[i]) + ';"></i> ';
         div.innerHTML += Math.floor(i*step) +" &mdash; "+ Math.floor((i + 1)*step) + "<br/>";
@@ -432,12 +432,12 @@ function resetMap() {
 function getColorFor(rate) {
     if(rate === undefined || rate === null)
         return '#FFFFFF';
-    return rate <= grades[0] ? '#FD8D3C' :
-           rate <= grades[1]  ? '#FC4E2A' :
-           rate <= grades[2]  ? '#E31A1C' :
-           rate <= grades[3]  ?  '#BD0026':
-           rate <= grades[4]  ? '#800026':
-           '#800000';
+    return rate <= grades[0] ? '#EFF3FF' :
+           rate <= grades[1]  ? '#BDD7E7' :
+           rate <= grades[2]  ? '#6BAED6' :
+           rate <= grades[3]  ?  '#3182BD':
+           rate <= grades[4]  ? '#08519C':
+           '#253494';
     }
 
 function style(feature) {
