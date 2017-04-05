@@ -194,7 +194,7 @@ def _get_form_id(survey_tree):
 
 
 def _get_submission_id(survey_tree):
-    return _get_nodes(SUBMISSIONS_ID_PATH, tree=survey_tree)[0].text.strip()
+    return _get_nodes(SUBMISSIONS_ID_PATH, tree=survey_tree)[0].text
 
 
 def _get_qset(survey_tree):
