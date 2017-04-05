@@ -334,49 +334,22 @@ function refreshIndicatorDisplay() {
 
 
 var legend = null;
-var grades = [20, 40, 60, 80, 100];
-var step = null;
-
-function updateLegend2(max) {
-    var oldLegend = legend;
-    legend = L.control({position: 'bottomright'});
-    if(max < 25)
-        max = 25;       //just to make sure it is divisible into 5 places.
-    step = max/5.
-
-    legend.onAdd = function (map) {
-        var div = L.DomUtil.create('div', 'info legend');
-        div.innerHTML = '';
-        div.innerHTML += "<strong>Respondent per EA</strong><br />"
-            + '<i style="background:' + getColorFor(null) + '"></i>'+ " Survey not opened<br/>";
-        for (var i = 0; i < 4; i++) {
-            div.innerHTML += '<i style="background:' + getColorFor(grades[i]) + '"></i> ';
-            div.innerHTML += Math.floor(i*step) +" &mdash; "+ Math.floor((i + 1)*step) + "<br/>";
-        }
-        div.innerHTML += '<i style="background:' + getColorFor(grades[4]) + '"></i> ';
-        div.innerHTML += Math.floor(4*step) +" and Above";
-        return div;
-    };
-    try {
-        if(oldLegend)
-            map.removeControl(oldLegend);
-    }catch(err){}
-    legend.addTo(map);
-}
+var heatBandSize = null;
 
 function updateLegend(max) {
+    var steps = 5;
     if(max < 25)
         max = 25;       //just to make sure it is divisible into 5 places.
-    step = max/5;
+    heatBandSize = max/steps;
     var div = document.getElementById('map-legend');
     div.innerHTML = '<h4>Ave. (Respondents/EA)</h4><br />';
     div.innerHTML += '<i class="map-legend" style="background:' + getColorFor() + '"></i>'+ " No Data<br/>";
-    for (var i = 0; i < grades.length-1; i++) {
-        div.innerHTML += '<i class="map-legend" style="background:' + getColorFor(grades[i]) + ';"></i> ';
-        div.innerHTML += Math.floor(i*step) +" &mdash; "+ Math.floor((i + 1)*step) + "<br/>";
+    for (var i = 0; i < steps; i++) {
+        div.innerHTML += '<i class="map-legend" style="background:' + getColorFor(i*heatBandSize) + ';"></i> ';
+        div.innerHTML += Math.floor(i*heatBandSize) +" &mdash; "+ Math.floor((i + 1)*heatBandSize) + "<br/>";
     }
-    div.innerHTML += '<i class="map-legend" style="background:' + getColorFor(grades[4]) + '"></i> ';
-    div.innerHTML += Math.floor(4*step) +" and Above";
+    div.innerHTML += '<i class="map-legend" style="background:' + getColorFor(steps*heatBandSize) + '"></i> ';
+    div.innerHTML += Math.floor(steps*heatBandSize) +" and Above";
 }
 
 function getCompletionFor(){
@@ -395,7 +368,7 @@ function getCompletionFor(){
             max_rate = Math.max(max_rate, rate_data[property].value);
           }
           else
-              feature.properties.rate = {'value': 0, description: ''};
+              feature.properties.rate = {'value': null, description: ''};
         });
        //update legend
         updateLegend(max_rate);
@@ -428,24 +401,18 @@ function resetMap() {
        geojson = L.geoJson(mapData, {style: style, onEachFeature: onEachFeature}).addTo(map);
 }
 
+var colorCodes = ['#EFF3FF', '#C6DBEF', '#9ECAE1', '#6BAED6', '#3182BD', '#08519C']
 
 function getColorFor(rate) {
-    if(rate === undefined || rate === null)
+    if(rate === undefined || rate === null || rate < 0)
         return '#FFFFFF';
-    return rate <= grades[0] ? '#EFF3FF' :
-           rate <= grades[1]  ? '#BDD7E7' :
-           rate <= grades[2]  ? '#6BAED6' :
-           rate <= grades[3]  ?  '#3182BD':
-           rate <= grades[4]  ? '#08519C':
-           '#253494';
+    return colorCodes[Math.floor(rate/heatBandSize)];
     }
 
 function style(feature) {
-   var i = Math.floor(feature.properties.rate.value/step);
-   //console.info('i: ' + i + 'grade: ' + grades[i-1] + 'rate: ' + feature.properties.rate.value + ' step: ' + step );
    try {
         return {
-            fillColor: getColorFor(grades[i-1]),
+            fillColor: getColorFor(feature.properties.rate.value),
             weight: 1.5,
             opacity: 0.55,
             color: '#1ba6e1',
@@ -479,6 +446,8 @@ function onEachFeature(feature, layer) {
 
 getIndicatorHtml = function(name, property) {
     var propertySummary = indicatorData[name][property];
+    if(propertySummary == undefined)
+        return '';
     var indicatorValue = propertySummary['{{indicator_reports_field}}'];
     var displayValue = 'N/A';
     if(indicatorValue) {
