@@ -276,11 +276,10 @@ def _render_question_view(request, batch, instance=None, prev_question=None):
     elif prev_question is None:
         try:
             prev_inlines = instance.previous_inlines()
-            prev_question = list(batch.previous_inlines(instance))[-1]
-        except ValidationError, IndexError:
+            if prev_inlines:
+                prev_question = prev_inlines[-1]
+        except ValidationError:
             pass
-
-
     button_label = 'Create'
     options = None
     response = None
