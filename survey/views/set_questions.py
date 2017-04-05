@@ -277,7 +277,7 @@ def _render_question_view(request, batch, instance=None, prev_question=None):
         try:
             prev_inlines = instance.previous_inlines()
             prev_question = list(batch.previous_inlines(instance))[-1]
-        except ValidationError:
+        except ValidationError, IndexError:
             pass
 
 
