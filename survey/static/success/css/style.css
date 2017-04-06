@@ -139,7 +139,7 @@
  }
 
  body {
-  font-family: 'Kanit', sans-serif;
+  font-family: 'Open Sans', sans-serif;
   font-weight: normal;
   color:#727272;
   font-size: 15px;
@@ -152,7 +152,7 @@
  }
 
  h1,h2,h3,h4,h5,h6,p,ul { margin:0;padding: 0;}
- h1,h2,h3,h4,h5 {color:#131212; font-family: 'Cabin', sans-serif;font-weight: 600;}
+ h1,h2,h3,h4,h5 {color:#131212; font-family: 'Open Sans', sans-serif;font-weight: 600;}
  h1 {font-size: 74px;}
  h2 {font-size: 40px;}
  h3 {font-size: 32px;}
@@ -162,7 +162,8 @@
  ul {list-style-type: none;}
  a {text-decoration: none; display: inline-block; font-family: 'Cabin', sans-serif;font-size: 14px;text-transform: uppercase;}
  a:hover,a:focus,a:visited {text-decoration: none; outline: none;}
- img {max-width: 100%; display: block;}
+ /*img {max-width: 100%; display: block;}*/
+ img {max-width: 100%}
  button {border:none;outline: none;box-shadow: none;display: block; padding: 0;}
  input,textarea {outline: none; box-shadow: none;-webkit-transition: all 0.3s ease-in-out;transition: all 0.3s ease-in-out;}
 .float-left {float:left;}

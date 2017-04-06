@@ -106,13 +106,17 @@ def delete(request, ea_id):
 
 @permission_required('auth.can_view_batches')
 def edit(request, ea_id):
-    locations_filter = LocationsFilterForm(data=request.GET)
     ea = get_object_or_404(EnumerationArea, pk=ea_id)
+    if request.GET:
+        data = request.GET
+    else:
+        data = dict([(loc.type.name, loc.pk) for loc in ea.parent_locations()])
+    locations_filter = LocationsFilterForm(data=data)
     enumeration_area_form = EnumerationAreaForm(
-        instance=ea, locations=ea.locations.all())
+        instance=ea, locations=locations_filter.get_locations())
     if request.method == 'POST':
         enumeration_area_form = EnumerationAreaForm(
-            data=request.POST, instance=ea)
+            data=request.POST, instance=ea, locations=locations_filter.get_locations())
 
         if enumeration_area_form.is_valid():
             enumeration_area_form.save()

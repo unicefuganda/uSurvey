@@ -110,10 +110,10 @@ def instances_form_list(request):
     Get all ODK submissions for this EA and survey
     """
     interviewer = request.user
-    interviews = Interview.objects.filter(ea__in=[a.allocation_ea for a in interviewer.unfinished_assignments],
-                                          survey=interviewer.unfinished_assignments.first().survey)
-    submissions = ODKSubmission.objects.filter(ea__in=[a.allocation_ea for a in interviewer.unfinished_assignments],
-                                               survey=interviewer.unfinished_assignments.first().survey)
+    assignments = interviewer.unfinished_assignments
+    submissions = ODKSubmission.objects.filter(ea__in=[a.allocation_ea for a in assignments],
+                                               survey=assignments.first().survey,
+                                               status=ODKSubmission.COMPLETED)      # only pick completed submissions
     content = render_to_string("odk/instances_xformsList.xml", {
         'interviewer': interviewer,
         'submissions': submissions,

@@ -7,6 +7,9 @@
   New Enumeration Area
  {% endif %}
 {% endblock %}
+{% block search %}
+{% include "locations_filter_form.html" with a_form=locations_filter no_button=True filter_id='loc_filter' no_auto_refresh=True %}
+{% endblock %}
 {% block pre_form_content %}
     <div class="control-group" style="width: 40%">
         <label class="control-label"><span id="text-counter" style="float: right;"></span></label>
@@ -21,7 +24,7 @@
 	margin-left: 55px !important;
 }
 </style>
-{% include "locations_filter_form.html" with a_form=locations_filter no_button=True filter_id='loc_filter' no_auto_refresh=True %}
+
 {% include "naked_form.html" with a_form=enumeration_area_form %}
 {% endblock %}
 

@@ -97,7 +97,7 @@ class ResultsDownloadService(object):
         reports_df.columns = header_names
         other_sort_fields = [identifier for identifier in self.batch.auto_fields.values_list('identifier', flat=True)
                              if identifier in header_names]
-        reports_df.sort_values(['Created', ] + location_names + other_sort_fields)
+        reports_df = reports_df.sort_values(['Created', ] + location_names + other_sort_fields)
         reports_df = reports_df[report_columns]
         try:
             reports_df.Created = reports_df.Created.dt.tz_convert(settings.TIME_ZONE)
@@ -120,7 +120,7 @@ class ResultsDownloadService(object):
         except EmptyResultSet:
             answers_df = pd.DataFrame(columns=answer_columns)
         # not get pivot table of interview_id, identifier and question value
-        return answers_df.pivot_table(index='id', columns='identifier', values=value, aggfunc=lambda x: ','.join(x))
+        return answers_df.pivot(index='id', columns='identifier', values=value)
 
     def generate_interview_reports(self):
         return self.get_interview_answers()

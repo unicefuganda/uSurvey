@@ -34,7 +34,7 @@ body.single-post{
 h1, h2, h3, h4, h5, h6 {
     color: #0b488d;
     /*font-family: trebuchet ms,Open Sans;*/
-    font-weight: bolder;
+    font-weight: bold;
     margin: 0;
     padding: 0;
 }
