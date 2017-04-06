@@ -24,14 +24,7 @@
     .variable-val {
 
         }
-    #displays, #indicators-tab, #locations-tab, .chzn-select  {
-        z-index: 10;
-    }
-
-    #indicators-tab span {
-        display: inline-block;
-        padding: 10px;
-    }
+    
      .map-show {
             width: 80%;
             display: inline-block;
@@ -203,11 +196,25 @@
             background: transparent !important;
         }
 
-        #indicators-tab, #loc-stats-tab {
+{% if not device.is_small %}
+#displays, #indicators-tab, #locations-tab, .chzn-select  {
+        z-index: 10;
+    }
+
+    #indicators-tab span {
+        display: inline-block;
+      padding: 10px;
+}
+
+
+#indicators-tab, #loc-stats-tab {
            position: absolute;
            display: block;
-           width: 100%;
-        }
+          width: 100%;
+      }
+
+{%endif%}
+      
 
 
   </style>
@@ -220,41 +227,40 @@
  {% if device.is_small %}
 
     <div class="tab-content r_tab-content">
-        <div id="locations-tab">
+        <div id="loc-stats-tab">
             <div class="row r-row">
                 <div class="col-md-9">
                     <div class="map-show">
                         <div id="survey_map" class="center-block"></div>
                     </div>
-                    
                 </div>
-                
-                <div id="displays" class="col-md-3">
-                    <div id="map-controls" >
-                        <div class="rat_h3_3">Survey</div>
-                        {{map_filter}}
-                    </div>
-                    {% include "home/_indicator_display.html" %}
-                    <div id="loc-stats-tab" class="tab-pane fade  in active">
-                       
-                    <div class="row" style="background: none !important">
-                        <div class="col-md-6 col-xs-6">
-                        <div id="info-update">{% include 'page_loader.html' %}</div>
-                        </div>
-                        <div class="col-md-6 col-xs-6">
-                            <div id="map-legend">
-                            </div>
-                        </div>
-                    </div>
-
-                    </div>
-                </div>
-                
             </div>
         </div>
-       
+        <div id="indicators-tab" class="tab-pane fade">
+            <div class="row r-row">
+                <div  class="col-md-12">
+                    {% include "home/_indicator_display.html" %}
+                    
+                </div>
+            </div>
+            
+        </div>
     </div>
-
+    <div class="row r-row" style="background: none !important">
+        <div class="col-md-12">
+             <div id="map-controls" >
+                <div class="rat_h3_3">Survey</div>
+                {{map_filter}}
+            </div>
+        </div>
+        <div class="col-md-6 col-xs-6">
+        <div id="info-update">{% include 'page_loader.html' %}</div>
+        </div>
+        <div class="col-md-6 col-xs-6">
+            <div id="map-legend">
+            </div>
+        </div>
+    </div>
 
  {%else%}
     <div class="tab-content r_tab-content">
@@ -265,7 +271,9 @@
                         <div class="rat_h3_3">Survey</div>
                         {{map_filter}}
                     </div>
+                    <div id="indicators-tab" class="tab-pane fade">
                     {% include "home/_indicator_display.html" %}
+                    </div>
                     <div id="loc-stats-tab" class="tab-pane fade  in active">
                         <div id="info-update">{% include 'page_loader.html' %}</div>
                         <br/>

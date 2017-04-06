@@ -97,7 +97,7 @@
 {% autopaginate questions max_display_per_page %}
 <!-- <table class="table table-striped table-bordered table-hover clear" id="questions_table"> -->
 {% load pagination_tags %}
-<table id="questions_table" class="table table-striped table-bordered table-hover no-footer">
+<table id="questions_table" class="table table-striped table-bordered dataTable table-hover no-footer">
     <thead>
     <tr>
         <th>
@@ -322,5 +322,10 @@
     <script src="{{ STATIC_URL }}js/questions.js" type="text/javascript" charset="utf-8"></script>    <style type="text/css">
         
          .dataTables_wrapper .row:last-child{border: none !important;}
+
+            .pagination {width: auto;float: left!important ;
+                margin-top: 15px !important;
+
+         }
     </style>
 {% endblock %}

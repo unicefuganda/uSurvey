@@ -289,7 +289,7 @@ def simple_indicator(request, indicator_id):
     indicator = context['indicator']
     # hence set the location where the report is based. i.e the child current selected location.
     context['report'] = mark_safe(reports_df.to_html(na_rep='-',
-                                                     classes='table table-striped table-bordered table-hover table-sort'
+                                                     classes='table table-striped table-bordered dataTable table-hover table-sort'
                                                      ))
     variable_names = indicator.active_variables()
     report_locations = context['report_locations']

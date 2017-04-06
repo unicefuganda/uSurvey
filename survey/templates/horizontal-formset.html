@@ -24,6 +24,7 @@
                 {{ formset.non_form_errors }}
 				<table class="inline">
 				<thead>
+				<tr>
 					{% for form in formset %}
 						{% if forloop.first %}
 							{% for field in form.visible_fields %}
@@ -31,6 +32,7 @@
 							{% endfor %}
 						{% endif %}
 					{% endfor %}
+					</tr>
 				</thead>
                 {% for form in formset %}
 
@@ -50,6 +52,7 @@
 					{% endfor %}
 						</tr>
 						<tr class="error">
+						<td>
 							{% for field in form.visible_fields %}
 								{% if field.errors %}
 									<label class="error">
@@ -64,6 +67,7 @@
 					  {{ hidden }}
 					{% endfor %}
 					</div>
+					</td>
 						</tr>
                 {% endfor %}
 				</tbody>
