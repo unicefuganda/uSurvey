@@ -12,7 +12,7 @@
                 <majorMinorVersion/>
                 <version/>
                 <hash />
-                <descriptionText> {{ batch.description }}</descriptionText>
+                <descriptionText>{{ survey.description }} - {{ batch.description }}</descriptionText>
                 <downloadUrl>{{ download_url }}</downloadUrl>
                 <manifestUrl></manifestUrl>
               </xform>
@@ -20,13 +20,13 @@
         {% else %}
         <xform>
             {% get_download_url request 'download_odk_listing_form'  as listing_download_url %}
-            <formID>{{ survey.pk }}</formID>
+            <formID>{{ survey.listing_form.pk }}</formID>
             <name>{{ survey.name }} - {{ survey.listing_form.name }}</name>
             <majorMinorVersion/>
             <version/>
             <hash />
-            <descriptionText> {{ survey.description }} - {{ survey.listing_form.description }}</descriptionText>
-            <downloadUrl> {{ listing_download_url }} </downloadUrl>
+            <descriptionText>{{ survey.description }} - {{ survey.listing_form.description }}</descriptionText>
+            <downloadUrl>{{ listing_download_url }} </downloadUrl>
             <manifestUrl></manifestUrl>
         </xform>
         {% endif %}
