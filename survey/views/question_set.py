@@ -185,7 +185,7 @@ def _view_qset_data(request, model_class, interviews, disabled_fields=[]):
         download_service = ResultsDownloadService(selected_qset, survey=survey, interviews=interviews,
                                                   page_index=page_index, items_per_page=items_per_page)
         df = download_service.get_interview_answers()
-        context['report'] = mark_safe(df.to_html(classes='table table-striped table-bordered table-hover table-sort',
+        context['report'] = mark_safe(df.to_html(classes='table table-striped dataTable table-bordered table-hover table-sort',
                                                  max_rows=items_per_page))
     return render(request, 'question_set/view_all_data.html', context)
 
