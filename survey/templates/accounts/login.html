@@ -3,7 +3,7 @@
 <html lang="en"><head>
 <style type="text/css">
     .form-email input, .form-password input {    
-    padding: 0 50px !important;
+    padding: 0 65px !important;
 }
 #id_username, #id_password{
     text-align: center;
@@ -129,8 +129,7 @@ text-align: center;">
                                 <input id="check" type="checkbox">
                                 <!-- <label for="check">
                                 <i class="icon md-check-2"></i>
-                                Remember me</label> -->
-                                <a style='margin-right: 100px;' href="{% url 'password_reset' %}">Forgot password?</a>
+                                Remember me</label> -->                      
                             </div>
                             <div class="form-submit-1">
                                 <input value="Sign In" class="mc-btn btn-style-1" type="submit">
@@ -140,6 +139,7 @@ text-align: center;">
         <input type="hidden" name="next" value="{% url 'home_page' %}" />
     {% endif %}
                             </div>
+                            <a style='float: right;' href="{% url 'password_reset' %}">Forgot password?</a>
                          
                         </form>
                     </div>
