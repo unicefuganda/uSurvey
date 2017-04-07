@@ -292,7 +292,7 @@
 </table>
 
 {% paginate %}
-<div class="paginate_msg">Total {{ page_obj.paginator.count }} entries. Showing {{ page_obj}}</div>
+<div class="paginate_msg">Total {{ page_obj.paginator.count }} entries. <?php  echo $journal_row['url'];?></div>
 {% if batch and batch.interviews.count == 0 %}<br/>
     <button type="submit" href="#batch_{{batch.pk}}" data-toggle="modal" class="btn btn-primary pull-right" name="save_button" {% if batch.has_loop or batch.has_skip %}onclick="return false;"{% endif %}>Update Question Order</button>
       {% if batch.has_loop or batch.has_skip %}

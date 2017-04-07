@@ -144,7 +144,7 @@
     </table>    
     {% autopaginate indicators max_display_per_page %}
     {% paginate %}
-    <div class="paginate_msg">Total {{ page_obj.paginator.count }} entries. Showing {{ page_obj}}</div>
+    <div class="paginate_msg">Total {{ page_obj.paginator.count }} entries. <?php  echo $journal_row['url'];?></div>
 {% endblock %}
 {% block javascripts %}
 <link rel="stylesheet" href="{{ STATIC_URL }}css/dataTables.bootstrap.css" type="text/css">
