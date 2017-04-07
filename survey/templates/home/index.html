@@ -27,9 +27,6 @@
 
         }
 
-     .map-show {
-            width: 100%;
-        }
 
 
         .leaflet-container {
@@ -53,7 +50,7 @@
             width: 100% !important;
             margin-left: auto;
             margin-right: auto;
-            z-index: 50;
+            z-index: 10 !important;
         }
         @media only screen and (max-width:767px) {
             #survey_map {
@@ -174,15 +171,18 @@
             width: 100% !important;
             background: transparent !important;
             border-left: 3px solid #0577e0;
+            z-index: 1000 !important;
         }
     <!--Indicators styles start-->
      #home_display .row, #home_display .r-row {
          padding: 0 !important;
          margin: 0 !important;
      }
+    #home_display .col-md-12 {
+        width: 100% !important;
+    }
     <!--Indicators styles start-->
 
-          <style>
 
 		  .indic-1{
 
@@ -367,8 +367,8 @@
     </ul>
      <div class="container">
      {% if device.is_small %}
-             <div class="row r-row" >
-                <div class="col-md-12">
+             <div class="row r-row">
+                <div class="col-md-12" >
                     <div class="container-fluid" style="padding: 0; margin: 0;">
                         <div id="map-controls" class="row r-row"  style="padding: 0; margin: 0;">
                             <div class="rat_h3_3 col-md-12"  style="padding: 0; margin: 0;">Survey</div>
@@ -377,25 +377,24 @@
                      </div>
                 </div>
              </div>
-             <div class="row r-row" >
+             <div class="row r-row"   style="padding: 0; margin: 0; " >
                 <div class="col-md-12">
                     <div class="map-show"  style="padding: 0; margin: 0;">
                         <div id="survey_map" class="center-block"></div>
                     </div>
                 </div>
              </div>
-             <div class="row r-row">
-                <div id="displays" class="col-md-4">
+             <div class="row r-row"  style="padding: 0; margin: 0;" >
+                <div id="displays" class="col-md-12">
                     <div class="container-fluid" style="padding: 0; margin: 0;">
                         <div id="indicators-tab" class="tab-pane fade row r-row" style="padding: 0; margin: 0;">
-                            <div  lass="col-md-12" style="padding: 0; margin: 0;">
+                            <div  class="col-md-12" style="padding: 0; margin: 0;">
                                 {% include "home/_indicator_display.html" %}
                             </div>
                         </div>
                         <div id="loc-stats-tab" class="tab-pane fade  in active row r-row">
-                            <div id="info-update" class="row r-row">{% include 'page_loader.html' %}</div>
-                            <br/>
-                            <div id="map-legend" class="row r-row">
+                            <div id="info-update" class="col-md-12">{% include 'page_loader.html' %}</div>
+                            <div id="map-legend" class="col-md-12">
                             </div>
                         </div>
                     </div>
@@ -612,7 +611,7 @@ function onEachFeature(feature, layer) {
 
 }
 
-getIndicatorHtml = function(name, property) {
+getIndicatorHtml = function(name, property, styleIndex) {
     var propertySummary = indicatorData[name][property];
     if(propertySummary == undefined)
         return '';
@@ -625,25 +624,33 @@ getIndicatorHtml = function(name, property) {
     else {
         indicatorValue = 0.0;
     }
-    html = '<div class="indicators indicator-' + indicatorSurveys[name] +'">\
-                <h4><span class="indicator-name">' + name + '</span><span class="indicator-value">' +  indicatorValue + '</span></h4>\
-                <div class="indicator-breakdown">';
+    html = '<div class="hero-description poll-hero-title indicators indicator-' + indicatorSurveys[name] +' indic-' + styleIndex +'">\
+                 <span class="tite' + styleIndex +'">' +  indicatorValue + '</span> <i>' + name + '</i>';
     for(variable in propertySummary) {
         if(variable != '{{indicator_reports_field}}')
-            html += '<div class="indicator-desc"><span class="variable-name">' + variable +
-                    '</span><span class="variable-val">'+ propertySummary[variable] + '</span></div>';
+            html += ' <p><span>'+ propertySummary[variable] + '</span><i>' + variable + '</i></p>';
     }
-    html +=  '</div>\
-            </div>';
+    html +=  '</div>';
     return html;
 }
 
 
 updateIndicators = function(property) {
-     indicatorTable.innerHTML = '<h3 class="rat_h3_1" style="margin-left: 8px;">'+property+ '</h3>';
+     indicatorTable.innerHTML = '<div class="row r-row">\
+                                        <div class="col-sm-12">\
+                                            <p style="font-size:17px; color:#8c203d; font-weight:bold;">' + property + '</p>\
+                                         </div>\
+                                    </div>\
+                                    <div class="row r-row"  style="font-family: Open Sans; ">\
+                                        <div class="col-sm-12">';
+     var styleIndex = 0;
      for (var name in indicatorData){
-        indicatorTable.innerHTML += getIndicatorHtml(name, property);
+        styleIndex = styleIndex%4+2;
+        indicatorTable.innerHTML += getIndicatorHtml(name, property, styleIndex);
+        styleIndex++;
      }
+     indicatorTable.innerHTML += '</div>\
+                                </div>';
      refreshIndicatorDisplay();
 }
 

@@ -1,9 +1,14 @@
     <div  id="indicator-table" class="container-fluid">
-        <div class="row indicators indicator-{{indicator.survey.id}}"  style="font-family: Open Sans; ">
+        <div class="row r-row">
+            <div class="col-sm-12">
+                <p style="font-size:17px; color:#8c203d; font-weight:bold;">&nbsp;</p>
+             </div>
+        </div>
+        <div class="row r-row"  style="font-family: Open Sans; "  style="padding: 0;margin: 0;">
             <div class="col-sm-12">
                 {% for indicator in display_indicators %}
-                    <div class="hero-description poll-hero-title indic-{% cycle 1 2 3 4 5 %}">
-                           <span class="tite{% cycle 1 2 3 4 5 %}">{{ indicator.country_wide_value }}</span> <i>{{ indicator.name }}</i>
+                    <div class="hero-description poll-hero-title indicators indicator-{{indicator.survey.id}} indic-{% cycle 2 3 4 %}">
+                           <span class="tite{% cycle 2 3 4 %}">{{ indicator.country_wide_value }}</span> <i>{{ indicator.name }}</i>
                             {% for key, value in indicator.country_wide_report.items %}
                                 {% if key != indicator_reports_field %}
                                     <p><span>{{value}}</span><i>{{key}}</i></p>
