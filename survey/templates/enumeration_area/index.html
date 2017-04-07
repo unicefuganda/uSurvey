@@ -20,7 +20,7 @@
                         }
                         </style>                                            
 											<div class="col-lg-12">
-	<a class="btn btn-white btn-warning btn-bold" style="margin-right: -15px; margin-top: -17px" href="{% url 'new_enumeration_area_page' %}" id="add-module">
+	<a class="btn btn-white btn-warning btn-bold" href="{% url 'new_enumeration_area_page' %}" id="add-module">
                         <i class="ace-icon fa fa-plus bigger-120"></i>
                          Add Enumeration Area</a>
                          </div>
@@ -30,7 +30,7 @@
 {% load pagination_tags %}
 <style>
  .search{
-            margin-top: 1px !important;
+            margin-top: 6px !important;
         }
         
  </style>
@@ -106,7 +106,7 @@
         </tbody>
     </table>    
 {% paginate %}
-<div class="paginate_msg">Total {{ page_obj.paginator.count }} entries. Showing {{ page_obj}}</div>
+<div class="paginate_msg">Total {{ page_obj.paginator.count }} entries. </div>
 {% endblock %}
 
 {% block javascripts %}

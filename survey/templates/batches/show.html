@@ -8,7 +8,7 @@
     margin-top: 4px;
   }
     .dataTables_wrapper input[type="text"] {
-    width: 345px !important;
+    <!--width: 345px !important;-->
 
   }
 </style>
@@ -85,9 +85,7 @@
       {% endfor %}
     </tbody>
   </table>
-  {% autopaginate locations  max_display_per_page_form %}
   {% paginate %}
-  <div class="paginate_msg">Total {{ page_obj.paginator.count }} entries. Showing {{ page_obj}}</div>
 {% endblock %}
 {% block javascripts %}
          <script src="{{ STATIC_URL }}js/jquery.validate.min.js" type="text/javascript" charset="utf-8"></script>

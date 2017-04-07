@@ -7,6 +7,9 @@
 {% block page_actions %}
 
 <style type="text/css">
+.search { 
+    margin-top: 6px !important;
+}
 .dataTables_wrapper .row {
     margin: 0!important;
     display: none !important;
@@ -94,7 +97,7 @@
       </table>
     
     {% paginate %}
-    <div class="paginate_msg">Total {{ page_obj.paginator.count }} entries. Showing {{ page_obj}}</div>
+    <div class="paginate_msg">Total {{ page_obj.paginator.count }} entries. </div>
     {% endblock %}
 
     {% block javascripts %}

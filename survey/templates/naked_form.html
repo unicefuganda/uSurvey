@@ -47,10 +47,7 @@
     padding-left:6px;
     z-index:1;
     }
-    .exod {
-    text-algin:center;
-    margin-bottom:5px;
-    }
+
     #id_gender{
     display: inline-block;
     vertical-align: middle;
@@ -82,7 +79,7 @@
     display: none !important;
     }
     .exod {
-    text-algin:center;
+    text-align:center;
     margin-bottom:5px;
     }
 
@@ -118,7 +115,7 @@
         <div class="col-md-2 col-sm-1">
         </div>
         <div class="col-md-3 col-sm-2">
-            <strong>All EAs</strong><span style="margin-left: 100px;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><strong>Selected EAs</strong>
+            <strong>All EAs</strong><span style="margin-left: 145px;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><strong>Selected EAs</strong>
         </div>
         <div class="col-md-2 col-sm-1 "></div>
       </div>
@@ -131,12 +128,12 @@
                 {% for icon, attrs in field.field.icons.items %}
                     <span {% for key, val in attrs.items %} {{key}}="{{val}}"{% endfor %} style="padding: 2px 5px;cursor: pointer;">
                         {% if icon.lower == 'edit' %}
-                            <span style="color:blue"><i class="fa fa-edit"></i></span>
+                            <span style="color:#478FCA;"><i class="fa fa-edit fa-2x"></i></span>
                         {%elif icon.lower == 'add'  %}
-                            <span style="color:green"><i class="fa fa-plus-square"></i></span>
+                            <span style="color:#69AA46;"><i class="fa fa-plus-square fa-2x"></i></span>
                         {%elif icon.lower == 'delete'  %}
-                            <span style="color:red">
-                            <i class="fa fa-minus-square"></i>
+                            <span style="color:#DD5A43;">
+                            <i class="fa fa-minus-square fa-2x"></i>
                             </span>
                         {%elif icon.lower == 'view'  %}
                             <span style="color:pink">

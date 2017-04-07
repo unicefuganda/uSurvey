@@ -943,6 +943,8 @@ This is only usurvey
         padding-top: 0;
         text-align: center;
         width: 100%;
+        position: relative;
+        margin-top: 10px; 
     }
     .topSocial ul {
         text-align: center;

@@ -144,7 +144,7 @@
   color:#727272;
   font-size: 15px;
   position: relative;
-  line-height: 26px;
+  /*line-height: 26px;*/
   letter-spacing: 0.25px;
  }
  body .main-page-wrapper {

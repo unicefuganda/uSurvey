@@ -36,7 +36,16 @@
     {{ batch.name.capitalize }} Questions
 {% endblock %}
 {% block search %}
+{% include "search_form.html" %}
+ {% include "horizontal_filter_form.html" with a_form=question_filter_form no_button=True filter_id='question-filter-form' %}
  <style>
+ .search-wrapper {
+    margin-top: -7px !important;
+    margin-right: -5px !important;
+}
+ .search{
+            margin-top: 8px !important;
+        }
 
   .horititle {
     margin-left: -18px !important;
@@ -44,16 +53,13 @@
 }
 #question-filter-form{
     padding-bottom: 17px !important;
-}
-
- </style>
-{% include "search_form.html" %}
- {% include "horizontal_filter_form.html" with a_form=question_filter_form no_button=True filter_id='question-filter-form' %}
+}      
+ </style>  
 
 {% endblock %}
 {% block page_actions %}
 <div class="col-lg-12">
-        <a href="#test_flow" style="padding-left: 4px;padding-right: 3px;" class="btn btn-white btn-warning btn-bold" data-toggle="modal">
+        <a href="#test_flow" style="padding-left: 0px;padding-right: 3px;" class="btn btn-white btn-warning btn-bold" data-toggle="modal">
                         <i class="ace-icon fa bigger-120"></i>
                          Preview</a>
         <a style="padding-left: 4px;padding-right: 3px;" class="btn btn-white btn-warning btn-bold" href="{% url 'export_questions_in_qset' batch.id %}">
@@ -73,8 +79,8 @@
 {% block content %}
 
 <div class="modal fade" id="test_flow" tabindex="-1" role="dialog"  aria-hidden="true" style="background: none !important;box-shadow: none !important;">
-        <div class="modal-dialog" style="background: none !important;">
-            <div class="modal-content" style="background: none !important;box-shadow: none !important; border: none !important;">
+        <div class="modal-dialog modal-dialog-1" style="background: none !important;">
+            <div class="modal-content modal-content-1" style="background: none !important;box-shadow: none !important; border: none !important;">
               <div class="modal-body test_flow_modal" style="background: none !important;">
                 {% include "interviews/new_interview.html" with action=batch.id|get_url_with_ids:"test_qset_flow" title="Preview" %}
               </div>
@@ -85,7 +91,10 @@
     $(document).ready(function(){
         var img = new Image();
         img.src = $('.iphone_bg').first().css('background-image').replace(/url\(|\)$|"/ig, '');
-        $('.modal-dialog, .modal-content, .iphone_bg').width(img.width);
+        // first time its getting img width is 0 after page refresh 333
+        //$('.modal-dialog-1, .modal-content-1, .iphone_bg').width(img.width);
+        // tTook new classes for preview due to css issue
+        $('.modal-dialog-1, .modal-content-1, .iphone_bg').width('333');
       });
     </script>
     {% if batch %}
@@ -282,10 +291,11 @@
     </tbody>
 </table>
 
-{% paginate %}
-<div class="paginate_msg">Total {{ page_obj.paginator.count }} entries. Showing {{ page_obj}}</div>
-{% if batch and batch.interviews.count == 0 %}<br/>
-    <button type="submit" href="#batch_{{batch.pk}}" data-toggle="modal" class="btn btn-primary pull-right" name="save_button" {% if batch.has_loop or batch.has_skip %}onclick="return false;"{% endif %}>Update Question Order</button>
+
+<div class="paginate_msg col-md-2 pull-left" style="margin-left: -15px;mar">Total {{ page_obj.paginator.count }} entries. </div>
+<div class="col-md-8">{% paginate %}</div>
+{% if batch and batch.interviews.count == 0 %}
+    <div class="col-md-2"><button style="margin-top: 20px;margin-right: -15px;float: right;" type="submit" href="#batch_{{batch.pk}}" data-toggle="modal" class="btn btn-primary  pull-right" name="save_button" {% if batch.has_loop or batch.has_skip %}onclick="return false;"{% endif %}>Update Question Order</button></div>
       {% if batch.has_loop or batch.has_skip %}
             <div class="modal fade" id="batch_{{batch.pk}}" tabindex="-1" role="dialog"  aria-hidden="true">
                 <div class="modal-dialog">
@@ -312,10 +322,9 @@
 
 {% block javascripts %}
 <link rel="stylesheet" href="{{ STATIC_URL }}css/dataTables.bootstrap.css" type="text/css">
-<script type="text/javascript" src="https://code.jquery.com/jquery-1.12.4.js"></script>
 <script src="{{ STATIC_URL }}/js/jquery.dataTables.js"></script>
 <script src="{{ STATIC_URL }}/js/dataTables.bootstrap.js" type="text/javascript" charset="utf-8"></script>
-<script src="{{STATIC_URL}}js/jquery.validate.js" type="text/javascript" charset="utf-8"></script>
+
             
     {% if batch %}
         <script src="{{ STATIC_URL }}js/jquery.tablednd.js" type="text/javascript" charset="utf-8"></script>
@@ -324,5 +333,6 @@
     <script src="{{ STATIC_URL }}js/questions.js" type="text/javascript" charset="utf-8"></script>    <style type="text/css">
         
          .dataTables_wrapper .row:last-child{border: none !important;}
+
     </style>
 {% endblock %}

@@ -29,8 +29,8 @@
 
    .search {
      float: right;
-     margin-right: -2px;
-    margin-top: 14px;
+     margin-right: 5px;
+    margin-top: 18px;
     }
    div.table-header a {
        color: #0f0;
@@ -291,7 +291,7 @@
 {% if has_powers %}
 <img src="{{ STATIC_URL }}images/userICON_admin.png" width="40px;" height="40px;" style="margin-left: 150px;" title="Super Powers Activated">
 {% else %}
-<img src="{{ STATIC_URL }}images/userICON.png" width="40px;" height="40px;" style="margin-left: 150px;">
+<img src="{{ STATIC_URL }}images/userICON.png" width="40px;" height="40px;" style="margin-left: 150px;margin-top: 10px;">
 {% endif %}
 </span>
 <ul>
@@ -554,10 +554,21 @@ div.dataTables_info {
     height: 330px !important;
     padding-bottom: 10px;
 }
-#ea_wrapper, .search{margin-top: 15px !important;}
 .dataTables_length {margin-top: 10px;}
-.paginate_msg{font-size: 14px;margin-top: 20px;}
 
+.paginate_msg{font-size: 14px;margin-top: 20px;}
+#cssmenu > ul > li > a {
+    padding: 17px;
+    font-size: 13px;
+    letter-spacing: 1px;
+    text-decoration: none;
+    color: #fff;
+    font-weight: 700;
+    font-family: Open Sans;
+    margin-top: 6px;
+}
+
+.paginate_msg{font-size: 14px;margin-top: 20px;color: #555;}
 </style>
    </body>
 </html>

@@ -22,12 +22,13 @@ nav{position:relative;width:1220px;-moz-width:1100px;}
     list-style: outside none none;
     position: relative;
     background: #0099ff none repeat scroll 0 0 !important;
-    z-index: 9;
+    z-index: 11;
 }
 #cssmenu:after,#cssmenu > ul:after{content:".";display:block;clear:both;visibility:hidden;line-height:0;height:0}
 #cssmenu #head-mobile{display:none}
 #cssmenu{font-family:Open Sans,sans-serif;background:#0099ff}
-#cssmenu > ul > li{float:left;padding-top: 10px;}
+/*#cssmenu > ul > li{float:left;padding-top: 10px;}*/
+#cssmenu > ul > li{float:left;}
 #cssmenu > ul > li > a{padding:17px;font-size:13px;letter-spacing:1px;text-decoration:none;color:#fff;font-weight:700;font-family: Open Sans;}
 #cssmenu > ul > li:hover > a,#cssmenu ul li.active a{color:yellow;}
 /*Removed Hover color*/

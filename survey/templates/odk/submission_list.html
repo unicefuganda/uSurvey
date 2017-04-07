@@ -9,7 +9,16 @@
 {% load pagination_tags %}
 {% autopaginate submissions 50 %}
 {% load template_tags %}
-	
+	<style type="text/css">
+     .dataTables_wrapper .row:first-child {
+    padding-top: 0px !important;
+    padding-bottom: 0px !important;    
+    background-color: #FFF;
+}
+.dataTables_length {
+    margin-top: -15px !important;
+}
+    </style>
         <table class="table table-striped table-bordered table-hover dataTable no-footer">
             <thead>
             <tr>
