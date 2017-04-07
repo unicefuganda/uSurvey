@@ -292,9 +292,9 @@
 </table>
 
 {% paginate %}
-<div class="paginate_msg">Total {{ page_obj.paginator.count }} entries. <?php  echo $journal_row['url'];?></div>
-{% if batch and batch.interviews.count == 0 %}<br/>
-    <button type="submit" href="#batch_{{batch.pk}}" data-toggle="modal" class="btn btn-primary pull-right" name="save_button" {% if batch.has_loop or batch.has_skip %}onclick="return false;"{% endif %}>Update Question Order</button>
+<div class="paginate_msg">Total {{ page_obj.paginator.count }} entries. </div>
+{% if batch and batch.interviews.count == 0 %}
+    <button style="margin-top: -20px;" type="submit" href="#batch_{{batch.pk}}" data-toggle="modal" class="btn btn-primary pull-right" name="save_button" {% if batch.has_loop or batch.has_skip %}onclick="return false;"{% endif %}>Update Question Order</button>
       {% if batch.has_loop or batch.has_skip %}
             <div class="modal fade" id="batch_{{batch.pk}}" tabindex="-1" role="dialog"  aria-hidden="true">
                 <div class="modal-dialog">
