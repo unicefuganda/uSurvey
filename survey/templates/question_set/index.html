@@ -185,6 +185,7 @@
         </div><!-- /.modal-dialog -->
     </div><!-- /.modal -->
   {% paginate %}
+  <div class="paginate_msg">Total {{ page_obj.paginator.count }} entries. Showing {{ page_obj}}</div>
 {% endblock %}
 
 

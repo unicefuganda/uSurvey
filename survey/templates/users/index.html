@@ -81,5 +81,6 @@
             </tbody>
         </table>
     {% paginate %}
+    <div class="paginate_msg">Total {{ page_obj.paginator.count }} entries. Showing {{ page_obj}}</div>
     {% include 'max_display_per_page_form.html' %}
 {% endblock %}

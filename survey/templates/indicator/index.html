@@ -144,6 +144,7 @@
     </table>    
     {% autopaginate indicators max_display_per_page %}
     {% paginate %}
+    <div class="paginate_msg">Total {{ page_obj.paginator.count }} entries. Showing {{ page_obj}}</div>
 {% endblock %}
 {% block javascripts %}
 <link rel="stylesheet" href="{{ STATIC_URL }}css/dataTables.bootstrap.css" type="text/css">
