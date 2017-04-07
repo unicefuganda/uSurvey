@@ -101,6 +101,7 @@
        .ms-container {
             margin-right: 10px !important;
        }
+       
 
    </style>
       <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" />
@@ -480,13 +481,15 @@
               "scrollX":        '100%',
               "scrollCollapse": true,
               "paging":         true,
+              "searching": false,
               "iDisplayLength": {{max_display_per_page}},
               'aoColumnDefs': [{
               'bSortable': false,
               "bPaginate": false,
+
               'aTargets': [-1] /* 1st one, start by the right */
           }]
-          "info" : false          
+          
           });
         });
         </script>
@@ -532,7 +535,7 @@
   .select2-container .selection .select2-selection{border-left: 3px solid #0577e0;}
   .form-search textarea, .form-inline textarea, .form-horizontal textarea{margin-left: 4px !important}
   .dataTables_scrollBody {
-     height: auto !important; 
+     
      padding-bottom: 10px;
 }
 .pagination {
@@ -546,6 +549,7 @@
 }
 div.dataTables_info {
     padding-top: 15px;
+    display: none;
 }
 #ea_wrapper, .search{margin-top: 15px !important;}
 

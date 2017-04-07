@@ -10,5 +10,15 @@ $(document).ready(function() {
             var ea_length = $("select[name='datatables_length'] :selected").val();
             window.location = "?max_display_per_page="+ea_length;
         });
+        $("select[name='DataTables_Table_0_length']").change(function(){
+            var ea_length = $("select[name='DataTables_Table_0_length'] :selected").val();
+            window.location = "?max_display_per_page="+ea_length;
+        });
+
+        $("#ea_info").empty();
+        
+
+
+
     });
 </script>

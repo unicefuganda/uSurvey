@@ -411,6 +411,35 @@ INTERVIEWER_SESSION_NAMESPACE = '//interviewer/'
 ONLINE_SURVEY_TIME_OUT = 50000
 
 
+RESPONSIVE_MEDIA_QUERIES = {
+    'small': {
+        'verbose_name': ('Small screens'),
+        'min_width': None,
+        'max_width': 640,
+    },
+    'medium': {
+        'verbose_name': ('Medium screens'),
+        'min_width': 641,
+        'max_width': 1024,
+    },
+    'large': {
+        'verbose_name': ('Large screens'),
+        'min_width': 1025,
+        'max_width': 1440,
+    },
+    'xlarge': {
+        'verbose_name': ('XLarge screens'),
+        'min_width': 1441,
+        'max_width': 1920,
+    },
+    'xxlarge': {
+        'verbose_name': ('XXLarge screens'),
+        'min_width': 1921,
+        'max_width': None,
+    }
+}
+
+
 ##end USSD config ##
 # Importing server specific settings
 try:
