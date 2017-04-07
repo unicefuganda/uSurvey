@@ -182,12 +182,12 @@
 {% if device.is_small %}
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 {% else %}
-    #displays, #indicators-tab, #locations-tab, .chzn-select  {
+    #displays, #indicators-tab, #main-contents-tab, .chzn-select  {
         z-index: 10;
     }
 
     #indicators-tab span {
-        display: inline-block;
+      display: inline-block;
       padding: 10px;
     }
 
@@ -213,72 +213,68 @@
         <li ><a data-toggle="tab" href="#indicators-tab">INDICATORS</a></li>
         
     </ul>
- {% if device.is_small %}
-
-    <div class="tab-content r_tab-content">
-        <div id="loc-stats-tab">
+ <div class="tab-content r_tab-content container">
+     {% if device.is_small %}
+        <div id="main-contents-tab">
             <div class="row r-row">
-                <div class="col-md-9">
-                    <div class="map-show">
-                        <div id="survey_map" class="center-block"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div id="indicators-tab" class="tab-pane fade">
-            
-                    {% include "home/_indicator_display.html" %}
-        </div>
-    </div>
-    <div class="row r-row" style="background: none !important">
-        <div class="col-md-12">
-             <div id="" >
-                <div class="rat_h3_3">Survey</div>
-                {{map_filter}}
-            </div>
-        </div>
-        <div class="col-md-6">
-        <div id="info-update">{% include 'page_loader.html' %}</div>
-        </div>
-        <div class="col-md-6">
-            <div id="map-legend">
-            </div>
-        </div>
-    </div>
-
- {%else%}
-    <div class="tab-content r_tab-content">
-        <div id="locations-tab">
-            <div class="row r-row">
-                <div id="displays" class="col-md-3">
-                    <div id="map-controls" style="padding: 10px; ">
-                        <div class="rat_h3_3">Survey</div>
-                        {{map_filter}}
-                    </div>
-                    <div id="indicators-tab" class="tab-pane fade">
-                    {% include "home/_indicator_display.html" %}
-                    </div>
-                    <div id="loc-stats-tab" class="tab-pane fade  in active">
-                        <div id="info-update">{% include 'page_loader.html' %}</div>
-                        <br/>
-                        <div id="map-legend">
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-9">
+                <div class="col-md-12">
                     <div class="map-show">
                         <div id="survey_map" class="center-block"></div>
                     </div>
                     <p>&nbsp;</p><p>&nbsp;</p>
                 </div>
             </div>
+            <div class="row r-row">
+                <div id="displays" class="col-md-12">
+                    <div id="map-controls" class="row r-row">
+                        <div class="rat_h3_3 col-md-12">Survey</div>
+                        {{map_filter}}
+                    </div>
+                    <div id="indicators-tab" class="tab-pane fade row r-row">
+                        <div  id="indicator-table" class="col-md-12">
+                            {% include "home/_indicator_display.html" %}
+                        </div>
+                    </div>
+                    <div id="loc-stats-tab" class="tab-pane fade  in active row r-row">
+                        <div id="info-update" class="col-md-6">{% include 'page_loader.html' %}</div>
+                        <div id="map-legend" class="col-md-6">
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-       
+
+     {%else%}
+
+            <div id="main-contents-tab">
+                <div class="row r-row">
+                    <div id="displays" class="col-md-3">
+                        <div id="map-controls" class="row r-row">
+                            <div class="rat_h3_3 col-md-12">Survey</div>
+                            {{map_filter}}
+                        </div>
+                        <div id="indicators-tab" class="tab-pane fade row r-row">
+                            <div  id="indicator-table" class="col-md-12">
+                                {% include "home/_indicator_display.html" %}
+                            </div>
+                        </div>
+                        <div id="loc-stats-tab" class="tab-pane fade  in active row r-row">
+                            <div id="info-update" class="row r-row">{% include 'page_loader.html' %}</div>
+                            <br/>
+                            <div id="map-legend" class="row r-row">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-9">
+                        <div class="map-show">
+                            <div id="survey_map" class="center-block"></div>
+                        </div>
+                        <p>&nbsp;</p><p>&nbsp;</p>
+                    </div>
+                </div>
+            </div>
+    {%endif%}
     </div>
-
-
-{%endif%}
-
 </div>
 
 
@@ -316,10 +312,7 @@ function adjustInitialZoom(map) {
     // tablets are between 768 and 922 pixels wide
     // phones are less than 768 pixels wide
 
-    if (width < 512) {
-        // set the zoom level to 10
-        return map.setZoom(5);
-    }
+
     if (width < 768) {
         // set the zoom level to 10
         return map.setZoom(6);

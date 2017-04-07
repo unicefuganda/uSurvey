@@ -1,4 +1,4 @@
-    <div  id="indicator-table">
+    <div  id="indicator-table" class="col-md-12">
         {% for indicator in display_indicators %}
             <div class="indicators indicator-{{indicator.survey.id}}">
                 <div class="indicator-header header"><h4><span class="indicator-name">{{ indicator.name }}</span><span class="indicator-value">{{ indicator.country_wide_value }}</span></h4></div>
