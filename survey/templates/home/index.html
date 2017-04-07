@@ -2,12 +2,6 @@
 {% block extra_head %}
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.3/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js"></script>
-{% endblock %}
-{% block title %}
-  Survey Map
-{% endblock %}
-{% block content %}
-
 <style>
       .indicator-name {
 
@@ -24,24 +18,24 @@
     .variable-val {
 
         }
-    
+
      .map-show {
             width: 80%;
             display: inline-block;
         }
 
-     
+
         .leaflet-container {
             margin-bottom: 10px;
             margin-left: 384px;
             background-color:rgba(255,0,0,0.0);
         }
 
-       
+
         .rop {
          text-align:center;
          }
-        
+
 
 
         #displays {
@@ -56,7 +50,7 @@
             width: 85%;
             margin-left: auto;
             margin-right: auto;
-            z-index: 2;    
+            z-index: 2;
         }
         @media only screen and (max-width:767px) {
             #survey_map {
@@ -65,7 +59,7 @@
                min-height:380px;
                margin-left: 10px;
             }
-           
+
 
              #displays {
                    position: relative;
@@ -185,101 +179,102 @@
             border-left: 3px solid #0577e0;
         }
 
-{% if not device.is_small %}
-#displays, #indicators-tab, #locations-tab, .chzn-select  {
+{% if device.is_small %}
+
+{% else %}
+    #displays, #indicators-tab, #main-contents-tab, .chzn-select  {
         z-index: 10;
     }
 
     #indicators-tab span {
-        display: inline-block;
+      display: inline-block;
       padding: 10px;
-}
+    }
 
 
-#indicators-tab, #loc-stats-tab {
+    #indicators-tab, #loc-stats-tab {
            position: absolute;
            display: block;
           width: 100%;
       }
-
-
-{%endif%}
-      
-
+{% endif %}
 
   </style>
+{% endblock %}
+{% block title %}
+  Survey Map
+{% endblock %}
+{% block content %}
+
+
 <div id="home_display">
     <ul class="nav nav-tabs center-block rathna-nav">
     <li class="active"><a data-toggle="tab" href="#loc-stats-tab">LOCATIONS</a></li>
         <li ><a data-toggle="tab" href="#indicators-tab">INDICATORS</a></li>
         
     </ul>
- {% if device.is_small %}
-
-    <div class="tab-content r_tab-content">
-        <div id="loc-stats-tab">
+ <div class="tab-content r_tab-content container">
+     {% if device.is_small %}
+        <div id="main-contents-tab">
             <div class="row r-row">
-                <div class="col-md-9">
-                    <div class="map-show">
-                        <div id="survey_map" class="center-block"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div id="indicators-tab" class="tab-pane fade">
-            
-                    {% include "home/_indicator_display.html" %}
-        </div>
-    </div>
-    <div class="row r-row" style="background: none !important">
-        <div class="col-md-12">
-             <div id="" >
-                <div class="rat_h3_3">Survey</div>
-                {{map_filter}}
-            </div>
-        </div>
-        <div class="col-md-6">
-        <div id="info-update">{% include 'page_loader.html' %}</div>
-        </div>
-        <div class="col-md-6">
-            <div id="map-legend">
-            </div>
-        </div>
-    </div>
-
- {%else%}
-    <div class="tab-content r_tab-content">
-        <div id="locations-tab">
-            <div class="row r-row">
-                <div id="displays" class="col-md-3">
-                    <div id="map-controls" style="padding: 10px; ">
-                        <div class="rat_h3_3">Survey</div>
-                        {{map_filter}}
-                    </div>
-                    <div id="indicators-tab" class="tab-pane fade">
-                    {% include "home/_indicator_display.html" %}
-                    </div>
-                    <div id="loc-stats-tab" class="tab-pane fade  in active">
-                        <div id="info-update">{% include 'page_loader.html' %}</div>
-                        <br/>
-                        <div id="map-legend">
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-9">
+                <div class="col-md-12">
                     <div class="map-show">
                         <div id="survey_map" class="center-block"></div>
                     </div>
                     <p>&nbsp;</p><p>&nbsp;</p>
                 </div>
             </div>
+            <div class="row r-row">
+                <div id="displays" class="col-md-12">
+                    <div id="map-controls" class="row r-row">
+                        <div class="rat_h3_3 col-md-12">Survey</div>
+                        {{map_filter}}
+                    </div>
+                    <div id="indicators-tab" class="tab-pane fade row r-row">
+                        <div  id="indicator-table" class="col-md-12">
+                            {% include "home/_indicator_display.html" %}
+                        </div>
+                    </div>
+                    <div id="loc-stats-tab" class="tab-pane fade  in active row r-row">
+                        <div id="info-update" class="col-md-6">{% include 'page_loader.html' %}</div>
+                        <div id="map-legend" class="col-md-6">
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-       
+
+     {%else%}
+
+            <div id="main-contents-tab">
+                <div class="row r-row">
+                    <div id="displays" class="col-md-3">
+                        <div id="map-controls" class="row r-row">
+                            <div class="rat_h3_3 col-md-12">Survey</div>
+                            {{map_filter}}
+                        </div>
+                        <div id="indicators-tab" class="tab-pane fade row r-row">
+                            <div  id="indicator-table" class="col-md-12">
+                                {% include "home/_indicator_display.html" %}
+                            </div>
+                        </div>
+                        <div id="loc-stats-tab" class="tab-pane fade  in active row r-row">
+                            <div id="info-update" class="row r-row">{% include 'page_loader.html' %}</div>
+                            <br/>
+                            <div id="map-legend" class="row r-row">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-9">
+                        <div class="map-show">
+                            <div id="survey_map" class="center-block"></div>
+                        </div>
+                        <p>&nbsp;</p><p>&nbsp;</p>
+                    </div>
+                </div>
+            </div>
+    {%endif%}
     </div>
-
-
-{%endif%}
-
 </div>
 
 
@@ -288,7 +283,7 @@
 
 {% block javascripts %}
     <script type="text/javascript">
-       var map = L.map('survey_map', {zoomControl: true, doubleClickZoom: false, scrollWheelZoom: false, attributionControl: false}).setView([{{map_center}}], {{ zoom_level|default:6}}),
+       var map = L.map('survey_map', {zoomControl: false, doubleClickZoom: false, scrollWheelZoom: false, attributionControl: false}).setView([{{map_center}}], {{ zoom_level|default:6}}),
 
     info = L.control(),
     //legend = L.control({position: 'bottomright'}),
@@ -300,12 +295,36 @@
     map.dragging.disable();
     map.touchZoom.disable();
     map.doubleClickZoom.disable();
+    L.control.zoom({
+         position:'topright',
+    }).addTo(map);
+  var defaultZoom = map.getZoom();
+  var initBounds = map.getBounds();
+    adjustInitialZoom(map);
 
   //osmAttrib=;
     L.control.attribution({prefix: '© uSurvey'}).addTo(map);
   var mapData = null;
 
+function adjustInitialZoom(map) {
+    // get the width of the screen after the resize event
+    var width = document.documentElement.clientWidth;
+    // tablets are between 768 and 922 pixels wide
+    // phones are less than 768 pixels wide
+
+
+    if (width < 768) {
+        // set the zoom level to 10
+        return map.setZoom(6);
+    }
+    else
+        map.setZoom(defaultZoom);
+}
+
 $(function(){
+    $(window).on("resize", function() {
+        adjustInitialZoom(map);
+    }).trigger("resize");
     $("#id_survey").on('change', function(){
         resetMap();
         getCompletionFor();

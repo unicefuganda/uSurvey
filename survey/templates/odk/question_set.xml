@@ -26,7 +26,7 @@ xmlns:jr="http://openrosa.org/javarosa">
 			 <lastModified />
 		 </dates>
 	 </submissions>
-	   <type>{{ stage }}</type> {% comment %} basically tells if it's listing or survey data. status may change {% endcomment %}
+	   {% comment %}<type>{{ stage }}</type>  basically tells if it's listing or survey data. status may change {% endcomment %}
 	   <surveyAllocation />
 	   <qset{{ qset.pk }}>
 	   {% if ea_samples %}

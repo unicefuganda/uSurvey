@@ -44,6 +44,7 @@ class SurveyForm(ModelForm, FormOrderMixin):
                                                        listing_forms).only('survey').distinct('survey')
             preferred_listings.extend(set([(l.survey.pk, l.survey.name) for l in survey_listings]))
             self.fields['preferred_listing'].choices = preferred_listings
+            self.fields['preferred_listing'].widget = forms.SelectMultiple(attrs={'class': 'chzn-select'})
         except Exception, err:
             print Exception, err
         self.fields['listing_form'].required = False
