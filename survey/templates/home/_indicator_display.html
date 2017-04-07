@@ -6,7 +6,7 @@
                            <span class="tite{% cycle 1 2 3 4 5 %}">{{ indicator.country_wide_value }}</span> <i>{{ indicator.name }}</i>
                             {% for key, value in indicator.country_wide_report.items %}
                                 {% if key != indicator_reports_field %}
-                                    <p><span>{{value}}</span> {{key}}</p>
+                                    <p><span>{{value}}</span><i>{{key}}</i></p>
                                 {% endif %}
                             {% endfor %}
                       </div>
