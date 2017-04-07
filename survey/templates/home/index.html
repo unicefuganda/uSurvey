@@ -20,8 +20,7 @@
         }
 
      .map-show {
-            width: 80%;
-            display: inline-block;
+            width: 100%;
         }
 
 
@@ -38,10 +37,6 @@
 
 
 
-        #displays {
-           position: relative;
-           width: 25%;
-        }
         #survey_map {
             border: none;
             box-shadow: none;
@@ -60,12 +55,6 @@
                margin-left: 10px;
             }
 
-
-             #displays {
-                   position: relative;
-                   width: 100%;
-
-                }
             .rat_h3_1{margin-top: 10px;}
         }
 
@@ -178,6 +167,158 @@
             background: transparent !important;
             border-left: 3px solid #0577e0;
         }
+    <!--Indicators styles start-->
+     #home_display .row, #home_display .r-row {
+         padding: 0 !important;
+         margin: 0 !important;
+     }
+    <!--Indicators styles start-->
+
+          <style>
+
+		  .indic-1{
+
+			  background:#D0E4F2 none repeat scroll 0 0;
+
+			   border: 1px solid #666;
+
+			   color: #000;
+
+			   font-size: 14px;
+
+			   font-weight: 600;
+
+			   height: auto;
+
+			   opacity: 0.8;
+
+			   padding: 10px;
+			   margin-bottom:10px;
+           }
+
+          .tite1
+
+          {
+
+              font-size:25px;
+
+              color:#30395C;
+
+              font-weight:bold;
+
+           }
+
+
+
+           .indic-2 {
+
+               background:#85A5CC none repeat scroll 0 0;
+
+               border: 1px solid #666;
+
+               color: #000;
+
+               font-size: 14px;
+
+               font-weight: 600;
+
+               height: auto;
+
+               opacity: 0.8;
+
+               padding: 10px;
+
+
+
+               margin-bottom:10px;
+
+           }
+
+
+
+           .tite2 {
+
+               font-size:25px;
+
+               color:#304a77;
+
+               font-weight:bold;
+
+            }
+
+
+
+           .indic-3 {
+
+                background:#4A6491 none repeat scroll 0 0;
+
+                border: 1px solid #666;
+
+                color: #000;
+
+                font-size: 14px;
+
+                font-weight: 600;
+
+                height: auto;
+
+                opacity: 0.8;
+
+                padding: 10px;
+                margin-bottom:10px;
+
+           }
+
+
+
+           .tite3 {
+
+               font-size:25px;
+
+               color:#D0E4F2;
+
+               font-weight:bold;
+
+            }
+
+
+
+           .indic-4 {
+
+                    background:#5a6386 none repeat scroll 0 0;
+
+                    border: 1px solid #666;
+
+                    color: #000;
+
+                    font-size: 14px;
+
+                    font-weight: 600;
+
+                    height: auto;
+
+                    opacity: 0.8;
+
+                    padding: 10px;
+
+
+
+                    margin-bottom:10px;
+
+              }
+
+
+
+           .tite4 {
+
+               font-size:25px;
+
+               color:#D0E4F2;
+
+               font-weight:bold;
+
+            }
+
 
 {% if device.is_small %}
 
@@ -198,7 +339,10 @@
           width: 100%;
       }
 {% endif %}
-
+    #home_display .container-fluid {
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+    }
   </style>
 {% endblock %}
 {% block title %}
@@ -209,51 +353,24 @@
 
 <div id="home_display">
     <ul class="nav nav-tabs center-block rathna-nav">
-    <li class="active"><a data-toggle="tab" href="#loc-stats-tab">LOCATIONS</a></li>
+        <li class="active"><a data-toggle="tab" href="#loc-stats-tab">LOCATIONS</a></li>
         <li ><a data-toggle="tab" href="#indicators-tab">INDICATORS</a></li>
-        
+
     </ul>
- <div class="container">
+     <div class="container">
      {% if device.is_small %}
-        <div id="main-contents-tab">
-            <div class="row r-row">
-                <div class="col-md-12">
-                    <div class="map-show">
-                        <div id="survey_map" class="center-block"></div>
-                    </div>
-                </div>
-            </div>
-            <div class="row r-row">
-                <div id="displays" class="col-md-12">
-                    <div id="map-controls" class="row r-row">
-                        <div class="rat_h3_3 col-md-12">Survey</div>
-                        <div class="col-md-12">{{map_filter}}</div>
-                    </div>
-                    <div id="indicators-tab" class="tab-pane fade row r-row">
-                        <div  id="indicator-table" class="col-md-12">
-                            {% include "home/_indicator_display.html" %}
-                        </div>
-                    </div>
-                    <div id="loc-stats-tab" class="tab-pane fade  in active row r-row">
-                        <div id="info-update" class="col-md-6">{% include 'page_loader.html' %}</div>
-                        <div id="map-legend" class="col-md-6">
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
 
      {%else%}
 
-            <div id="main-contents-tab">
-                <div class="row r-row">
-                    <div id="displays" class="col-md-3">
-                        <div id="map-controls" class="row r-row">
-                            <div class="rat_h3_3 col-md-12">Survey</div>
-                            <div class="col-md-12">{{map_filter}}</div>
+            <div class="row r-row" >
+                <div id="displays" class="col-md-4">
+                    <div class="container-fluid" style="padding: 0; margin: 0;">
+                        <div id="map-controls" class="row r-row"  style="padding: 0; margin: 0;">
+                            <div class="rat_h3_3 col-md-12"  style="padding: 0; margin: 0;">Survey</div>
+                            <div class="col-md-12"  style="padding: 0; margin: 0;">{{map_filter}}</div>
                         </div>
-                        <div id="indicators-tab" class="tab-pane fade row r-row">
-                            <div  id="indicator-table" class="col-md-12">
+                        <div id="indicators-tab" class="tab-pane fade row r-row" style="padding: 0; margin: 0;">
+                            <div  lass="col-md-12" style="padding: 0; margin: 0;">
                                 {% include "home/_indicator_display.html" %}
                             </div>
                         </div>
@@ -264,10 +381,10 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-9">
-                        <div class="map-show">
-                            <div id="survey_map" class="center-block"></div>
-                        </div>
+                </div>
+                <div class="col-md-8">
+                    <div class="map-show"  style="padding: 0; margin: 0;">
+                        <div id="survey_map" class="center-block"></div>
                     </div>
                 </div>
             </div>
