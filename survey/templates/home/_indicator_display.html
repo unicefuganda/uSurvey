@@ -1,8 +1,8 @@
     <div  id="indicator-table">
         {% for indicator in display_indicators %}
-            <div class="indicators indicator-{{indicator.survey.id}} panel panel-primary">
-                <div class="indicator-header panel-heading row"><div class="indicator-name col-sm-6">{{ indicator.name }}</div><div class="indicator-value col-sm-6">{{ indicator.country_wide_value }}</div></div>
-                <div class="indicator-breakdown panel-body">
+            <div class="indicators indicator-{{indicator.survey.id}}">
+                <div class="indicator-header row header"><div class="indicator-name col-sm-6"><h4>{{ indicator.name }}</h4></div><div class="indicator-value col-sm-6"><h4>{{ indicator.country_wide_value }}</h4></div></div>
+                <div class="indicator-breakdown row">
                     {% for key, value in indicator.country_wide_report.items %}
                         {% if key != indicator_reports_field %}
                             <div class="indicator-desc row"><div class="variable-name col-sm-6">{{key}}</div><div class="variable-val col-sm-6">{{value}}</div></div>
