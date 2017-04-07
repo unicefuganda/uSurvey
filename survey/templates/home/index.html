@@ -366,7 +366,7 @@
 
     </ul>
      <div class="container">
-     {% if device.is_small %}
+     {% if not device.is_small %}
              <div class="row r-row">
                 <div class="col-md-12" >
                     <div class="container-fluid" style="padding: 0; margin: 0;">
@@ -392,7 +392,7 @@
                                 {% include "home/_indicator_display.html" %}
                             </div>
                         </div>
-                        <div id="loc-stats-tab" class="tab-pane fade  in active row r-row">
+                        <div id="loc-stats-tab" class="tab-pane fade  in active row r-row" style="padding: 0; margin: 0;">
                             <div id="map-legend" class="col-md-12">
                             <div id="info-update" class="col-md-12">{% include 'page_loader.html' %}</div>
                             </div>
