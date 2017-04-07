@@ -50,6 +50,7 @@
     </table>
 
     {% paginate %}
+    <div class="paginate_msg">Total {{ page_obj.paginator.count }} entries. Showing {{ page_obj}}</div>
 {% endif %}
 {% endblock %}
 {% block javascripts %}

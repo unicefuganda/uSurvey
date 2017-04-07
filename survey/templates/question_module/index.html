@@ -88,6 +88,7 @@
     </table>    
     {% autopaginate question_modules max_display_per_page %}
     {% paginate %}
+    <div class="paginate_msg">Total {{ page_obj.paginator.count }} entries. Showing {{ page_obj}}</div>
 {% endblock %}
 
 {% block javascripts %}

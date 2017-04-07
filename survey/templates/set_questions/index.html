@@ -97,7 +97,7 @@
 {% autopaginate questions max_display_per_page %}
 <!-- <table class="table table-striped table-bordered table-hover clear" id="questions_table"> -->
 {% load pagination_tags %}
-<table id="questions_table" class="table table-striped table-bordered table-hover no-footer">
+<table id="questions_table" class="table table-striped table-bordered  table-hover no-footer">
     <thead>
     <tr>
         <th>
@@ -281,7 +281,9 @@
     {% endfor %}
     </tbody>
 </table>
+
 {% paginate %}
+<div class="paginate_msg">Total {{ page_obj.paginator.count }} entries. Showing {{ page_obj}}</div>
 {% if batch and batch.interviews.count == 0 %}<br/>
     <button type="submit" href="#batch_{{batch.pk}}" data-toggle="modal" class="btn btn-primary pull-right" name="save_button" {% if batch.has_loop or batch.has_skip %}onclick="return false;"{% endif %}>Update Question Order</button>
       {% if batch.has_loop or batch.has_skip %}
@@ -322,10 +324,5 @@
     <script src="{{ STATIC_URL }}js/questions.js" type="text/javascript" charset="utf-8"></script>    <style type="text/css">
         
          .dataTables_wrapper .row:last-child{border: none !important;}
-
-            .pagination {width: auto;float: left!important ;
-                margin-top: 15px !important;
-
-         }
     </style>
 {% endblock %}
