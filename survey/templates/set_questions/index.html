@@ -36,7 +36,16 @@
     {{ batch.name.capitalize }} Questions
 {% endblock %}
 {% block search %}
+{% include "search_form.html" %}
+ {% include "horizontal_filter_form.html" with a_form=question_filter_form no_button=True filter_id='question-filter-form' %}
  <style>
+ .search-wrapper {
+    margin-top: -7px !important;
+    margin-right: -5px !important;
+}
+ .search{
+            margin-top: 8px !important;
+        }
 
   .horititle {
     margin-left: -18px !important;
@@ -44,16 +53,13 @@
 }
 #question-filter-form{
     padding-bottom: 17px !important;
-}
-
- </style>
-{% include "search_form.html" %}
- {% include "horizontal_filter_form.html" with a_form=question_filter_form no_button=True filter_id='question-filter-form' %}
+}      
+ </style>  
 
 {% endblock %}
 {% block page_actions %}
 <div class="col-lg-12">
-        <a href="#test_flow" style="padding-left: 4px;padding-right: 3px;" class="btn btn-white btn-warning btn-bold" data-toggle="modal">
+        <a href="#test_flow" style="padding-left: 0px;padding-right: 3px;" class="btn btn-white btn-warning btn-bold" data-toggle="modal">
                         <i class="ace-icon fa bigger-120"></i>
                          Preview</a>
         <a style="padding-left: 4px;padding-right: 3px;" class="btn btn-white btn-warning btn-bold" href="{% url 'export_questions_in_qset' batch.id %}">
