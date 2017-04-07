@@ -1344,7 +1344,7 @@ table.mc-table tbody .new .submissions a:before {
   z-index: -2;
 }*/
 .awe-overlay {
-    background-color: #288feb;
+    /*background-color: #288feb;*/
     height: 100%;
     left: 0;
     position: absolute;
@@ -4565,7 +4565,8 @@ footer#footer.footer-style-2 {
 }
 /* SIGN UP */
 .form-login {
-  background-color: rgba(0, 0, 0, 0.6);
+  /*background-color: rgba(0, 0, 0, 0.6);*/
+  background-color: #10395C;
   padding: 45px;
   margin-bottom: 70px;
   border-radius:15px;

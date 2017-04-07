@@ -40,9 +40,9 @@ class SurveyForm(ModelForm, FormOrderMixin):
         preferred_listings = [('', '------ Create new -------'), ]
         try:
             listing_forms = ListingTemplate.objects.values_list('pk', flat=True).order_by('id')
-            survey_listings = Interview.objects.filter(pk__in=listing_forms).only('survey').distinct('survey')
-            preferred_listings.extend(
-                set([(l.survey.pk, l.survey.name) for l in survey_listings]))
+            survey_listings = Interview.objects.filter(question_set__pk__in=
+                                                       listing_forms).only('survey').distinct('survey')
+            preferred_listings.extend(set([(l.survey.pk, l.survey.name) for l in survey_listings]))
             self.fields['preferred_listing'].choices = preferred_listings
         except Exception, err:
             print Exception, err
