@@ -291,10 +291,11 @@
     </tbody>
 </table>
 
-{% paginate %}
-<div class="paginate_msg">Total {{ page_obj.paginator.count }} entries. </div>
+
+<div class="paginate_msg col-md-2 pull-left" style="margin-left: -15px;mar">Total {{ page_obj.paginator.count }} entries. </div>
+<div class="col-md-8">{% paginate %}</div>
 {% if batch and batch.interviews.count == 0 %}
-    <button style="margin-top: -20px;" type="submit" href="#batch_{{batch.pk}}" data-toggle="modal" class="btn btn-primary pull-right" name="save_button" {% if batch.has_loop or batch.has_skip %}onclick="return false;"{% endif %}>Update Question Order</button>
+    <div class="col-md-2"><button style="margin-top: 20px;margin-right: -15px;float: right;" type="submit" href="#batch_{{batch.pk}}" data-toggle="modal" class="btn btn-primary  pull-right" name="save_button" {% if batch.has_loop or batch.has_skip %}onclick="return false;"{% endif %}>Update Question Order</button></div>
       {% if batch.has_loop or batch.has_skip %}
             <div class="modal fade" id="batch_{{batch.pk}}" tabindex="-1" role="dialog"  aria-hidden="true">
                 <div class="modal-dialog">
@@ -332,5 +333,6 @@
     <script src="{{ STATIC_URL }}js/questions.js" type="text/javascript" charset="utf-8"></script>    <style type="text/css">
         
          .dataTables_wrapper .row:last-child{border: none !important;}
+
     </style>
 {% endblock %}
