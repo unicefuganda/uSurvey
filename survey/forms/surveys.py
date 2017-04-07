@@ -135,15 +135,25 @@ class SamplingCriterionForm(forms.ModelForm, FormOrderMixin):
     def clean(self):
         super(SamplingCriterionForm, self).clean()
         validation_test = self.cleaned_data.get('validation_test', None)
+        if validation_test == None:
+            raise ValidationError('This field is Required')
+            return self.cleaned_data['validation_test']
         listing_question = self.cleaned_data.get('listing_question', None)
         if listing_question:
             answer_class = Answer.get_class(listing_question.answer_type)
             method = getattr(answer_class, validation_test, None)
             if method is None:
                 raise ValidationError('unsupported validator defined on listing question')
+
         if validation_test == 'between':
             if self.cleaned_data.get('min', False) is False or self.cleaned_data.get('max', False) is False:
                 raise ValidationError('min and max values required for between condition')
+                return self.cleaned_data
+        
+        if validation_test == 'equals':
+            if not self.cleaned_data['value']:
+                raise ValidationError('Value Required')
+
         elif self.cleaned_data.get('value', False) is False:
             raise ValidationError('Value is required for %s' % validation_test)
         if listing_question and listing_question.answer_type == MultiChoiceAnswer.choice_name():
@@ -151,6 +161,14 @@ class SamplingCriterionForm(forms.ModelForm, FormOrderMixin):
                 raise ValidationError('No option selected for %s' % listing_question.identifier)
             self.cleaned_data['value'] = self.cleaned_data['options']
         return self.cleaned_data
+
+    def clean_validation_test(self):
+        if self.cleaned_data['validation_test'] == None:
+            raise ValidationError('This field is Required')
+        return self.cleaned_data['validation_test']
+
+    
+
 
     def save(self, *args, **kwargs):
         criterion = super(SamplingCriterionForm, self).save(*args, **kwargs)

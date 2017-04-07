@@ -8,21 +8,11 @@
 {% include "naked_form.html" with a_form=sampling_form %}
 
 {% endblock %}
-    {% block buttons %}
-  <div class="form-actions">
-    <button id="button" type="submit" class="btn btn-primary submit" name="save_button" data-disabled-text="{{ loading_text }}">Save</button>
-
-    {% if cancel_url %}
-      <a href="{{ cancel_url }}" class="btn btn-primary" name="cancel_button" class="cancel">Cancel</a>
-    {% else %}
-      <a href="#" class="btn btn-primary" name="cancel_button" id="cancel_{{ id }}" class="cancel">Cancel</a>
-    {% endif %}
-  </div>
-    {% endblock %}
-
+    
 {% block javascripts %}
         <script type="text/javascript">
-            $(function(){
+         $(document).ready(function() {
+                 
 
                  if(!$('#id_value').val()) {
                      $('#id_value-control-group').hide();
@@ -63,8 +53,21 @@
                         });
                 });
 
-                $('#id_validation_test').change(function(){
-                    switch($(this).val()) {
+
+                 $('#id_validation_test').change(function(){
+                    do_process($(this).val(), question_options);
+                 });
+                 {%  if sampling_form.validation_test.value %}
+                    do_process("{{sampling_form.validation_test.value}}", question_options);
+                 {%endif%}
+             
+
+                
+            });
+
+
+            function do_process(validation_test, question_options){
+                    switch(validation_test) {
                         case('between'):
                              $('#id_options-control-group').hide();
                             $('#id_options').prop('disabled', true);
@@ -88,6 +91,7 @@
                                 break;
                             }
                         default:
+
                             $('#id_options-control-group').hide();
                             $('#id_options').prop('disabled', true);
                             $('#id_value-control-group').show();
@@ -97,8 +101,13 @@
                              $('#id_max-control-group').hide();
                              $('#id_max').prop('disabled', true);
                     }
-                });
-            });
+            }
+
+
+
+
+            
+
         </script>
         <script src="{{STATIC_URL}}js/logic.js" type="text/javascript" charset="utf-8"></script>
         <script type="text/javascript">
@@ -108,6 +117,7 @@
 {% endblock %}
 
 {% block non_form_content %}
+
     <h4>Existing Criteria</h4>
     {% include 'surveys/_view_criteria.html' %}
 {% endblock %}
