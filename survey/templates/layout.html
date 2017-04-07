@@ -291,7 +291,7 @@
 {% if has_powers %}
 <img src="{{ STATIC_URL }}images/userICON_admin.png" width="40px;" height="40px;" style="margin-left: 150px;" title="Super Powers Activated">
 {% else %}
-<img src="{{ STATIC_URL }}images/userICON.png" width="40px;" height="40px;" style="margin-left: 150px;">
+<img src="{{ STATIC_URL }}images/userICON.png" width="40px;" height="40px;" style="margin-left: 150px;margin-top: 10px;">
 {% endif %}
 </span>
 <ul>
@@ -556,6 +556,16 @@ div.dataTables_info {
 }
 .dataTables_length {margin-top: 10px;}
 .paginate_msg{font-size: 14px;margin-top: 20px;}
+#cssmenu > ul > li > a {
+    padding: 17px;
+    font-size: 13px;
+    letter-spacing: 1px;
+    text-decoration: none;
+    color: #fff;
+    font-weight: 700;
+    font-family: Open Sans;
+    margin-top: 6px;
+}
 </style>
    </body>
 </html>
