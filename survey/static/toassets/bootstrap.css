@@ -3345,8 +3345,8 @@ fieldset[disabled] .btn-info.active {
 .btn-warning.active,
 .open > .dropdown-toggle.btn-warning {
   color: #fff;
-  background-color: #ec971f;
-  border-color: #d58512;
+  /*background-color: #ec971f;
+  border-color: #d58512;*/
 }
 .btn-warning:active,
 .btn-warning.active,

@@ -4,6 +4,14 @@
 {% endblock %}
 {% block content %}
 <style type="text/css">
+  .form-inline .control-label {
+    margin-top: 15px;
+    margin-bottom: 10px !important;
+    vertical-align: middle;
+}
+.control-group {
+    margin-bottom: 30px;
+}
   .dataTables_wrapper .row {
     margin: 0!important;
     display: none !important;
@@ -40,3 +48,8 @@
 {% block javascripts %}
 <script src="{{STATIC_URL}}/js/bulk-sms.js" type="text/javascript" charset="utf-8"></script>
 {% endblock %}
+<script type="text/javascript">
+   $(document).ready(function(){
+     $('.controls textarea ').after($('<span id="text-counter"></span>'));
+     });
+</script>
