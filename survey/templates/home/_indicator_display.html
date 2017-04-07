@@ -1,11 +1,11 @@
-    <div  id="indicator-table">
+    <div  id="indicator-table .container-fluid">
         {% for indicator in display_indicators %}
             <div class="indicators indicator-{{indicator.survey.id}}">
-                <div class="indicator-header row header"><div class="indicator-name col-sm-6"><h4>{{ indicator.name }}</h4></div><div class="indicator-value col-sm-6"><h4>{{ indicator.country_wide_value }}</h4></div></div>
-                <div class="indicator-breakdown row">
+                <div class="indicator-header header"><h4><span class="indicator-name">{{ indicator.name }}</span><span class="indicator-value">{{ indicator.country_wide_value }}</span></h4></div>
+                <div class="indicator-breakdown">
                     {% for key, value in indicator.country_wide_report.items %}
                         {% if key != indicator_reports_field %}
-                            <div class="indicator-desc row"><div class="variable-name col-sm-6">{{key}}</div><div class="variable-val col-sm-6">{{value}}</div></div>
+                            <div class="indicator-desc"><span class="variable-name">{{key}}</span><span class="variable-val">{{value}}</span></div>
                         {% endif %}
                     {% endfor %}
                 </div>
