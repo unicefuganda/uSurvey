@@ -50,7 +50,7 @@
     </table>
 
     {% paginate %}
-    <div class="paginate_msg">Total {{ page_obj.paginator.count }} entries. Showing {{ page_obj}}</div>
+    <div class="paginate_msg">Total {{ page_obj.paginator.count }} entries. <?php  echo $journal_row['url'];?></div>
 {% endif %}
 {% endblock %}
 {% block javascripts %}

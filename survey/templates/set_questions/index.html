@@ -79,8 +79,8 @@
 {% block content %}
 
 <div class="modal fade" id="test_flow" tabindex="-1" role="dialog"  aria-hidden="true" style="background: none !important;box-shadow: none !important;">
-        <div class="modal-dialog" style="background: none !important;">
-            <div class="modal-content" style="background: none !important;box-shadow: none !important; border: none !important;">
+        <div class="modal-dialog modal-dialog-1" style="background: none !important;">
+            <div class="modal-content modal-content-1" style="background: none !important;box-shadow: none !important; border: none !important;">
               <div class="modal-body test_flow_modal" style="background: none !important;">
                 {% include "interviews/new_interview.html" with action=batch.id|get_url_with_ids:"test_qset_flow" title="Preview" %}
               </div>
@@ -91,7 +91,10 @@
     $(document).ready(function(){
         var img = new Image();
         img.src = $('.iphone_bg').first().css('background-image').replace(/url\(|\)$|"/ig, '');
-        $('.modal-dialog, .modal-content, .iphone_bg').width(img.width);
+        // first time its getting img width is 0 after page refresh 333
+        //$('.modal-dialog-1, .modal-content-1, .iphone_bg').width(img.width);
+        // tTook new classes for preview due to css issue
+        $('.modal-dialog-1, .modal-content-1, .iphone_bg').width('333');
       });
     </script>
     {% if batch %}
@@ -289,7 +292,7 @@
 </table>
 
 {% paginate %}
-<div class="paginate_msg">Total {{ page_obj.paginator.count }} entries. Showing {{ page_obj}}</div>
+<div class="paginate_msg">Total {{ page_obj.paginator.count }} entries. <?php  echo $journal_row['url'];?></div>
 {% if batch and batch.interviews.count == 0 %}<br/>
     <button type="submit" href="#batch_{{batch.pk}}" data-toggle="modal" class="btn btn-primary pull-right" name="save_button" {% if batch.has_loop or batch.has_skip %}onclick="return false;"{% endif %}>Update Question Order</button>
       {% if batch.has_loop or batch.has_skip %}
@@ -318,10 +321,9 @@
 
 {% block javascripts %}
 <link rel="stylesheet" href="{{ STATIC_URL }}css/dataTables.bootstrap.css" type="text/css">
-<script type="text/javascript" src="https://code.jquery.com/jquery-1.12.4.js"></script>
 <script src="{{ STATIC_URL }}/js/jquery.dataTables.js"></script>
 <script src="{{ STATIC_URL }}/js/dataTables.bootstrap.js" type="text/javascript" charset="utf-8"></script>
-<script src="{{STATIC_URL}}js/jquery.validate.js" type="text/javascript" charset="utf-8"></script>
+
             
     {% if batch %}
         <script src="{{ STATIC_URL }}js/jquery.tablednd.js" type="text/javascript" charset="utf-8"></script>
