@@ -180,7 +180,7 @@
         }
 
 {% if device.is_small %}
-    
+
 {% else %}
     #displays, #indicators-tab, #main-contents-tab, .chzn-select  {
         z-index: 10;
@@ -214,7 +214,7 @@
         
     </ul>
  <div class="tab-content r_tab-content container">
-     {% if not device.is_small %}
+     {% if device.is_small %}
         <div id="main-contents-tab">
             <div class="row r-row">
                 <div class="col-md-12">
