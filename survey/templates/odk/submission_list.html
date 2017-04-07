@@ -14,10 +14,9 @@
             <thead>
             <tr>
                 <th>Enumeration Area</th>
-                <th>Household Number</th>
-				<th>Household Member</th>
 				<th>Interviewer</th>
                 <th>Survey</th>
+                <th>Batch</th>
                 <th>Form Id</th>
                 <th>Submission Instance</th>
 		<th>Submission Date</th>
@@ -28,19 +27,16 @@
             {% for submission in submissions %}
                 <tr>
                     <td>
-                        {{ submission.household.listing.ea }}
-                    </td>
-                    <td>
-                        {{ submission.household.house_number }}
-                    </td>
-					<td>
-                        {{ submission.household_member.first_name}}, {{submission.household_member.surname }}
+                        {{ submission.ea }}
                     </td>
                     <td>
                         {{ submission.interviewer.name }}
                     </td>
                     <td>
 						{{ submission.survey.name }}
+                    </td>
+                    <td>
+						{{ submission.question_set.name }}
                     </td>
                     <td>
                         {{ submission.form_id }}
