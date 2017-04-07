@@ -645,7 +645,7 @@ updateIndicators = function(property) {
                                         <div class="col-sm-12">';
      var styleIndex = 0;
      for (var name in indicatorData){
-        styleIndex = styleIndex%4+2;
+        styleIndex = styleIndex%3+2;
         indicatorTable.innerHTML += getIndicatorHtml(name, property, styleIndex);
         styleIndex++;
      }
