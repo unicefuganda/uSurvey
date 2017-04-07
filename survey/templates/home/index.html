@@ -47,14 +47,14 @@
             box-shadow: none;
             min-height: 600px;
             margin-bottom: 130px;
-            width: 85%;
+            width: 100% !important;
             margin-left: auto;
             margin-right: auto;
-            z-index: 2;
+            z-index: 50;
         }
         @media only screen and (max-width:767px) {
             #survey_map {
-               width: 100%;
+               width: 100% !important;
                margin-bottom: 10px;
                min-height:380px;
                margin-left: 10px;
@@ -213,7 +213,7 @@
         <li ><a data-toggle="tab" href="#indicators-tab">INDICATORS</a></li>
         
     </ul>
- <div class="tab-content r_tab-content container">
+ <div class="container">
      {% if device.is_small %}
         <div id="main-contents-tab">
             <div class="row r-row">
@@ -221,14 +221,13 @@
                     <div class="map-show">
                         <div id="survey_map" class="center-block"></div>
                     </div>
-                    <p>&nbsp;</p><p>&nbsp;</p>
                 </div>
             </div>
             <div class="row r-row">
                 <div id="displays" class="col-md-12">
                     <div id="map-controls" class="row r-row">
                         <div class="rat_h3_3 col-md-12">Survey</div>
-                        {{map_filter}}
+                        <div class="col-md-12">{{map_filter}}</div>
                     </div>
                     <div id="indicators-tab" class="tab-pane fade row r-row">
                         <div  id="indicator-table" class="col-md-12">
@@ -251,7 +250,7 @@
                     <div id="displays" class="col-md-3">
                         <div id="map-controls" class="row r-row">
                             <div class="rat_h3_3 col-md-12">Survey</div>
-                            {{map_filter}}
+                            <div class="col-md-12">{{map_filter}}</div>
                         </div>
                         <div id="indicators-tab" class="tab-pane fade row r-row">
                             <div  id="indicator-table" class="col-md-12">
@@ -269,7 +268,6 @@
                         <div class="map-show">
                             <div id="survey_map" class="center-block"></div>
                         </div>
-                        <p>&nbsp;</p><p>&nbsp;</p>
                     </div>
                 </div>
             </div>
