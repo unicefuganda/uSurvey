@@ -359,7 +359,40 @@
     </ul>
      <div class="container">
      {% if device.is_small %}
-
+             <div class="row r-row" >
+                <div class="col-md-12">
+                    <div class="container-fluid" style="padding: 0; margin: 0;">
+                        <div id="map-controls" class="row r-row"  style="padding: 0; margin: 0;">
+                            <div class="rat_h3_3 col-md-12"  style="padding: 0; margin: 0;">Survey</div>
+                            <div class="col-md-12"  style="padding: 0; margin: 0;">{{map_filter}}</div>
+                        </div>
+                     </div>
+                </div>
+             </div>
+             <div class="row r-row" >
+                <div class="col-md-12">
+                    <div class="map-show"  style="padding: 0; margin: 0;">
+                        <div id="survey_map" class="center-block"></div>
+                    </div>
+                </div>
+             </div>
+             <div class="row r-row">
+                <div id="displays" class="col-md-4">
+                    <div class="container-fluid" style="padding: 0; margin: 0;">
+                        <div id="indicators-tab" class="tab-pane fade row r-row" style="padding: 0; margin: 0;">
+                            <div  lass="col-md-12" style="padding: 0; margin: 0;">
+                                {% include "home/_indicator_display.html" %}
+                            </div>
+                        </div>
+                        <div id="loc-stats-tab" class="tab-pane fade  in active row r-row">
+                            <div id="info-update" class="row r-row">{% include 'page_loader.html' %}</div>
+                            <br/>
+                            <div id="map-legend" class="row r-row">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
      {%else%}
 
             <div class="row r-row" >

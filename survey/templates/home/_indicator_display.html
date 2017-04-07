@@ -2,8 +2,8 @@
         <div class="row indicators indicator-{{indicator.survey.id}}"  style="font-family: Open Sans; ">
             <div class="col-sm-12">
                 {% for indicator in display_indicators %}
-                    <div class="hero-description poll-hero-title indic-{{ forloop.counter }}">
-                           <span class="tite1">{{ indicator.country_wide_value }}</span> <i>{{ indicator.name }}</i>
+                    <div class="hero-description poll-hero-title indic-{% cycle 1 2 3 4 5 %}">
+                           <span class="tite{% cycle 1 2 3 4 5 %}">{{ indicator.country_wide_value }}</span> <i>{{ indicator.name }}</i>
                             {% for key, value in indicator.country_wide_report.items %}
                                 {% if key != indicator_reports_field %}
                                     <p><span>{{value}}</span> {{key}}</p>
