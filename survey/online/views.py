@@ -46,6 +46,7 @@ def respond(request):
         access_form = UserAccessForm()
     template_file = "interviews/answer.html"
     context = {'button_label': 'send', 'answer_form': access_form,
+               'ussd_session_timeout': settings.USSD_TIMEOUT,
                'template_file': template_file,
                'id': 'interview_form',
                }
@@ -135,6 +136,7 @@ class OnlineInterview(OnlineHandler):
         context = {'button_label': 'send', 'answer_form': interview_form,
                    'template_file': template_file,
                    'access': access,
+                   'ussd_session_timeout': settings.USSD_TIMEOUT,
                    'id': 'interview_form',
                    'action': self.action_url
                    }

@@ -5,8 +5,7 @@ from django.contrib import messages
 from django.core.exceptions import ValidationError
 from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth.decorators import permission_required
-from survey.forms.filters import QuestionFilterForm,  \
-    MAX_NUMBER_OF_QUESTION_DISPLAYED_PER_PAGE, DEFAULT_NUMBER_OF_QUESTION_DISPLAYED_PER_PAGE
+from survey.forms.filters import QuestionFilterForm
 from survey.models import Question, QuestionSet
 from survey.models import QuestionFlow
 from survey.models import QuestionSet
@@ -27,39 +26,28 @@ ADD_SUBQUESTION_ON_OPEN_BATCH_ERROR_MESSAGE = "Subquestions cannot be added whil
 REMOVE_QUESTION_FROM_OPEN_BATCH_ERROR_MESSAGE = "Question cannot be removed from a batch while the batch is open."
 
 
-def _max_number_of_question_per_page(number_sent_in_request):
-    max_question_per_page_supplied = number_sent_in_request or 0
-    given_max_per_page = min(
-        int(max_question_per_page_supplied), MAX_NUMBER_OF_QUESTION_DISPLAYED_PER_PAGE)
-    return max(given_max_per_page, DEFAULT_NUMBER_OF_QUESTION_DISPLAYED_PER_PAGE)
-
 @permission_required('auth.can_view_batches')
 def index(request, qset_id):
     # now I'm gonna call question set a batch of questions. If there's time, I'll rename them properly
     # So don't get confused :)
     batch = QuestionSet.get(pk=qset_id)
     questions = batch.questions_inline()
-    max_per_page = None
     if request.method == 'GET':
-        question_filter_form = QuestionFilterForm(
-            data=request.GET, qset=batch)
+        question_filter_form = QuestionFilterForm(data=request.GET, qset=batch)
         search_fields = ['identifier',  'text', ]
         qset_questions = batch.questions.all()      # basically using this make use of db filters
-        if request.GET.has_key('q'):
+        if 'q' in request.GET:
             questions = get_filterset(qset_questions, request.GET['q'], search_fields)
-        relevant_questions = question_filter_form.filter(qset_questions)
-        relevant_ids = [q.id for q in relevant_questions]
+        relevant_ids = list(question_filter_form.filter(qset_questions).values_list('id', flat=True))
         questions = [q for q in questions if q.id in relevant_ids]
         # now maintain same inline other exclusing questions in
-        max_per_page = _max_number_of_question_per_page(
-            request.GET.get('number_of_questions_per_page', 0))
     else:
         question_filter_form = QuestionFilterForm(qset=batch)
     #question_library =  question_filter_form.filter(QuestionTemplate.objects.all())
     breadcrumbs = Question.index_breadcrumbs(qset=batch)
     if breadcrumbs:
         request.breadcrumbs(breadcrumbs)
-    context = {'questions': questions, 'request': request, 'batch': batch, 'max_question_per_page': max_per_page,
+    context = {'questions': questions, 'request': request, 'batch': batch,
                'question_filter_form': question_filter_form,
                'placeholder': 'identifier, text',
                'template_file': 'interviews/answer.html',   # caution atleast on ODK access

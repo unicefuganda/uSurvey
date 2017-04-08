@@ -286,7 +286,7 @@ class QuestionSet(CloneableMixin, BaseModel):   # can be qset, listing, responde
     objects = InheritanceManager()
     name = models.CharField(max_length=100, blank=False, null=True, db_index=True)
     description = models.CharField(max_length=300, blank=True, null=True)
-    start_question = models.OneToOneField(Question, related_name='starter_%(class)s',
+    start_question = models.OneToOneField(Question, related_name='qset_started',
                                           null=True, blank=True, on_delete=models.SET_NULL)
     @property
     def to_exact(self):
@@ -387,6 +387,7 @@ class QuestionSet(CloneableMixin, BaseModel):   # can be qset, listing, responde
 
     def questions_inline(self):
         qflows = self.inline_flows()
+        start_question_id = None
         @cached_as(QuestionSet.objects.get(id=self.id),
                    Question.objects.filter(qset__id=self.id),
                    QuestionFlow.objects.filter(question__qset__id=self.id),
@@ -401,6 +402,7 @@ class QuestionSet(CloneableMixin, BaseModel):   # can be qset, listing, responde
                 return inlines
             else:
                 return []
+        #>import pdb; pdb.set_trace()
         return _questions_inline()
 
     def previous_inlines(self, question):

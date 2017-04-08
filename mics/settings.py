@@ -364,6 +364,7 @@ MAP_ZOOM_LEVEL = 7
 USSD_MOBILE_NUMBER_FIELD = 'msisdn'             # for get or post request
 USSD_MSG_FIELD = 'ussdRequestString'            # for get or post request
 USSD_RESPONSE_FORMAT = 'responseString=%(response)s&action=1'
+USSD_TIMEOUT = 180          # timeout in seconds
 
 RESULT_REFRESH_FREQ = 6
 MEMORIZE_TIMEOUT = 120

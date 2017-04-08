@@ -15,22 +15,8 @@
 {% else %}
 <div class="row" id="preview-container">
    <div class="row">
-      <div class="col-md-3">
-         {% comment %}
-         {% if access.choice_name == 'Ussd Access' and timeout_form %}
-            {% include "naked_form.html" with a_form=timeout_form %}
-           <div class="control-group">
-             <label class="control-label">Timer</label>
-             <div class="controls">
-               <div id="timer" class="span1">
-                 03 min 00 sec
-               </div>
-             </div>
-           </div>
-         <script src="{{STATIC_URL}}/js/jquery.countdown.js" type="text/javascript" charset="utf-8"></script>
-         <script src="{{STATIC_URL}}js/simulator.js" type="text/javascript" charset="utf-8"></script>
-         {% endif %}
-         {% endcomment %}
+      <div class="col-md-6">
+
       </div>
       <div>
          <!-- Mobile view start-->

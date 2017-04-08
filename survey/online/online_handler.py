@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 __author__ = 'anthony <antsmc2@gmail.com>'
 from django.utils import timezone
+from django.conf import settings
 from django.shortcuts import render
 from survey.models import (InterviewerAccess, QuestionLoop, QuestionSet, Answer, Question,
                            SurveyAllocation, AnswerAccessDefinition, ODKAccess, Interviewer, Interview)
@@ -122,6 +123,7 @@ class OnlineHandler(object):
                    'interview': interview,
                    'survey': interview.survey,
                    'access': access,
+                   'ussd_session_timeout': settings.USSD_TIMEOUT,
                    # for display, use answer as text. Answer as value is used for group and question logic
                    'existing_answers': session_data.get('answers', {}),
                    'loops': session_data.get('loops', []),
