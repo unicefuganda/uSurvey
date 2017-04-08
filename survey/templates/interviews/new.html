@@ -8,19 +8,20 @@
 <link rel="stylesheet" href="{{ STATIC_URL }}assets/formstyleres.css" />
 <link rel="stylesheet" href="{{ STATIC_URL }}css/flipclock.css" />
 <style>
-    #preview-container {
-        margin: 0;
-        padding: 0;
+    #preview-container, #preview-container .col-md-12  {
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100%;
     }
 </style>
 {% endblock %}
 {% block content %}
     <div id="preview-container" class="container">
-        <div class="row">
+        <div class="row" style="margin: 0; padding: 0;">
             {% if access %}
                 {% if access.choice_name == 'Ussd Access' %}
                    <div class="col-md-6">
-                      <div class="container-fluid">
+                      <div class="container-fluid" id="countdown-container" >
                         <div class="row">
                             <div class="col-md-12" id="timer">
 
