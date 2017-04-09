@@ -23,22 +23,28 @@
 </div>
 <script type="text/javascript">
    $(document).ready(function(){
+        updateProgress = function(text) {
+            var i = 0;
+            var interval = setInterval(function() {
+                  i = ++i % 10;
+                  $("#download-status").text(text + Array(i+1).join("."));
+                }, 1000);
+            return interval;
+        }
         $('#download_excel').click(function(event){
             event.preventDefault();
             var form = $(this).closest('form');
             arr = form.serializeArray();
             arr.push({'name': this.name, 'value': this.value});
             $('#progress_modal').modal('show');
-            i = 0;
-            var interval = setInterval(function() {
-                  i = ++i % 10;
-                  $("#download-status").text("Report is being generated. Please wait" + Array(i+1).join("."));
-                }, 1000);
+            var interval = updateProgress("Report is being generated. Please wait");
             $.ajax({
                 url  : '.?'+$.param(arr),
                 data: arr,
                 method: 'GET',
                 success: function(data){
+                    clearInterval(interval);
+                    interval = updateProgress("Retrieving file");
                     download(data, $('#id_survey option:selected').text()+ '-'+$('#id_batch option:selected').text()+'.csv', 'text/csv');
                     clearInterval(interval);
                     $('#progress_modal').modal('hide');
