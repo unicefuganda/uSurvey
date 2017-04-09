@@ -131,7 +131,8 @@ def download(request):
                 response = HttpResponse(content_type='text/csv')
                 response['Content-Disposition'] = 'attachment; filename="%s.csv"' % file_name
                 reports_df.to_csv(response, columns=reports_df.columns[1:])   #exclude interview id
-                messages.info(request, "Download successfully downloaded")
+                if not request.is_ajax():
+                    messages.info(request, "Download successfully downloaded")
                 return response
     loc_types = LocationType.in_between()
     return render(request, 'aggregates/download_excel.html',

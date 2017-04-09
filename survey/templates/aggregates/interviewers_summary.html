@@ -28,12 +28,11 @@
           <th>
             Enumeration Area
           </th>
-          <!-- th>
-            Total Households in E.A.
-          </th -->
-
           <th>
-            Total Registered
+            Presently Assigned EA Interviews
+          </th>
+          <th>
+            Total Interviews
           </th>
         </tr>
       </thead>
@@ -46,12 +45,11 @@
             <td>
               {{ interviewer.ea.name }}
             </td>
-            <!-- td>
-              {{ interviewer.ea.total_households }}
-            </td -->
-
             <td>
-              {{ interviewer.present_households.count }}
+              {{ interviewer.present_interviews }}
+            </td>
+            <td>
+              {{ interviewer.interviews.count }}
             </td>
           </tr>
         {% endfor %}

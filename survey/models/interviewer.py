@@ -56,6 +56,11 @@ class Interviewer(BaseModel):
         return self.assignments.filter(status=SurveyAllocation.PENDING)
 
     @property
+    def present_interviews(self):
+        return self.interviews.filter(ea__in=[a.allocation_ea for a in self.unfinished_assignments]).count()
+
+
+    @property
     def age(self):
         return relativedelta(timezone.now().date(), self.date_of_birth).years
 
