@@ -129,7 +129,7 @@ def download(request):
                                       last_selected_loc else '', batch.name if batch else survey.name)
                 reports_df = download_service.generate_interview_reports()
                 response = HttpResponse(content_type='text/csv')
-                response['Content-Disposition'] = 'attachment; filename="%s.csv"' % file_name
+                response['Content-Disposition'] = 'attachment; filename=%s.csv' % file_name
                 reports_df.to_csv(response, columns=reports_df.columns[1:])   #exclude interview id
                 if not request.is_ajax():
                     messages.info(request, "Download successfully downloaded")
