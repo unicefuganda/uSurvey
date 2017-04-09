@@ -32,6 +32,9 @@
             return interval;
         }
         $('#download_excel').click(function(event){
+            if(!$('#id_batch').val())
+                return true;
+            // else rest follows
             event.preventDefault();
             var form = $(this).closest('form');
             arr = form.serializeArray();
