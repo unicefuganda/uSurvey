@@ -118,6 +118,8 @@
       <link rel="stylesheet" href="{{ STATIC_URL }}toassets/font-awesome.css" type="text/css" media="all"  />
        <link href="{{ STATIC_URL }}css/jquery-ui.css" rel="stylesheet" type="text/css"/>
        <link href="{{ STATIC_URL }}chosen/chosen.css" rel="stylesheet" type="text/css"/>
+
+
       <script type="text/javascript" src="{{ STATIC_URL }}toassets/jquery_005.js"></script>
        <!-- <script type="text/javascript" src="{{ STATIC_URL }}toassets/jquery.js"></script> -->
        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
@@ -129,7 +131,8 @@
         <script src="{{STATIC_URL}}js/select2.full.js"></script>
         <script src='http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
       <script type="text/javascript" src="{{ STATIC_URL }}toassets/menjs.js"></script>
-
+       <link href="http://cdn.jsdelivr.net/qtip2/3.0.3/jquery.qtip.min.css" rel="stylesheet" type="text/css"/>
+        <script type="text/javascript" src="http://cdn.jsdelivr.net/qtip2/3.0.3/jquery.qtip.min.js"></script>
        {% block extra_head %}
 
        {% endblock %}
@@ -463,7 +466,7 @@
       </div>
       <!--================= Box Div Start ==================-->
       <script type="text/javascript" src="{{ STATIC_URL }}toassets/bootstrap.js"></script>
-      <script type="text/javascript" src="{{ STATIC_URL }}toassets/jquery_002.js"></script>      
+      <script type="text/javascript" src="{{ STATIC_URL }}toassets/jquery_002.js"></script>
       <script src="{{ STATIC_URL }}js/jquery-ui.min.js" type="text/javascript" charset="utf-8"></script>
       <script src="{{ STATIC_URL }}js/jquery.dataTables.js"></script>
       <script src="{{ STATIC_URL }}js/dataTables.bootstrap.js" type="text/javascript" charset="utf-8"></script>
@@ -512,6 +515,7 @@
            });
 		});
         $('.multi-select').multiSelect();
+        $( 'form span[title]' ).qtip();
         </script>
       {% block javascripts %}
 

@@ -46,7 +46,7 @@ def get_question_form(model_class):
                 self.fields['module'].empty_label = 'Select Module'
             if self.fields.has_key('group'):
                 self.fields['group'].empty_label = 'Select Group'
-
+            self.fields['text'].help_text = "To get previous identifier suggestions, type {{ any time"
             self.parent_question = parent_question
             self.order_fields(['module', 'group', 'identifier', 'text', 'answer_type', 'mandatory'])
 
@@ -54,7 +54,7 @@ def get_question_form(model_class):
             model = model_class
             exclude = []
             widgets = {
-                'text': forms.Textarea(attrs={"rows": 5, "cols": 30, "maxlength": "150"}),
+                'text': forms.Textarea(attrs={"rows": 5, "cols": 30, "maxlength": "150",}),
             }
 
         def clean_options(self):

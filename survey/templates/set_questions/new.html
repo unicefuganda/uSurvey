@@ -104,6 +104,11 @@
                    make_suggestions('#id_text', "{% url 'qset_identifiers' %}?id={{batch.pk}}{% if questionform.instance.id %}&q_id={{questionform.instance.id}}{% endif %}");
                    this.focus();
                 });
+                $('#id_answer_type').change(function(){
+                    help_text = channel_map[$('#id_answer_type').val()].join(' and ');
+                    $('#id_answer_type_tip').text(help_text);
+                    //$( '.id_answer_type_tip[title]' ).qtip();
+                });
             });
         </script>
 {% endblock %}
