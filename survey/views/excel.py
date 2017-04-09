@@ -130,7 +130,7 @@ def download(request):
                 file_name = '%s%s' % ('%s-%s-' % (last_selected_loc.type.name, last_selected_loc.name) if
                                       last_selected_loc else '', batch.name if batch else survey.name)
                 reports_df = download_service.generate_interview_reports()
-                response = HttpResponse(content_type='text/csv')
+                response = HttpResponse(content_type='application/csv')
                 string_buf = StringIO()
                 reports_df.to_csv(string_buf, columns=reports_df.columns[1:])
                 string_buf.seek(0)
