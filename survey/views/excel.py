@@ -1,4 +1,5 @@
 import csv
+from StringIO import StringIO
 from datetime import datetime
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseNotFound
@@ -19,6 +20,7 @@ from rq import get_current_job
 import json
 from django.core.cache import cache
 from channels import Group
+from survey.utils.zip import InMemoryZip
 from mics.routing import get_group_path
 
 
@@ -129,8 +131,14 @@ def download(request):
                                       last_selected_loc else '', batch.name if batch else survey.name)
                 reports_df = download_service.generate_interview_reports()
                 response = HttpResponse(content_type='text/csv')
-                response['Content-Disposition'] = 'attachment; filename=%s.csv' % file_name
-                reports_df.to_csv(response, columns=reports_df.columns[1:])   #exclude interview id
+                string_buf = StringIO()
+                reports_df.to_csv(string_buf, columns=reports_df.columns[1:])
+                string_buf.seek(0)
+                response['Content-Disposition'] = 'attachment; filename=%s.zip' % file_name
+                zip_file = InMemoryZip()
+                zip_file.append("%s.csv" % file_name, string_buf.read())
+                response.write(zip_file.read())
+                   #exclude interview id
                 if not request.is_ajax():
                     messages.info(request, "Download successfully downloaded")
                 return response
