@@ -131,16 +131,15 @@ class LocationFilterForm(forms.Form):
 class SurveyBatchFilterForm(forms.Form):
     AS_TEXT = 1
     AS_LABEL = 0
-    survey = forms.ModelChoiceField(
-        queryset=Survey.objects.all().order_by('name'), empty_label='----')
-    batch = forms.ModelChoiceField(queryset=Batch.objects.all(
-    ).order_by('name'), empty_label='----', required=False)
+    survey = forms.ModelChoiceField(queryset=Survey.objects.all().order_by('name'), empty_label='Choose Survey',
+                                    widget=forms.Select(attrs={'class': 'chzn-select'}))
+    batch = forms.ModelChoiceField(queryset=Batch.objects.all().order_by('name'), empty_label='Choose Batch',
+                                   required=False, widget=forms.Select(attrs={'class': 'chzn-select'}))
     multi_option = forms.ChoiceField(
-        choices=[(AS_TEXT, 'As Text'), (AS_LABEL, 'As Value')])
+        choices=[(AS_TEXT, 'As Text'), (AS_LABEL, 'As Value'), ], widget=forms.Select(attrs={'class': 'chzn-select'}))
 
     def __init__(self, *args, **kwargs):
         super(SurveyBatchFilterForm, self).__init__(*args, **kwargs)
-        # import  pdb; pdb.set_trace()
         if self.data.get('survey'):
             survey = Survey.objects.get(id=self.data['survey'])
             self.fields['batch'].queryset = survey.batches.all()
