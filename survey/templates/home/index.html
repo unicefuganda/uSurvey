@@ -334,7 +334,7 @@
          left: 0;
       }
 
-{% if not device.is_small %}
+{% if device.is_small %}
     #info-update {
         margin-top: 15px;
     }
@@ -371,7 +371,7 @@
 
     </ul>
      <div class="container">
-     {% if not device.is_small %}
+     {% if device.is_small %}
              <div class="row r-row">
                 <div class="col-md-12" >
                     <div class="container-fluid" style="padding: 0; margin: 0;">
