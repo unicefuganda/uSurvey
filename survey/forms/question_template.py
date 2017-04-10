@@ -3,7 +3,7 @@ from django.forms import ModelForm, ValidationError
 import re
 from django.conf import settings
 from survey.models import (QuestionTemplate, TemplateOption, Answer, QuestionModule, MultiChoiceAnswer,
-                           MultiSelectAnswer, QuestionFlow, AnswerAccessDefinition, USSDAccess)
+                           MultiSelectAnswer, QuestionFlow, AnswerAccessDefinition, USSDAccess, AutoResponse)
 from survey.models import ParameterTemplate
 from survey.forms.form_helper import FormOrderMixin
 
@@ -23,7 +23,8 @@ def get_question_templates_form(model_class):
                     AnswerAccessDefinition.access_channels(instance.answer_type))
                 self.fields['answer_type'].help_text = self.help_text
             self.fields['answer_type'].choices = [(name, name) for name in
-                                                  AnswerAccessDefinition.answer_types(USSDAccess.choice_name())]
+                                                  AnswerAccessDefinition.answer_types(USSDAccess.choice_name())
+                                                  if name != AutoResponse.choice_name()]
             self.answer_map = {}            # key,val pair of supported access channels for each answer type
             # not much needed since we are only restricting to USSD access
             definitions = AnswerAccessDefinition.objects.filter()
