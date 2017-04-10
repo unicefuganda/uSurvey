@@ -326,11 +326,20 @@
                font-weight:bold;
 
             }
+    #indicators-tab, #loc-stats-tab {
+           position: absolute;
+           display: block;
+          width: 100%;
+          top: 0;
+         left: 0;
+      }
 
-
-{% if device.is_small %}
+{% if not device.is_small %}
     #info-update {
         margin-top: 15px;
+    }
+    #loc-tab-stat-container {
+        position: relative;
     }
 {% else %}
     #displays, #indicators-tab, #main-contents-tab, .chzn-select  {
@@ -342,12 +351,6 @@
       padding: 10px;
     }
 
-
-    #indicators-tab, #loc-stats-tab {
-           position: absolute;
-           display: block;
-          width: 100%;
-      }
 {% endif %}
     #home_display .container-fluid {
         padding-left: 0 !important;
@@ -368,7 +371,7 @@
 
     </ul>
      <div class="container">
-     {% if device.is_small %}
+     {% if not device.is_small %}
              <div class="row r-row">
                 <div class="col-md-12" >
                     <div class="container-fluid" style="padding: 0; margin: 0;">
@@ -388,13 +391,13 @@
              </div>
              <div class="row r-row"  style="padding: 0; margin: 0;" >
                 <div id="displays" class="col-md-12">
-                    <div class="container-fluid" style="padding: 0; margin: 0;">
-                        <div id="indicators-tab" class="tab-pane fade row r-row" style="padding: 0; margin: 0;">
-                            <div  class="col-md-12" style="padding: 0; margin: 0;">
+                    <div id="loc-tab-stat-container" class="container-fluid" style="padding: 0; margin: 0;">
+                        <div id="indicators-tab" class="tab-pane fade container-fluid" style="padding: 0; margin: 0;">
+                            <div  class="row r-row" style="padding: 0; margin: 0;">
                                 {% include "home/_indicator_display.html" %}
                             </div>
                         </div>
-                        <div id="loc-stats-tab" class="tab-pane fade  in active row r-row" style="padding: 0; margin: 0;">
+                        <div id="loc-stats-tab" class="tab-pane fade  in active container-fluid" style="padding: 0; margin: 0;">
                             <div id="map-legend" class="row r-row"></div>
                             <div id="info-update" class="row r-row">&nbsp;</div>
                         </div>
