@@ -176,7 +176,9 @@
     <!--Indicators styles start-->
      #home_display .row, #home_display .r-row {
          padding: 0 !important;
-         margin: 0 !important;
+         /*margin: 0 !important;*/
+         margin-left: -8px !important;
+         margin-top: 10px !important;
      }
     #home_display .col-md-12 {
         width: 100% !important;
@@ -371,7 +373,7 @@
                 <div class="col-md-12" >
                     <div class="container-fluid" style="padding: 0; margin: 0;">
                         <div id="map-controls" class="row r-row"  style="padding: 0; margin: 0;">
-                            <div class="rat_h3_3 col-md-12"  style="padding: 0; margin: 0;">Survey</div>
+                            <div class="rat_h3_3 col-md-12"  style="padding: 0; margin: 0;margin-bottom: 10px;">Survey</div>
                             <div class="col-md-12"  style="padding: 0; margin: 0;">{{map_filter}}</div>
                         </div>
                      </div>
@@ -406,11 +408,11 @@
                 <div id="displays" class="col-md-4">
                     <div class="container-fluid" style="padding: 0; margin: 0;">
                         <div id="map-controls" class="row r-row"  style="padding: 0; margin: 0;">
-                            <div class="rat_h3_3 col-md-12"  style="padding: 0; margin: 0;">Survey</div>
+                            <div class="rat_h3_3 col-md-12"  style="padding: 0; margin: 0;margin-bottom: 10px;">Survey</div>
                             <div class="col-md-12"  style="padding: 0; margin: 0;">{{map_filter}}</div>
                         </div>
                         <div id="indicators-tab" class="tab-pane fade row r-row" style="padding: 0; margin: 0;">
-                            <div  lass="col-md-12" style="padding: 0; margin: 0;">
+                            <div  class="col-md-12" style="padding: 0; margin: 0;">
                                 {% include "home/_indicator_display.html" %}
                             </div>
                         </div>
@@ -637,7 +639,7 @@ getIndicatorHtml = function(name, property, styleIndex) {
 
 updateIndicators = function(property) {
      indicatorTable.innerHTML = '<div class="row r-row">\
-                                        <div class="col-sm-12">\
+                                        <div style="margin-left:-8px !important;" class="col-sm-12">\
                                             <p style="font-size:17px; color:#8c203d; font-weight:bold;">' + property + '</p>\
                                          </div>\
                                     </div>\
