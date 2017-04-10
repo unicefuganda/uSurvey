@@ -329,7 +329,9 @@
 
 
 {% if device.is_small %}
-
+    #info-update {
+        margin-top: 15px;
+    }
 {% else %}
     #displays, #indicators-tab, #main-contents-tab, .chzn-select  {
         z-index: 10;
@@ -393,9 +395,8 @@
                             </div>
                         </div>
                         <div id="loc-stats-tab" class="tab-pane fade  in active row r-row" style="padding: 0; margin: 0;">
-                            <div id="map-legend" class="col-md-12">
-                            <div id="info-update" class="col-md-12">{% include 'page_loader.html' %}</div>
-                            </div>
+                            <div id="map-legend" class="col-md-12"></div>
+                            <div id="info-update" class="col-md-12">&nbsp;</div>
                         </div>
                     </div>
                 </div>
