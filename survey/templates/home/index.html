@@ -327,11 +327,8 @@
 
             }
     #indicators-tab, #loc-stats-tab {
-           position: absolute;
            display: block;
           width: 100%;
-          top: 0;
-         left: 0;
       }
 
 {% if device.is_small %}
@@ -341,6 +338,11 @@
     #loc-tab-stat-container {
         position: relative;
     }
+    #indicators-tab, #loc-stats-tab {
+       position: absolute;
+      top: 0;
+     left: 0;
+  }
 {% else %}
     #displays, #indicators-tab, #main-contents-tab, .chzn-select  {
         z-index: 10;
