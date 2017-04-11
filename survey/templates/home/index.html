@@ -5,6 +5,7 @@
 <style>
       #id_survey_chosen{
         margin-left: -3px;
+        width: 300px !important;
       }
       .dataTables_wrapper .row:first-child {
     padding-top: 0px !important;
@@ -40,7 +41,9 @@
          text-align:center;
          }
 
-
+        .chzn-select {
+            width: 100% !important;
+        }
 
         #survey_map {
             border: none;
@@ -176,7 +179,9 @@
     <!--Indicators styles start-->
      #home_display .row, #home_display .r-row {
          padding: 0 !important;
-         margin: 0 !important;
+         /*margin: 0 !important;*/
+         margin-left: -8px !important;
+         margin-top: 10px !important;
      }
     #home_display .col-md-12 {
         width: 100% !important;
@@ -327,9 +332,21 @@
 
             }
 
+    #loc-tab-stat-container {
+        position: relative;
+    }
+    #indicators-tab, #loc-stats-tab {
+           position: absolute;
+           top: 0;
+           left: 0;
+           display: block;
+          width: 100%;
+      }
 
 {% if device.is_small %}
-
+    #info-update {
+        margin-top: 15px;
+    }
 {% else %}
     #displays, #indicators-tab, #main-contents-tab, .chzn-select  {
         z-index: 10;
@@ -337,15 +354,9 @@
 
     #indicators-tab span {
       display: inline-block;
-      padding: 10px;
+      padding: 3px;
     }
 
-
-    #indicators-tab, #loc-stats-tab {
-           position: absolute;
-           display: block;
-          width: 100%;
-      }
 {% endif %}
     #home_display .container-fluid {
         padding-left: 0 !important;
@@ -371,7 +382,7 @@
                 <div class="col-md-12" >
                     <div class="container-fluid" style="padding: 0; margin: 0;">
                         <div id="map-controls" class="row r-row"  style="padding: 0; margin: 0;">
-                            <div class="rat_h3_3 col-md-12"  style="padding: 0; margin: 0;">Survey</div>
+                            <div class="rat_h3_3 col-md-12"  style="padding: 0; margin: 0;margin-bottom: 10px;">Survey</div>
                             <div class="col-md-12"  style="padding: 0; margin: 0;">{{map_filter}}</div>
                         </div>
                      </div>
@@ -386,16 +397,15 @@
              </div>
              <div class="row r-row"  style="padding: 0; margin: 0;" >
                 <div id="displays" class="col-md-12">
-                    <div class="container-fluid" style="padding: 0; margin: 0;">
-                        <div id="indicators-tab" class="tab-pane fade row r-row" style="padding: 0; margin: 0;">
-                            <div  class="col-md-12" style="padding: 0; margin: 0;">
+                    <div id="loc-tab-stat-container" class="container-fluid" style="padding: 0; margin: 0;">
+                        <div id="indicators-tab" class="tab-pane fade container-fluid" style="padding: 0; margin: 0;">
+                            <div  class="row r-row" style="padding: 0; margin: 0;">
                                 {% include "home/_indicator_display.html" %}
                             </div>
                         </div>
-                        <div id="loc-stats-tab" class="tab-pane fade  in active row r-row" style="padding: 0; margin: 0;">
-                            <div id="map-legend" class="col-md-12">
-                            <div id="info-update" class="col-md-12">{% include 'page_loader.html' %}</div>
-                            </div>
+                        <div id="loc-stats-tab" class="tab-pane fade  in active container-fluid" style="padding: 0; margin: 0;">
+                            <div id="map-legend" class="row r-row"></div>
+                            <div id="info-update" class="row r-row">&nbsp;</div>
                         </div>
                     </div>
                 </div>
@@ -406,20 +416,24 @@
                 <div id="displays" class="col-md-4">
                     <div class="container-fluid" style="padding: 0; margin: 0;">
                         <div id="map-controls" class="row r-row"  style="padding: 0; margin: 0;">
-                            <div class="rat_h3_3 col-md-12"  style="padding: 0; margin: 0;">Survey</div>
+                            <div class="rat_h3_3 col-md-12"  style="padding: 0; margin: 0;margin-bottom: 10px;">Survey</div>
                             <div class="col-md-12"  style="padding: 0; margin: 0;">{{map_filter}}</div>
                         </div>
-                        <div id="indicators-tab" class="tab-pane fade row r-row" style="padding: 0; margin: 0;">
-                            <div  lass="col-md-12" style="padding: 0; margin: 0;">
-                                {% include "home/_indicator_display.html" %}
+
+                        <div id="loc-tab-stat-container" class="container-fluid" style="padding: 0; margin: 0;">
+                            <div id="indicators-tab" class="tab-pane fade row r-row" style="padding: 0; margin: 0; position: relative;">
+                                <div  lass="col-md-12" style="padding: 0; margin: 0;">
+                                    {% include "home/_indicator_display.html" %}
+                                </div>
+
                             </div>
-                        </div>
-                        <div id="loc-stats-tab" class="tab-pane fade  in active row r-row">
-                            <div id="info-update" class="row r-row">{% include 'page_loader.html' %}</div>
-                            <br/>
-                            <div id="map-legend" class="row r-row">
+                            <div id="loc-stats-tab" class="tab-pane fade  in active row r-row">
+                                <div id="info-update" class="row r-row">{% include 'page_loader.html' %}</div>
+                                <br/>
+                                <div id="map-legend" class="row r-row">
+                                </div>
                             </div>
-                        </div>
+                       </div>
                     </div>
                 </div>
                 <div class="col-md-8">
@@ -637,7 +651,7 @@ getIndicatorHtml = function(name, property, styleIndex) {
 
 updateIndicators = function(property) {
      indicatorTable.innerHTML = '<div class="row r-row">\
-                                        <div class="col-sm-12">\
+                                        <div style="margin-left:-8px !important;" class="col-sm-12">\
                                             <p style="font-size:17px; color:#8c203d; font-weight:bold;">' + property + '</p>\
                                          </div>\
                                     </div>\

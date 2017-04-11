@@ -25,6 +25,7 @@ class InterviewerForm(ModelForm):
         super(InterviewerForm, self).__init__(data=data, *args, **kwargs)
         self.fields.keyOrder = ['name', 'gender', 'date_of_birth',
                                 'level_of_education', 'language',  'ea', 'survey']
+        self.fields['ea'].label = 'Enumeration Area'
         if self.instance:
             try:
                 self.fields['survey'].initial = SurveyAllocation.objects.filter(interviewer=self.instance,
@@ -136,6 +137,7 @@ class ODKAccessForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super(ODKAccessForm, self).__init__(*args, **kwargs)
         self.fields.keyOrder = ['is_active', 'user_identifier', 'odk_token', ]
+        self.fields['odk_token'].label = 'ODK TOKEN'
 
     def clean_user_identifier(self):
         identifier = self.cleaned_data.get('user_identifier', '')
