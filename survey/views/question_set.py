@@ -62,12 +62,16 @@ class QuestionSetView(object):
             qset_form = self.questionSetForm(**form_extra)
         # if qset_form.errors:
         #     messages.error(request, qset_form.errors.values()[0])
+        cancel_url =  reverse('%s_home'%self.model.resolve_tag())
+        if "initial" in form_extra:
+            if "survey" in form_extra['initial']:
+                cancel_url = reverse('batch_index_page', args=[form_extra['initial']['survey']])
         context = {'question_set_form': qset_form,
                    'title': "New %s" % self.model.verbose_name(),
                    'button_label': 'Create',
                    'id': 'add-question_set-form',
                    'model': self.model,
-                   'cancel_url': reverse('%s_home'%self.model.resolve_tag()),
+                   'cancel_url': cancel_url
                    }
         context.update(extra_context)
         return response or render(request, template_name, context)
