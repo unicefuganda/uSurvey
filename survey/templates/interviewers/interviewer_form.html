@@ -31,6 +31,11 @@
             <legend style="color: #034b94;font-weight: bold;">Interviewer Details</legend>
           </div>
 {% include "naked_form.html" with a_form=form %}
+<style type="text/css">
+  .col-md-3 {
+    width: 50% !important;
+}
+</style>
 <div>
   <legend style="color: #034b94;font-weight: bold;">ODK Access</legend>
   {% include "horizontal_naked_form.html" with a_form=odk_access_form %}
