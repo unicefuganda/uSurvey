@@ -3,10 +3,22 @@
 <html lang="en"><head>
 <style type="text/css">
     .form-email input, .form-password input {    
-    padding: 0 65px !important;
+    /*padding: 0 65px !important;*/
+    width: 100%;
 }
 #id_username, #id_password{
     text-align: center;
+}
+@media screen and (min-device-width: 360px) and (max-device-width: 768px) {
+.login-content .form-login {
+    position: relative;
+     z-index: 99; 
+    max-width: 400px;
+    margin-left: auto;
+    margin-top: -35px;
+    margin-bottom: 190px;
+    margin-right: auto;
+}
 }
 </style>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">

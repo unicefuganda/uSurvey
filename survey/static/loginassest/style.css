@@ -1065,7 +1065,7 @@ textarea {
 }
 .form-submit-1 .mc-btn {
   width: 100%;
-  margin-top: 25px;
+  /*margin-top: 25px;*/
   line-height: 40px;
 }
 .list-disc {
