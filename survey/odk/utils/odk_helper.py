@@ -211,14 +211,14 @@ def _get_form_type(survey_tree):
     return int(_get_nodes(FORM_TYPE_PATH, tree=survey_tree)[0].text)
 
 
-def process_submission(interviewer, xml_file, media_files=[], request=None):
+def process_submission(interviewer, xml_file, media_files={}, request=None):
     """extracts and saves the collected data from associated xform.
     """
-    media_files = dict([(os.path.basename(f.name), f) for f in media_files])
+    # media_files = dict([(os.path.basename(f.name), f) for f in media_files])
     return process_xml(interviewer, xml_file.read(), media_files=media_files, request=request)
 
 
-def process_xml(interviewer, xml_blob, media_files=[], request=None):
+def process_xml(interviewer, xml_blob, media_files={}, request=None):
     survey_tree = _get_tree_from_blob(xml_blob)
     form_id = _get_form_id(survey_tree)
     submission_id = _get_submission_id(survey_tree)

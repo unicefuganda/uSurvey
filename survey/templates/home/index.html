@@ -319,7 +319,9 @@
 
               }
 
-
+            .col-md-12 {
+                width: 100% !important;
+            }
 
            .tite4 {
 
@@ -419,17 +421,17 @@
                             <div class="col-md-12"  style="padding: 0; margin: 0;">{{map_filter}}</div>
                         </div>
 
-                        <div id="loc-tab-stat-container" class="container-fluid" style="padding: 0; margin: 0;">
+                        <div id="loc-tab-stat-container" class="container-fluid" style="padding: 0; margin: 0; width: 100%;">
                             <div id="indicators-tab" class="tab-pane fade row r-row" style="padding: 0; margin: 0;">
-                                <div  lass="col-md-12" style="padding: 0; margin: 0;">
+                                <div  class="col-md-12" style="padding: 0; margin: 0; width: 100%;">
                                     {% include "home/_indicator_display.html" %}
                                 </div>
 
                             </div>
                             <div id="loc-stats-tab" class="tab-pane fade  in active row r-row">
-                                <div id="info-update" class="row r-row">{% include 'page_loader.html' %}</div>
+                                <div id="info-update" class="col-md-12" style="padding: 0; margin: 0; width: 100%;">{% include 'page_loader.html' %}</div>
                                 <br/>
-                                <div id="map-legend" class="row r-row">
+                                <div id="map-legend" class="col-md-12" style="padding: 0; margin: 0; width: 100%;">
                                 </div>
                             </div>
                        </div>
