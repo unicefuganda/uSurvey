@@ -5,6 +5,7 @@
 <style>
       #id_survey_chosen{
         margin-left: -3px;
+        width: 300px !important;
       }
       .dataTables_wrapper .row:first-child {
     padding-top: 0px !important;
@@ -355,7 +356,7 @@
 
     #indicators-tab span {
       display: inline-block;
-      padding: 10px;
+      padding: 3px;
     }
 
 {% endif %}
@@ -386,16 +387,16 @@
                             <div class="rat_h3_3 col-md-12"  style="padding: 0; margin: 0;margin-bottom: 10px;">Survey</div>
                             <div class="col-md-12"  style="padding: 0; margin: 0;">{{map_filter}}</div>
                         </div>
-                     </div>
-                </div>
-             </div>
-             <div class="row r-row"   style="padding: 0; margin: 0; " >
+                        <div class="row r-row"   style="padding: 0; margin: 0; " >
                 <div class="col-md-12">
                     <div class="map-show"  style="padding: 0; margin: 0;">
                         <div id="survey_map" class="center-block"></div>
                     </div>
                 </div>
              </div>
+                     </div>
+                </div>
+             </div>             
              <div class="row r-row"  style="padding: 0; margin: 0;" >
                 <div id="displays" class="col-md-12">
                     <div id="loc-tab-stat-container" class="container-fluid" style="padding: 0; margin: 0;">
@@ -421,9 +422,9 @@
                             <div class="col-md-12"  style="padding: 0; margin: 0;">{{map_filter}}</div>
                         </div>
 
-                        <div id="loc-tab-stat-container" class="container-fluid" style="padding: 0; margin: 0; width: 100%;">
-                            <div id="indicators-tab" class="tab-pane fade row r-row" style="padding: 0; margin: 0;">
-                                <div  class="col-md-12" style="padding: 0; margin: 0; width: 100%;">
+                        <div id="loc-tab-stat-container" class="container-fluid" style="padding: 0; margin: 0;">
+                            <div id="indicators-tab" class="tab-pane fade row r-row" style="padding: 0; margin: 0; position: relative;">
+                                <div  lass="col-md-12" style="padding: 0; margin: 0;">
                                     {% include "home/_indicator_display.html" %}
                                 </div>
 

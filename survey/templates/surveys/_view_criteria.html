@@ -30,7 +30,7 @@
 
             </td>
             <td>
-                <a href="#delete_criterion_{{criterion.id}}" data-toggle="modal" class="tooltip-info" data-rel="tooltip" title="" data-original-title="Delete"><span class="blue"><i class="usur-icon fa fa-trash bigger-120"  id="delete-icon-{{criterion.id}}"></i></span></a>
+                <a href="#delete_criterion_{{criterion.id}}" data-toggle="modal" class="tooltip-info" data-rel="tooltip" title="" data-original-title="Delete"><span class="red"><i class="usur-icon fa fa-trash bigger-120"  id="delete-icon-{{criterion.id}}"></i></span></a>
             </td>
             {% include "base/delete_modal.html" with object_name="" id=criterion.id name="criterion" url=criterion.id|get_url_with_ids:"delete_listing_criterion" %}
         </tr>

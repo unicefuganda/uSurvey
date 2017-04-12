@@ -12,7 +12,6 @@ class AboutUsForm(ModelForm):
         exclude = []
 
 class SuccessStoriesForm(ModelForm):
-	print "hello"
 	image = forms.FileField(
         label='Select a file',
         help_text='max. 42 megabytes'

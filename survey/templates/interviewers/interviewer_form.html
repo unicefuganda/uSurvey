@@ -31,13 +31,18 @@
             <legend style="color: #034b94;font-weight: bold;">Interviewer Details</legend>
           </div>
 {% include "naked_form.html" with a_form=form %}
+<style type="text/css">
+  .col-md-3 {
+    width: 50% !important;
+}
+</style>
 <div>
   <legend style="color: #034b94;font-weight: bold;">ODK Access</legend>
   {% include "horizontal_naked_form.html" with a_form=odk_access_form %}
 <br />
 </div>
 <div>
-<h5 style="color: #034b94;font-weight: bold;">Ussd Access</h5>
+<h5 style="color: #034b94;font-weight: bold;">USSD Access</h5>
   {% include "horizontal-formset.html" with formset=ussd_access_form class='ussd_form' %}  
 </div>
 <div>

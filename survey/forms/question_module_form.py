@@ -17,5 +17,5 @@ class QuestionModuleForm(ModelForm):
         model = QuestionModule
         exclude = []
         widgets = {
-            'description': forms.Textarea(attrs={"rows": 3, "cols": 30})
+            'description': forms.Textarea(attrs={"rows": 6, "cols": 30})
         }
