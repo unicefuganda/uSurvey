@@ -23,20 +23,10 @@ class QuestionFilterForm(forms.Form):
             self.fields[field].widget.attrs['readonly'] = True
             self.fields[field].widget.attrs['disabled'] = True
 
-    def _query_dict(self, questions):
-        query_dict = None
-        if self.is_valid():
-            query_dict = {'answer_type': self.cleaned_data['question_types']}
-            for key, val in query_dict.items():
-                if val == 'All' or not val:
-                    del query_dict[key]
-        if query_dict is None:
-            query_dict = {'answer_type__in': [key for key, val in
-                                              self.fields['question_types'].choices if not val == 'All']}
-        return query_dict
-
     def filter(self, questions):
-        return questions.filter(**self._query_dict(questions))
+        if self.is_valid() and self.cleaned_data['question_types'] != 'All':
+            return questions.filter(answer_type=self.cleaned_data['question_types'])
+        return questions
 
 
 class BatchQuestionFilterForm(QuestionFilterForm):
