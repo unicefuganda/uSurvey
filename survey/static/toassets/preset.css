@@ -15,10 +15,11 @@ body, html {
     line-height: 1;
 }  
 body{
-    background: #fff url("../images/diagonal.png") repeat scroll center center;
+    /*background: #fff url("../images/diagonal.png") repeat scroll center center;*/
 }
 body.single-post{
-    background: #fff url("../images/diagonal2.png") repeat scroll center center;
+    background: #fff;
+/*    *//*background:#fff;*/
 } 
 .boxWrapper{
     position: relative;

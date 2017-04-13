@@ -192,7 +192,7 @@ Theme usurvey
     //========================================================
     // Fun Fact
     //========================================================
-    $('.singleFacts').appear(function () {
+   /* $('.singleFacts').appear(function () {
         $('.mycounter').each(function () {
             var $this = $(this);
             jQuery({Counter: 0}).animate({Counter: $this.attr('data-counter')}, {
@@ -209,7 +209,7 @@ Theme usurvey
                 }
             });
         });
-    });
+    });*/
     //========================
     // Back To Top
     //========================
@@ -223,13 +223,13 @@ Theme usurvey
     //========================
     // WOW INIT
     //========================
-    if ($(window).width() > 767)
+    /*if ($(window).width() > 767)
     {
         var wow = new WOW({
             mobile: false
         });
         wow.init();
-    }
+    }*/
     //========================
     // Image Carousel
     //========================

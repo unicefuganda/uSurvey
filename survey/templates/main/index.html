@@ -1,406 +1,183 @@
-<!DOCTYPE html>
-<html class=" js csstransitions" lang="en-US">
-   <head>
-      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
-      <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width">
-      <link rel="icon" type="image/png" href="{{ STATIC_URL }}images/favicon.png">
-      <title>{{ PROJECT_TITLE }} :: Home</title>
-      <link rel="stylesheet" href="{{ STATIC_URL }}toassets/contentsty.css">
-  <link rel="stylesheet" href="{{ STATIC_URL }}toassets/conshortcodes.css">
-    <link id="theme_css" rel="stylesheet" href="{{ STATIC_URL }}toassets/light.css">
-    <link id="skin_css" rel="stylesheet" href="{{ STATIC_URL }}toassets/contentdefault.css">
-        <link rel="stylesheet" href="{{ STATIC_URL }}toassets/assets.css">
-        <link rel="stylesheet" href="{{ STATIC_URL }}toassets/menstyle.css">
-              <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}banassets/banstyle.css">
-      <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
-      <link href="https://fonts.googleapis.com/css?family=Dosis" rel="stylesheet">
-      <link href="https://fonts.googleapis.com/css?family=Baloo+Bhaina" rel="stylesheet"> 
-      <link rel="stylesheet" href="{{ STATIC_URL }}toassets/bootstrap.css" type="text/css" media="all">
-      <link rel="stylesheet" href="{{ STATIC_URL }}toassets/animate.css" type="text/css" media="all">
-      <link rel="stylesheet" href="{{ STATIC_URL }}toassets/preset.css" type="text/css" media="all">
-      <link rel="stylesheet" href="{{ STATIC_URL }}toassets/style_002.css" type="text/css" media="all">
-      <link rel="stylesheet" href="{{ STATIC_URL }}toassets/responsive.css" type="text/css" media="all">
-      <link rel="stylesheet" href="{{ STATIC_URL }}toassets/fonts.css" type="text/css" media="all">
-      <!-- <link rel="stylesheet" href="{{ STATIC_URL }}toassets/color8.css" type="text/css" media="all"> -->
-      <link rel="stylesheet" href="{{ STATIC_URL }}css/dataTables.bootstrap.css" />
-      <link rel="stylesheet" href="{{ STATIC_URL }}toassets/font-awesome.css" type="text/css" media="all">
-      <script type="text/javascript" src="{{ STATIC_URL }}toassets/jquery_005.js"></script>
-      <script type="text/javascript" src="{{ STATIC_URL }}toassets/jquery.js"></script>      
-      <script src='http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
-      <script type="text/javascript" src="{{ STATIC_URL }}toassets/menjs.js"></script>
+{% extends "base.html" %}
+{% load repeatedblocks %}
+{% load template_tags %}
 
-      <style>
-         .headerArea {
-         background: #0099ff; 
-     border-bottom:6px solid #0073bf;
-         }
-     
-     .container-fluid {
-      padding-left:0px;
-      padding-right:0px;
-  
-       
-     }
-  #cssmenu > ul > li > a {
-    padding: 17px;
-    font-size: 13px;
-    letter-spacing: 1px;
-    text-decoration: none;
-    color: #fff;
-    font-weight: 700;
-    font-family: Open Sans;
-    margin-top: 6px;
-}
-      </style>
-      <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}success/css/style.css">
-    <!-- responsive style sheet -->
-    <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}success/css/responsive.css">
-   </head>
-   <body>
-      <!--================= Site Preloader ==================-->
-    <!--  <div class="loaderWrap" style="display: none;">
-         <div class="loader-inner sk-folding-cube">
-            <div class="sk-cube1 sk-cube"></div>
-            <div class="sk-cube2 sk-cube"></div>
-            <div class="sk-cube4 sk-cube"></div>
-            <div class="sk-cube3 sk-cube"></div>
-         </div>
-      </div>-->
-      <!--================= Site Preloader ==================-->
-      <!--================= Box Div Start ==================-->
-      <div class="">
-         <!--================= Box Div Start ==================-->
-         <!-- Header Area -->
-         <header class="headerFix">
-            <div class="logo pull-left">
-               <div class="logoImg">               
-                  <a href="/"><img src="{{ STATIC_URL }}toassets/Logo_Main.png" alt="uSurvey"></a>
-               </div>
-            </div>
-            <!-- <nav class="mainMenu pull-left">
-               <div class="menuButton">
-                  <span></span>
-                  <span></span>
-                  <span></span>
-               </div>
-               <ul id="menu-main-menu" class="">
-                  <li id="menu-item-120" class="menu-item menu-item-type-custom menu-item-object-custom current-menu-ancestor current-menu-parent menu-item-has-children menu-item-120"><a href="#">Home</a>
-                  </li>
-                  <li id="menu-item-182" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-182"><a href="#">Discover</a>
-                  </li>
-                  <li id="menu-item-251" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-251"><a href="#">Contact</a>
-                  </li>
-                  <ul class="sub-menu">
-                     <li id="menu-item-289" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-289"><a href="#">Member</a></li>
-                     <li id="menu-item-290" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-290"><a href="#">404</a></li>
-                     <li id="menu-item-291" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-291"><a href="#">Event</a>
-                     </li>
-                  </ul>
-                  </li>
-                  <li id="menu-item-181" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-181"><a href="{% url 'about_page' %}" style="border-right: none !important;">About</a></li> 
+{% block page_title %}HOME{%endblock%}
 
-                   {% if user.is_authenticated %}
-                   <li id="menu-item-181" class="ulogin menu-item menu-item-type-post_type menu-item-object-page menu-item-181 pull-right"><a href="{% url 'home_page' %}">SURVEY</a></li>         
-{% else %}
-                   <li id="menu-item-181" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-181 pull-right" ><a href="{% url 'login_page' %}">login</a></li>
-                   {% endif%}
-               </ul>
-            </nav> -->
-            <nav id='cssmenu'>
-<div id="head-mobile"></div>
-<div class="button"></div>
-<ul>
-<!-- <li class='active'><a href='#'>HOME</a></li> -->
-<li><a href="/" class="home">HOME</a></li>
-<li><a href="{% url 'discover' %}" class="discover">DISCOVER</a></li>
-<li><a href="{% url 'home_success_story_list' %}" class="success-story">SUCCESS STORIES</a></li>                 
-<li><a href="{% url 'about_page' %}" class="about">ABOUT</a></li>
-{% if user.is_authenticated %}
-                   <li id="menu-item-181" class="ulogin menu-item menu-item-type-post_type menu-item-object-page menu-item-181 pull-right"><a href="{% url 'home_page' %}">SURVEY</a></li>         
-{% else %}
-                   <li id="menu-item-181" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-181 pull-right" ><a href="{% url 'login_page' %}">LOGIN</a></li>
-                   {% endif%}
-</ul>
-</nav>
-           
-            <div class="clearfix"></div>
-         </header>
-         <div class="fw-page-builder-content">
-<!-- <div class="container-fluid"> -->
-                     <div>
-         <div class="sp-slideshow">
-      
-        <input id="button-1" name="radio-set" class="sp-selector-1" checked="checked" type="radio">
-        <label for="button-1" class="button-label-1"></label>
-        
-        <input id="button-2" name="radio-set" class="sp-selector-2" type="radio">
-        <label for="button-2" class="button-label-2"></label>
-        
-        <input id="button-3" name="radio-set" class="sp-selector-3" type="radio">
-        <label for="button-3" class="button-label-3"></label>
-        
-        <input id="button-4" name="radio-set" class="sp-selector-4" type="radio">
-        <label for="button-4" class="button-label-4"></label>
-        
-        <input id="button-5" name="radio-set" class="sp-selector-5" type="radio">
-        <label for="button-5" class="button-label-5"></label>
-        
-        <label for="button-1" class="sp-arrow sp-a1"></label>
-        <label for="button-2" class="sp-arrow sp-a2"></label>
-        <label for="button-3" class="sp-arrow sp-a3"></label>
-        <label for="button-4" class="sp-arrow sp-a4"></label>
-        <label for="button-5" class="sp-arrow sp-a5"></label>
-        
-        <div class="sp-content">
-          <div class="sp-parallax-bg"></div>
-          <ul class="sp-slider clearfix">
-            <li><img src="{{ STATIC_URL }}banassets/image1.png" alt="image01"></li>
-            <li><img src="{{ STATIC_URL }}banassets/image2.png" alt="image02"></li>
-            <li><img src="{{ STATIC_URL }}banassets/image3.png" alt="image03"></li>
-            <li><img src="{{ STATIC_URL }}banassets/image4.png" alt="image04"></li>
-            <li><img src="{{ STATIC_URL }}banassets/image5.png" alt="image05"></li>
-          </ul>
-        </div><!-- sp-content -->
-        
-      </div><!-- sp-slideshow -->
-      
-      
-    </div>
-      
-       
-               <div class="fw-row">
-           
-                  <div class="fw-col-xs-12 fw-col-xs-12 col-sm-12  col-md-12  wow none animated" style="text-align: left ! important; padding-left: 0px; padding-right: 0px; visibility: visible;">
-                  </div>
-                  
-                  <div class="tp-fullwidth-forcer" style="width: 100%;"></div>
-               </div>
-               <!-- END REVOLUTION SLIDER --> 
-               
-                           </div>
-     
-         </div>
-      </div>
- <!-- <div class="secTriangle" style="background-image:url({{ STATIC_URL }}images/slider3.png);background-repeat: no-repeat; background-position: center; height:40px; z-index: 999;"></div> -->
- <!-- <div class="secTriangle">
- <img src="{{STATIC_URL}}images/slider3.png" / style="background-repeat: no-repeat; background-position: center; height:40px; z-index: 9999;position: relative;">
- </div> -->
-   </section>
-  
-      <section class="commonSection " style="background-color: #ffffff; background-repeat: no-repeat; ">
-       
-         <div class="container">
-            <div class="fw-row">
-               <div class="fw-col-xs-12 fw-col-xs-12" style=" text-align: left!important;  ">
-               
-                  <div class="col-lg-10 col-lg-offset-1 col-sm-offset-1 col-sm-10 col-xs-12 text-center">
-                  <div class="secTriangle">
- <img src="{{STATIC_URL}}images/slider3.png" / style="background-position: center center; background-repeat: no-repeat; height: 40px;margin-left: auto; margin-right: auto; position: relative; width: 80px; z-index: 9999;
-">
- </div>
-                     <div class="singleTesti">
+
+{% block extra_slider %}
+{% include 'slideshow.html' %}
+{% endblock %}
+
+{% block extra_content %}
+<section name="content-block" class="commonSection " style="background-color: #ffffff; background-repeat: no-repeat; ">
+    <div class="container">
+        <div class="fw-row">
+            <div class="fw-col-xs-12 fw-col-xs-12" style=" text-align: left!important;  ">
+                <div class="col-lg-10 col-lg-offset-1 col-sm-offset-1 col-sm-10 col-xs-12 text-center">
+                    <div class="secTriangle">
+                        <img src="{{STATIC_URL}}images/slider3.png" / style="background-position: center center; background-repeat: no-repeat; height: 40px;margin-left: auto; margin-right: auto; position: relative; width: 80px; z-index: 9999;
+                            ">
+                    </div>
+                    <div class="singleTesti">
                         <h2 style="color:#002956; font-family:'Baloo Bhaina',cursive;">uSurvey</h2>
-                     </div>
-                     <div data-ride="carousel" class="carousel slide" id="testiCarousel">
-                        <!-- Indicators -->
-                        <!-- Wrapper for slides -->
+                    </div>
+                    <div data-ride="carousel" class="carousel slide" id="testiCarousel">
                         <div role="listbox" class="carousel-inner">
-                           <div class="item active">
-                              <div class="quote noPaddingBottom">
-                                 <p class="" style="color:#0099ff;  font-weight:400; font-family: 'Open Sans'letter-spacing:1px; font-size:16px;">
-                                    "uSurvey is an innovative data collection tool designed to provide statistically representative real time estimates of a given indicator. It runs on USSD interactive secured channel and on ODK, for off-line data collection in locations with intermittent mobile network connections."  
-                                 </p>
-                              </div>
-                           </div>
+                            <div class="item active">
+                                <div class="quote noPaddingBottom">
+                                    <p class="" style="color:#0099ff;  font-weight:400; font-family: 'Open Sans'letter-spacing:1px; font-size:16px;">
+                                        "uSurvey is an innovative data collection tool designed to provide statistically representative real time estimates of a given indicator. It runs on USSD interactive secured channel and on ODK, for off-line data collection in locations with intermittent mobile network connections."  
+                                    </p>
+                                </div>
+                            </div>
                         </div>
-                     </div>
-                     
-                  </div>
-               </div>
-            </div>
-         </div>
-         
-      </section>
-      <div class="pageWrapper">
-      <div class="pageContent blog-home" style="">
-            <div class="md-padding">
-          <div class="container">
-            <div class="container">
-            
-            <div class="heading main centered">
-              <h2 class="lg-title" style="color:#002956; font-family:'Baloo Bhaina',cursive;">Discover</h2><b class="head-sep"><u></u></b><b class="head-sep"><u></u></b><b class="head-sep"><u></u></b>
-              <p>UNICEF Uganda, in partnership with the Uganda Bureau of Statistics (UBOS), developed uSurvey to conduct official structured surveys and assessments....<span style="padding-left: 3px; color: red;"><a href="{% url 'about_page' %}">More</a></span></p>
-            </div>
-
-            <div class="row">
-              <div class="col-md-4">
-                <div class="icon-box lg-icon t-center light-gry-border rect-angles">
-                  <span><span><span><span><span><span><span><span><span><i ><img src="{{ STATIC_URL }}images/ussd.png" width="115" height="86"></i>
-                  <h4 class="uppercase" style="color:#0059d0;">USSD & ODK CHANNELS</h4><p class="m-b-3">uSurvey enables real-time data collection and storage using mobile device (tablet/phone) through via USSD and ODK channels...</p><a class="btn main-bg uppercase" href="{% url 'about_page' %}#ussd">READ More</a></span></span></span></span></span></span></span></span></span>                  
+                    </div>
                 </div>
-              </div>
-              <div class="col-md-4">
-                <div class="icon-box lg-icon t-center light-gry-border rect-angles">
-                  <span><span><span><span><span><span><span><span><span><i><img src="{{ STATIC_URL }}images/real.png" width="167" height="86"></i>
-                  <h4 class="uppercase" style="color:#0059d0;">REAL TIME MONITORING</h4><p class="m-b-3">uSurvey eliminates the use of paper questionnaires and associated delays in the release of survey results oftentimes...</p><a class="btn main-bg uppercase" href="{% url 'about_page' %}#real">READ More</a></span></span></span></span></span></span></span></span></span>                  
-                </div>
-              </div>
-              <div class="col-md-4">
-                <div class="icon-box lg-icon t-center light-gry-border rect-angles">
-                  <span><span><span><span><span><span><span><span><span><i ><img src="{{ STATIC_URL }}images/oupput.png" width="169" height="86"></i>
-                  <h4 class="uppercase" style="color:#0059d0;">SAMPLE & CENSUS SURVEY</h4><p class="m-b-3">uSurvey possesses in-built capabilities to randomly select a representative sample from a population of interest...</p><a class="btn main-bg uppercase" href="{% url 'about_page' %}#sample">READ More</a></span></span></span></span></span></span></span></span></span>
-                </div>
-              </div>
-              
             </div>
-          </div> 
-          </div>
         </div>
-          <section class="project-section">
-        <div class="container">
-          <div class="theme-title">            
+    </div>
+</section>
+
+<section name="3-blocks">
+    <div class="pageWrapper">
+        <div class="pageContent blog-home" style="">
+            <div class="md-padding">
+                <div class="container">
+                    <div class="container">
+                        <div class="heading main centered">
+                            <h2 class="lg-title" style="color:#002956; font-family:'Baloo Bhaina',cursive;">Discover</h2>
+                            <b class="head-sep"><u></u></b><b class="head-sep"><u></u></b><b class="head-sep"><u></u></b>
+                            <p>UNICEF Uganda, in partnership with the Uganda Bureau of Statistics (UBOS), developed uSurvey to conduct official structured surveys and assessments....<span style="padding-left: 3px; color: red;"><a href="{% url 'about_page' %}">More</a></span></p>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="icon-box lg-icon t-center light-gry-border rect-angles">
+                                    <i ><img src="{{ STATIC_URL }}images/ussd.png" width="115" height="86"></i>
+                                    <h4 class="uppercase" style="color:#0059d0;">USSD & ODK CHANNELS</h4>
+                                    <p class="m-b-3">uSurvey enables real-time data collection and storage using mobile device (tablet/phone) through via USSD and ODK channels...</p>
+                                    <a class="btn main-bg uppercase" href="{% url 'about_page' %}#ussd">READ More</a>
+                                                                   
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="icon-box lg-icon t-center light-gry-border rect-angles">
+                                    <i><img src="{{ STATIC_URL }}images/real.png" width="167" height="86"></i>
+                                    <h4 class="uppercase" style="color:#0059d0;">REAL TIME MONITORING</h4>
+                                    <p class="m-b-3">uSurvey eliminates the use of paper questionnaires and associated delays in the release of survey results oftentimes...</p>
+                                    <a class="btn main-bg uppercase" href="{% url 'about_page' %}#real">READ More</a>
+                                                                    
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="icon-box lg-icon t-center light-gry-border rect-angles">
+                                    <i ><img src="{{ STATIC_URL }}images/oupput.png" width="169" height="86"></i>
+                                    <h4 class="uppercase" style="color:#0059d0;">SAMPLE & CENSUS SURVEY</h4>
+                                    <p class="m-b-3">uSurvey possesses in-built capabilities to randomly select a representative sample from a population of interest...</p>
+                                    <a class="btn main-bg uppercase" href="{% url 'about_page' %}#sample">READ More</a>
+                                                                  
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="project-section">
+    <div class="container">
+        <div class="theme-title">
             <h4 style="color: #0059d0;" class="uppercase">Success Stories</h4>
-            <span></span>
-          </div> <!-- /.theme-title -->
-
-          <div class="row">
+            <span>&nbsp;</span>
+        </div>
+        <div class="row">
             <div class="project-slider project-single-content">
-              <div class="item">
-                <div class="single-project">
-                  <div class="img">
-                    <img src="{{ STATIC_URL }}success/images/project/1.jpg" alt="Image">
-                    <div class="opacity"></div> <!-- /.opacity -->
-                    <ul class="icon">
-                      <!-- <li><a href="#" class="tran3s" title="Share Item"><i class="fa fa-share" aria-hidden="true"></i></a></li> -->
-                      <li><a href="{% url 'home_success_story_list' %}" class="tran3s" title="View details"><i class="fa fa-external-link" aria-hidden="true"></i></a></li>
-                      <!-- <li><a href="#" class="tran3s fancybox" title="Zoom View"><i class="fa fa-camera-retro" aria-hidden="true"></i></a></li> -->
-                    </ul>
-                  </div> <!-- /.img -->
-                  <div class="text">
-                    <h4><a href="{% url 'home_success_story_list' %}" class="tran3s">Leveraging ICT</a></h4>
-                    <p>Using mobile phones to collect data often leads to more efficient processing times and informed decision-making. Additionally, it presents new opportunities to deploy surveys remotely while providing results in real-time.</p>
-                  
-                  </div> <!-- /.text -->
-                </div> <!-- /.single-project -->
-              </div> <!-- /.item -->
-              <div class="item">
-                <div class="single-project">
-                  <div class="img">
-                    <img src="{{ STATIC_URL }}success/images/project/2.jpg" alt="Image">
-                    <div class="opacity"></div> <!-- /.opacity -->
-                    <ul class="icon">
-                      <!-- <li><a href="#" class="tran3s" title="Share Item"><i class="fa fa-share" aria-hidden="true"></i></a></li> -->
-                      <li><a href="{% url 'home_success_story_list' %}" class="tran3s" title="View details"><i class="fa fa-external-link" aria-hidden="true"></i></a></li>
-                      <!-- <li><a href="#" class="tran3s fancybox" title="Zoom View"><i class="fa fa-camera-retro" aria-hidden="true"></i></a></li> -->
-                    </ul>
-                  </div> <!-- /.img -->
-                  <div class="text">
-                    <h4><a href="{% url 'home_success_story_list' %}" class="tran3s">Surveying made Easy</a></h4>
-                    <p>Ms. Flavia Ouma, Senior IT Officer of Uganda Bureau of Statistics (UBOS) demonstrating the uSurvey application to a field worker during the field testing of the system for Female Genital </p>
-                    
-                  </div> <!-- /.text -->
-                </div> <!-- /.single-project -->
-              </div> <!-- /.item -->
-              <div class="item">
-                <div class="single-project">
-                  <div class="img">
-                    <img src="{{ STATIC_URL }}success/images/project/3.png" alt="Image">
-                    <div class="opacity"></div> <!-- /.opacity -->
-                    <ul class="icon">
-                      <!-- <li><a href="#" class="tran3s" title="Share Item"><i class="fa fa-share" aria-hidden="true"></i></a></li> -->
-                      <li><a href="{% url 'home_success_story_list' %}" class="tran3s" title="View details"><i class="fa fa-external-link" aria-hidden="true"></i></a></li>
-                      <!-- <li><a href="#" class="tran3s fancybox" title="Zoom View"><i class="fa fa-camera-retro" aria-hidden="true"></i></a></li> -->
-                    </ul>
-                  </div> <!-- /.img -->
-                  <div class="text">
-                    <h4><a href="{% url 'home_success_story_list' %}" class="tran3s">Use of uSurvey in Uganda</a></h4>
-                    <p>Maiden use of the system in early 2016 enabled UNICEF and UBOS to obtain real-time data from 4,500 respondents, allowing for a presentation of preliminary results just three days after the fieldwork...</p>
-                  
-                  </div> <!-- /.text -->
-                </div> <!-- /.single-project -->
-              </div> <!-- /.item -->
-              <div class="item">
-                <div class="single-project">
-                  <div class="img">
-                    <img src="{{ STATIC_URL }}success/images/project/12.png" alt="Image">
-                    <div class="opacity"></div> <!-- /.opacity -->
-                    <ul class="icon">
-                      <!-- <li><a href="#" class="tran3s" title="Share Item"><i class="fa fa-share" aria-hidden="true"></i></a></li> -->
-                      <li><a href="{% url 'home_success_story_list' %}" class="tran3s" title="View details"><i class="fa fa-external-link" aria-hidden="true"></i></a></li>
-                      <!-- <li><a href="#" class="tran3s fancybox" title="Zoom View"><i class="fa fa-camera-retro" aria-hidden="true"></i></a></li> -->
-                    </ul>
-                  </div> <!-- /.img -->
-                  <div class="text">
-                  <h4><a href="{% url 'home_success_story_list' %}" class="tran3s">Business Advantages of uSurvey</a></h4>
-                    <p>Generic system that can be used for any survey or census with defined parameters during survey set-up (uSurvey has a bank of standard questions that can be added to)</p>
-                  </div> <!-- /.text -->
-                </div> <!-- /.single-project -->
-              </div> <!-- /.item -->
-            </div> <!-- /.project-slider -->
-          </div> <!-- /.row -->
-        </div> <!-- /.container -->
-      </section>
-    
-    
-    <!-- Js File_________________________________ -->
-
-    <!-- j Query -->    
-    <script type="text/javascript" src="{{ STATIC_URL }}success/vendor/jquery.2.2.3.min.js"></script>
-
-    <!-- Bootstrap JS -->
-    <script type="text/javascript" src="{{ STATIC_URL }}success/vendor/bootstrap/bootstrap.min.js"></script>
-
-  
-    <script type="text/javascript" src="{{ STATIC_URL }}vendor/revolution/revolution.extension.slideanims.min.js"></script>
-
-    <!-- fancy box -->
-  <script type="text/javascript" src="{{ STATIC_URL }}success/vendor/fancy-box/jquery.fancybox.pack.js"></script>
-    <!-- owl.carousel -->
-  <script type="text/javascript" src="{{ STATIC_URL }}success/vendor/owl-carousel/owl.carousel.min.js"></script>
-    <!-- Theme js -->
-    <script type="text/javascript" src="{{ STATIC_URL }}success/js/theme.js"></script>
-    
-       <!--ss end-->  
-      </div>          
-</div>
-
-      <footer class="footerArea">
-         <section class="copyRight">
-            <div class="container">
-               <div class="row">
-                  <!-- <div class="col-lg-12 col-sm-12 col-xs-12 text-center">  
-                  <p style="padding-bottom:43px;font-size:10px;"><span><img src="{{ STATIC_URL }}toassets/bottomfooter_logo.jpg"></span>Copyright © 2016 <a href="#">UNICEF</a><span> and UBOS</span> </p>
-                  </div> -->
-                   <div class="col-lg-12 col-sm-12 col-xs-12 text-center" style="margin:10px;">  
-  <p style="font-size:8px;"></p><p><img src="/static/toassets/bottomfooter_logo.jpg"></p><p>Copyright © 2016 UNICEF and UBOS </p>
-                  </div>
-                  <div class="topSocial pull-right">
-                     <ul>
-                        <li><a class="facebook" href="#"><i class="fa fa-facebook"></i></a></li>
-                        <li><a class="twitter" href="#"><i class="fa fa-twitter"></i></a></li>
-                        <li><a class="google" href="#"><i class="fa fa-linkedin"></i></a></li>
-                     </ul>
-                  </div>
-               </div>
+                <div class="item">
+                    <div class="single-project">
+                        <div class="img">
+                            <img src="{{ STATIC_URL }}success/images/project/1.jpg" alt="Image">
+                            <div class="opacity"></div>
+                            <ul class="icon">
+                                <li><a href="{% url 'home_success_story_list' %}" class="tran3s" title="View details"><i class="fa fa-external-link" aria-hidden="true"></i></a></li>
+                            </ul>
+                        </div>
+                        <div class="text">
+                            <h4><a href="{% url 'home_success_story_list' %}" class="tran3s">Leveraging ICT</a></h4>
+                            <p>Using mobile phones to collect data often leads to more efficient processing times and informed decision-making. Additionally, it presents new opportunities to deploy surveys remotely while providing results in real-time.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="item">
+                    <div class="single-project">
+                        <div class="img">
+                            <img src="{{ STATIC_URL }}success/images/project/2.jpg" alt="Image">
+                            <div class="opacity"></div>
+                            <ul class="icon">
+                                <li><a href="{% url 'home_success_story_list' %}" class="tran3s" title="View details"><i class="fa fa-external-link" aria-hidden="true"></i></a></li>
+                            </ul>
+                        </div>
+                        <div class="text">
+                            <h4><a href="{% url 'home_success_story_list' %}" class="tran3s">Surveying made Easy</a></h4>
+                            <p>Ms. Flavia Ouma, Senior IT Officer of Uganda Bureau of Statistics (UBOS) demonstrating the uSurvey application to a field worker during the field testing of the system for Female Genital </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="item">
+                    <div class="single-project">
+                        <div class="img">
+                            <img src="{{ STATIC_URL }}success/images/project/3.png" alt="Image">
+                            <div class="opacity"></div>
+                            <ul class="icon">
+                                <li><a href="{% url 'home_success_story_list' %}" class="tran3s" title="View details"><i class="fa fa-external-link" aria-hidden="true"></i></a></li>
+                            </ul>
+                        </div>
+                        <div class="text">
+                            <h4><a href="{% url 'home_success_story_list' %}" class="tran3s">Use of uSurvey in Uganda</a></h4>
+                            <p>Maiden use of the system in early 2016 enabled UNICEF and UBOS to obtain real-time data from 4,500 respondents, allowing for a presentation of preliminary results just three days after the fieldwork...</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="item">
+                    <div class="single-project">
+                        <div class="img">
+                            <img src="{{ STATIC_URL }}success/images/project/12.png" alt="Image">
+                            <div class="opacity"></div>
+                            <ul class="icon">
+                                <li><a href="{% url 'home_success_story_list' %}" class="tran3s" title="View details"><i class="fa fa-external-link" aria-hidden="true"></i></a></li>
+                            </ul>
+                        </div>
+                        <div class="text">
+                            <h4><a href="{% url 'home_success_story_list' %}" class="tran3s">Business Advantages of uSurvey</a></h4>
+                            <p>Generic system that can be used for any survey or census with defined parameters during survey set-up (uSurvey has a bank of standard questions that can be added to)</p>
+                        </div>
+                    </div>
+                </div>
             </div>
-            </div>
-         </section>
-      </footer>
-      <!--================= Box Div Start ==================-->
-      </div>
-      <!--================= Box Div Start ==================--> 
-       <script type="text/javascript" src="{{ STATIC_URL }}toassets/theme.js"></script>
-      <script type="text/javascript" src="{{ STATIC_URL }}toassets/bootstrap.js"></script>
-      <script type="text/javascript" src="{{ STATIC_URL }}toassets/jquery_002.js"></script>
-      <script type="text/javascript" src="{{ STATIC_URL }}toassets/modernizr.js"></script>
-     <style type="text/css">
-       .commonSection {    
-     padding: 0px 0 0px !important;} 
+        </div>
+    </div>
+</section>
+
+{%endblock%}
+
+{% block extra_js %}
+
+<script type="text/javascript" src="{{ STATIC_URL }}success/vendor/owl-carousel/owl.carousel.min.js"></script>
+
+<script type="text/javascript" src="/static/success/js/theme.js"></script>
+
+{%endblock%}
+
+
+
+{% block extra_css %}
+<link rel="stylesheet" type="text/css" href="/static/success/css/style.css">
+<link rel="stylesheet" type="text/css" href="/static/success/css/responsive.css">
+<style type="text/css">
      #cssmenu > ul > li .home {
     color: yellow;
-}
-    
-     </style>
-   </body>
-</html>
+}    
+</style>
+
+{%endblock%}

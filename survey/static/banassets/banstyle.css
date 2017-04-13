@@ -18,7 +18,8 @@
 }*/
 
 .sp-content {
-    background: #7d7f72 url(../images/grid.png) repeat scroll 0 0;
+    /*background: #7d7f72 url(../images/grid.png) repeat scroll 0 0;*/
+	background: #7d7f72;
 	position: relative;
 	width: 100%;
 	/*height: 100%;*/
