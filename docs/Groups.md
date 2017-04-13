@@ -7,7 +7,7 @@ Population has to be segment into Groups / multiple groups and our system allows
 From this above Groups page, Groups are managed, i.e. to Create a New Group, Edit existing Group, Delete Groups and Manage Parameters
 
 ###Create a New Group
-Groups is available from main menu under, <b>Design</b> >> <b>Groups</b>
+Groups are available from main menu under, <b>Design</b> >> <b>Groups</b>
 
 To create a new Group, click on ‘Add Group’ button at top right of the Groups page, that opens a form to create a new Group, which has following elements;
 

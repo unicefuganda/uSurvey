@@ -4,13 +4,13 @@ Surveys are available from main menu under <b>Design</b> >> <b>Surveys</b>
 
 A New Survey can be created and defined here, so before creating a survey first of all one has to know about the terminology used here.
 
-Preferred Listing: List of existing Listing, which are already in the system.
+<b>Preferred Listing</b>: List of existing Listing, which are already in the system.
 Is an option to choose, existing Listing for this New Survey, where already survey was conducted on these Listings, which will include total Listing questions along with the data/results.
 
-Listing Form: List of Newly created Listings, not previously used in any survey.
+<b>Listing Form</b>: List of Newly created Listings, not previously used in any survey.
 This field will enable only if option “None, Create New” is selected, in the dropdown ‘Preferred Listing’. which contains list of Newly created Listings, which are not yet used in any survey.
 
-Randomly selected data label: Is the identifier for respondents while conducting a Listing survey. 
+<b>Randomly selected data label</b>: Is the identifier for respondents while conducting a Listing survey. 
 This field will enable only when listing in dropdown ‘Listing Form’ is selected.
 
 <b>How to create a Survey?</b>
@@ -19,19 +19,19 @@ To create a New Survey, click on ‘Create New Survey’ button at top right of 
 
 <b>Elements of a Survey</b>:
 
-•	Name: Is Survey Name, which is a unique identity to a survey and is a mandatory field.   
-•	Description: write about the importance of this survey in short.  
-•	Survey Type: This identifies how survey is going to take place either using Listing or not. 
-If Survey Type is “Sampled”, Survey uses Sample size and Listing 
+•	<b>Name</b>: Is Survey Name, which is a unique identity to a survey and is a mandatory field.   
+•	<b>Description</b>: write about the importance of this survey in short.  
+•	<b>Survey Type</b>: This identifies how survey is going to take place either using Listing or not.
+If Survey Type is “Sampled”, Survey uses Sample size and Listing. 
 If Survey Type is “Census”, Survey doesn’t need Sample size and Listing.
- 
-• Sample size: Provide survey sample size
-• Preferred Listing: select an existing Listing Or
-• Listing Form: select Newly created Listing
-• Randomly selected data label: You need to include one listing response identifier in double curly brackets.
+
+• <b>Sample size</b>: Provide survey sample size
+• <b>Preferred Listing</b>: select an existing Listing Or
+• <b>Listing Form</b>: select Newly created Listing
+• <b>Randomly selected data label</b>: You need to include one listing response identifier in double curly brackets.
  i.e. just type, double curly brackets to automatically insert ‘Variable Name’ in above selected Listing
-Ex: type {{ , system prompts with ‘Variable Name’ then select any one to insert Variable Name 
-Like: {{house_number}}
+ Ex: type {{ , system prompts with ‘Variable Name’ then select any one to insert Variable Name
+ Like: {{house_number}}
 
 A New Survey is created by providing above fields and click on ‘Save’ button to Create a Survey. 
 
@@ -39,9 +39,12 @@ A New Survey is created by providing above fields and click on ‘Save’ button
 
 On the ‘Survey’ page one can view all the Survey created in the application, in a tabular form with following column names:
 
-<b>Sts</b>: Represents Status of the Survey by color indicator, that means each of the Color code indicates that Gray – Not Started; Green – Ongoing; Amber – Completed
+<b>Sts</b>: Represents Status of the Survey by color indicator, that means each of the Color code indicates that;
+Gray – Not Started
+Green – Ongoing
+Amber – Completed
 
-<b>Name</b>: Is Name of a Survey, which is a unique identity to represent Survey and is a mandatory field.   
+<b>Name</b>: Is Name of a Survey, which is a unique identity to represent Survey and is a mandatory field.
 
 <b>Description</b>: A short description about Listing
 
@@ -51,37 +54,37 @@ On the ‘Survey’ page one can view all the Survey created in the application,
 
 <b>Total Respondents</b>: once the Survey is completed, this column will be updated with the count of participants/ respondents.
 
-Eas Covered: Count of Enumeration areas covered in this particular survey.
+<b>Eas Covered</b>: Count of Enumeration areas covered in this particular survey.
 
 <b>Actions in Survey</b>:
 
-•	Edit Survey: click on, Action Item ‘Edit’, User can Edit all fields in the Survey.
-•	Delete Survey: click on, Action Item ‘Delete, the entire Survey is removed, before deleting you will be prompted with conformation to delete, click ‘Yes’ to Delete permanently. This option is not available for completed Survey.
-•	View Batches in Survey: click on, Action Item ‘View Batches’, navigates to ‘Survey Batches’ page. 
-•	Clone a Survey: click on, Action Item ‘Clone’, an another copy of same Survey is created along with Survey Batches and Batch Questions, except existing Looping and Logic in Batch Questions.
-•	Sampling Criteria: 
+•	<b>Edit Survey</b>: click on, Action Item ‘Edit’, User can Edit all fields in the Survey.
+•	<b>Delete Survey</b>: click on, Action Item ‘Delete, the entire Survey is removed, before deleting you will be prompted with conformation to delete, click ‘Yes’ to Delete permanently. This option is not available for completed Survey.
+•	<b>View Batches in Survey</b>: click on, Action Item ‘View Batches’, navigates to ‘Survey Batches’ page.
+•	<b>Clone a Survey</b>: click on, Action Item ‘Clone’, an another copy of same Survey is created along with Survey Batches and Batch Questions, except existing Looping and Logic in Batch Questions.
+•	<b>Sampling Criteria</b>: 
 
-Batches: 
+###Batches: 
 Batch is a categorization of Survey Questions, that means set of Questions categorized for a Survey convenience. We can create multiple Batches in a survey.
 
 Once the Survey is created, next step is to create ‘Batch’ and ‘Add Questions’ to Batch.
 
-How to create a Batch?
+<b>How to create a Batch?</b>
 Go to Batches Page, which can be done in two ways
 On the ‘Survey’ page you can view all the Survey created in the application
 Now click on Survey Name, or click on, Action Item ‘View Batches’ to go to ‘Batches’ Page
 
 To create a New Batch, click on ‘Create New Batch’ button at top right of the Batch page, that opens a form to create a new Batch, which has following elements;
 
-Elements of a Batch:
+<b>Elements of a Batch</b>:
 
-•	Name: Is Batch Name, which is a unique identity to a Batch and is a mandatory field  
-•	Description: write about the importance of this Batch in short
-•	Access channels: This will identify on which channel this survey has to be conducted and has two channel ODK and USSD
+•	<b>Name</b>: Is Batch Name, which is a unique identity to a Batch and is a mandatory field  
+•	<b>Description</b>: write about the importance of this Batch in short
+•	<b>Access channels</b>: This will identify on which channel this survey has to be conducted and has two channel ODK and USSD
 
 A New Batch is created by providing above fields and click on ‘Save’ button to Create a New Batch in Survey. 
 
-Actions in Batch:
+<b>Actions in Batch</b>:
 
 •	Edit Batch: click on, Action Item ‘Edit’, User can Edit all fields in a Batch.
 •	Delete Batch: click on, Action Item ‘Delete, the entire Batch along with questions are removed, before deleting you will be prompted with conformation to delete, click ‘Yes’ to Delete permanently. This option is not available for completed Surveys.
@@ -152,7 +155,7 @@ View Options: This Action item is visible only for the Questions that has Answer
 
 Start/Edit Loop: 
 
-‘Start/Edit Loop’ is an Action item available only for the Questions that has Answer Type “Auto Generated”.
+‘Start/Edit Loop’ is an Action item available only for the Questions that has Answer Type “Auto Generated”. 
 
 Looping means repeatedly asking set of questions based up the need and purpose of the base question.  
 

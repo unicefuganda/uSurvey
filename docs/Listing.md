@@ -113,13 +113,13 @@ On the ‘Listing Questions’ page one can view all the Questions created in th
 
 <b>Start/Edit Loop</b>: 
 
-‘Start/Edit Loop’ is an Action item available only for the Questions that has Answer Type “Auto Generated”.
+‘Start/Edit Loop’ is an Action item available only for the Questions that has Answer Type “Auto Generated”. 
 
 Looping means repeatedly asking set of questions based up the need and purpose of the base question.  
 
 To define the Looping concept, first of all one has to understand about terms that are used in creating a Loop are as following:
 
-* <b>Repeat Logic</b>: To apply Looping for a question there should be a base criteria to start loop, that is chosen from ‘Repeat Logic’ as “User Defined”, “Fixed number of repeats” and “Response from previous question”
+* <b>Repeat Logic</b>: To apply Looping for a question there should be some base criteria to start loop, that is chosen from ‘Repeat Logic’ as “User Defined”, “Fixed number of repeats” and “Response from previous question”
 
 <b>User Defined</b>: Need to choose what set of Question come into loop, starting from this particular question and has to end loop with any of the consecutive question in the Listing. 
 
