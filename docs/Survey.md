@@ -25,10 +25,10 @@ To create a New Survey, click on ‘Create New Survey’ button at top right of 
 If Survey Type is “Sampled”, Survey uses Sample size and Listing. 
 If Survey Type is “Census”, Survey doesn’t need Sample size and Listing.
 
-• <b>Sample size</b>: Provide survey sample size
-• <b>Preferred Listing</b>: select an existing Listing Or
-• <b>Listing Form</b>: select Newly created Listing
-• <b>Randomly selected data label</b>: You need to include one listing response identifier in double curly brackets.
+•  <b>Sample size</b>: Provide survey sample size
+•  <b>Preferred Listing</b>: select an existing Listing Or
+•  <b>Listing Form</b>: select Newly created Listing
+•  <b>Randomly selected data label</b>: You need to include one listing response identifier in double curly brackets.
  i.e. just type, double curly brackets to automatically insert ‘Variable Name’ in above selected Listing
  Ex: type {{ , system prompts with ‘Variable Name’ then select any one to insert Variable Name
  Like: {{house_number}}
@@ -40,9 +40,9 @@ A New Survey is created by providing above fields and click on ‘Save’ button
 On the ‘Survey’ page one can view all the Survey created in the application, in a tabular form with following column names:
 
 <b>Sts</b>: Represents Status of the Survey by color indicator, that means each of the Color code indicates that;
-Gray – Not Started
-Green – Ongoing
-Amber – Completed
+ <span style="color:Gray;font-weight:bold;">Gray</span>– Not Started<br>
+ <span style="color:Green;font-weight:bold;">Green</span>– Ongoing<br>
+ <span style="color:Orange;font-weight:bold;">Amber</span>– Completed<br>
 
 <b>Name</b>: Is Name of a Survey, which is a unique identity to represent Survey and is a mandatory field.
 

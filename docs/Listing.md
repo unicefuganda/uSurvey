@@ -18,8 +18,8 @@ To create a new Listing, click on the ‘Create New Listing Form’ button at to
 
 <b>Elements of Listing form</b><br>
 
-* <b>Name</b>: Is Listing Name, which is a unique identity to a Listing and is a mandatory field.   
-* <b>Description</b>: write about the importance of the Listing in short.  
+* <b>Name</b>: Is Listing Name, which is a unique identity to a Listing and is a mandatory field.
+* <b>Description</b>: write about the importance of the Listing in short.
 * <b>Access channels</b>: This will identify on which channel this survey has to be conducted and has two channel ODK and USSD
 
 A Listing Form is created by filling above all fields, finally clicking on ‘Save’ button to create Listing.
@@ -29,9 +29,9 @@ A Listing Form is created by filling above all fields, finally clicking on ‘Sa
 On the ‘Listing Form’ page one can view all the Listings created in the application, in a tabular form with following column names:
 
 <b>Sts</b>: Represents Status of the Listing by color indicator, that means each of the Color code indicates that;
- <span style="color:Gray;font-weight:bold;">Gray</span>– Not Started;
- <span style="color:Green;font-weight:bold;">Green</span>– Ongoing;
- <span style="color:Amber;font-weight:bold;">Amber</span>– Completed
+ <span style="color:Gray;font-weight:bold;">Gray</span>– Not Started<br>
+ <span style="color:Green;font-weight:bold;">Green</span>– Ongoing<br>
+ <span style="color:Orange;font-weight:bold;">Amber</span>– Completed<br>
 
 <b>Name</b>: Is Name of the Listing, which is a unique identity to represent Listing and is a mandatory field.   
 
