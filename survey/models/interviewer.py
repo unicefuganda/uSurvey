@@ -69,8 +69,8 @@ class Interviewer(BaseModel):
         :return:
         """
         if survey and not batch:
-            return self.interviews.objects.filter(survey=survey).count() > 0
-        return self.interviews.objects.filter(question_set__id=batch.id).count() > 0
+            return self.interviews.filter(survey=survey).count() > 0
+        return self.interviews.filter(question_set__id=batch.id).count() > 0
 
     def locations_in_hierarchy(self):
         locs = self.ea.locations.all()  # this should evaluate to country
