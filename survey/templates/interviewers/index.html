@@ -78,7 +78,9 @@
 	      </td>
         {% endfor %}
 	   <td>
-        <a href="#ea_{{interviewer.pk}}" data-toggle="modal" class="add_batch">view ({{interviewer.unfinished_assignments.count}})</a>
+        <a style="color: #369 !important;
+    font-style: normal !important;
+    text-decoration: none !important;" href="#ea_{{interviewer.pk}}" data-toggle="modal" class="add_batch">view ({{interviewer.unfinished_assignments.count}})</a>
                 	  <div class="modal fade" id="ea_{{interviewer.pk}}" tabindex="-1" role="dialog"  aria-hidden="true">
 					    <div class="modal-dialog">
 					        <div class="modal-content">
