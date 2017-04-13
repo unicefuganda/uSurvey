@@ -25,7 +25,6 @@ from survey.models.question_module import QuestionModule
 from survey.models.indicators import Indicator, IndicatorVariableCriteria, IndicatorVariable
 from survey.models.about_us_content import AboutUs,SuccessStories
 from survey.models.odk_submission import ODKSubmission, Attachment, ODKFileDownload
-from survey.models.formula import Formula
 from survey.models.interviews import AnswerAccessDefinition
 from survey.models.locations import Location, LocationType
 

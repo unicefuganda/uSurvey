@@ -1,3 +1,4 @@
+    <div  id="indicator-table" class="container-fluid" style="padding: 0;margin: 0; width: 100%;">
     <style>
    .hero-description {
     color: #000;    
@@ -19,14 +20,13 @@
  
 }
 </style>
-    <div  id="indicator-table" class="container-fluid">
         <div class="row r-row">
             <div class="col-sm-12">
                 <p style="font-size:17px; color:#8c203d; font-weight:bold;">&nbsp;</p>
              </div>
         </div>
-        <div class="row r-row"  style="font-family: Open Sans; "  style="padding: 0;margin: 0;">
-            <div class="col-sm-12">
+        <div class="row r-row"  style="font-family: Open Sans; ">
+            <div class="col-sm-12"  style="width: 100% !important;">
                 {% for indicator in display_indicators %}
                     <div class="hero-description poll-hero-title indicators indicator-{{indicator.survey.id}} indic-{% cycle 2 3 4 %}">
                            <span class="tite{% cycle 2 3 4 %}">{{ indicator.country_wide_value }}</span> <i>{{ indicator.name }}</i>

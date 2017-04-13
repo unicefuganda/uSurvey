@@ -5,7 +5,6 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.shortcuts import render, get_object_or_404
 from django.core.urlresolvers import reverse
 from survey.models import EnumerationArea, LocationType, Location
-from survey.forms.upload_csv_file import UploadEAForm
 from survey.forms.enumeration_area import EnumerationAreaForm, LocationsFilterForm
 from survey.services.ea_upload import UploadEACSVLayoutHelper
 from django_rq import job
@@ -137,25 +136,3 @@ def edit(request, ea_id):
 def _process_form(request, form, instance=None):
     pass
 
-
-@job('default')
-def begin_upload(upload_form):
-    upload_form.upload()
-
-
-@permission_required('auth.can_view_batches')
-def upload(request):
-    upload_form = UploadEAForm()
-
-    if request.method == 'POST':
-        upload_form = UploadEAForm(request.POST, request.FILES)
-        if upload_form.is_valid():
-            begin_upload.delay(upload_form)
-            messages.warning(
-                request, "Upload in progress. This could take a while.")
-            return HttpResponseRedirect('/locations/enumeration_area/upload/')
-
-    context = {'button_label': 'Upload', 'id': 'upload-location-ea-form', 'upload_form': upload_form,
-               'csv_layout': UploadEACSVLayoutHelper()}
-
-    return render(request, 'locations/enumeration_area/upload.html', context)

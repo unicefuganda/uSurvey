@@ -38,9 +38,10 @@ class ODKSubmission(BaseModel):
         return self.attachments.count() > 0
 
     def save_attachments(self, media_files):
-        for f in media_files.values():
+        for name, f in media_files.items():
             content_type = f.content_type if hasattr(f, 'content_type') else ''
-            attach, created = Attachment.objects.get_or_create(submission=self,
+            attach, created = Attachment.objects.get_or_create(upload_field_name=name,
+                                                               submission=self,
                                                                media_file=f,
                                                                mimetype=content_type)
 
@@ -73,7 +74,6 @@ class ODKSubmission(BaseModel):
         return super(ODKSubmission, self).save(*args, **kwargs)
 
 
-
 def upload_to(attachment, filename):
     return os.path.join(
         settings.SUBMISSION_UPLOAD_BASE,
@@ -83,6 +83,7 @@ def upload_to(attachment, filename):
 
 
 class Attachment(BaseModel):
+    upload_field_name = models.CharField(max_length=100)
     submission = models.ForeignKey(ODKSubmission, related_name="attachments")
     media_file = models.FileField(upload_to=upload_to)
     mimetype = models.CharField(

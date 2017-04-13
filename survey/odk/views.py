@@ -240,7 +240,7 @@ def submission(request):
         xml_file_list = request.FILES.pop("xml_submission_file", [])
         if len(xml_file_list) != 1:
             return OpenRosaResponseBadRequest(u"There should be a single XML submission file.")
-        media_files = request.FILES.values()
+        media_files = request.FILES
         submission_report = process_submission(
             interviewer, xml_file_list[0], media_files=media_files)
         logger.info(submission_report)
