@@ -32,8 +32,7 @@ class Interviewer(BaseModel):
     gender = models.CharField(default=MALE, verbose_name="Gender", choices=[
                               (MALE, "M"), (FEMALE, "F")], max_length=10)
 #     age = models.PositiveIntegerField(validators=[MinValueValidator(18), MaxValueValidator(50)], null=True)
-    date_of_birth = models.DateField(
-        null=True, validators=[validate_min_date_of_birth, validate_max_date_of_birth])
+    date_of_birth = models.DateField(null=True, validators=[validate_min_date_of_birth, validate_max_date_of_birth])
     level_of_education = models.CharField(max_length=100, null=True, choices=LEVEL_OF_EDUCATION,
                                           blank=False, default='Primary',
                                           verbose_name="Education")
@@ -59,15 +58,19 @@ class Interviewer(BaseModel):
     def present_interviews(self):
         return self.interviews.filter(ea__in=[a.allocation_ea for a in self.unfinished_assignments]).count()
 
-
     @property
     def age(self):
         return relativedelta(timezone.now().date(), self.date_of_birth).years
 
     def completed_batch_or_survey(self, survey, batch):
+        """Retrieves interviews for this interviewer for survey if batch not specified or the the batch
+        :param survey:
+        :param batch:
+        :return:
+        """
         if survey and not batch:
-            return self.total_households_completed(survey) > 0
-        return self.total_households_batch_completed(batch) > 0
+            return self.interviews.objects.filter(survey=survey).count() > 0
+        return self.interviews.objects.filter(question_set__id=batch.id).count() > 0
 
     def locations_in_hierarchy(self):
         locs = self.ea.locations.all()  # this should evaluate to country

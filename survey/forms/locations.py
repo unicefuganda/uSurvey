@@ -4,8 +4,6 @@ from survey.models.locations import *
 from django.template.defaultfilters import slugify
 from django.core.exceptions import ValidationError
 
-from survey.models.formula import *
-
 
 class LocationTypeForm(ModelForm):
 
