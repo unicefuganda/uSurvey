@@ -32,18 +32,16 @@ def index(request, qset_id):
     # So don't get confused :)
     batch = QuestionSet.get(pk=qset_id)
     questions = batch.questions_inline()
-    if request.method == 'GET':
-        question_filter_form = QuestionFilterForm(data=request.GET, qset=batch)
-        search_fields = ['identifier',  'text', ]
-        qset_questions = batch.questions.all()      # basically using this make use of db filters
-        if 'q' in request.GET:
-            questions = get_filterset(qset_questions, request.GET['q'], search_fields)
+    request_data = request.GET if request.method == 'GET' else request.POST
+    question_filter_form = QuestionFilterForm(data=request_data, qset=batch)
+    search_fields = ['identifier',  'text', ]
+    qset_questions = batch.questions.all()
+    if 'q' in request_data:
+        questions = get_filterset(qset_questions, request_data['q'], search_fields)
+    if 'question_types' in request_data:
         relevant_ids = list(question_filter_form.filter(qset_questions).values_list('id', flat=True))
         questions = [q for q in questions if q.id in relevant_ids]
-        # now maintain same inline other exclusing questions in
-    else:
-        question_filter_form = QuestionFilterForm(qset=batch)
-    #question_library =  question_filter_form.filter(QuestionTemplate.objects.all())
+    # now maintain same inline other exclusing questions in
     breadcrumbs = Question.index_breadcrumbs(qset=batch)
     if breadcrumbs:
         request.breadcrumbs(breadcrumbs)
