@@ -1,4 +1,4 @@
-###Create Survey: 
+###Create Survey
 
 Surveys are available from main menu under <b>Design</b> >> <b>Surveys</b>
 
@@ -64,7 +64,7 @@ Amber – Completed
 •	<b>Clone a Survey</b>: click on, Action Item ‘Clone’, an another copy of same Survey is created along with Survey Batches and Batch Questions, except existing Looping and Logic in Batch Questions.
 •	<b>Sampling Criteria</b>: 
 
-###Batches: 
+###Batches
 Batch is a categorization of Survey Questions, that means set of Questions categorized for a Survey convenience. We can create multiple Batches in a survey.
 
 Once the Survey is created, next step is to create ‘Batch’ and ‘Add Questions’ to Batch.
@@ -93,7 +93,7 @@ A New Batch is created by providing above fields and click on ‘Save’ button 
 i.e. Open- means allow to conduct survey and Close - means it prevents to conduct survey.
 •	View Data in the Survey: click on, Action Item ‘View Data’, shows Data collected in this Survey. This option is available only for completed Surveys.
 
-How to create Batch Questions?
+<b>How to create Batch Questions?</b>
 
 Once Survey and Batches are created, next step is to ‘Add Questions’ to Batch as follows:
 

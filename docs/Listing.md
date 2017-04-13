@@ -1,5 +1,6 @@
 ###Listing
 <hr>
+
 The Listing is generally carried out by field staff other than interviewers, as a separate field operation conducted before the survey starts. This pre-process has the following benefits
 
 1. It creates a common set of common questions to be asked before any survey is captured, as a one-time effort. For instance, the demographic details of household residents is required before conducting any household survey. Such data can be captured as part of the Listing.
@@ -12,6 +13,7 @@ Listing is a set of Questions that can be customized/configured for any survey b
 
 ###Creating New Listing
 <hr>
+
 To create a new Listing, click on the ‘Create New Listing Form’ button at top right of the Listing page, that opens a form to create a new Listing, which has following elements; 
 
 <b>Elements of Listing form</b><br>
@@ -26,7 +28,10 @@ A Listing Form is created by filling above all fields, finally clicking on ‘Sa
   
 On the ‘Listing Form’ page one can view all the Listings created in the application, in a tabular form with following column names:
 
-<b>Sts</b>: Represents Status of the Listing by color indicator, that means each of the Color code indicates that Gray – Not Started; Green – Ongoing; Amber – Completed
+<b>Sts</b>: Represents Status of the Listing by color indicator, that means each of the Color code indicates that;
+ <span style="color:Gray;font-weight:bold;">Gray</span>– Not Started;
+ <span style="color:Green;font-weight:bold;">Green</span>– Ongoing;
+ <span style="color:Amber;font-weight:bold;">Amber</span>– Completed
 
 <b>Name</b>: Is Name of the Listing, which is a unique identity to represent Listing and is a mandatory field.   
 
