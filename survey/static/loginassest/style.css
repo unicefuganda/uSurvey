@@ -1329,7 +1329,7 @@ table.mc-table tbody .new .submissions a:before {
   background-image: url('../images/bg/sub-banner-course.jpg');
 }
 .bg-login-content {
-	background-image: url(loginassest/bg.jpg);
+	/*background-image: url(loginassest/bg.jpg);*/
 }
 .bg-featured-request-teacher {
   background-image: url('../images/bg/parallax-1.jpg');

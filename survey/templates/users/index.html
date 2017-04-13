@@ -3,10 +3,15 @@
   Users List
 {% endblock %}
 {% block search %}
-{% include "search_form.html" %}
+
 {% include "horizontal_filter_form.html" with a_form=users_filter_form no_button=True filter_id='users_filter_form' %}
 {% endblock %}
 {% block page_actions %}
+<style type="text/css">
+    .search {     
+    margin-top: 11px !important;
+    }
+</style>
 <ul id="horizontal-filter">
                 <li>
                     <a style="padding: 3px 5px" href="{% url 'new_user_page' %}" class="btn btn-white btn-warning btn-bold pull-right" id="add-user"><i class="ace-icon fa fa-plus bigger-120"></i> Add User</a>
@@ -14,6 +19,7 @@
             </ul>
 {% endblock %}
 {% block content %}
+{% include "search_form.html" %}
 {% load pagination_tags %}
 {% autopaginate users max_display_per_page %}
 {% load template_tags %}

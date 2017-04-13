@@ -30,7 +30,7 @@
    .search {
      float: right;
      margin-right: 5px;
-    margin-top: 18px;
+    margin-top: 26px;
     }
    div.table-header a {
        color: #0f0;
@@ -175,160 +175,159 @@
          <!--================= Box Div Start ==================-->
          <!-- Header Area -->
          <header class="headerFix">
+         {% if user.is_authenticated %}
             <div class="logo pull-left">
                <div class="logoImg">
                   <a href="{% url 'main_page' %}"><img src="{{ STATIC_URL }}toassets/Logo_Main.png" alt="uSurvey"></a>
                </div>
             </div>
-
-                <nav id='cssmenu'>
-<div id="head-mobile"></div>
-<div class="button"></div>
-<ul>
-<li id="menu-item-120" class="menu-item menu-item-type-custom menu-item-object-custom menu-ancestor menu-parent menu-item-has-children menu-item-120"><a href="{% url 'home_page' %}">DASHBOARD</a>
-                   </li>
-<li><a href='#'>DESIGN</a>
-   <ul>      
-      {% if perms.auth.can_view_batches %}
+            <nav id='cssmenu'>
+                <div id="head-mobile"></div>
+                <div class="button"></div>
+                <ul>
+                    <li id="menu-item-120" class="menu-item menu-item-type-custom menu-item-object-custom menu-ancestor menu-parent menu-item-has-children menu-item-120"><a href="{% url 'home_page' %}">DASHBOARD</a>
+                    </li>
+                    <li>
+                        <a href='#'>DESIGN</a>
+                        <ul>
+                            {% if perms.auth.can_view_batches %}
                             <li><a href="{% url 'survey_list_page' %}">Surveys</a></li>
                             {% endif%}
-                    {% if perms.auth.can_enter_data %}
+                            {% if perms.auth.can_enter_data %}
                             <li><a href="{% url 'listing_template_home' %}">Listing Form</a></li>
                             {% endif%}
-                    {% if perms.auth.can_enter_data %}
+                            {% if perms.auth.can_enter_data %}
                             <li><a href="{% url 'question_module_listing_page' %}">Modules</a></li>
-
                             <li><a href="{% url 'respondent_groups_page' %}">Groups</a></li>
-                    <li><a href="{% url 'show_question_library' %}">Question
-                                                Library</a></li>
-                            
-                       {% endif %}
-   </ul>
-</li>
+                            <li><a href="{% url 'show_question_library' %}">Question
+                                Library</a>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </li>
+                    <li>
+                        <a href='#'>ADMINISTRATION</a>
+                        <ul>
+                            <li>
+                                <a href="{% url 'interviewers_page' %}">Interviewers</a>
+                            </li>
+                            <li>
+                                <a href="{% url 'bulk_sms' %}">Notifications</a>
+                            </li>
+                            <li>
+                                <a href="{% url 'online_interviewer_view' %}">Data Entry</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href='#'>MONITOR</a>
+                        <ul>
+                            {% if perms.auth.view_completed_survey %}
+                            <li>
+                                <a href="{% url 'view_listing_data' %}">Listing Data</a>
+                            </li>
+                            <li>
+                                <a href="{% url 'view_batch_data' %}">Batch Data</a>
+                            </li>
+                            <li>
+                                <a href="{% url 'show_interviewer_completion_summary' %}"> Completion
+                                Summary</a>
+                            </li>
+                            {% endif %}
+                            <li><a href="{% url 'odk_submission_list' %}">ODK submissions</a>
+                            </li>
+                        </ul>
+                    </li>
+                    {% if perms.auth.can_view_batches or perms.auth.view_completed_survey %}
+                    <li>
+                        <a href='#'>ANALYSE</a>
+                        <ul>
+                            <li>
+                                <a href="{% url 'list_indicator_page' %}">Indicators</a>
+                            </li>
+                            <li>
+                                <a href="{% url 'list_weights_page' %}">Location Weights</a>
+                            </li>
+                            {% endif %}    
+                        </ul>
+                    </li>
+                    {% if perms.auth.can_view_aggregates %}
+                    <li>
+                        <a href='#'>DOWNLOADS</a>
+                        <ul>
+                            <li>
+                                <a href="{% url 'download_excel' %}">Survey Data</a>
+                            </li>
+                            <li>
+                                <a href="{% url 'interviewer_report_page' %}">Mobile Money Sheet</a>
+                            </li>
+                            {% endif %}    
+                        </ul>
+                    </li>
+                    {% if user.is_authenticated %}
+                    <li>
+                        <a href='#'>SETTINGS</a>
+                        <ul>
+                            {% if user.is_superuser == True %}
+                            <li>
+                                <a href="{% url 'users_index' %}">Users</a>
+                            </li>
+                            <li>
+                                <a href="{% url 'enumeration_area_home' %}">Locations</a>
+                            </li>
+                            <li>
+                                <a href="#">Setup</a>
+                            </li>
+                            {% else %}
+                            <li>
+                                <a href="{% url 'users_edit' user.id %}">Edit Profile</a>
+                            </li>
+                            {% endif %}    
+                        </ul>
+                    </li>
+                    {% endif %}
+                    <li>
+                        {% has_super_powers request as has_powers %}
+                        {% if user.is_authenticated %}
+                        <span class="dropdown-toggle" data-toggle="dropdown" data-position="auto" style="background:  none !important; border: none !important;">
+                        {% if has_powers %}
+                        <img src="{{ STATIC_URL }}images/userICON_admin.png" width="40px;" height="40px;" style="margin-left: 150px;" title="Super Powers Activated">
+                        {% else %}
+                        <img src="{{ STATIC_URL }}images/userICON.png" width="40px;" height="40px;" style="margin-left: 150px;margin-top: 10px;">
+                        {% endif %}
+                        </span>
+                        <ul>
+                            <li>
+                                <a href="#">{% if user.first_name %}{{ user.first_name }} {% else %} Settings {% endif %}</a>
+                            </li>
+                            {% if perms.auth.can_have_super_powers %}
+                            {% if has_powers %}
+                            <li>
+                                <a href="{% url 'deactivate_super_powers_page' %}">Deactivate Power Mode</a>
+                            </li>
+                            {% else %}
+                            <li>
+                                <a href="{% url 'activate_super_powers_page' %}">Active Power Mode</a>
+                            </li>
+                            {% endif %}
+                            {% endif %}
+                            <li>
+                                <a href="{% url 'password_change' %}">Change Password</a>
+                            </li>
+                            <li>
+                                <a href="{% url 'logout_page' %}">Logout</a>
+                            </li>
+                            {% else %}
+                            <a href="{% url 'login_page' %}">Login</a>
+                            {% endif %}
+                        </ul>
+                    </li>
+                </ul>
+            </nav>
+            {%else%}
+            {% include 'home_navbar.html' %}
+            {%endif%}
 
-
-
-<li><a href='#'>ADMINISTRATION</a>
-   <ul>      
-      <li>
-      <a href="{% url 'interviewers_page' %}">Interviewers</a>
-      </li>
-      <li>
-      <a href="{% url 'bulk_sms' %}">Notifications</a></li>
-      <li>
-      <a href="{% url 'online_interviewer_view' %}">Data Entry</a>
-      </li>      
-   </ul>
-</li>
-
-<li><a href='#'>MONITOR</a>
-   <ul>      
-      {% if perms.auth.view_completed_survey %}
-                           <li>
-                           <a href="{% url 'view_listing_data' %}">Listing Data</a>
-                           </li>
-                           <li>
-                           <a href="{% url 'view_batch_data' %}">Batch Data</a>
-                           </li>
-                           <li>
-                           <a href="{% url 'show_interviewer_completion_summary' %}"> Completion
-                                        Summary</a>
-                           </li>
-      {% endif %}
-                       <li><a href="{% url 'odk_submission_list' %}">ODK submissions</a>
-                       </li>      
-   </ul>
-</li>
-
-{% if perms.auth.can_view_batches or perms.auth.view_completed_survey %}
-<li><a href='#'>ANALYSE</a>
-   <ul>      
-      <li>
-      <a href="{% url 'list_indicator_page' %}">Indicators</a>
-      </li>
-      <li>
-      <a href="{% url 'list_weights_page' %}">Location Weights</a>
-      </li>
-      {% endif %}    
-   </ul>
-</li>
-{% if perms.auth.can_view_aggregates %}
-<li><a href='#'>DOWNLOADS</a>
-   <ul>      
-      <li>
-      <a href="{% url 'download_excel' %}">Survey Data</a>
-      </li>
-      <li>
-      <a href="{% url 'interviewer_report_page' %}">Mobile Money Sheet</a>
-      </li>
-      {% endif %}    
-   </ul>
-</li>
-
-
-{% if user.is_authenticated %}
-<li><a href='#'>SETTINGS</a>
-   <ul>      
-      {% if user.is_superuser == True %}
-      <li>
-      <a href="{% url 'users_index' %}">Users</a>
-      </li>
-      <li>
-      <a href="{% url 'enumeration_area_home' %}">Locations</a></li>
-      <li>
-      <a href="#">Setup</a>
-      </li>
-      {% else %}
-      <li>
-      <a href="{% url 'users_edit' user.id %}">Edit Profile</a>
-      </li>
-      {% endif %}    
-   </ul>
-</li>
-{% endif %}
-
-<li>
-{% has_super_powers request as has_powers %}
-{% if user.is_authenticated %}
-<span class="dropdown-toggle" data-toggle="dropdown" data-position="auto" style="background:  none !important; border: none !important;">
-{% if has_powers %}
-<img src="{{ STATIC_URL }}images/userICON_admin.png" width="40px;" height="40px;" style="margin-left: 150px;" title="Super Powers Activated">
-{% else %}
-<img src="{{ STATIC_URL }}images/userICON.png" width="40px;" height="40px;" style="margin-left: 150px;margin-top: 10px;">
-{% endif %}
-</span>
-<ul>
-<li>
-<a href="#">{% if user.first_name %}{{ user.first_name }} {% else %} Settings {% endif %}</a>
-</li>
-{% if perms.auth.can_have_super_powers %}
-{% if has_powers %}
-<li>
-<a href="{% url 'deactivate_super_powers_page' %}">Deactivate Power Mode</a>
-</li>
-{% else %}
-<li>
-<a href="{% url 'activate_super_powers_page' %}">Active Power Mode</a>
-</li>
-{% endif %}
-{% endif %}
-<li>
-<a href="{% url 'password_change' %}">Change Password</a>
-</li>
-<li>
-<a href="{% url 'logout_page' %}">Logout</a>
-</li>
-{% else %}
-<a href="{% url 'login_page' %}">Login</a>
-{% endif %}
-</ul>
-</li>
-
-
-</ul>
-</nav>
-            <div>
-            </div>
             <div class="clearfix"></div>
          </header>
          <div class="fw-page-builder-content">

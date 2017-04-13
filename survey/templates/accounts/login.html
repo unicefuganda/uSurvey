@@ -1,7 +1,71 @@
+{% extends "base.html" %}
+{% load repeatedblocks %}
 {% load template_tags %}
-<!DOCTYPE html>
-<html lang="en"><head>
+{% block page_title %} Login {%endblock%}
+{% block extra_content %}
+
+<section id="login-content" class="login-content">
+    <div class="awe-parallax bg-login-content">
+    </div>
+    <div class="awe-overlay"></div>
+    <div class="container">
+        <div class="row"  style="margin-top: 145px;">
+            <!-- FORM -->
+            <div class="col-xs-12 col-lg-4 pull-right">
+                <div class="form-login">
+                    {% if form.errors %}
+                    <label class="error" style="color:yellow">Your username and password didn't match. Please try again.</label>
+                    {% endif %}
+                    {% if not form.errors %}
+                    {% endif %}                   
+                    <form method="post" action="{% url 'django.contrib.auth.views.login' %}">
+                        <h2 style="font-family: Open-Sans">uSurvey</h2>
+                        {% csrf_token %} 
+                        <div>
+                            <div class="form-email">
+                                <!-- <label for="username" style="color: #fff">{{ form.username.label_tag }}</label> -->
+                                {{ form.username }}
+                            </div>
+                        </div>
+                        <div class="form-password">
+                            <!-- <label  for="inputPassword" style="color: #fff">{{ form.password.label_tag }}</label> -->
+                            {{ form.password }}
+                        </div>
+                        <div class="form-check" >
+                            <input id="check" type="checkbox">
+                            <!-- <label for="check">
+                                <i class="icon md-check-2"></i>
+                                Remember me</label> -->                      
+                        </div>
+                        <div class="form-submit-1">
+                            <input value="Sign In" class="mc-btn btn-style-1" type="submit">
+                            {% if next %}
+                            <input type="hidden" name="next" value="{{ next }}" />
+                            {% else %}
+                            <input type="hidden" name="next" value="{% url 'home_page' %}" />
+                            {% endif %}
+                        </div>
+                        <a style='float: right;' href="{% url 'password_reset' %}">Forgot password?</a>
+                    </form>
+                </div>
+            </div>
+            <!-- END / FORM -->
+            <div class="image">
+                <img src="{{ STATIC_URL }}loginassest/img-thumb.png" alt="">
+            </div>
+        </div>
+    </div>
+    <div style="min-height: 100px;">&nbsp;</div>
+</section>
+            
+{%endblock%}
+{% block extra_css %}
+<link href="{{ STATIC_URL }}loginassest/css.css" rel="stylesheet" type="text/css">
+<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}loginassest/bootstrap.css">
+<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}loginassest/style.css">
 <style type="text/css">
+    #cssmenu > ul > li .login {
+    color: yellow;}
     .form-email input, .form-password input {    
     /*padding: 0 65px !important;*/
     width: 100%;
@@ -15,183 +79,20 @@
      z-index: 99; 
     max-width: 400px;
     margin-left: auto;
-    margin-top: -35px;
-    margin-bottom: 190px;
+    margin-top: -90px;
+    margin-bottom: 250px;
     margin-right: auto;
 }
 }
+    
 </style>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-     <!-- Google font -->
-    <link href="{{ STATIC_URL }}loginassest/css.css" rel="stylesheet" type="text/css">
-    <!-- Css -->
-    <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}loginassest/bootstrap.css">
-       <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}loginassest/style.css">
-    <!--[if lt IE 9]>
-        <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
-      
-    <![endif]-->
-    <title>Login - uSurvey </title>
-
-</head>
-<body id="page-top" class="home">
-
-<!-- PAGE WRAP -->
-<div id="page-wrap">
-
-
-    <!-- HEADER -->
-    <header id="header" class="header">
-        <div class="container">
-
-            <!-- LOGO -->
-            <div class="logoImg"><a href="/"><img style="padding-top: 16px;" src="{{ STATIC_URL }}loginassest/Logo_Main.png" alt=""></a></div>
-            <!-- END / LOGO -->
-
-            <!-- NAVIGATION -->
-            <nav class="navigation">
-
-                <div class="open-menu">
-                   
-                </div>
-
-                <!-- MENU -->
-          
-                <!-- END / MENU -->
-
-                <!-- LIST ACCOUNT INFO -->
-                <ul class="list-account-info">
-
-
-                    <li class="list-item account">
-                        <!-- <div class="account-info item-click">
-                            <img src="{{ STATIC_URL }}loginassest/userafterlogin.jpg" alt="">
-                        </div> -->
-                        <div class="toggle-account toggle-list">
-                            <ul class="list-account">
-                                <li><a href="#"><i><img src="{{ STATIC_URL }}loginassest/settings.png" width="16" height="16"></i> Settings</a></li>
-                                <li><a href="#"><i><img src="{{ STATIC_URL }}loginassest/logout.png" width="16" height="16"></i> Sign Out</a></li>
-                            </ul>
-                        </div>
-                    </li>
-
-
-                </ul>
-                <!-- END / LIST ACCOUNT INFO -->
-
-            </nav>
-            <!-- END / NAVIGATION -->
-
-        </div>
-    </header>
-    <!-- END / HEADER -->
-
-    <!-- LOGIN -->
-
-              {% if messages %}
-                <!-- <br /><br /> -->
-                {% for message in messages %}
-                   <ul class="alert alert-{{ message.tags }}"  style="background: #def0d8 none repeat scroll 0 0;
-border: 1px solid #cfdaca;
-margin-top: 7px;
-padding: 8px;
-text-align: center;">
-                        <button type="button" class="close" data-dismiss="alert">&times;</button>
-                        {{ message }}
-                    </ul>
-                {% endfor %}
-            {% endif %}
-    <section id="login-content" class="login-content">
-
-        <div class="awe-parallax bg-login-content">
-        </div>
-      <div class="awe-overlay"></div>
-        <div class="container">
-            <div class="row" style="padding-bottom: 60px">
-
-                <!-- FORM -->
-                <div class="col-xs-12 col-lg-4 pull-right">
-                {% csrf_token %}
-                   <div class="form-login">
-
-                   {% if form.errors %}
-
-      
-        <label class="error" style="color:yellow">Your username and password didn't match. Please try again.</label>
-      
-  {% endif %}
-
-  {% if not form.errors %}
-
-  {% endif %}                   
-                        <form method="post" action="{% url 'django.contrib.auth.views.login' %}">
-                            <h2 style="font-family: Open-Sans">uSurvey</h2>
-                            {% csrf_token %} <div>
-                            <div class="form-email">
-                                 <!-- <label for="username" style="color: #fff">{{ form.username.label_tag }}</label> -->
-                                 {{ form.username }}
-                                 </div>
-                            </div>
-                            <div class="form-password">
-                               <!-- <label  for="inputPassword" style="color: #fff">{{ form.password.label_tag }}</label> -->
-                              {{ form.password }}
-                            </div>
-                            <div class="form-check" >
-                                <input id="check" type="checkbox">
-                                <!-- <label for="check">
-                                <i class="icon md-check-2"></i>
-                                Remember me</label> -->                      
-                            </div>
-                            <div class="form-submit-1">
-                                <input value="Sign In" class="mc-btn btn-style-1" type="submit">
-                                 {% if next %}
-        <input type="hidden" name="next" value="{{ next }}" />
-    {% else %}
-        <input type="hidden" name="next" value="{% url 'home_page' %}" />
-    {% endif %}
-                            </div>
-                            <a style='float: right;' href="{% url 'password_reset' %}">Forgot password?</a>
-                         
-                        </form>
-                    </div>
-                </div>
-                <!-- END / FORM -->
-    
-                <div class="image">
-                    <img src="{{ STATIC_URL }}loginassest/img-thumb.png" alt="">
-                </div>
-    
-            </div>
-        </div>
-    </section>
-    <!-- END / LOGIN -->
-    <!-- FOOTER -->
-    <footer id="footer" class="footer">
-        
-        <div class="second-footer">
-            <div class="container">
-                <div class="contact">
-                   
-                    
-                    <div class="address">
-                 
-                    </div>
-                </div>
-                <p class="copyright">Copyright © 2017 uSurvey. All rights reserved.</p>
-            </div>
-        </div>
-    </footer>
-    <!-- END / FOOTER -->
-<div class="overlayForm"></div></div>
-<!-- END / PAGE WRAP -->
-
-<!-- Load jQuery -->
-<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+{%endblock%}
+{% block extra_js %}
 <script type="text/javascript">
-    
-$('#id_username').attr("placeholder","Username");
-$('#id_password').attr("placeholder","Password");
-
+    $('#id_username').attr("placeholder","Username");
+    $('#id_password').attr("placeholder","Password");
 </script>
-</body></html>
+{%endblock%}
+</body>
+</html>
+
