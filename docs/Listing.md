@@ -30,7 +30,8 @@ A Listing Form is created by filling above all fields, finally clicking on ‘Sa
   
 On the ‘Listing Form’ page one can view all the Listings created in the application, in a tabular form with following column names:
 
-<b>Sts</b>: Represents Status of the Listing by color indicator, that means each of the Color code indicates that;
+<b>Sts</b>: Represents Status of the Listing by color indicator, that means each of the Color code indicates as:
+
  <span style="color:Gray;font-weight:bold;">•</span>– Not Started<br>
  <span style="color:Orange;font-weight:bold;">•</span>– Ongoing<br>
  <span style="color:Green;font-weight:bold;">•</span>– Completed<br>
@@ -45,14 +46,14 @@ On the ‘Listing Form’ page one can view all the Listings created in the appl
 
 <b>Actions in Listing Form</b>:
 
-* Edit Listing: click on, Action Item ‘Edit’, User can Edit only the name of the Listing, Description and selection of Access channels (OBK, USSD)
+* <b>Edit</b>: click on, Action Item ‘Edit’, User can Edit only the name of the Listing, Description and selection of Access channels (OBK, USSD)
 
-* Delete Listing: click on, Action Item ‘Delete, the entire Listing is removed, before deleting you will be prompted with conformation to delete, click ‘Yes’ to Delete permanently.
+* <b>Delete</b>: click on, Action Item ‘Delete, the entire Listing is removed, before deleting you will be prompted with conformation to delete, click ‘Yes’ to Delete permanently.
 This option is not available for completed listing
 
-* View/Edit Questions in Listing: click on, Action Item ‘View/Edit Questions’, navigates to ‘Listing Questions’ page to View or Edit Respective Questions in Listing
+* <b>View/Edit Questions</b>: click on, Action Item ‘View/Edit Questions’, navigates to ‘Listing Questions’ page to View or Edit Respective Questions in Listing
 
-* Clone a Listing: click on, Action Item ‘Clone’, an another copy of same Listing Form is created along with Listing Questions, except existing Looping and Logic
+* <b>Clone</b>: click on, Action Item ‘Clone’, an another copy of same Listing Form is created along with Listing Questions, except existing Looping and Logic
 
 * View Listing Data: This Action Item is available only for the completed Listing operation in the field.  click on, Action Item ‘View Data’, to view data collected for this particular Listing
 

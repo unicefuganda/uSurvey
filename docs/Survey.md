@@ -22,15 +22,18 @@ To create a New Survey, click on ‘Create New Survey’ button at top right of 
 •	<b>Name</b>: Is Survey Name, which is a unique identity to a survey and is a mandatory field.   
 •	<b>Description</b>: write about the importance of this survey in short.  
 •	<b>Survey Type</b>: This identifies how survey is going to take place either using Listing or not.
-If Survey Type is “Sampled”, Survey uses Sample size and Listing. 
+If Survey Type is “Sampled”, Survey uses Sample size and Listing.<br>
 If Survey Type is “Census”, Survey doesn’t need Sample size and Listing.
 
 •  <b>Sample size</b>: Provide survey sample size
+
 •  <b>Preferred Listing</b>: select an existing Listing Or
+
 •  <b>Listing Form</b>: select Newly created Listing
+
 •  <b>Randomly selected data label</b>: You need to include one listing response identifier in double curly brackets.
- i.e. just type, double curly brackets to automatically insert ‘Variable Name’ in above selected Listing
- Ex: type {{ , system prompts with ‘Variable Name’ then select any one to insert Variable Name
+ i.e. just type, double curly brackets to automatically insert ‘Variable Name’ in above selected Listing<br>
+ Ex: type {{ , system prompts with ‘Variable Name’ then select any one to insert Variable Name<br>
  Like: {{house_number}}
 
 A New Survey is created by providing above fields and click on ‘Save’ button to Create a Survey. 
@@ -39,10 +42,11 @@ A New Survey is created by providing above fields and click on ‘Save’ button
 
 On the ‘Survey’ page one can view all the Survey created in the application, in a tabular form with following column names:
 
-<b>Sts</b>: Represents Status of the Survey by color indicator, that means each of the Color code indicates that;
- <span style="color:Gray;font-weight:bold;">Gray</span>– Not Started<br>
- <span style="color:Green;font-weight:bold;">Green</span>– Ongoing<br>
- <span style="color:Orange;font-weight:bold;">Amber</span>– Completed<br>
+<b>Sts</b>: Represents Status of the Survey by color indicator, that means each of the Color code indicates as:
+
+ <span style="color:Gray;font-weight:bold;">•</span>– Not Started<br>
+ <span style="color:Orange;font-weight:bold;">•</span>– Ongoing<br>
+ <span style="color:Green;font-weight:bold;">•</span>– Completed<br>
 
 <b>Name</b>: Is Name of a Survey, which is a unique identity to represent Survey and is a mandatory field.
 
@@ -78,20 +82,26 @@ To create a New Batch, click on ‘Create New Batch’ button at top right of th
 
 <b>Elements of a Batch</b>:
 
-•	<b>Name</b>: Is Batch Name, which is a unique identity to a Batch and is a mandatory field  
+•	<b>Name</b>: Is Batch Name, which is a unique identity to a Batch and is a mandatory field
+
 •	<b>Description</b>: write about the importance of this Batch in short
+
 •	<b>Access channels</b>: This will identify on which channel this survey has to be conducted and has two channel ODK and USSD
 
 A New Batch is created by providing above fields and click on ‘Save’ button to Create a New Batch in Survey. 
 
 <b>Actions in Batch</b>:
 
-•	Edit Batch: click on, Action Item ‘Edit’, User can Edit all fields in a Batch.
-•	Delete Batch: click on, Action Item ‘Delete, the entire Batch along with questions are removed, before deleting you will be prompted with conformation to delete, click ‘Yes’ to Delete permanently. This option is not available for completed Surveys.
-•	View/Edit Questions: click on, Action Item ‘View /Edit Questions’, takes to the Survey ‘Batch Questions’ page 
-•	Open/Close: click on, Action Item ‘Open/Close’, takes to the page where all Enumeration Areas are listed, here one can change the “status of conducting survey in a particular Enumeration Area” to Open/Close.
+•	<b>Edit</b>: click on, Action Item ‘Edit’, User can Edit all fields in a Batch.
+
+•	<b>Delete</b>: click on, Action Item ‘Delete, the entire Batch along with questions are removed, before deleting you will be prompted with conformation to delete, click ‘Yes’ to Delete permanently. This option is not available for completed Surveys.
+
+•	<b>View/Edit Questions/<b>: click on, Action Item ‘View /Edit Questions’, takes to the Survey ‘Batch Questions’ page 
+
+•	<b>Open/Close</b>: click on, Action Item ‘Open/Close’, takes to the page where all Enumeration Areas are listed, here one can change the “status of conducting survey in a particular Enumeration Area” to Open/Close.
 i.e. Open- means allow to conduct survey and Close - means it prevents to conduct survey.
-•	View Data in the Survey: click on, Action Item ‘View Data’, shows Data collected in this Survey. This option is available only for completed Surveys.
+
+•	<b>View Data</b>: click on, Action Item ‘View Data’, shows Data collected in this Survey. This option is available only for completed Surveys.
 
 <b>How to create Batch Questions?</b>
 
@@ -102,7 +112,7 @@ Now click on Batch Name, or click on, Action Item ‘View /Edit Question’ to g
 
 Now click on, ‘Add Question’ button at top right side of this page, this will open a form where one can create a Question, which has following elements; 
 
-Elements in Batch Question form:
+<b>Elements in Batch Question form</b>:
 
 Module: All Modules in the application are listed here in this dropdown, one has to select, respective Module that is related to survey.
 
