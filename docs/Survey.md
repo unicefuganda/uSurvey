@@ -3,7 +3,7 @@
 Surveys are available from main menu under <b>Design</b> >> <b>Surveys</b>
 ![Listing](./Survey2.png)
 A New Survey can be created and defined here, so before creating a survey first of all one has to know about the terminology used here.
-
+![Listing](./Survey1.png)
 • <b>Preferred Listing</b>: List of existing Listing, which are already in the system.<br>
 Is an option to choose, existing Listing for this New Survey, where already survey was conducted on these Listings, which will include total Listing questions along with the data/results.
 
