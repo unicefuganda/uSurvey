@@ -4,10 +4,12 @@ Surveys are available from main menu under <b>Design</b> >> <b>Surveys</b>
 
 A New Survey can be created and defined here, so before creating a survey first of all one has to know about the terminology used here.
 
-• <b>Preferred Listing</b>: List of existing Listing, which are already in the system.
+• <b>Preferred Listing</b>: List of existing Listing, which are already in the system.<br>
 Is an option to choose, existing Listing for this New Survey, where already survey was conducted on these Listings, which will include total Listing questions along with the data/results.
-• <b>Listing Form</b>: List of Newly created Listings, not previously used in any survey.
+
+• <b>Listing Form</b>: List of Newly created Listings, not previously used in any survey.<br>
 This field will enable only if option “None, Create New” is selected, in the dropdown ‘Preferred Listing’. which contains list of Newly created Listings, which are not yet used in any survey.
+
 • <b>Randomly selected data label</b>: Is the identifier for respondents while conducting a Listing survey.<br>
 This field will enable only when listing in dropdown ‘Listing Form’ is selected.
 
@@ -51,7 +53,7 @@ On the ‘Survey’ page one can view all the Survey created in the application,
 <b>Actions in Survey</b>:
 
 • <b>Edit Survey</b>: click on, Action Item ‘Edit’, User can Edit all fields in the Survey<br>
-• <b>Delete Survey</b>: click on, Action Item ‘Delete, the entire Survey is removed, before deleting you will be prompted with conformation to delete, click ‘Yes’ to Delete permanently.<br> This option is not available for completed Survey<br>
+• <b>Delete Survey</b>: click on, Action Item ‘Delete, the entire Survey is removed, before deleting you will be prompted with conformation to delete, click ‘Yes’ to Delete permanently. <br> This option is not available for completed Survey<br>
 • <b>View Batches in Survey</b>: click on, Action Item ‘View Batches’, navigates to ‘Survey Batches’ page<br>
 • <b>Clone a Survey</b>: click on, Action Item ‘Clone’, an another copy of same Survey is created along with Survey Batches and Batch Questions, except existing Looping and Logic in Batch Questions<br>
 • <b>Sampling Criteria</b>: 
