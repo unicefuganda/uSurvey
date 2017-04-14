@@ -16,7 +16,7 @@ Listing is a set of Questions that can be customized/configured for any survey b
 
 To create a new Listing, click on the ‘Create New Listing Form’ button at top right of the Listing page, that opens a form to create a new Listing, which has following elements; 
 
-<b>Elements of Listing form</b>:<br>
+<b>Elements of Listing form</b>:
 
 * <b>Name</b>: Is Listing Name, which is a unique identity to a Listing and is a mandatory field.
 
@@ -48,7 +48,7 @@ On the ‘Listing Form’ page one can view all the Listings created in the appl
 
 * <b>Edit</b>: click on, Action Item ‘Edit’, User can Edit only the name of the Listing, Description and selection of Access channels (OBK, USSD)
 
-* <b>Delete</b>: click on, Action Item ‘Delete, the entire Listing is removed, before deleting you will be prompted with conformation to delete, click ‘Yes’ to Delete permanently.
+* <b>Delete</b>: click on, Action Item ‘Delete, the entire Listing is removed, before deleting you will be prompted with conformation to delete, click ‘Yes’ to Delete permanently.<br>
 This option is not available for completed listing
 
 * <b>View/Edit Questions</b>: click on, Action Item ‘View/Edit Questions’, navigates to ‘Listing Questions’ page to View or Edit Respective Questions in Listing

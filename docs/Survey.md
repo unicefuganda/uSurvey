@@ -4,11 +4,11 @@ Surveys are available from main menu under <b>Design</b> >> <b>Surveys</b>
 
 A New Survey can be created and defined here, so before creating a survey first of all one has to know about the terminology used here.
 
-* <b>Preferred Listing</b>: List of existing Listing, which are already in the system.
+• <b>Preferred Listing</b>: List of existing Listing, which are already in the system.
 Is an option to choose, existing Listing for this New Survey, where already survey was conducted on these Listings, which will include total Listing questions along with the data/results.
-* <b>Listing Form</b>: List of Newly created Listings, not previously used in any survey.
+• <b>Listing Form</b>: List of Newly created Listings, not previously used in any survey.
 This field will enable only if option “None, Create New” is selected, in the dropdown ‘Preferred Listing’. which contains list of Newly created Listings, which are not yet used in any survey.
-* <b>Randomly selected data label</b>: Is the identifier for respondents while conducting a Listing survey.<br>
+• <b>Randomly selected data label</b>: Is the identifier for respondents while conducting a Listing survey.<br>
 This field will enable only when listing in dropdown ‘Listing Form’ is selected.
 
 <b>How to create a Survey?</b>
@@ -41,17 +41,17 @@ On the ‘Survey’ page one can view all the Survey created in the application,
  <span style="color:Orange;font-weight:bold;">•</span>– Ongoing<br>
  <span style="color:Green;font-weight:bold;">•</span>– Completed<br>
 
-<b>Name</b>: Is Name of a Survey, which is a unique identity to represent Survey and is a mandatory field.<br>
-<b>Description</b>: A short description about Listing<br>
-<b>Type</b>: Survey type Sampled or Census<br>
-<b>Sample size</b>: Provide survey sample size<br>
-<b>Total Respondents</b>: once the Survey is completed, this column will be updated with the count of participants/ respondents.<br>
-<b>Eas Covered</b>: Count of Enumeration areas covered in this particular survey.
+• <b>Name</b>: Is Name of a Survey, which is a unique identity to represent Survey and is a mandatory field.<br>
+• <b>Description</b>: A short description about Listing<br>
+• <b>Type</b>: Survey type Sampled or Census<br>
+• <b>Sample size</b>: Provide survey sample size<br>
+• <b>Total Respondents</b>: once the Survey is completed, this column will be updated with the count of participants/ respondents.<br>
+• <b>Eas Covered</b>: Count of Enumeration areas covered in this particular survey.
 
 <b>Actions in Survey</b>:
 
 • <b>Edit Survey</b>: click on, Action Item ‘Edit’, User can Edit all fields in the Survey<br>
-• <b>Delete Survey</b>: click on, Action Item ‘Delete, the entire Survey is removed, before deleting you will be prompted with conformation to delete, click ‘Yes’ to Delete permanently. This option is not available for completed Survey<br>
+• <b>Delete Survey</b>: click on, Action Item ‘Delete, the entire Survey is removed, before deleting you will be prompted with conformation to delete, click ‘Yes’ to Delete permanently.<br> This option is not available for completed Survey<br>
 • <b>View Batches in Survey</b>: click on, Action Item ‘View Batches’, navigates to ‘Survey Batches’ page<br>
 • <b>Clone a Survey</b>: click on, Action Item ‘Clone’, an another copy of same Survey is created along with Survey Batches and Batch Questions, except existing Looping and Logic in Batch Questions<br>
 • <b>Sampling Criteria</b>: 
@@ -98,17 +98,15 @@ Now click on, ‘Add Question’ button at top right side of this page, this wil
 
 <b>Elements in Batch Question form</b>:
 
-<b>Module</b>: All Modules in the application are listed here in this dropdown, one has to select, respective Module that is related to survey<br>
-<b>Group</b>: All available Groups are listed in this dropdown, select relevant group name for the question<br>
-<b>Variables Name</b>: This is an identifier for Question, type a code for Question
-
-<b>Text</b>: Is the actual Question, Write a Question. While typing a question, auto suggestion feature is available, which will prompt with the ‘Variable Name’ of preceding questions, that helps to include “Answered text of preceding question” in framing this question. 
+• <b>Module</b>: All Modules in the application are listed here in this dropdown, one has to select, respective Module that is related to survey<br>
+• <b>Group</b>: All available Groups are listed in this dropdown, select relevant group name for the question<br>
+• <b>Variables Name</b>: This is an identifier for Question, type a code for Question<br>
+• <b>Text</b>: Is the actual Question, Write a Question. While typing a question, auto suggestion feature is available, which will prompt with the ‘Variable Name’ of preceding questions, that helps to include “Answered text of preceding question” in framing this question. 
 i.e. just type, double curly brackets to automatically prompt with the ‘Variable Name’ from preceding questions, <br>
 Ex: type {{ , system prompts with ‘Variable Name’ then select any one to insert Variable Name,<br>
-Like: {{structure_address}}
- 
-<b>Answer Type</b>: Select an Answer Type from dropdown list, such that Question has to be answered in any one of these formats only, that is ‘Answer type’ should be: “Audio, Auto Generate, Date, Geo Point, Image, Multi choice, Multi Select, Numeric, Text and Video”<br>
-<b>Mandatory</b>: To mark the Question, that has to answered compulsory
+Like: {{structure_address}} <br>
+• <b>Answer Type</b>: Select an Answer Type from dropdown list, such that Question has to be answered in any one of these formats only, that is ‘Answer type’ should be: “Audio, Auto Generate, Date, Geo Point, Image, Multi choice, Multi Select, Numeric, Text and Video”<br>
+• <b>Mandatory</b>: To mark the Question, that has to answered compulsory
 
 A Question in Batch is created by filling above all fields, finally click on ‘Save’ button to Add Question in Batch or click on ‘Save and Add More’ button to continue adding another Question to the same Batch or click on ‘Save and Update Library’ to add same to the ‘Questions Library’.
 
