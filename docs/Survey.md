@@ -22,15 +22,12 @@ To create a New Survey, click on ‘Create New Survey’ button at top right of 
 •	<b>Name</b>: Is Survey Name, which is a unique identity to a survey and is a mandatory field.   
 •	<b>Description</b>: write about the importance of this survey in short.  
 •	<b>Survey Type</b>: This identifies how survey is going to take place either using Listing or not.
-If Survey Type is “Sampled”, Survey uses Sample size and Listing.<br>
-If Survey Type is “Census”, Survey doesn’t need Sample size and Listing.
+    If Survey Type is “Sampled”, Survey uses Sample size and Listing.<br>
+    If Survey Type is “Census”, Survey doesn’t need Sample size and Listing.
 
 •  <b>Sample size</b>: Provide survey sample size
-
 •  <b>Preferred Listing</b>: select an existing Listing Or
-
 •  <b>Listing Form</b>: select Newly created Listing
-
 •  <b>Randomly selected data label</b>: You need to include one listing response identifier in double curly brackets.
  i.e. just type, double curly brackets to automatically insert ‘Variable Name’ in above selected Listing<br>
  Ex: type {{ , system prompts with ‘Variable Name’ then select any one to insert Variable Name<br>
@@ -43,7 +40,6 @@ A New Survey is created by providing above fields and click on ‘Save’ button
 On the ‘Survey’ page one can view all the Survey created in the application, in a tabular form with following column names:
 
 <b>Sts</b>: Represents Status of the Survey by color indicator, that means each of the Color code indicates as:
-
  <span style="color:Gray;font-weight:bold;">•</span>– Not Started<br>
  <span style="color:Orange;font-weight:bold;">•</span>– Ongoing<br>
  <span style="color:Green;font-weight:bold;">•</span>– Completed<br>
@@ -199,7 +195,9 @@ One should be very careful while creating a loop, first of all analyze how a loo
 <b>Loop Representation</b>:
 
 * <span style="color:Chartreuse;font-weight:bold;">Light Green</span>Bar icon represents Loop - START,
+
 * <span style="color:Red;font-weight:bold;">Red</span>Bar icon represents Loop - END,
+
 * <span style="color:Green;font-weight:bold;">Green</span>Bar icon represents Loop - CONTINUATION
 
 <b>Remove Loop</b>:
@@ -207,7 +205,7 @@ One should be very careful while creating a loop, first of all analyze how a loo
 This Action item available only for the Questions that has Answer Type “Auto Generated” and a Loop is created.
 click on, Action Item ‘Remove Loop’ which will remove the existing looping logic.
 
-Add Logic: 
+<b>Add Logic</b>: 
 
 ‘Add Logic’ is an Action item for every question expect for the Questions that has Answer Type “Auto Generated”.
 

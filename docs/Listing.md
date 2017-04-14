@@ -55,7 +55,7 @@ This option is not available for completed listing
 
 * <b>Clone</b>: click on, Action Item ‘Clone’, an another copy of same Listing Form is created along with Listing Questions, except existing Looping and Logic
 
-* <b>View Data<b>: This Action Item is available only for the completed Listing operation in the field.  click on, Action Item ‘View Data’, to view data collected for this particular Listing
+* <b>View Data</b>: This Action Item is available only for the completed Listing operation in the field.  click on, Action Item ‘View Data’, to view data collected for this particular Listing
 
 <b>Creating Questionnaire to the Listing Form</b>: 
 
@@ -64,7 +64,7 @@ On the ‘Listing Form’ page you can view all the Listings created in the appl
 To add new questions in Listing can be done in 2 ways
 
 1. Click on the Listing Name
-2. Click on Actions Drop down and select the item ‘View/Edit Questions’ 
+2. Click on Actions Drop down and select the item ‘View/Edit Questions’
 
 One can also select the questions from ‘Questions Library’ to add into Listing, using ‘Select Questions’ 
 
