@@ -145,6 +145,7 @@ To define the Looping concept, first of all one has to understand about terms th
 One should be very careful while creating a loop, first of all analyze how a loop has to be created, using ‘Repeat logic’ and where to ‘End Loop’, as defined above select accordingly from ‘Repeat logic’ and ‘Loop end at’ to define a loop.
 
 click on, Action Item ‘Start/Edit Loop’ which will take to ‘Start Loop’ page, now create loop as follows:
+
 * select “Logic Type” from dropdown ‘Repeat logic’,
 * select “Question at which loop should end” from dropdown ‘Loop end at’ and
 * in ‘Loop Prompt’ Text Box, write some message about, instructing the loop flow,
@@ -182,6 +183,7 @@ one has to define the Logic here for respective question by satisfying the condi
 * ‘End Interview’ – Skips the intermediate Question and moves to end of the questioner.
  
 * ‘Ask Sub-Question’ – Provides an option to Create a Sub-Question based upon the ‘Attribute’ value.<br>
+
 To do this, select option “Ask Sub-Question” than you will find a button with name ‘Add Sub-Question’ beside this, <br>
 click on it to create a Sub-Question, same like create question, once you click on ‘Save’ button, you will find this Sub-Question in the dropdown ‘Choose Question’ 
 beside it, now select the “Sub-Question” and click on ‘Save’ button.

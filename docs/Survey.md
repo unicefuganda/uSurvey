@@ -213,11 +213,11 @@ Add Logic option will convert a question to conditional one such that question w
 
 one has to define the Logic here for respective question by satisfying the condition by providing ‘Eligible Criteria’, ‘Attribute’ Value, and ‘Then’ as follows:
 
-Eligible Criteria: This is a condition made based up on this Question value “Starts With”, “Equals”, “Contains” and “Ends With”.
+<b>Eligible Criteria</b>: This is a condition made based up on this Question value “Starts With”, “Equals”, “Contains” and “Ends With”.
 
-Attribute: Provide the “Value” as per the above ‘Eligible Criteria’ selected
+<b>Attribute</b>: Provide the “Value” as per the above ‘Eligible Criteria’ selected
 
-Then: Based up on the ‘Eligible Criteria’ and ‘Attribute’ Value chosen, the condition for Question is applied here with following options:
+<b>Then</b>: Based up on the ‘Eligible Criteria’ and ‘Attribute’ Value chosen, the condition for Question is applied here with following options:
   
 ‘Reconfirm’ – Prompts with conformation Question to validate the Answer 
 
@@ -230,18 +230,18 @@ beside it, now select the “Sub-Question” and click on ‘Save’ button.
  
 ‘Skip To’ - Provides the option to jump to any particular/ consecutive question in the list, by skipping / avoiding the    intermediate Question. 
 
-How to Apply Logic to a Question?
+<b>How to Apply Logic to a Question?</b>
 
 Click on, Action Item, ‘Add Logic’ this will open a form where one can create a Logic for Question, by providing ‘Eligible Criteria’, ‘Attribute’ Value, and ‘Then’ as per the condition required, then click on ‘Save’ button to create Logic.  
 
 In the same page, logic that is created can be seen in table “Existing Logic”.
 Which shows the created logic for this particular question and has option to ‘Delete’ the applied Logic
 
-Edit Logic: 
+<b>Edit Logic</b>: 
 In the ‘Batch Questions’ page, Questions that has Logic are represented with hyperlink, click on the respective Question, that shows options like ‘View logic’, ‘Edit’ and ‘Delete’
 
-View Logic – click to view the Logic that is Applied for this particular question
+<b>View Logic</b> – click to view the Logic that is Applied for this particular question
 
-Edit Logic – click to Edit the existing Logic that is Applied for this particular question
+<b>Edit Logic</b> – click to Edit the existing Logic that is Applied for this particular question
 
-Delete Logic - click to Remove the Logic that is Applied for this particular question
+<b>Delete Logic</b> - click to Remove the Logic that is Applied for this particular question
