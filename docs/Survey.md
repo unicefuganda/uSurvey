@@ -189,14 +189,15 @@ Ex: “Do you what to Add one more”, “Do you what to Add another Household�
 
 One should be very careful while creating a loop, first of all analyze how a loop has to be created, using ‘Repeat logic’ and where to ‘End Loop’, as defined above select accordingly from ‘Repeat logic’ and ‘Loop end at’ to define a loop.
 
-* click on, Action Item ‘Start/Edit Loop’ which will take to ‘Start Loop’ page, now create loop as follows:<br>
-* select “Logic Type” from dropdown ‘Repeat logic’,<br>
-* select “Question at which loop should end” from dropdown ‘Loop end at’ and <br>
-* in ‘Loop Prompt’ Text Box, write some message about, instructing the loop flow,<br>
-* then click on ‘Save’ button to create loop.<br>
-* Now you will be viewing a looping representation on ‘Batch Questions’ page in the ‘Code’ column of the ‘Questions’ table, 
+• click on, Action Item ‘Start/Edit Loop’ which will take to ‘Start Loop’ page, now create loop as follows:<br>
+• select “Logic Type” from dropdown ‘Repeat logic’,<br>
+• select “Question at which loop should end” from dropdown ‘Loop end at’ and <br>
+• in ‘Loop Prompt’ Text Box, write some message about, instructing the loop flow,<br>
+• then click on ‘Save’ button to create loop.<br>
+• Now you will be viewing a looping representation on ‘Batch Questions’ page in the ‘Code’ column of the ‘Questions’ table, 
 
 <b>Loop Representation</b>:
+
 * <span style="color:Chartreuse;font-weight:bold;">Light Green</span>Bar icon represents Loop - START,
 * <span style="color:Red;font-weight:bold;">Red</span>Bar icon represents Loop - END,
 * <span style="color:Green;font-weight:bold;">Green</span>Bar icon represents Loop - CONTINUATION
