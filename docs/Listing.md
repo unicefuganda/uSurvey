@@ -3,7 +3,7 @@
 
 The Listing is generally carried out by field staff other than interviewers, as a separate field operation conducted before the survey starts. This pre-process has the following benefits
 
-1. It creates a common set of common questions to be asked before any survey is captured, as a one-time effort. For instance, the demographic details of household residents is required before conducting any household survey. Such data can be captured as part of the Listing.
+1. It creates set of common questions to be asked before any survey is captured, as a one-time effort. For instance, the demographic details of household residents is required before conducting any household survey. Such data can be captured as part of the Listing.
 
 2. By creating a separate Listing the system gives the user flexibility to use the same Listing for multiple surveys.
 
@@ -55,7 +55,7 @@ This option is not available for completed listing
 
 * <b>Clone</b>: click on, Action Item ‘Clone’, an another copy of same Listing Form is created along with Listing Questions, except existing Looping and Logic
 
-* View Listing Data: This Action Item is available only for the completed Listing operation in the field.  click on, Action Item ‘View Data’, to view data collected for this particular Listing
+* <b>View Data<b>: This Action Item is available only for the completed Listing operation in the field.  click on, Action Item ‘View Data’, to view data collected for this particular Listing
 
 <b>Creating Questionnaire to the Listing Form</b>: 
 
@@ -127,7 +127,7 @@ Looping means repeatedly asking set of questions based up the need and purpose o
 
 To define the Looping concept, first of all one has to understand about terms that are used in creating a Loop are as following:
 
-* <b>Repeat Logic</b>: To apply Looping for a question there should be some base criteria to start loop, that is chosen from ‘Repeat Logic’ as “User Defined”, “Fixed number of repeats” and “Response from previous question”
+<b>Repeat Logic</b>: To apply Looping for a question there should be some base criteria to start loop, that is chosen from ‘Repeat Logic’ as “User Defined”, “Fixed number of repeats” and “Response from previous question”
 
 <b>User Defined</b>: Need to choose what set of Question come into loop, starting from this particular question and has to end loop with any of the consecutive question in the Listing. 
 
@@ -141,6 +141,7 @@ To define the Looping concept, first of all one has to understand about terms th
 
 ###How to create a Loop?
 <hr>
+
 One should be very careful while creating a loop, first of all analyze how a loop has to be created, using ‘Repeat logic’ and where to ‘End Loop’, as defined above select accordingly from ‘Repeat logic’ and ‘Loop end at’ to define a loop.
 
 click on, Action Item ‘Start/Edit Loop’ which will take to ‘Start Loop’ page, now create loop as follows:
@@ -153,9 +154,9 @@ Now you will be viewing a looping representation on ‘Listing Questions’ page
 
 <b>Loop Representation</b>:
 
-* <span style="color:Chartreuse;font-weight:bold;">Light Green Bar</span> icon represents Loop - START,
-* <span style="color:Red;font-weight:bold;">Red Bar</span> icon represents Loop - END,
-* <span style="color:Green;font-weight:bold;">Green Bar</span> icon represents Loop - CONTINUATION
+* <span style="color:Chartreuse;font-weight:bold;">Light Green</span>Bar icon represents Loop - START,
+* <span style="color:Red;font-weight:bold;">Red</span>Bar icon represents Loop - END,
+* <span style="color:Green;font-weight:bold;">Green</span>Bar icon represents Loop - CONTINUATION
 
 <b>Remove Loop</b>:
 
