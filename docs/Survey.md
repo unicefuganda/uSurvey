@@ -14,21 +14,20 @@ This field will enable only if option “None, Create New” is selected, in the
 This field will enable only when listing in dropdown ‘Listing Form’ is selected.
 
 <b>How to create a Survey?</b>
- 
 To create a New Survey, click on ‘Create New Survey’ button at top right of the Survey page, that opens a form to create a new Survey, which has following elements;
 
 <b>Elements of a Survey</b>:
 
-•	<b>Name</b>: Is Survey Name, which is a unique identity to a survey and is a mandatory field.   
-•	<b>Description</b>: write about the importance of this survey in short.  
-•	<b>Survey Type</b>: This identifies how survey is going to take place either using Listing or not.
+•	<b>Name</b>: Is Survey Name, which is a unique identity to a survey and is a mandatory field.
+•	<b>Description</b>: write about the importance of this survey in short.
+•	<b>Survey Type</b>: This identifies how survey is going to take place either using Listing or not.<br>
     If Survey Type is “Sampled”, Survey uses Sample size and Listing.<br>
     If Survey Type is “Census”, Survey doesn’t need Sample size and Listing.
 
-•  <b>Sample size</b>: Provide survey sample size
-•  <b>Preferred Listing</b>: select an existing Listing Or
-•  <b>Listing Form</b>: select Newly created Listing
-•  <b>Randomly selected data label</b>: You need to include one listing response identifier in double curly brackets.
+•   <b>Sample size</b>: Provide survey sample size
+•   <b>Preferred Listing</b>: select an existing Listing Or
+•   <b>Listing Form</b>: select Newly created Listing
+•   <b>Randomly selected data label</b>: You need to include one listing response identifier in double curly brackets.<br>
  i.e. just type, double curly brackets to automatically insert ‘Variable Name’ in above selected Listing<br>
  Ex: type {{ , system prompts with ‘Variable Name’ then select any one to insert Variable Name<br>
  Like: {{house_number}}
