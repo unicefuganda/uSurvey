@@ -135,7 +135,9 @@ On the ‘Batch Questions’ page one can view all the Questions created in that
 <b>Actions for Batch Questions</b>:
 
 * <b>Edit Question</b>: click on, Action Item ‘Edit’, User can edit respective Question, ‘Variable Name’, ‘Text’ (Question), ‘Answer Type’ and can change ‘Mandatory’ type. This option is not available and cannot be performed for completed survey.
+
 * <b>Insert Question</b>: click on, Action Item, ‘Insert Question’ using which User can insert a New Question below the respective Question and rest of the process is similar to ‘Add New Question’.
+
 * <b>Delete Question</b>: click on, Action Item ‘Delete’, the Question is removed from list, before deleting you will be prompted with conformation to delete, click ‘Yes’ to Delete permanently.
 
 Caution, while deleting a Question: when a user attempts to delete a question, if that particular question is assigned with Logic or Loop, then along with the question logic or entire loop is removed respectively.
@@ -176,11 +178,11 @@ One should be very careful while creating a loop, first of all analyze how a loo
 
 <b>Loop Representation</b>:
 
-* <span style="color:Chartreuse;font-weight:bold;">Light Green</span>Bar icon represents Loop - START,
+* <span style="color:Chartreuse;font-weight:bold;">Light Green </span> Bar icon represents Loop - START,
 
-* <span style="color:Red;font-weight:bold;">Red</span>Bar icon represents Loop - END,
+* <span style="color:Red;font-weight:bold;">Red </span> Bar icon represents Loop - END,
 
-* <span style="color:Green;font-weight:bold;">Green</span>Bar icon represents Loop - CONTINUATION
+* <span style="color:Green;font-weight:bold;">Green </span> Bar icon represents Loop - CONTINUATION
 
 <b>Remove Loop</b>:
 
@@ -200,17 +202,17 @@ one has to define the Logic here for respective question by satisfying the condi
 <b>Attribute</b>: Provide the “Value” as per the above ‘Eligible Criteria’ selected
 
 <b>Then</b>: Based up on the ‘Eligible Criteria’ and ‘Attribute’ Value chosen, the condition for Question is applied here with following options:
-  
-‘Reconfirm’ – Prompts with conformation Question to validate the Answer 
 
-‘End Interview’ – Skips the intermediate Question and moves to end of the questioner.
- 
-‘Ask Sub-Question’ – Provides an option to Create a Sub-Question based upon the ‘Attribute’ value.
- To do this, select option “Ask Sub-Question” than you will find a button with name ‘Add Sub-Question’ beside this, 
+<b>Reconfirm</b> – Prompts with conformation Question to validate the Answer 
+
+<b>End Interview</b> – Skips the intermediate Question and moves to end of the questioner
+
+<b>Ask Sub-Question</b> – Provides an option to Create a Sub-Question based upon the ‘Attribute’ value.<br>
+To do this, select option “Ask Sub-Question” than you will find a button with name ‘Add Sub-Question’ beside this, 
 click on it to create a Sub-Question, same like create question, once you click on ‘Save’ button, you will find this Sub-Question in the dropdown ‘Choose Question’ 
 beside it, now select the “Sub-Question” and click on ‘Save’ button.
  
-‘Skip To’ - Provides the option to jump to any particular/ consecutive question in the list, by skipping / avoiding the    intermediate Question. 
+<b>Skip To</b> - Provides the option to jump to any particular/ consecutive question in the list, by skipping / avoiding the    intermediate Question. 
 
 <b>How to Apply Logic to a Question?</b>
 
@@ -222,8 +224,6 @@ Which shows the created logic for this particular question and has option to ‘
 <b>Edit Logic</b>: 
 In the ‘Batch Questions’ page, Questions that has Logic are represented with hyperlink, click on the respective Question, that shows options like ‘View logic’, ‘Edit’ and ‘Delete’
 
-<b>View Logic</b>: click to view the Logic that is Applied for this particular question
-
-<b>Edit Logic</b>: click to Edit the existing Logic that is Applied for this particular question
-
-<b>Delete Logic</b>: click to Remove the Logic that is Applied for this particular question
+• <b>View Logic</b>: click to view the Logic that is Applied for this particular question <br>
+• <b>Edit Logic</b>: click to Edit the existing Logic that is Applied for this particular question <br>
+• <b>Delete Logic</b>: click to Remove the Logic that is Applied for this particular question
