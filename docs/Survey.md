@@ -1,21 +1,21 @@
 ###Create Survey
 
 Surveys are available from main menu under <b>Design</b> >> <b>Surveys</b>
-![Listing](./Survey1.png)
+![Survey](./Survey1.png)
 A New Survey can be created and defined here, so before creating a survey first of all one has to know about the terminology used here.
 
 • <b>Preferred Listing</b>: List of existing Listing, which are already in the system.<br>
 Is an option to choose, existing Listing for this New Survey, where already survey was conducted on these Listings, which will include total Listing questions along with the data/results.
 
-• <b>Listing Form</b>: List of Newly created Listings, not previously used in any survey.<br>
+• <b>New Listing</b>: List of Newly created Listings, not previously used in any survey.<br>
 This field will enable only if option “None, Create New” is selected, in the dropdown ‘Preferred Listing’. which contains list of Newly created Listings, which are not yet used in any survey.
 
 • <b>Randomly selected data label</b>: Is the identifier for respondents while conducting a Listing survey.<br>
-This field will enable only when listing in dropdown ‘Listing Form’ is selected.
+This field will enable only when listing in dropdown ‘New Listing’ is selected.
 
 <b>How to create a Survey?</b><br>
 To create a New Survey, click on ‘Create New Survey’ button at top right of the Survey page, that opens a form to create a new Survey, which has following elements;
-
+![Survey](./Survey2.png)
 <b>Elements of a Survey</b>:
 
 • <b>Name</b>: Is Survey Name, which is a unique identity to a survey and is a mandatory field<br>
@@ -26,7 +26,7 @@ To create a New Survey, click on ‘Create New Survey’ button at top right of 
 
 •   <b>Sample size</b>: Provide survey sample size<br>
 •   <b>Preferred Listing</b>: select an existing Listing Or<br>
-•   <b>Listing Form</b>: select Newly created Listing<br>
+•   <b>New Listing</b>: select Newly created Listing<br>
 •   <b>Randomly selected data label</b>: You need to include one listing response identifier in double curly brackets.<br>
  i.e. just type, double curly brackets to automatically insert ‘Variable Name’ in above selected Listing<br>
  Ex: type {{ , system prompts with ‘Variable Name’ then select any one to insert Variable Name<br>
