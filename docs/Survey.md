@@ -178,11 +178,11 @@ One should be very careful while creating a loop, first of all analyze how a loo
 
 <b>Loop Representation</b>:
 
-* <span style="color:Chartreuse;font-weight:bold;">Light Green | </span> Bar icon represents Loop - START,
+* <span style="color:Chartreuse;font-weight:bolder;">| </span> Bar icon represents Loop - START,
 
-* <span style="color:Red;font-weight:bold;">Red |</span> Bar icon represents Loop - END,
+* <span style="color:Red;font-weight:bolder;"> |</span> Bar icon represents Loop - END,
 
-* <span style="color:Green;font-weight:bold;">Green |</span> Bar icon represents Loop - CONTINUATION
+* <span style="color:Green;font-weight:900;"> |</span> Bar icon represents Loop - CONTINUATION
 
 <b>Remove Loop</b>:
 
