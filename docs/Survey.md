@@ -19,7 +19,9 @@ To create a New Survey, click on ‘Create New Survey’ button at top right of 
 <b>Elements of a Survey</b>:
 
 •<b>Name</b>: Is Survey Name, which is a unique identity to a survey and is a mandatory field.
+
 •<b>Description</b>: write about the importance of this survey in short.
+
 •<b>Survey Type</b>: This identifies how survey is going to take place either using Listing or not.<br>
     If Survey Type is “Sampled”, Survey uses Sample size and Listing.<br>
     If Survey Type is “Census”, Survey doesn’t need Sample size and Listing.
