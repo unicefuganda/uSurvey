@@ -200,8 +200,8 @@ Which shows the created logic for this particular question and has option to ‘
 <b>Edit Logic</b>: 
 In the ‘Listing Form Questions Template’ page, Questions that has Logic are represented with hyperlink, click on the respective Question, that shows options to ‘View logic’, ‘Edit’ and ‘Delete’
 
-* View Logic – click to view the Logic that is Applied for this particular question
+* <b>View Logic</b>: click to view the Logic that is Applied for this particular question
 
-* Edit Logic – click to Edit the existing Logic that is Applied for this particular question
+* <b>Edit Logic</b>: click to Edit the existing Logic that is Applied for this particular question
 
-* Delete Logic - click to Remove the Logic that is Applied for this particular question
+* <b>Delete Logic</b>: click to Remove the Logic that is Applied for this particular question
