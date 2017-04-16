@@ -413,10 +413,15 @@ def is_relevant_odk(context, question, interviewer):
             validation_test__isnull=True, next_question__isnull=False)
         if null_flows:
             null_flow = null_flows[0]
+            next_question = null_flow.next_question
             # check if next question if we are moving to a less looped question
             # essentially same as checking if next question is outside current questions loop
             loop_story = question.qset.get_loop_story()
-            if len(loop_story.get(question.pk, [])) > len(loop_story.get(null_flow.next_question.pk, [])):
+            # fix for side by side loops. Handle like out of loop
+            if hasattr(question, 'loop_ended') and hasattr(next_question, 'loop_started'):
+                null_condition = ["count(%s) &gt; 0" % node_path, ]
+            # basically check if next question is not on same loop
+            elif len(loop_story.get(question.pk, [])) > len(loop_story.get(null_flow.next_question.pk, [])):
                 null_condition = ["count(%s) &gt; 0" % node_path, ]
             else:
                 null_condition = ["string-length(%s) &gt; 0" % node_path, ]
@@ -425,7 +430,6 @@ def is_relevant_odk(context, question, interviewer):
             if len(flow_conditions) > 0 and hasattr(question, 'loop_ended') is False:
                 null_condition.append('not(%s)' %
                                       ' or '.join(flow_conditions))
-            next_question = null_flow.next_question
             next_q_context = context.get(next_question.pk, ['false()', ])
             next_q_context.append('(%s)' % ' and '.join(null_condition))
             if hasattr(question, 'group') and (hasattr(next_question, 'group') is False or
