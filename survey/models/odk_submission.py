@@ -71,9 +71,9 @@ class ODKSubmission(BaseModel):
             locked_node = tree.xpath('//qset/meta/locked')[0]
         except IndexError:
             locked_node = etree.Element('locked')
-            locked_node.text = str(1)      # present implementation on customized ODK only requires this to be not null
             meta_node = tree.xpath('//qset/meta')[0]
             meta_node.insert(0, locked_node)
+        locked_node.text = str(1)      # present implementation on customized ODK only requires this to be not null
         self.xml = etree.tostring(tree)
 
     def save(self, *args, **kwargs):
