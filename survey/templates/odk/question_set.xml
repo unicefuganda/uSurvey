@@ -19,6 +19,7 @@ xmlns:jr="http://openrosa.org/javarosa">
      <meta>
        <instanceID />
        <instanceName />
+		<locked />
      </meta>
 	 <submissions>
 		 <id />
@@ -27,7 +28,7 @@ xmlns:jr="http://openrosa.org/javarosa">
 		 </dates>
 	 </submissions>
 	   {% comment %}<type>{{ stage }}</type>  basically tells if it's listing or survey data. status may change {% endcomment %}
-	   <surveyAllocation />
+	   <surveyAllocation locked="true()" />
 	   <qset{{ qset.pk }}>
 	   {% if ea_samples %}
 	     <sampleData>
