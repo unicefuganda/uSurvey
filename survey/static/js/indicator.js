@@ -26,7 +26,8 @@ jQuery(function($){
             });
         });
     }
-    if(batch && batch.val().length == 0)
-        $('#id_survey').trigger("change");
+    if(batch)
+        if ($("#id_question_set").val.length == 0)
+            $('#id_survey').trigger("change");
 
 });
