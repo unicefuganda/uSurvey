@@ -103,11 +103,12 @@ def download_results(request, batch_id):
 @login_required
 @permission_required('auth.can_view_aggregates')
 def download(request):
-    survey_batch_filter_form = SurveyBatchFilterForm(data=request.GET)
-    locations_filter = LocationsFilterForm(data=request.GET)
+    request_data = request.GET if request.method == 'GET' else request.POST
+    survey_batch_filter_form = SurveyBatchFilterForm(data=request_data)
+    locations_filter = LocationsFilterForm(data=request_data)
     last_selected_loc = locations_filter.last_location_selected
-    if request.GET and request.GET.get('action'):
-        survey_batch_filter_form = SurveyBatchFilterForm(data=request.GET)
+    if request_data and request_data.get('action'):
+        survey_batch_filter_form = SurveyBatchFilterForm(data=request_data)
         if survey_batch_filter_form.is_valid():
             batch = survey_batch_filter_form.cleaned_data['batch']
             survey = survey_batch_filter_form.cleaned_data['survey']
@@ -115,7 +116,7 @@ def download(request):
             restricted_to = None
             if last_selected_loc:
                 restricted_to = [last_selected_loc, ]
-            if request.GET.get('action') == 'Email Spreadsheet':
+            if request_data.get('action') == 'Email Spreadsheet':
                 composer = ResultComposer(request.user,
                                           ResultsDownloadService(batch,
                                                                  survey=survey,
@@ -134,11 +135,13 @@ def download(request):
                 string_buf = StringIO()
                 reports_df.to_csv(string_buf, columns=reports_df.columns[1:])
                 string_buf.seek(0)
-                response['Content-Disposition'] = 'attachment; filename=%s.zip' % file_name
+                file_contents = string_buf.read()
+                string_buf.close()
                 zip_file = InMemoryZip()
-                zip_file.append("%s.csv" % file_name, string_buf.read())
+                zip_file = zip_file.append("%s.csv" % file_name, file_contents)
+                response['Content-Disposition'] = 'attachment; filename=%s.zip' % file_name
                 response.write(zip_file.read())
-                   #exclude interview id
+                # exclude interview id
                 if not request.is_ajax():
                     messages.info(request, "Download successfully downloaded")
                 return response

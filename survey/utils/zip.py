@@ -22,7 +22,7 @@ class InMemoryZip(object):
         # Unix permissions are not inferred as 0000
         for zfile in zf.filelist:
             zfile.create_system = 0
-
+        zf.close()
         return self
 
     def read(self):
@@ -35,3 +35,4 @@ class InMemoryZip(object):
         f = file(filename, "w")
         f.write(self.read())
         f.close()
+

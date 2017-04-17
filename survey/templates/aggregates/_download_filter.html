@@ -11,6 +11,7 @@
     <input type="submit" name="action" value="Email Spreadsheet" class="btn btn-primary" id="email_excel" style="    border-left: 0px solid #0577e0 !important;     padding: 4px;" />
      <input type="submit" name="action"  value="Download Spreadsheet" class="btn btn-primary" id="download_excel" style="border-left: 0px solid #0577e0 !important;     padding: 4px;" />
 </td>
+
 <div class="modal fade" id="progress_modal" tabindex="-1" role="dialog" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -21,6 +22,7 @@
     </div>
   </div>
 </div>
+<script src="{{ STATIC_URL }}js/jquery.binarytransport.js" type="text/javascript" charset="utf-8"></script>
 <script type="text/javascript">
    $(document).ready(function(){
         updateProgress = function(text) {
@@ -37,28 +39,29 @@
             // else rest follows
             event.preventDefault();
             var form = $(this).closest('form');
-            arr = form.serializeArray();
-            arr.push({'name': this.name, 'value': this.value});
             $('#progress_modal').modal('show');
             var interval = updateProgress("Report is being generated. Please wait");
-            $.ajax({
-                url  : form.action,
-                data: arr,
-                method: 'GET',
-                success: function(data, status, response){
-                    var filename = response.getResponseHeader('Content-Disposition').split('=')[1];
-                    var content_type = response.getResponseHeader('Content-Type');
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", '.?'+form.serialize()+'&'+this.name+'='+this.value);        //include this action name
+            xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');                 // for request.is_ajax()
+            xhr.responseType = "arraybuffer";
+            xhr.onload = function () {
+                if (this.status === 200) {
                     clearInterval(interval);
                     interval = updateProgress("Retrieving file");
-                    download(data, filename, content_type);
+                    var blob = new Blob([xhr.response], {type: xhr.getResponseHeader("Content-Type")});
+                    var objectUrl = URL.createObjectURL(blob);
+                    var a = document.createElement("a");
+                    document.body.appendChild(a);
+                    a.style = "display: none";
+                    a.href = objectUrl;
+                    a.download = xhr.getResponseHeader('Content-Disposition').split('=')[1];
                     clearInterval(interval);
                     $('#progress_modal').modal('hide');
-                },
-                error: function(){
-                    clearInterval(interval);
-                    $("#download-status").text('Error while generating the report. please try again');
+                    a.click();
                 }
-            });
+            };
+            xhr.send();
             return false;
         });
    } );
