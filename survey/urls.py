@@ -427,9 +427,16 @@ urlpatterns = patterns('',
                        url(r'^object_does_not_exist/$',
                            login_required(TemplateView.as_view(template_name="empty.html")), name='empty_page')
                        )
+              
 
 # if not settings.PRODUCTION:
 #     urlpatterns += (
 #         url(r'^api/create_interviewer', 'survey.views.api.create_interviewer', name='create_interviewer'),
 #         url(r'^api/delete_interviewer', 'survey.views.api.delete_interviewer', name='delete_interviewer'),
 #     )
+
+handler400 = 'survey.views.home_page.custom_404'
+handler403 = 'survey.views.home_page.custom_404'
+handler404 = 'survey.views.home_page.custom_404'
+handler500 = 'survey.views.home_page.custom_404'
+

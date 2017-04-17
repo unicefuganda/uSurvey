@@ -1169,13 +1169,17 @@ div.pp_default .pp_close{
     color: #fff;
 }
 .copyRight{
-    padding: 0px 0;
+    padding: 10px;
     background: #0099ff;
 	color:#fff;
 }
 .copyRight p{
     font-size: 12px;
     line-height: .9;
+}
+.copyRight .copy_text{
+
+    font-size:12px;color: #fff;line-height: 30px;
 }
 .copyRight p a{
     color: #48e1fd;
@@ -3271,3 +3275,5 @@ padding-right: 20px;
     margin:0px auto;
     width: 50%;
 }
+
+.help_us_text{font-size: 14px;color: #333;}
