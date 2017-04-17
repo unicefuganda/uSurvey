@@ -185,10 +185,10 @@
                 <div id="head-mobile"></div>
                 <div class="button"></div>
                 <ul>
-                    <li id="menu-item-120" class="menu-item menu-item-type-custom menu-item-object-custom menu-ancestor menu-parent menu-item-has-children menu-item-120"><a href="{% url 'home_page' %}">DASHBOARD</a>
+                    <li id="menu-item-120" class="menu-item menu-item-type-custom menu-item-object-custom menu-ancestor menu-parent menu-item-has-children menu-item-120"><a href="{% url 'home_page' %}"><i class="fa fa-dashboard"></i> DASHBOARD</a>
                     </li>
                     <li>
-                        <a href='#'>DESIGN</a>
+                        <a href='#'><i class="fa fa-file-picture-o"></i> DESIGN</a>
                         <ul>
                             {% if perms.auth.can_view_batches %}
                             <li><a href="{% url 'survey_list_page' %}">Surveys</a></li>
@@ -206,7 +206,7 @@
                         </ul>
                     </li>
                     <li>
-                        <a href='#'>ADMINISTRATION</a>
+                        <a href='#'><i class="fa fa-user-md"></i> ADMINISTRATION</a>
                         <ul>
                             <li>
                                 <a href="{% url 'interviewers_page' %}">Interviewers</a>
@@ -220,7 +220,7 @@
                         </ul>
                     </li>
                     <li>
-                        <a href='#'>MONITOR</a>
+                        <a href='#'><i class="fa fa-desktop"></i> MONITOR</a>
                         <ul>
                             {% if perms.auth.view_completed_survey %}
                             <li>
@@ -240,7 +240,7 @@
                     </li>
                     {% if perms.auth.can_view_batches or perms.auth.view_completed_survey %}
                     <li>
-                        <a href='#'>ANALYSE</a>
+                        <a href='#'><i class="fa fa-line-chart"></i> ANALYSE</a>
                         <ul>
                             <li>
                                 <a href="{% url 'list_indicator_page' %}">Indicators</a>
@@ -253,7 +253,7 @@
                     </li>
                     {% if perms.auth.can_view_aggregates %}
                     <li>
-                        <a href='#'>DOWNLOADS</a>
+                        <a href='#'><i class="fa fa-download"></i> DOWNLOADS</a>
                         <ul>
                             <li>
                                 <a href="{% url 'download_excel' %}">Survey Data</a>
@@ -266,7 +266,7 @@
                     </li>
                     {% if user.is_authenticated %}
                     <li>
-                        <a href='#'>SETTINGS</a>
+                        <a href='#'><i class="fa fa-cog"></i> SETTINGS</a>
                         <ul>
                             {% if user.is_superuser == True %}
                             <li>
@@ -516,6 +516,8 @@
 		});
         $('.multi-select').multiSelect();
         $( 'form span[title]' ).qtip();
+
+
         </script>
       {% block javascripts %}
 
@@ -539,7 +541,12 @@
   
   .select2-container .selection .select2-selection{border-left: 3px solid #0577e0;}
   .form-search textarea, .form-inline textarea, .form-horizontal textarea{margin-left: 4px !important}
- 
+ .pagination {
+display: inline-block;
+width: 55%;
+margin: auto;
+border-radius: 4px;
+margin-top: 15px;}
 
 div.dataTables_info {
     padding-top: 15px;
@@ -552,17 +559,6 @@ div.dataTables_info {
 }
 .dataTables_length {margin-top: 10px;}
 
-.paginate_msg{font-size: 14px;margin-top: 20px;}
-#cssmenu > ul > li > a {
-    padding: 17px;
-    font-size: 13px;
-    letter-spacing: 1px;
-    text-decoration: none;
-    color: #fff;
-    font-weight: 700;
-    font-family: Open Sans;
-    margin-top: 6px;
-}
 
 .paginate_msg{font-size: 14px;margin-top: 20px;color: #555;}
 </style>
