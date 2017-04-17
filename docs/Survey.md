@@ -178,11 +178,11 @@ One should be very careful while creating a loop, first of all analyze how a loo
 
 <b>Loop Representation</b>:
 
-* <span style="color:Chartreuse;font-weight:bolder;">| </span> Bar icon represents Loop - START,
+* <span style="color:Chartreuse;font-weight:bolder;"> | </span> - icon represents Loop - START,
 
-* <span style="color:Red;font-weight:bolder;"> |</span> Bar icon represents Loop - END,
+* <span style="color:Red;font-weight:bolder;"> | </span> - icon represents Loop - END,
 
-* <span style="color:Green;font-weight:900;"> |</span> Bar icon represents Loop - CONTINUATION
+* <span style="color:Green;font-weight:900;"> | </span> - icon represents Loop - CONTINUATION
 
 <b>Remove Loop</b>:
 
@@ -195,7 +195,7 @@ click on, Action Item ‘Remove Loop’ which will remove the existing looping l
 
 Add Logic option will convert a question to conditional one such that question will have choices to “Reconfirm”, “End Interview”, “Ask Sub-Question” and “Skip To” which is based up on value/Answer provided.
 
-one has to define the Logic here for respective question by satisfying the condition by providing ‘Eligible Criteria’, ‘Attribute’ Value, and ‘Then’ as follows:
+One has to define the Logic here for respective question by satisfying the condition by providing ‘Eligible Criteria’, ‘Attribute’ Value, and ‘Then’ as follows:
 
 <b>Eligible Criteria</b>: This is a condition made based up on this Question value “Starts With”, “Equals”, “Contains” and “Ends With”.
 
