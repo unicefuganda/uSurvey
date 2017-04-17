@@ -116,6 +116,11 @@ def success_story_form(request,id=None, instance=None):
         form = SuccessStoriesForm(instance=instance)
     return render(request, 'home/success_story_form.html', {'form': form})
 
+def custom_404(request):
+    print "*****"
+    return render_to_response('404.html')
+
+
 
 
 

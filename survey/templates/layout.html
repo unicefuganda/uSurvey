@@ -15,7 +15,8 @@
    </style>
       <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
       <meta charset="UTF-8" />
-      <meta name="viewport" content="width=device-width" />
+      <!-- <meta name="viewport" content="width=device-width" /> -->
+      <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
       <link rel="icon" type="{{ STATIC_URL }}image/png" href="images/favicon.png" />
       <title>{% repeated_block title %}uSurvey – Data Matters{% endblock %}</title>
 
@@ -126,7 +127,6 @@
        <link href="{{ STATIC_URL }}css/formset-extra.css" rel="stylesheet" type="text/css"/>
        <link rel="stylesheet" href="{{ STATIC_URL }}bootstrap-switch/bootstrap-switch.css"/>
        <link rel="stylesheet" href="{{ STATIC_URL }}multi-select/multi-select.css"/>
-       <link rel="stylesheet" href="{{ STATIC_URL }}css/interview-status.css"/>
         <link href="{{STATIC_URL}}css/select2.css" rel="stylesheet"/>
         <script src="{{STATIC_URL}}js/select2.full.js"></script>
         <script src='http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
@@ -467,6 +467,7 @@
       <script type="text/javascript" src="{{ STATIC_URL }}toassets/bootstrap.js"></script>
       <script type="text/javascript" src="{{ STATIC_URL }}toassets/jquery_002.js"></script>
       <script src="{{ STATIC_URL }}js/jquery-ui.min.js" type="text/javascript" charset="utf-8"></script>
+      <script src="http://danml.com/js/download.js" type="text/javascript" charset="utf-8"></script>
       <script src="{{ STATIC_URL }}js/jquery.dataTables.js"></script>
       <script src="{{ STATIC_URL }}js/dataTables.bootstrap.js" type="text/javascript" charset="utf-8"></script>
       <script type="text/javascript" src="{{ STATIC_URL }}toassets/modernizr.js"></script>
@@ -539,15 +540,7 @@
   .select2-container .selection .select2-selection{border-left: 3px solid #0577e0;}
   .form-search textarea, .form-inline textarea, .form-horizontal textarea{margin-left: 4px !important}
  
-.pagination {
-    display: inline-block;
-    width: 55%;
-    margin: auto;
-    
-    border-radius: 4px;
-    margin-top: 15px;
-    
-}
+
 div.dataTables_info {
     padding-top: 15px;
   display: none;

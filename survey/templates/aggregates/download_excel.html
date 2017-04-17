@@ -5,7 +5,10 @@
 {% endblock %}
 {% block page_title %}Choose survey to export data {% endblock %}
 {% block search %}
-{% include "horizontal_filter_form.html" with a_form=locations_filter no_button=True filter_id='location_filter' %}
+<div style="margin-top: -20px;">
+ {% include "aggregates/_download_filter.html" with action="excel_report"|get_url_without_ids filter_id="download-report-form" a_form=survey_batch_filter_form  %}
+  {% include "horizontal_filter_form.html" with a_form=locations_filter no_button=True filter_id='location_filter' %}
+  </div>
 <br />
 {% endblock %}
 {% block extra_head %}
@@ -20,12 +23,13 @@
     top: -28px;
 	left:10;
 }
+label{font-weight: normal !important;}
 </style>
 {% endblock %}
 {% block content %}
 
 <div class="forleft">
-  {% include "aggregates/_download_filter.html" with action="excel_report"|get_url_without_ids filter_id="download-report-form" a_form=survey_batch_filter_form  %}
+
 </div>
 <script type="text/javascript">
 $(function(){
