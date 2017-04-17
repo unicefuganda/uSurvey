@@ -66,6 +66,13 @@ class ODKSubmission(BaseModel):
         last_modified_node = etree.Element('lastModified')
         last_modified_node.text = str(self.modified)
         dates_node.insert(0, last_modified_node)
+        # now update the locked meta so fields expressly defined on blank form as locked is honoured
+        try:
+            locked_node = tree.xpath('//qset/meta/locked')[0]
+        except IndexError:
+            locked_node = etree.Element('locked')
+            meta_node = tree.xpath('//qset/meta')[0]
+            meta_node.insert(0, locked_node)
         self.xml = etree.tostring(tree)
 
     def save(self, *args, **kwargs):
