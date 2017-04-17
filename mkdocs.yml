@@ -1,17 +1,16 @@
 site_name: uSurvey
 pages:
-- Home: index.md
-- User Manual: user_manual.md
-- Offline Data Collection: odk_guide.md
-- USSD Integration: ussd-integration.md
-- Set up Guide: installation.md
-- Deployment Guide: deployment_guide.md
-- Site Map: Site_Map.md
-- uSurvey User Manual: uSurvey_manual.md
-- Groups: Groups.md
-- Modules: Modules.md
-- Listing: Listing.md
-- Survey: Survey.md
-- Tests: tests.md
+Site Map:
+- Site_Map.md
+User Guides:
+- uSurvey_manual.md
+Groups: 
+- Groups.md
+Modules:
+- Modules.md
+Listing:
+- Listing.md
+Survey:
+- Survey.md
 #theme: readthedocs
 theme: cerulean
