@@ -19,15 +19,12 @@ User Guides
 
 * **Administration** 
   * [Interviewers](./Interviewer.md)
-  * [Households](http://usurvey.unicefuganda.org/households/)
-  * [Open/Close](#)
   * [Notification](http://usurvey.unicefuganda.org/bulk_sms)
-
-* **Collect**
-   * [Data Entry](#)
+  * [Data Entry](#)
 
 * **Monitor**
-   * [Completion Rate](http://usurvehttp://usurvey.unicefuganda.org/surveys/interviewers_completion/y.unicefuganda.org/surveys/completion/)
+   * [Listing Data](#)
+   * [Batch Data](#)
    * [Completion Summary](http://usurvey.unicefuganda.org/surveys/interviewers_completion/)
    * [ODK Submission](http://usurvey.unicefuganda.org/odk/aggregate/submission_list/)
 

@@ -1,7 +1,5 @@
 site_name: uSurvey
 pages:
-Site Map:
-- Site_Map.md
 User Guides:
 - uSurvey_manual.md
 Groups: 
