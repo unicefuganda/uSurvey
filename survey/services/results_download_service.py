@@ -3,8 +3,9 @@ from django.core.mail import EmailMessage
 from django.conf import settings
 from django.db.models.sql.datastructures import EmptyResultSet
 from survey.models import (Location, LocationType, Answer, MultiChoiceAnswer, MultiSelectAnswer,
-                           NumericalAnswer, QuestionOption, Interview)
+                           NumericalAnswer, QuestionOption, Interview, QuestionSet, Survey, EnumerationArea)
 from survey.utils.query_helper import to_df
+from cacheops import cached_as
 from datetime import datetime
 import StringIO
 
@@ -65,46 +66,50 @@ class ResultsDownloadService(object):
         self.multi_display = int(multi_display)
 
     def get_interview_answers(self):
-        interview_list_args = ['created', 'ea__locations__name', 'ea__name', 'interviewer__name', 'id', ]
-        if self.follow_ref:
-            interview_list_args.append('interview_reference__id')
-        parent_loc = 'ea__locations'
-        for i in range(LocationType.objects.count() - 2):
-            parent_loc = '%s__parent' % parent_loc
-            interview_list_args.insert(1, '%s__name' % parent_loc)
-        interview_query_args = list(interview_list_args)
-        interview_queryset = self.interviews.values_list(*interview_query_args)
-        if self.items_per_page:
-            interview_queryset = interview_queryset[self.page_start: self.page_start + self.items_per_page]
-        try:
-            interviews_df = to_df(interview_queryset, date_cols=['created'])
-        except EmptyResultSet:
-            interviews_df = pd.DataFrame(columns=interview_query_args)
-        if self.follow_ref:
-            ref_answers_report_df = self._get_answer_df(interviews_df['interview_reference_id'])
-            reports_df = interviews_df.join(ref_answers_report_df, on='id', how='outer')
-        answers_report_df = self._get_answer_df(interviews_df['id'])
-        reports_df = interviews_df.join(answers_report_df, on='id', how='outer')
-        header_names = ['Created', ]
-        location_names = list(LocationType.objects.get(parent__isnull=True).get_descendants(include_self=False))
-        header_names.extend(location_names)
-        header_names.extend(['EA', 'interviewer__name', ])
-        if self.follow_ref:
-            header_names.extend(list(ref_answers_report_df.columns)[1:])
-        report_columns = header_names[1:] + [q.identifier for q in self.batch.all_questions
-                                             if q.identifier in reports_df.columns] + ['Created', ]
-        header_names.extend(list(reports_df.columns)[len(header_names):])
-        reports_df.columns = header_names
-        other_sort_fields = [identifier for identifier in self.batch.auto_fields.values_list('identifier', flat=True)
-                             if identifier in header_names]
-        reports_df = reports_df.sort_values(['Created', ] + location_names + other_sort_fields)
-        reports_df = reports_df[report_columns]
-        try:
-            reports_df.Created = reports_df.Created.dt.tz_convert(settings.TIME_ZONE)
-        except:
-            pass        # just try to convert if possible. Else leave it
-        reports_df.index += self.page_start
-        return reports_df
+        @cached_as(QuestionSet.objects.get(id=self.batch.id), Survey.objects.get(id=self.survey.id),
+                   EnumerationArea.objects.filter(locations__in=self.locations))
+        def _get_interview_answers():
+            interview_list_args = ['created', 'ea__locations__name', 'ea__name', 'interviewer__name', 'id', ]
+            if self.follow_ref:
+                interview_list_args.append('interview_reference__id')
+            parent_loc = 'ea__locations'
+            for i in range(LocationType.objects.count() - 2):
+                parent_loc = '%s__parent' % parent_loc
+                interview_list_args.insert(1, '%s__name' % parent_loc)
+            interview_query_args = list(interview_list_args)
+            interview_queryset = self.interviews.values_list(*interview_query_args)
+            if self.items_per_page:
+                interview_queryset = interview_queryset[self.page_start: self.page_start + self.items_per_page]
+            try:
+                interviews_df = to_df(interview_queryset, date_cols=['created'])
+            except EmptyResultSet:
+                interviews_df = pd.DataFrame(columns=interview_query_args)
+            if self.follow_ref:
+                ref_answers_report_df = self._get_answer_df(interviews_df['interview_reference_id'])
+                reports_df = interviews_df.join(ref_answers_report_df, on='id', how='outer')
+            answers_report_df = self._get_answer_df(interviews_df['id'])
+            reports_df = interviews_df.join(answers_report_df, on='id', how='outer')
+            header_names = ['Created', ]
+            location_names = list(LocationType.objects.get(parent__isnull=True).get_descendants(include_self=False))
+            header_names.extend(location_names)
+            header_names.extend(['EA', 'interviewer__name', ])
+            if self.follow_ref:
+                header_names.extend(list(ref_answers_report_df.columns)[1:])
+            report_columns = header_names[1:] + [q.identifier for q in self.batch.all_questions
+                                                 if q.identifier in reports_df.columns] + ['Created', ]
+            header_names.extend(list(reports_df.columns)[len(header_names):])
+            reports_df.columns = header_names
+            other_sort_fields = [identifier for identifier in self.batch.auto_fields.values_list('identifier', flat=True)
+                                 if identifier in header_names]
+            reports_df = reports_df.sort_values(['Created', ] + location_names + other_sort_fields)
+            reports_df = reports_df[report_columns]
+            try:
+                reports_df.Created = reports_df.Created.dt.tz_convert(settings.TIME_ZONE)
+            except:
+                pass        # just try to convert if possible. Else leave it
+            reports_df.index += self.page_start
+            return reports_df
+        return _get_interview_answers()
 
     def _get_answer_df(self, interview_ids):
         answer_query_args = ['interview__id', 'identifier', ]
