@@ -508,16 +508,15 @@ $(function(){
     });
     loadInitialMap();
     load_indicators();
+    refreshIndicatorDisplay();
 });
 
 
 function refreshIndicatorDisplay() {
+    $('.indicators').hide();
     if($("#id_survey").val()) {
-        $('.indicators').hide();
         $('.indicator-'+$("#id_survey").val()).show();
     }
-    else
-        $('.indicators').show();
 }
 
 

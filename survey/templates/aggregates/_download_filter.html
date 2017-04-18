@@ -28,10 +28,15 @@
             var i = 0;
             var interval = setInterval(function() {
                   i = ++i % 5;
-                  $("#download-status").text(text + Array(i+1).join("."));
+                  $("#download-status").html(text + '<span class="text-warning">' + Array(i+1).join(".") + '</span>');
                 }, 1000);
             return interval;
         }
+        $('#email_excel').click(function(event){
+            $('#progress_modal').modal('show');
+            var interval = updateProgress("Waiting for server");
+            return true;
+        });
         $('#download_excel').click(function(event){
             if(!$('#id_batch').val())
                 return true;
