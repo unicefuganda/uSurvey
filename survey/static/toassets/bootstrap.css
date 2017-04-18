@@ -3212,7 +3212,7 @@ a.btn-primary {
 .btn-primary:active,
 .btn-primary.active,
 .open > .dropdown-toggle.btn-primary {
-  color: #eee !important;
+  color: yellow !important;
   background: #3498db !important;  
  
   border-color: #3498db;
