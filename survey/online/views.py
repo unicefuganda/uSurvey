@@ -31,7 +31,7 @@ def ussd_flow(request):
             response = 'Invalid mobile number for your region'
     except phonenumbers.NumberParseException:
         response = 'Invalid mobile number'
-    return HttpResponse(response, content_type='text/plain')
+    return HttpResponse(str(response))
 
 
 def respond(request):
