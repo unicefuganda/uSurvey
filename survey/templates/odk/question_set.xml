@@ -132,7 +132,7 @@ xmlns:jr="http://openrosa.org/javarosa">
 						{% for sample in samples %}
 						{% get_sample_data_display sample as  sample_label %}
 						<item>
-							<label>{{ sample_label }}</label>
+							<label>{{ sample_label|default:qset.name }}</label>
 							<value>{{ sample.interview.pk }}</value>
 						</item>
 						{% endfor %}

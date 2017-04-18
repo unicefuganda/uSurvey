@@ -198,13 +198,15 @@ class SurveyAllocation(BaseModel):
         return self.status == self.PENDING and self.interviewer.ea == self.allocation_ea
 
     def sample_size_reached(self):
-        from survey.models import Interview
+        from survey.models import Interview, Answer
         survey = self.survey.preferred_listing
         if self.survey.preferred_listing:
             survey = self.survey.preferred_listing
         # more than one interviewer can result in the sample size for that EA
-        return Interview.objects.filter( survey__in=[survey, self.survey],
-                                        ea=self.allocation_ea).count() >= self.survey.sample_size
+        # use answer count to prevent interviews without answers
+        return Answer.objects.filter(interview__survey__in=[survey, self.survey],
+                                     interview__ea=self.allocation_ea).distinct('interview'
+                                                                                ).count() >= self.survey.sample_size
 
     def batches_enabled(self):
         if self.is_valid():
