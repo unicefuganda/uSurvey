@@ -18,4 +18,19 @@
 
 {% block javascripts %}
   <script src="{{STATIC_URL}}/js/users.js" type="text/javascript" charset="utf-8"></script>
+
+  <script type="text/javascript">
+      {% if mode == 'view' %}
+        $("#id_username").attr("readonly","readonly");
+        $("#id_first_name").attr("readonly","readonly");
+        $("#id_last_name").attr("disabled","disabled");
+        $("#id_email").attr("disabled","disabled");
+        $("#id_mobile_number").attr("disabled","disabled");
+        $("#id_group").attr("disabled","disabled");
+        $("#button").text('Edit');
+        $("#button").attr({"type":"button","onclick":"window.location.href='{% url 'users_edit' user_id 'edit' %}'"});
+        $(".add-row").attr("href",'');
+        
+      {%endif%}
+    </script>
 {% endblock %}

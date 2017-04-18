@@ -83,7 +83,7 @@ def index(request):
 
 
 @permission_required_for_perm_or_current_user('auth.can_view_users')
-def edit(request, user_id):
+def edit(request, user_id,mode=None):
     user = User.objects.get(pk=user_id)
     initial = {'mobile_number': UserProfile.objects.get(
         user=user).mobile_number}
@@ -96,13 +96,14 @@ def edit(request, user_id):
     request.breadcrumbs([
         ('User list', reverse('users_index')),
     ])
+    print userform
     context_variables = {'userform': userform,
-                         'action': reverse('users_edit', args=(user_id, )),
+                         'action': reverse('users_edit', args=(user_id, mode)),
                          'cancel_url': reverse('users_index'),
                          'id': 'edit-user-form', 'class': 'user-form', 'button_label': 'Save',
                          'loading_text': 'Saving...',
                          'country_phone_code': settings.COUNTRY_CODE,
-                         'title': 'Edit User'}
+                         'title': 'Edit User','mode':mode,'user_id':user.id}
     return response or render(request, 'users/new.html', context_variables)
 
 
