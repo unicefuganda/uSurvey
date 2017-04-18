@@ -266,7 +266,9 @@ display: inline-block;
     /*background: #de3c2f;*/
 }
 .headerFix{
-  position: fixed !important;
+  /*position: fixed !important;*/
+    /*position: relative;*/
+    margin-bottom: -10px;
     width: 100%;
     left: 0;
     top: 0;

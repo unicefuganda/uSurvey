@@ -32,9 +32,13 @@ def new(request):
         ('Indicators', reverse('list_indicator_page')),
     ])
 
-    return render(request, 'indicator/new.html',
-                  {'indicator_form': indicator_form, 'title': 'Add Indicator', 'button_label': 'Create',
-                   'cancel_url': reverse('list_indicator_page'), 'action': '/indicators/new/',
+    return render(request,
+                  'indicator/new.html',
+                  {'indicator_form': indicator_form,
+                   'title': 'Add Indicator',
+                   'button_label': 'Create',
+                   'cancel_url': reverse('list_indicator_page'),
+                   'action': '/indicators/new/',
                    'variable_form': IndicatorVariableForm(None)})
 
 
@@ -52,9 +56,12 @@ def edit(request, indicator_id):
     request.breadcrumbs([
         ('Indicators', reverse('list_indicator_page')),
     ])
-    context = {'indicator_form': indicator_form, 'title': 'Edit Indicator',
-               'button_label': 'Save', 'cancel_url': reverse('list_indicator_page'),
-               'variable_form': IndicatorVariableForm(None)}
+    context = {
+        'indicator_form': indicator_form,
+        'title': 'Edit Indicator',
+        'button_label': 'Save',
+        'cancel_url': reverse('list_indicator_page'),
+        'variable_form': IndicatorVariableForm(None)}
     return render(request, 'indicator/new.html', context)
 
 
@@ -70,7 +77,9 @@ def _process_form(indicator_filter_form, indicators):
         elif batch_id.isdigit() and not module_id.isdigit():
             indicators = indicators.filter(batch__id=batch_id)
         elif survey_id.isdigit():
-            batches = Survey.objects.get(id=survey_id).batches.values_list('id', flat=True)
+            batches = Survey.objects.get(
+                id=survey_id).batches.values_list(
+                'id', flat=True)
             indicators = indicators.filter(batch__id__in=batches)
     return indicators
 
@@ -82,8 +91,10 @@ def index(request):
     indicator_filter_form = IndicatorFilterForm(data=request.GET)
     indicators = _process_form(indicator_filter_form, indicators)
 
-    return render(request, 'indicator/index.html',
-                  {'indicators': indicators, 'indicator_filter_form': indicator_filter_form})
+    return render(request,
+                  'indicator/index.html',
+                  {'indicators': indicators,
+                   'indicator_filter_form': indicator_filter_form})
 
 
 @login_required
@@ -98,7 +109,8 @@ def delete(request, indicator_id):
 
 def validate_formulae(request):
     request_data = request.GET if request.method == 'GET' else request.POST
-    return JsonResponse({'valid': IndicatorFormulaeForm(data=request_data).is_valid()})
+    return JsonResponse(
+        {'valid': IndicatorFormulaeForm(data=request_data).is_valid()})
 
 
 @login_required
@@ -126,7 +138,12 @@ def _add_variable(request, indicator=None):
             variable = variable_form.save()
             if request.is_ajax() is False:
                 messages.success(request, 'Variable successfully saved.')
-            return HttpResponseRedirect(reverse('edit_indicator_variable', args=(variable.pk, )))
+            return HttpResponseRedirect(
+                reverse(
+                    'edit_indicator_variable',
+                    args=(
+                        variable.pk,
+                    )))
     context = {'variable_form': variable_form,
                'indicator': indicator,
                'title': "Manage Indicator Criteria",
@@ -157,27 +174,39 @@ def ajax_edit_indicator_variable(request):
 @permission_required('auth.can_view_household_groups')
 def edit_indicator_variable(request, variable_id):
     variable = IndicatorVariable.get(id=variable_id)
-    variable_form = IndicatorVariableForm(variable.indicator, instance=variable)
+    variable_form = IndicatorVariableForm(
+        variable.indicator, instance=variable)
     parameter_questions = []
     if variable.indicator:
         parameter_questions = variable.indicator.eqset.all_questions
     if request.method == 'POST':
-        variable_form = IndicatorVariableForm(variable.indicator, instance=variable, data=request.POST)
+        variable_form = IndicatorVariableForm(
+            variable.indicator, instance=variable, data=request.POST)
         if variable_form.is_valid():
             variable_form.save()
             if request.is_ajax() is False:
                 messages.success(request, 'Variable successfully saved.')
-            return HttpResponseRedirect(reverse('edit_indicator_variable', args=(variable.pk, )))
-    context = {'variable_form': variable_form,
-               'indicator': variable.indicator,
-               'title': "Manage Indicator Criteria",
-               'button_label': 'Save',
-               'id': 'add_group_form',
-               "v_form_action": reverse("edit_indicator_variable", args=(variable_id, )),
-               'cancel_url': reverse('list_indicator_page'),
-               'parameter_questions': parameter_questions,
-               'conditions': variable.criteria.all(),
-               'condition_title': "Conditions"}
+            return HttpResponseRedirect(
+                reverse(
+                    'edit_indicator_variable',
+                    args=(
+                        variable.pk,
+                    )))
+    context = {
+        'variable_form': variable_form,
+        'indicator': variable.indicator,
+        'title': "Manage Indicator Criteria",
+        'button_label': 'Save',
+        'id': 'add_group_form',
+        "v_form_action": reverse(
+            "edit_indicator_variable",
+            args=(
+                variable_id,
+            )),
+        'cancel_url': reverse('list_indicator_page'),
+        'parameter_questions': parameter_questions,
+        'conditions': variable.criteria.all(),
+        'condition_title': "Conditions"}
     if request.is_ajax():
         context['cancel_url'] = None
         return render(request, 'indicator/indicator_form.html', context)
@@ -186,7 +215,9 @@ def edit_indicator_variable(request, variable_id):
     ]
     if variable.indicator:
         breadcrumbs.append(
-        ('Variable List', reverse('view_indicator_variables', args=(variable.indicator.pk, ))))
+            ('Variable List', reverse(
+                'view_indicator_variables', args=(
+                    variable.indicator.pk, ))))
     request.breadcrumbs(breadcrumbs)
     return render(request, 'indicator/indicator_variable.html', context)
 
@@ -212,12 +243,19 @@ def ajax_delete_indicator_variable(request):
 @login_required
 @permission_required('auth.can_view_household_groups')
 def delete_indicator_criteria(request, indicator_criteria_id):
-    criterion = get_object_or_404(IndicatorVariableCriteria, id=indicator_criteria_id)
+    criterion = get_object_or_404(
+        IndicatorVariableCriteria,
+        id=indicator_criteria_id)
     variable = criterion.variable
     criterion.delete()
     if request.is_ajax() is False:
         messages.info(request, 'condition removed successfully')
-    return HttpResponseRedirect(reverse('edit_indicator_variable', args=(variable.pk, )))
+    return HttpResponseRedirect(
+        reverse(
+            'edit_indicator_variable',
+            args=(
+                variable.pk,
+            )))
 
 
 def view_indicator_variables(request, indicator_id):
@@ -237,7 +275,11 @@ def variables(request):
         response = list(indicator.variables.values_list('name', flat=True))
     else:
         var_ids = request.GET.getlist('var_id[]')
-        response = list(IndicatorVariable.objects.filter(id__in=var_ids).values_list('name', flat=True))
+        response = list(
+            IndicatorVariable.objects.filter(
+                id__in=var_ids).values_list(
+                'name',
+                flat=True))
     return JsonResponse(response, safe=False)
 
 
@@ -246,7 +288,8 @@ def variables(request):
 def indicator_formula(request, indicator_id):
     indicator = Indicator.get(id=indicator_id)
     if request.method == 'POST':
-        formulae_form = IndicatorFormulaeForm(instance=indicator, data=request.POST)
+        formulae_form = IndicatorFormulaeForm(
+            instance=indicator, data=request.POST)
         if formulae_form.is_valid():
             formulae_form.save()
             messages.info(request, 'Formulae has been saved!')
@@ -256,8 +299,11 @@ def indicator_formula(request, indicator_id):
     request.breadcrumbs([
         ('Indicator List', reverse('list_indicator_page')),
     ])
-    context = {'indicator_form': formulae_form, 'title': 'Indicator Formulae',
-               'button_label': 'Save', 'cancel_url': reverse('list_indicator_page')}
+    context = {
+        'indicator_form': formulae_form,
+        'title': 'Indicator Formulae',
+        'button_label': 'Save',
+        'cancel_url': reverse('list_indicator_page')}
     return render(request, 'indicator/formulae.html', context)
 
 
@@ -287,14 +333,18 @@ def simple_indicator(request, indicator_id):
     ])
     context, reports_df = _retrieve_data_frame(request, indicator_id)
     indicator = context['indicator']
-    # hence set the location where the report is based. i.e the child current selected location.
-    context['report'] = mark_safe(reports_df.to_html(na_rep='-',
-                                                     classes='table table-striped table-bordered dataTable table-hover table-sort'
-                                                     ))
+    # hence set the location where the report is based. i.e the child current
+    # selected location.
+    context['report'] = mark_safe(
+        reports_df.to_html(
+            na_rep='-',
+            classes='table table-striped table-bordered dataTable table-hover table-sort'))
     variable_names = indicator.active_variables()
     report_locations = context['report_locations']
+
     def make_hover_text(row):
-        return '<br />'.join(['%s: %d' % (name, row[name]) for name in variable_names])
+        return '<br />'.join(['%s: %d' % (name, row[name])
+                              for name in variable_names])
     reports_df['hover-text'] = reports_df.apply(make_hover_text, axis=1)
     if report_locations:
         trace1 = go.Bar(x=reports_df.index,
@@ -303,18 +353,25 @@ def simple_indicator(request, indicator_id):
                         text=reports_df['hover-text'],)
         data = go.Data([trace1])
         margin = go.Margin(pad=15)
-        layout = go.Layout(title=indicator.name, xaxis={'title': report_locations[0].type.name},
+        layout = go.Layout(title=indicator.name,
+                           xaxis={'title': report_locations[0].type.name},
                            yaxis={'title': 'Values per %s' % report_locations[0].type.name},
                            margin=margin,
-                           annotations=[dict(x=xi, y=yi,
+                           annotations=[dict(x=xi,
+                                             y=yi,
                                              text=str(yi),
                                              xanchor='center',
                                              yanchor='bottom',
                                              showarrow=False,
-                                             ) for xi, yi in zip(reports_df.index,
-                                                                 reports_df[indicator.REPORT_FIELD_NAME])])
+                                             ) for xi,
+                                        yi in zip(reports_df.index,
+                                                  reports_df[indicator.REPORT_FIELD_NAME])])
         figure = go.Figure(data=data, layout=layout)
-        graph_div = opy.plot(figure, auto_open=False, output_type='div', show_link=False)
+        graph_div = opy.plot(
+            figure,
+            auto_open=False,
+            output_type='div',
+            show_link=False)
         context['graph'] = mark_safe(graph_div)
     return render(request, 'indicator/simple_indicator.html', context)
 
@@ -325,9 +382,13 @@ def download_indicator_analysis(request, indicator_id):
     context, reports_df = _retrieve_data_frame(request, indicator_id)
     last_selected_loc = context['selected_location']
     indicator = context['indicator']
-    file_name = '%s%s' % ('%s-%s-' % (last_selected_loc.type.name, last_selected_loc.name) if
-                          last_selected_loc else '', indicator.name)
+    file_name = '%s%s' % ('%s-%s-' % (last_selected_loc.type.name,
+                                      last_selected_loc.name) if last_selected_loc else '',
+                          indicator.name)
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="%s.csv"' % file_name
-    reports_df.to_csv(response, date_format='%Y-%m-%d %H:%M:%S', encoding='utf-8')   #exclude interview id
+    reports_df.to_csv(
+        response,
+        date_format='%Y-%m-%d %H:%M:%S',
+        encoding='utf-8')  # exclude interview id
     return response
