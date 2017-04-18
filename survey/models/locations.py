@@ -45,7 +45,7 @@ class LocationType(MPTTModel, BaseModel):
         try:
             root_node = cls.objects.get(parent=None)
             return root_node.get_leafnodes(False).get(parent__isnull=False)
-        except cls.DoesNotExist, IndexError:
+        except cls.DoesNotExist as IndexError:
             return None
 
     @classmethod
@@ -53,13 +53,15 @@ class LocationType(MPTTModel, BaseModel):
         try:
             root_node = cls.objects.get(parent=None)
             return root_node.get_children()[0]
-        except cls.DoesNotExist, IndexError:
+        except cls.DoesNotExist as IndexError:
             return None
 
     @classmethod
     def in_between(cls):
         if cls.objects.exists():
-            return cls.objects.exclude(pk=LocationType.smallest_unit().pk).exclude(parent__isnull=True)
+            return cls.objects.exclude(
+                pk=LocationType.smallest_unit().pk).exclude(
+                parent__isnull=True)
         else:
             return cls.objects.none()
 

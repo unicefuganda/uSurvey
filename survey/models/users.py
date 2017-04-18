@@ -6,8 +6,14 @@ from survey.models.base import BaseModel
 
 class UserProfile(BaseModel):
     user = models.OneToOneField(User, related_name="userprofile")
-    mobile_number = models.CharField(validators=[MinLengthValidator(9), MaxLengthValidator(9)],
-                                     max_length=10, unique=True, null=False, blank=False)
+    mobile_number = models.CharField(
+        validators=[
+            MinLengthValidator(9),
+            MaxLengthValidator(9)],
+        max_length=10,
+        unique=True,
+        null=False,
+        blank=False)
 
     class Meta:
         app_label = 'survey'
