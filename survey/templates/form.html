@@ -38,11 +38,11 @@
   {% block display_form_fields %}{% endblock %}
     {% block buttons %}
   <div class="form-actions">
-    <button id="button" type="submit" class="btn btn-primary submit" name="save_button" data-disabled-text="{{ loading_text }}" >Save</button>
+    <button id="button" type="submit" class="btn btn-primary submit" name="save_button" data-disabled-text="{{ loading_text }}" ><i class="fa fa-save"></i> Save Changes</button>
     {% if cancel_url %}
       <a href="{{ cancel_url }}" class="btn btn-primary" name="cancel_button" class="cancel" style=" padding-right: 5px;
     padding-left: 5px;
-    padding-bottom: 1px;">Cancel</a>
+    padding-bottom: 1px;"><i class="fa fa-close"></i> Cancel</a>
     {% else %}
       <a href="{{ redirect_url }}" class="btn btn-primary" name="cancel_button" id="cancel_{{ id }}" class="cancel">Cancel</a>
     {% endif %}
