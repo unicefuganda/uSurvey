@@ -396,26 +396,36 @@
         <script src="{{ STATIC_URL }}js/question_options.js" type="text/javascript" charset="utf-8"></script>
         <script>
             $(document).ready(function() {
-            $(".chzn-select").chosen();
-            });
-        </script>
-        <script type="text/javascript">
-            $(document).ready(function() {
-                $(".datepicker").datepicker({
-                 changeMonth: true,
-                 changeYear: true,
-                 dateFormat: 'dd-mm-yy',
-                 yearRange: "-120:+nn"
-               });
-            });
-            $('.multi-select').multiSelect();
-            
-            try { 
-                $('form span[title]').qtip();
+                $('.multi-select').multiSelect();
+                
+                try { 
+                    $(".chzn-select").chosen();
+                 }
+                catch(err) {
+                //err;
                 }
-            catch(err) {
-            //err;
-            }
+               
+                try { 
+                    $(".datepicker").datepicker({
+                     changeMonth: true,
+                     changeYear: true,
+                     dateFormat: 'dd-mm-yy',
+                     yearRange: "-120:+nn"
+                   });
+                     }
+                catch(err) {
+                //err;
+                }
+                
+                
+                try { 
+                    $('form span[title]').qtip();
+                    }
+                catch(err) {
+                //err;
+                }
+
+            });
             
         </script>
         <script type="text/javascript">
