@@ -11,8 +11,23 @@
 {% block display_form_fields %}
 	{% include "naked_form.html" with a_form=survey_form %}
 <style type="text/css">
+  #id_sample_size{
+    margin-left: 5px!important;
+    width: 308px !important;
+  }
+#id_listing_form{
+ margin-left: 5px!important;
+ width: 308px !important; 
+  }
+  #id_random_sample_label{ 
+ width: 308px !important; 
+  }
+  #id_preferred_listing_chosen{
+    margin-left: 5px!important; 
+    width: 308px !important;
+  }
   .dataTables_wrapper input[type="text"] {
-    width: 345px !important;
+    width: 308px !important;
 }
 </style>
 {% endblock %}
