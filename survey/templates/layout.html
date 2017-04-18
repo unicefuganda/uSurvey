@@ -337,9 +337,9 @@
     margin-right: 10px;">
                   <div class="fw-col-xs-12 fw-col-xs-12 col-sm-12  col-md-12  wow none animated" style="text-align: left ! important; padding-left: 0px; padding-right: 0px; visibility: visible;margin-top: 15px;">
                   </div>
-                   <br />                  
-                  <div class="row col-xs-12 col-md-8" id="xyz-breadcrumbs">
-                      <h5 style="color:#09F; font-weight:none; max-width: 80%;">
+                                    
+                  <div class="row" id="xyz-breadcrumbs">
+                      <h5 style="color:#09F; font-weight:none; max-width: 80%;line-height: 2em;">
                                 <a href="{% url 'home_page' %}">Home</a> &raquo;
                                     {% for breadcrumb in request.breadcrumbs %}
                                     <a href="{{ breadcrumb.url }}">{{ breadcrumb.name }}</a> &raquo;
