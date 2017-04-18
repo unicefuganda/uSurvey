@@ -96,14 +96,16 @@ nav{width:100%;}
 #cssmenu ul ul li:hover{background:#0073bf!important}
 #cssmenu ul ul ul li a{padding-left:35px}
 #cssmenu ul ul li a{color:#fff;background:none}
-#cssmenu ul ul li:hover > a,#cssmenu ul ul li.active > a{color:#fff}
+#cssmenu ul ul li:hover > a,#cssmenu ul ul li:hover > a{color:#yellow}
 #cssmenu ul ul,#cssmenu ul ul ul{position:relative;left:0;width:100%;margin:0;text-align:left}
 #cssmenu > ul > li.has-sub > a:after,#cssmenu > ul > li.has-sub > a:before,#cssmenu ul ul > li.has-sub > a:after,#cssmenu ul ul > li.has-sub > a:before{display:none}
 #cssmenu #head-mobile{display:block;padding:31px;color:#ddd;font-size:12px;font-weight:700}
-.button{width:55px;height:46px;position:absolute;right:0;top:0;cursor:pointer;z-index: 12399994;}
+.button{width:55px;height:46px;position:absolute;right:0;top:-12px;cursor:pointer;z-index: 12399994;}
 /*.button:after{position:absolute;top:22px;right:20px;display:block;height:4px;width:20px;border-top:2px solid #dddddd;border-bottom:2px solid #dddddd;content:''}*/
 .button:after {
     border-bottom: 2px solid #dddddd;
+    padding-top: 5px;
+    border-top: 2px solid #dddddd;
     content: "";
     display: block;
      position: absolute;
