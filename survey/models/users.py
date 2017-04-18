@@ -17,3 +17,6 @@ class UserProfile(BaseModel):
 
     class Meta:
         app_label = 'survey'
+
+    def __unicode__(self):
+        return '"%s"<%s>' % (self.user.first_name, self.user.email)
