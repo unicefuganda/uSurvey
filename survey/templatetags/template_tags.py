@@ -350,14 +350,19 @@ def get_sample_data_display(sample):
     questions = survey.listing_form.questions.filter(identifier__in=identifiers)
     context = {}
     for question in questions:
-        answer_class = Answer.get_class(question.answer_type)
         try:
-            answer = answer_class.get(interview=interview, question=question)
-            context[question.identifier] = answer.value
-        except answer_class.DoesNotExist:
+            answer = Answer.get(interview=interview, question=question)
+            context[question.identifier] = answer.as_value
+        except:
             pass
     question_context = template.Context(context)
-    return template.Template(html.escape(naming_label)).render(question_context)
+    label = template.Template(html.escape(naming_label)).render(question_context)
+    # now if label happens to be empty, just use the first response as label
+    try:
+        label = interview.answer.first().as_text
+    except:
+        pass
+    return label
 
 
 @register.assignment_tag

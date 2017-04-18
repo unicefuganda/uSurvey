@@ -32,7 +32,8 @@ class Interviewer(BaseModel):
     gender = models.CharField(default=MALE, verbose_name="Gender", choices=[
                               (MALE, "M"), (FEMALE, "F")], max_length=10)
 #     age = models.PositiveIntegerField(validators=[MinValueValidator(18), MaxValueValidator(50)], null=True)
-    date_of_birth = models.DateField(null=True, validators=[validate_min_date_of_birth, validate_max_date_of_birth])
+    date_of_birth = models.DateField(
+        null=True, validators=[validate_min_date_of_birth, validate_max_date_of_birth])
     level_of_education = models.CharField(max_length=100, null=True, choices=LEVEL_OF_EDUCATION,
                                           blank=False, default='Primary',
                                           verbose_name="Education")
@@ -58,19 +59,15 @@ class Interviewer(BaseModel):
     def present_interviews(self):
         return self.interviews.filter(ea__in=[a.allocation_ea for a in self.unfinished_assignments]).count()
 
+
     @property
     def age(self):
         return relativedelta(timezone.now().date(), self.date_of_birth).years
 
     def completed_batch_or_survey(self, survey, batch):
-        """Retrieves interviews for this interviewer for survey if batch not specified or the the batch
-        :param survey:
-        :param batch:
-        :return:
-        """
         if survey and not batch:
-            return self.interviews.filter(survey=survey).count() > 0
-        return self.interviews.filter(question_set__id=batch.id).count() > 0
+            return self.total_households_completed(survey) > 0
+        return self.total_households_batch_completed(batch) > 0
 
     def locations_in_hierarchy(self):
         locs = self.ea.locations.all()  # this should evaluate to country
@@ -198,15 +195,13 @@ class SurveyAllocation(BaseModel):
         return self.status == self.PENDING and self.interviewer.ea == self.allocation_ea
 
     def sample_size_reached(self):
-        from survey.models import Interview, Answer
+        from survey.models import Interview
         survey = self.survey.preferred_listing
         if self.survey.preferred_listing:
             survey = self.survey.preferred_listing
         # more than one interviewer can result in the sample size for that EA
-        # use answer count to prevent interviews without answers
-        return Answer.objects.filter(interview__survey__in=[survey, self.survey],
-                                     interview__ea=self.allocation_ea).distinct('interview'
-                                                                                ).count() >= self.survey.sample_size
+        return Interview.objects.filter(survey__in=[survey, self.survey],
+                                        ea=self.allocation_ea).count() >= self.survey.sample_size
 
     def batches_enabled(self):
         if self.is_valid():
