@@ -155,11 +155,11 @@ Now you will be viewing a looping representation on ‘Listing Questions’ page
 
 <b>Loop Representation</b>:
 
-* <span style="color:Chartreuse;font-weight:bolder;"> | </span> - icon represents Loop - START,
+* <span style="color:Chartreuse;font-weight:bold;"> | </span> - icon represents Loop - START,
 
 * <span style="color:Red;font-weight:bold;"> | </span> - icon represents Loop - END,
 
-* <span style="color:Green;font-weight:1000;"> | </span> - icon represents Loop - CONTINUATION
+* <span style="color:Green;font-weight:bold;"> | </span> - icon represents Loop - CONTINUATION
 
 <b>Remove Loop</b>:
 
