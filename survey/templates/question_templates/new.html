@@ -30,13 +30,13 @@
 {% if options %}
   {% for option in options %}
    {% if option %}
-   {{option}}
+   
     <div class="control-group options question-option">
-        <label style="margin-top:10px;" class="control-label col-md-4">Option <span class="number"> {{ option.order }}</span></label>
+        <label  class="control-label col-md-4" style="margin-top: 15px !important;">Option <span class="number"> {{ option.order }}</span></label>
         <div class="controls">
                 <input type="text" maxlength="100" name="options">
-            <a href="javascript:;" class="btn btn-white btn-warning btn-bold add-option"><i class="ace-icon fa fa-plus bigger-120 orange"></i></i></a>
-            <a href="javascript:;" class="btn btn-white btn-warning btn-bold remove-option"><i class="ace-icon fa fa-minus bigger-120 orange"></i></i></a>
+            <a href="javascript:;" class="btn btn-white btn-warning btn-bold add-option"><i class="ace-icon fa fa-plus bigger-120 orange"></i></a>
+            <a href="javascript:;" class="btn btn-white btn-warning btn-bold remove-option"><i class="ace-icon fa fa-minus bigger-120 orange"></i></a>
             </div>
     </div>
     {% endif %}
@@ -49,15 +49,15 @@
 
     {% block buttons %}
   <div class="form-actions">
-    <button id="button" type="submit" class="btn btn-primary submit" name="save_button" data-disabled-text="{{ loading_text }}">Save</button>
-    <button id="button" type="submit" class="btn btn-primary submit" name="add_more_button" data-disabled-text="{{ loading_text }}">Save and Add More</button>
+    <button id="button" type="submit" class="btn btn-primary submit" name="save_button" data-disabled-text="{{ loading_text }}"><i class="fa fa-save"></i> Save Changes</button>
+    <button id="button" type="submit" class="btn btn-primary submit" name="add_more_button" data-disabled-text="{{ loading_text }}"><i class="fa fa-save"></i> Save and Add More</button>
 
     {% if cancel_url %}
       <a href="{{ cancel_url }}" class="btn btn-primary" name="cancel_button" class="cancel" style=" padding-right: 5px;
     padding-left: 5px;
-    padding-bottom: 1px;">Cancel</a>
+    padding-bottom: 1px;"><i class="fa fa-close"></i> Cancel</a>
     {% else %}
-      <a href="../" class="btn btn-primary" name="cancel_button" id="cancel_{{ id }}" class="cancel">Cancel</a>
+      <a href="../" class="btn btn-primary" name="cancel_button" id="cancel_{{ id }}" class="cancel"><i class="fa fa-close"></i> Cancel</a>
     {% endif %}
   </div>
     {% endblock %}
@@ -95,5 +95,12 @@ $("#id_text").attr({"cols":29});
 height: 25px !important;
 margin-left: 0px !important; }
 .dataTables_wrapper select {margin-left: 0px !important;}
+.btn-white{padding: 0px !important;font-size: 10px !important;}
+.dataTables_wrapper input[name=options] {
+  width: 261px !important;
+    height: 27px !important;
+margin-left: 2px !important;
+margin-top: 10px !important;
+}
 </style>
 {% endblock %}

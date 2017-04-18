@@ -3179,27 +3179,31 @@ fieldset[disabled] .btn-default.active {
 
  
 .btn-primary {
-  -webkit-border-radius: 0; 
+  /*-webkit-border-radius: 0; 
    -moz-border-radius: 0; 
-    border-radius: 0px; 
-     font-family: Arial; 
+    border-radius: 0px; */
+     
       color: #ffffff; 
-       font-size: 12px; 
-        background: #3498db !important;  
+       font-size: 13px; 
+       background-color: #286090;
+ 
+  border-color: #286090;
         padding: 5px 10px 5px 10px;
-        border-radius: 5px; 
+        /*border-radius: 5px; */
          text-decoration: none;
 }
 a.btn-primary {
-  -webkit-border-radius: 0; 
+ /* -webkit-border-radius: 0; 
    -moz-border-radius: 0; 
-    border-radius: 0px; 
-     font-family: Arial; 
+    border-radius: 0px; */
+     
       color: #ffffff; 
-       font-size: 12px; 
-        background: #3498db !important;  
+       font-size: 13px;background-color: #286090;
+ 
+  border-color: #286090;
+        
         padding: 5px 10px 5px 10px !important;
-        border-radius: 5px; 
+        /*border-radius: 5px; */
          text-decoration: none;
 }
 .btn-primary:hover,
@@ -3209,9 +3213,9 @@ a.btn-primary {
 .btn-primary.active,
 .open > .dropdown-toggle.btn-primary {
   color: #fff;
-  /*background-color: #286090;*/
-  background-color: #3498db !important;
-  /*border-color: #204d74;*/
+  background-color: #286090;
+ 
+  border-color: #286090;
 }
 .btn-primary:active,
 .btn-primary.active,
