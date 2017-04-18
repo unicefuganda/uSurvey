@@ -9,7 +9,7 @@
     </div>
     <div class="awe-overlay"></div>
     <div class="container">
-        <div class="row"  style="margin-top: 145px;">
+        <div class="row"  style="margin-top:80px;">
             <!-- FORM -->
             <div class="col-xs-12 col-lg-4 pull-right">
                 <div class="form-login">
@@ -50,12 +50,12 @@
                 </div>
             </div>
             <!-- END / FORM -->
-            <div class="image">
+            <div class="image col-md-12">
                 <img src="{{ STATIC_URL }}loginassest/img-thumb.png" alt="">
             </div>
         </div>
     </div>
-    <div style="min-height: 100px;">&nbsp;</div>
+    <!-- <div style="min-height: 100px;">&nbsp;</div> -->
 </section>
             
 {%endblock%}
@@ -65,7 +65,8 @@
 <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}loginassest/style.css">
 <link rel="stylesheet" href="{{ STATIC_URL }}toassets/style_002.css" type="text/css">
 <style type="text/css">
-    #cssmenu > ul > li .login {
+
+=  #cssmenu > ul > li .login {
     color: yellow;}
     .form-email input, .form-password input {    
     /*padding: 0 65px !important;*/
@@ -81,11 +82,34 @@
     max-width: 400px;
     margin-left: auto;
     margin-top: -90px;
-    margin-bottom: 250px;
+    margin-bottom: 300px;
     margin-right: auto;
 }
 }
-    
+ 
+ @media screen and (min-device-width: 320px) and (max-device-width: 568px) {
+.login-content .form-login {
+    position: relative;
+     z-index: 99; 
+    max-width: 400px;
+    margin-left: auto;
+    margin-top: -90px;
+    margin-bottom: 265px;
+    margin-right: auto;
+}
+}
+
+ @media screen and (min-device-width: 767px) and (max-device-width: 1024px) {
+.login-content .form-login {
+    position: relative;
+     z-index: 99; 
+    max-width: 400px;
+    margin-left: auto;
+    margin-top: -90px;
+    margin-bottom: 500px;
+    margin-right: auto;
+}
+}   
 </style>
 {%endblock%}
 {% block extra_js %}

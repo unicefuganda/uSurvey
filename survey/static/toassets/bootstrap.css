@@ -3187,7 +3187,7 @@ fieldset[disabled] .btn-default.active {
        font-size: 13px; 
        background-color: #286090;
  
-  border-color: #286090;
+  background: #3498db !important;  
         padding: 5px 10px 5px 10px;
         /*border-radius: 5px; */
          text-decoration: none;
@@ -3198,9 +3198,9 @@ a.btn-primary {
     border-radius: 0px; */
      
       color: #ffffff; 
-       font-size: 13px;background-color: #286090;
+       font-size: 13px;
  
-  border-color: #286090;
+  background: #3498db !important;  
         
         padding: 5px 10px 5px 10px !important;
         /*border-radius: 5px; */
@@ -3212,10 +3212,10 @@ a.btn-primary {
 .btn-primary:active,
 .btn-primary.active,
 .open > .dropdown-toggle.btn-primary {
-  color: #fff;
-  background-color: #286090;
+  color: yellow !important;
+  background: #3498db !important;  
  
-  border-color: #286090;
+  border-color: #3498db;
 }
 .btn-primary:active,
 .btn-primary.active,

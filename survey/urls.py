@@ -115,7 +115,7 @@ urlpatterns = patterns('',
                            name='users_index'),
                        url(r'^users/new/$', 'survey.views.users.new',
                            name='new_user_page'),
-                       url(r'^users/(?P<user_id>\d+)/edit/$',
+                       url(r'^users/(?P<user_id>\d+)/(?P<mode>\w+)/$',
                            'survey.views.users.edit', name='users_edit'),
                        url(r'^users/(?P<user_id>\d+)/deactivate/$',
                            'survey.views.users.deactivate', name='deactivate_user'),
@@ -435,8 +435,8 @@ urlpatterns = patterns('',
 #         url(r'^api/delete_interviewer', 'survey.views.api.delete_interviewer', name='delete_interviewer'),
 #     )
 
-handler400 = 'survey.views.home_page.custom_404'
-handler403 = 'survey.views.home_page.custom_404'
+handler401 = 'survey.views.home_page.custom_401'
+handler403 = 'survey.views.home_page.custom_403'
 handler404 = 'survey.views.home_page.custom_404'
-handler500 = 'survey.views.home_page.custom_404'
+handler500 = 'survey.views.home_page.custom_500'
 
