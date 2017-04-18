@@ -396,8 +396,15 @@
         <script src="{{ STATIC_URL }}js/question_options.js" type="text/javascript" charset="utf-8"></script>
         <script>
             $(document).ready(function() {
+
+                try { 
                 $('.multi-select').multiSelect();
-                
+
+                }
+                catch(err) {
+                //err;
+                }
+
                 try { 
                     $(".chzn-select").chosen();
                  }
