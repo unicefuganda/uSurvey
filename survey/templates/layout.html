@@ -412,12 +412,12 @@
             });
         </script>
         <script>
-            jQuery(function($) {
+            $(document).ready(function() {
             $(".chzn-select").chosen();
             });
         </script>
         <script type="text/javascript">
-            jQuery(function($) {
+            $(document).ready(function() {
                 $(".datepicker").datepicker({
                  changeMonth: true,
                  changeYear: true,
@@ -427,9 +427,9 @@
             });
             $('.multi-select').multiSelect();
             
-                try { 
-            $('form span[title]').qtip();
-            }
+            try { 
+                $('form span[title]').qtip();
+                }
             catch(err) {
             //err;
             }

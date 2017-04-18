@@ -1,16 +1,15 @@
 {% extends "base.html" %}
-{% block title %}
-Page Not Found!
+{% block title %}404
 {% endblock %}
 
 {% block extra_content %}
 <section class="commonSection " style="background-color: #ffffff; background-repeat: no-repeat; " > 
     <div class="container">
         <div class="fw-row usurvey-static-content" style="min-height: 600px;">
-            <div class="col-md-12">
+            <div class="col-md-7 col-md-offset-2">
                 <p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p>
-                <div class="static-content">
-                    <h3 class="">Page Not Found <small>(404)</small></h3>
+                <div class="static-content text-center" style="border: 1px #eee solid;padding: 20px;">
+                    <h1 class="text-danger"><i class="fa fa-warning"></i> Page Not Found <small>(404)</small></h1>
                         <hr/>
                         {% if user.is_authenticated %}
                         	<p style="font-size: 15px;" >Looks like someting went wrong on our end. Head back to the dashbaord page </p><br/>
