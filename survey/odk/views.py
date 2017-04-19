@@ -112,8 +112,7 @@ def instances_form_list(request):
     interviewer = request.user
     assignments = interviewer.unfinished_assignments
     submissions = ODKSubmission.objects.filter(ea__in=[a.allocation_ea for a in assignments],
-                                               survey=assignments.first().survey,
-                                               status=ODKSubmission.COMPLETED)      # only pick completed submissions
+                                               survey=assignments.first().survey)       # pick irrespective of status
     content = render_to_string("odk/instances_xformsList.xml", {
         'interviewer': interviewer,
         'submissions': submissions,
