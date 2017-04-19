@@ -20,9 +20,10 @@ $.fn.menumaker = function(options) {
    });
    cssmenu.find('li ul').parent().addClass('has-sub');
 multiTg = function() {
-     cssmenu.find(".has-sub").prepend('<span class="submenu-button"></span>');
-     cssmenu.find('.submenu-button').on('click', function() {
+     //cssmenu.find(".submenu-button1").prepend('<span class="submenu-button="></span>');
+     cssmenu.find('.submenu-button1').on('click', function() {
        $(this).toggleClass('submenu-opened');
+
        if ($(this).siblings('ul').hasClass('open')) {
          $(this).siblings('ul').removeClass('open').slideToggle();
        }
@@ -30,6 +31,9 @@ multiTg = function() {
          $(this).siblings('ul').addClass('open').slideToggle();
        }
      });
+
+
+
    };
    if (settings.format === 'multitoggle') multiTg();
    else cssmenu.addClass('dropdown');
