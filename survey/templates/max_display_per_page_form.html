@@ -19,18 +19,36 @@ $(document).ready(function() {
         $('#ea_length').on('change', function() {
             var url = window.location.href;
             var ea_length = $('#ea_length :selected').text();
-            window.location = url+"&max_display_per_page="+ea_length;
+            var str = url.slice(-1);
+            if (str == '/')
+            {
+              window.location = url+"?max_display_per_page="+ea_length;
+            }else{
+              window.location = url+"&max_display_per_page="+ea_length;
+            }
         });
         
     	$("select[name='datatables_length']").change(function(){
             var url = window.location.href;
             var ea_length = $("select[name='datatables_length'] :selected").val();
-            window.location = url+"&max_display_per_page="+ea_length;
+            var str = url.slice(-1);
+            if (str == '/')
+            {
+              window.location = url+"?max_display_per_page="+ea_length;
+            }else{
+              window.location = url+"&max_display_per_page="+ea_length;
+            }
         });
         $("select[name='DataTables_Table_0_length']").change(function(){
             var url = window.location.href;
             var ea_length = $("select[name='DataTables_Table_0_length'] :selected").val();
-            window.location = url+"&max_display_per_page="+ea_length;
+            var str = url.slice(-1);
+            if (str == '/')
+            {
+              window.location = url+"?max_display_per_page="+ea_length;
+            }else{
+              window.location = url+"&max_display_per_page="+ea_length;
+            }
         });
         
         
