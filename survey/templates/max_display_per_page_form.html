@@ -11,26 +11,29 @@ $(document).ready(function() {
                   'aoColumnDefs': [{
                   'bSortable': false,
                   "bPaginate": false,
-            
                   'aTargets': [-1] /* 1st one, start by the right */
               }]
               
               });
 		// on change load page
         $('#ea_length').on('change', function() {
+            var url = window.location.href;
             var ea_length = $('#ea_length :selected').text();
-            window.location = "?max_display_per_page="+ea_length;
+            window.location = url+"&max_display_per_page="+ea_length;
         });
         
     	$("select[name='datatables_length']").change(function(){
+            var url = window.location.href;
             var ea_length = $("select[name='datatables_length'] :selected").val();
-            window.location = "?max_display_per_page="+ea_length;
+            window.location = url+"&max_display_per_page="+ea_length;
         });
         $("select[name='DataTables_Table_0_length']").change(function(){
+            var url = window.location.href;
             var ea_length = $("select[name='DataTables_Table_0_length'] :selected").val();
-            window.location = "?max_display_per_page="+ea_length;
+            window.location = url+"&max_display_per_page="+ea_length;
         });
-
+        
+        
         $("#ea_info").empty();
 
     

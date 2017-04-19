@@ -35,7 +35,7 @@ def home(request):
 
 
 def index(request):
-    return render(request, 'main/index.html', {'title': settings.PROJECT_TITLE})
+    return render(request, 'main/index.html', {'title': settings.PROJECT_TITLE,'ss_list'  : SuccessStories.objects.all()})
 
 
 def about(request):
