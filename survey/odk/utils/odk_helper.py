@@ -239,8 +239,8 @@ def process_xml(interviewer, xml_blob, media_files={}, request=None):
                                                   instance_name=instance_name)
     question_map = dict([(str(q.pk), q) for q in qset.flow_questions])
     access_channel = ODKAccess.objects.get(interviewer=interviewer)
-    process_answers.delay(xml_blob, qset, access_channel, question_map, survey_allocation, submission, media_files)
-    #>process_answers(xml_blob, qset, access_channel, question_map, survey_allocation, submission, media_files)
+    #>process_answers.delay(xml_blob, qset, access_channel, question_map, survey_allocation, submission, media_files)
+    process_answers(xml_blob, qset, access_channel, question_map, survey_allocation, submission, media_files)
     return submission
 
 
