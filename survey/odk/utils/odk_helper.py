@@ -229,6 +229,8 @@ def process_xml(interviewer, xml_blob, media_files={}, request=None):
     # since interviewers may have downloaded this submission file before, fetch old instance if exists
     if submission_id:
         submission = ODKSubmission.objects.get(id=submission_id)
+        submission.xml = xml_blob       # update the xml
+        submission.save()
     else:
         # first things first. save the submission incase all else background task fails... enables recover
         submission = ODKSubmission.objects.create(interviewer=interviewer, survey=survey_allocation.survey,
