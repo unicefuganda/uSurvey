@@ -49,9 +49,9 @@
             border: none;
             box-shadow: none;
             min-height: 600px;
-            margin-bottom: 130px;
+            /*margin-bottom: 130px;*/
             width: 100% !important;
-            margin-left: auto;
+            margin-left: 100px;
             margin-right: auto;
             z-index: 10 !important;
         }
@@ -287,7 +287,9 @@
 
            }
 
-
+#displays{
+  margin-left: -50px;
+}
 
            .tite3 {
 
@@ -659,7 +661,7 @@ getIndicatorHtml = function(name, property, styleIndex) {
 updateIndicators = function(property) {
      indicatorTable.innerHTML = '<div class="row r-row">\
                                         <div style="margin-left:-8px !important;" class="col-sm-12">\
-                                            <p style="font-size:17px; color:#8c203d; font-weight:bold;">' + property + '</p>\
+                                            <p style="font-size:17px; color:#ff8200; font-weight:bold;">' + property + '</p>\
                                          </div>\
                                     </div>\
                                     <div class="row r-row"  style="font-family: Open Sans; ">\
