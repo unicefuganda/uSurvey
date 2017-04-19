@@ -26,12 +26,12 @@ multiTg = function() {
 
        if ($(this).siblings('ul').hasClass('open')) {
          $(this).siblings('ul').removeClass('open').slideToggle();
-          $(this).find("i").remove();
+          $(this).find(".submenu-button").remove();
           $(this).append("<i class='fa fa-plus submenu-button hidden-md hidden-lg '></i>");
        }
        else {
          $(this).siblings('ul').addClass('open').slideToggle();
-          $(this).find("i").remove();
+          $(this).find(".submenu-button").remove();
           $(this).append("<i class='fa fa-minus submenu-button hidden-md hidden-lg'></i>");
        }
      });
