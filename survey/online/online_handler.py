@@ -73,6 +73,7 @@ class OnlineHandler(object):
         :param session_data:
         :return:
         """
+        pass
 
     def respond_interview(self, request, interview, session_data):
         initial = {}
