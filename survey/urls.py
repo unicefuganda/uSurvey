@@ -435,8 +435,8 @@ urlpatterns = patterns('',
 #         url(r'^api/delete_interviewer', 'survey.views.api.delete_interviewer', name='delete_interviewer'),
 #     )
 
-handler400 = 'survey.views.home_page.custom_404'
-handler403 = 'survey.views.home_page.custom_404'
+handler401 = 'survey.views.home_page.custom_401'
+handler403 = 'survey.views.home_page.custom_403'
 handler404 = 'survey.views.home_page.custom_404'
-handler500 = 'survey.views.home_page.custom_404'
+handler500 = 'survey.views.home_page.custom_500'
 

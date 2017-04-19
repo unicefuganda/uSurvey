@@ -22,8 +22,8 @@ class RespondentGroup(BaseModel):
 
     def has_interviews(self):
         from survey.models import Interview
-        return self.questions.exists() and \
-               Interview.objects.filter(question_set__pk=self.questions.first().qset.pk).exists()
+        return self.questions.exists() and Interview.objects.filter(question_set__pk=
+                                                                    self.questions.first().qset.pk).exists()
 
     def remove_related_questions(self):
         self.question_templates.all().delete()
@@ -96,7 +96,7 @@ class SurveyParameterList(QuestionSet):             # basically used to tag surv
     @classmethod
     def update_parameter_list(cls, batch):
         """Updates the parameter list for this batch.
-        Basically checks all the groups registered in this batch and ensures required parameter list is updated.
+        Basically checks all the target_groups registered in this batch and ensures required parameter list is updated.
         Presently because the entire group parameters required in a batch would typically be less than 10, The strategy
          employed here shall be to delete all parameters and create new when called.
          Questions in returned question set does not necessarily belong to any flow.
@@ -106,10 +106,10 @@ class SurveyParameterList(QuestionSet):             # basically used to tag surv
         param_list, _ = cls.objects.get_or_create(batch=batch)
         param_list.questions.all().delete()
         # now create a new
-        groups = RespondentGroup.objects.filter(questions__qset=batch)
+        target_groups = RespondentGroup.objects.filter(questions__qset__id=batch.id)
         question_ids = []
-        # loop through groups to get required template parameters
-        for group in groups:
+        # loop through target_groups to get required template parameters
+        for group in target_groups:
             map(lambda condition: question_ids.append(condition.test_question.id), group.group_conditions.all())
         parameters = ParameterTemplate.objects.filter(id__in=question_ids).order_by('identifier')
         prev_question = None

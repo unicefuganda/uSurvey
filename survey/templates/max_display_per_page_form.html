@@ -1,5 +1,21 @@
 <script type="text/javascript">
 $(document).ready(function() {  
+          $('.dataTable').DataTable( {
+                  "scrollY":        "250px",
+                  "scrollX":        '100%',
+                  "scrollCollapse": true,
+                  "paging":         true,
+                  "searching": false,
+                  "aaSorting": [],
+                  "iDisplayLength": {{max_display_per_page}},
+                  'aoColumnDefs': [{
+                  'bSortable': false,
+                  "bPaginate": false,
+            
+                  'aTargets': [-1] /* 1st one, start by the right */
+              }]
+              
+              });
 		// on change load page
         $('#ea_length').on('change', function() {
             var ea_length = $('#ea_length :selected').text();
@@ -16,6 +32,7 @@ $(document).ready(function() {
         });
 
         $("#ea_info").empty();
+
     
     });
 </script>

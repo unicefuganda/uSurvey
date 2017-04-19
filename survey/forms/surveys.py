@@ -21,7 +21,7 @@ class SurveyForm(ModelForm, FormOrderMixin):
         model = Survey
         exclude = []
         widgets = {
-            'name' : forms.TextInput(attrs={'size': 40, 'title': 'Your name','style': 'height: 2em;'}),
+            'name': forms.TextInput(attrs={'size': 40, 'title': 'Your name','style': 'height: 2em;'}),
             # 'name' : forms.TextInput(attrs={"rows": 3, "cols": 40}),            
             'description': forms.Textarea(attrs={"rows": 6, "cols": 41}),
             'random_sample_label': forms.Textarea(attrs={"rows": 4, "cols": 40,
@@ -46,10 +46,10 @@ class SurveyForm(ModelForm, FormOrderMixin):
             self.fields['preferred_listing'].choices = preferred_listings
             self.fields['preferred_listing'].widget = forms.SelectMultiple(attrs={'class': 'chzn-select'})
         except Exception, err:
-            print Exception, err
+            pass
         self.fields['listing_form'].required = False
         self.order_fields(['name', 'description', 'has_sampling', 'sample_size',
-                           'preferred_listing', 'listing_form', 'sample_naming_convention'])
+                           'preferred_listing', 'listing_form', 'sample_naming_convention', 'email_group'])
 
     def clean_random_sample_label(self):
         """Make sure this field makes reference to listing form entry in {{}} brackets
@@ -79,9 +79,10 @@ class SurveyForm(ModelForm, FormOrderMixin):
         return cleaned_data
 
     def clean_listing_form(self):
-        if not self.cleaned_data.get('listing_form') and  not self.cleaned_data.get('preferred_listing'):
-            raise ValidationError('Required')
-        if self.cleaned_data.get('listing_form')  and self.cleaned_data.get('preferred_listing'):
+        if self.cleaned_data.get('has_sampling', False) and \
+                not (self.cleaned_data.get('listing_form') or self.cleaned_data.get('preferred_listing')):
+            raise ValidationError('Chose Either listing_form/preferred_listing ')
+        if self.cleaned_data.get('listing_form') and self.cleaned_data.get('preferred_listing'):
             raise ValidationError('Chose Either listing_form/preferred_listing ')
         return self.cleaned_data['listing_form']
 
@@ -164,12 +165,9 @@ class SamplingCriterionForm(forms.ModelForm, FormOrderMixin):
         return self.cleaned_data
 
     def clean_validation_test(self):
-        if self.cleaned_data['validation_test'] == None:
+        if not self.cleaned_data.get('validation_test', None):
             raise ValidationError('This field is Required')
         return self.cleaned_data['validation_test']
-
-    
-
 
     def save(self, *args, **kwargs):
         criterion = super(SamplingCriterionForm, self).save(*args, **kwargs)

@@ -119,10 +119,9 @@
         </div>
         <div class="col-md-2 col-sm-1 "></div>
       </div>
-      <span title="{{ field.help_text }}" class="{{field.auto_id}}_tip">{{field}}</span>
-    {%else%}
-       <span title="{{ field.help_text }}" class="{{field.auto_id}}_tip">{{field}}</span>
     {%endif%}
+      <span title="{{ field.help_text }}" class="{{field.auto_id}}_tip">{{field}}</span>
+
         {% if field.field.icons %}
             <div class="input-prepend" style="display: inline-block; border: none;">
                 {% for icon, attrs in field.field.icons.items %}
