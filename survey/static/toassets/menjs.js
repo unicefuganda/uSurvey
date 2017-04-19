@@ -20,15 +20,19 @@ $.fn.menumaker = function(options) {
    });
    cssmenu.find('li ul').parent().addClass('has-sub');
 multiTg = function() {
-     //cssmenu.find(".submenu-button1").prepend('<span class="submenu-button="></span>');
+     cssmenu.find(".submenu-button1").prepend("<i class='fa fa-plus submenu-button hidden-md hidden-lg'></i>");
      cssmenu.find('.submenu-button1').on('click', function() {
        $(this).toggleClass('submenu-opened');
 
        if ($(this).siblings('ul').hasClass('open')) {
          $(this).siblings('ul').removeClass('open').slideToggle();
+          $(this).find("i").remove();
+          $(this).append("<i class='fa fa-plus submenu-button hidden-md hidden-lg '></i>");
        }
        else {
          $(this).siblings('ul').addClass('open').slideToggle();
+          $(this).find("i").remove();
+          $(this).append("<i class='fa fa-minus submenu-button hidden-md hidden-lg'></i>");
        }
      });
 

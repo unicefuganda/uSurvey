@@ -31,12 +31,13 @@ nav{position:relative;width:1220px;-moz-width:1100px;}
 #cssmenu > ul > li{float:left;}
 #cssmenu > ul > li > a{margin-top: 6px;padding-top:20px;padding-left:30px;padding-bottom:10px;font-size:13px;letter-spacing:1px;text-decoration:none;color:#fff;font-weight:700;font-family: "Open Sans";}
 #cssmenu > ul > li:hover > a,#cssmenu ul li.active a{color:yellow;}
+#cssmenu > ul > li > .last{margin-top: 0px;padding-top:0px;padding-left:0px;padding-bottom:0px;}
 /*Removed Hover color*/
 /*#cssmenu > ul > li:hover,#cssmenu ul li.active:hover,#cssmenu ul li.active,#cssmenu ul li.has-sub.active:hover{background:#0073bf!important;-webkit-transition:background .3s ease;-ms-transition:background .3s ease;transition:background .3s ease;}*/
 /*#cssmenu > ul > li.has-sub > a{padding-right:24px}*/
 /*Removed Plush and minus functionality*/ 
 /*#cssmenu > ul > li.has-sub > a:after{position:absolute;top:22px;right:11px;width:8px;height:2px;display:block;background:#fff;content:''}*/
-/*#cssmenu > ul > li.has-sub > a:before{position:absolute;top:19px;right:14px;display:block;width:2px;height:8px;background:#fff;content:'';-webkit-transition:all .25s ease;-ms-transition:all .25s ease;transition:all .25s ease}*/
+/*#cssmenu > ul > li.has-sub > a:before{position:absolute;top:19px;margin-top: 6px;padding-top:20px;padding-left:30px;padding-bottom:10px;font-size:13px;letter-spacing:1px;text-decoration:none;color:#fff;font-weight:700;font-family: "Open Sans";right:14px;display:block;width:2px;height:8px;background:#fff;content:'';-webkit-transition:all .25s ease;-ms-transition:all .25s ease;transition:all .25s ease}*/
 #cssmenu > ul > li.has-sub:hover > a:before{top:23px;height:0}
 #cssmenu ul ul{position:absolute;left:-9999px;margin-top: 0px;}
 /*#cssmenu ul ul li{height:0;-webkit-transition:all .25s ease;-ms-transition:all .25s ease;background:#0073bf;border-bottom: 1px solid #EDC;transition:all .25s ease}*/
@@ -133,12 +134,12 @@ nav{width:100%;}
 #cssmenu .submenu-button{position:absolute;z-index:99;right:0;top:0;display:block;border-left:1px solid #0381d5;height:46px;width:46px;cursor:pointer}
 #cssmenu .submenu-button.submenu-opened{background:#0381d5}
 #cssmenu ul ul .submenu-button{height:34px;width:34px}
-#cssmenu .submenu-button:after{position:absolute;top:22px;right:19px;width:8px;height:2px;display:block;background:#ddd;content:''}
+/*#cssmenu .submenu-button:after{position:absolute;top:22px;right:19px;width:8px;height:2px;display:block;background:#ddd;content:''}
 #cssmenu ul ul .submenu-button:after{top:15px;right:13px}
 #cssmenu .submenu-button.submenu-opened:after{background:#fff}
 #cssmenu .submenu-button:before{position:absolute;top:19px;right:22px;display:block;width:2px;height:8px;background:#ddd;content:''}
 #cssmenu ul ul .submenu-button:before{top:12px;right:16px}
-#cssmenu .submenu-button.submenu-opened:before{display:none}
+#cssmenu .submenu-button.submenu-opened:before{display:none}*/
 #cssmenu ul ul ul li.active a{border-left:none}
 #cssmenu > ul > li.has-sub > ul > li.active > a,#cssmenu > ul ul > li.has-sub > ul > li.active > a{border-top:none}
 }
@@ -148,4 +149,7 @@ nav{width:100%;}
 #cssmenu ul ul li {
     border-bottom: none !important;
     }
+    #cssmenu .fa-plus,#cssmenu .fa-minus{padding: 15px;}
 }
+
+
