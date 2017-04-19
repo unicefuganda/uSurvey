@@ -17,31 +17,17 @@
 {% endblock %}
 {% block content %}
     <div id="preview-container" class="container">
-        <div class="row" style="margin: 0; padding: 0;">
+        <div class="row r-row" style="margin: 0; padding: 0;">
             {% if access %}
                 {% if access.choice_name == 'Ussd Access' %}
                    <div class="col-md-6">
                       <div class="container-fluid" id="countdown-container" >
-                        <div class="row">
+                        <div class="row r-row">
                             <div class="col-md-12" id="timer">
 
                             </div>
                         </div>
-                          <script src="{{STATIC_URL}}js/flipclock.min.js"></script>
-                          <script type="text/javascript">
-                              $(function(){
-                                    var timer = $("#timer").FlipClock({{ussd_session_timeout|default:180}}, {
-                                                    clockFace: 'MinuteCounter',
-                                                    countdown: true,
-                                                    callbacks: {
-                                                        stop: function() {
-                                                            $('#timer_modal').modal('show');
-                                                        },
-                                                    }
-                                                });
 
-                                });
-                      </script>
                       <div class="modal fade" id="timer_modal" tabindex="-1" role="dialog" aria-hidden="true">
                           <div class="modal-dialog">
                             <div class="modal-content">
@@ -70,6 +56,23 @@
                     {% include "interviews/new_interview.html" with use_ajax_post=False %}
                 </div>
             {% endif %}
+            {% block javascripts %}
+                <script src="{{STATIC_URL}}js/flipclock.min.js"></script>
+                  <script type="text/javascript">
+                      $(function(){
+                            var timer = $("#timer").FlipClock({{ussd_session_timeout|default:180}}, {
+                                            clockFace: 'MinuteCounter',
+                                            countdown: true,
+                                            callbacks: {
+                                                stop: function() {
+                                                    $('#timer_modal').modal('show');
+                                                },
+                                            }
+                                        });
+
+                        });
+              </script>
+            {% endblock %}
         </div>
     </div>
 {% endblock %}
