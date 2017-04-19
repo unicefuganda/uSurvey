@@ -23,7 +23,7 @@
                     {% for each in ss_list %}  
                     {% if not forloop.counter|divisibleby:2 %}   
                     <div class="row success_story_list">
-                        <div class="col-md-2">
+                        <div class="col-md-2"><a name="{{each.id}}"></a>
                             <img src="/media/{{each.image}}" class="img-responsive">
                         </div>
                         <div class="col-md-10">

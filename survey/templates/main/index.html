@@ -94,22 +94,25 @@
         </div>
         <div class="row">
             <div class="project-slider project-single-content">
+                {% for each in ss_list %}
                 <div class="item">
                     <div class="single-project">
                         <div class="img">
-                            <img src="{{ STATIC_URL }}success/images/project/1.jpg" alt="Image">
+                            <img src="/media/{{each.image}}" alt="Image">
                             <div class="opacity"></div>
                             <ul class="icon">
-                                <li><a href="{% url 'home_success_story_list' %}" class="tran3s" title="View details"><i class="fa fa-external-link" aria-hidden="true"></i></a></li>
+                                <li><a href="{% url 'home_success_story_list' %}#{{each.id}}" class="tran3s" title="View details"><i class="fa fa-external-link" aria-hidden="true"></i></a></li>
                             </ul>
                         </div>
+
                         <div class="text">
-                            <h4><a href="{% url 'home_success_story_list' %}" class="tran3s">Leveraging ICT</a></h4>
-                            <p>Using mobile phones to collect data often leads to more efficient processing times and informed decision-making. Additionally, it presents new opportunities to deploy surveys remotely while providing results in real-time.</p>
+                            <h4><a href="{% url 'home_success_story_list' %}#{{each.id}}" class="tran3s">{{each.name}}</a></h4>
+                        {{each.content|safe}}
                         </div>
                     </div>
                 </div>
-                <div class="item">
+                {% endfor %}
+          <!--       <div class="item">
                     <div class="single-project">
                         <div class="img">
                             <img src="{{ STATIC_URL }}success/images/project/2.jpg" alt="Image">
@@ -119,7 +122,7 @@
                             </ul>
                         </div>
                         <div class="text">
-                            <h4><a href="{% url 'home_success_story_list' %}" class="tran3s">Surveying made Easy</a></h4>
+                            <h4><a href="{% url 'home_success_story_list' %}#2" class="tran3s">Surveying made Easy</a></h4>
                             <p>Ms. Flavia Ouma, Senior IT Officer of Uganda Bureau of Statistics (UBOS) demonstrating the uSurvey application to a field worker during the field testing of the system for Female Genital </p>
                         </div>
                     </div>
@@ -134,7 +137,7 @@
                             </ul>
                         </div>
                         <div class="text">
-                            <h4><a href="{% url 'home_success_story_list' %}" class="tran3s">Use of uSurvey in Uganda</a></h4>
+                            <h4><a href="{% url 'home_success_story_list' %}#3" class="tran3s">Use of uSurvey in Uganda</a></h4>
                             <p>Maiden use of the system in early 2016 enabled UNICEF and UBOS to obtain real-time data from 4,500 respondents, allowing for a presentation of preliminary results just three days after the fieldwork...</p>
                         </div>
                     </div>
@@ -149,11 +152,11 @@
                             </ul>
                         </div>
                         <div class="text">
-                            <h4><a href="{% url 'home_success_story_list' %}" class="tran3s">Business Advantages of uSurvey</a></h4>
+                            <h4><a href="{% url 'home_success_story_list' %}#4" class="tran3s">Business Advantages of uSurvey</a></h4>
                             <p>Generic system that can be used for any survey or census with defined parameters during survey set-up (uSurvey has a bank of standard questions that can be added to)</p>
                         </div>
                     </div>
-                </div>
+                </div> -->
             </div>
         </div>
     </div>
