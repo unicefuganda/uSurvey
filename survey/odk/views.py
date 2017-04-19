@@ -113,6 +113,9 @@ def instances_form_list(request):
     assignments = interviewer.unfinished_assignments
     submissions = ODKSubmission.objects.filter(ea__in=[a.allocation_ea for a in assignments],
                                                survey=assignments.first().survey)       # pick irrespective of status
+    # now exclude any question already being used as a sample sample
+    listing_interviews = ListingSample.objects.values_list('interview', flat=True)
+    submissions = submissions.exclude(interviews__in=listing_interviews)
     content = render_to_string("odk/instances_xformsList.xml", {
         'interviewer': interviewer,
         'submissions': submissions,
@@ -264,6 +267,14 @@ def submission(request):
         return response
     except NotEnoughData:
         desc = settings.ODK_UPLOADED_DATA_BELOW_SAMPLE_SIZE
+        audit_log(Actions.SUBMISSION_REQUESTED, request.user, interviewer,
+                  _("Failed attempted to submit XML for form for interviewer: '%(interviewer)s'. desc: '%(desc)s'") % {
+                      "interviewer": interviewer.name,
+                      "desc": desc
+                  }, {'desc': desc}, request, logging.WARNING)
+        return OpenRosaRequestForbidden(desc)
+    except ValueError, err:
+        desc = str(err)
         audit_log(Actions.SUBMISSION_REQUESTED, request.user, interviewer,
                   _("Failed attempted to submit XML for form for interviewer: '%(interviewer)s'. desc: '%(desc)s'") % {
                       "interviewer": interviewer.name,

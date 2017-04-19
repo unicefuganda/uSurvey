@@ -2,6 +2,7 @@ from datetime import date, datetime
 import os
 import pytz
 from lxml import etree
+from django.forms import ValidationError
 from django.http import HttpResponse, HttpResponseNotFound, StreamingHttpResponse
 from django.core.servers.basehttp import FileWrapper
 from django.core.files.storage import get_storage_class
@@ -11,9 +12,10 @@ from django.utils import timezone
 from djangohttpdigest.digest import Digestor
 from djangohttpdigest.authentication import SimpleHardcodedAuthenticator
 from django.utils.translation import ugettext as _
-from survey.models import Survey, Interviewer, Interview, SurveyAllocation, ODKAccess, QuestionSet, \
-    Question, Batch, ODKSubmission, ODKGeoPoint, TextAnswer, Answer, NonResponseAnswer, \
-    VideoAnswer, AudioAnswer, ImageAnswer, MultiSelectAnswer, MultiChoiceAnswer, DateAnswer, GeopointAnswer
+from survey.models import (Survey, Interviewer, Interview, SurveyAllocation, ODKAccess, QuestionSet,
+                           Question, Batch, ODKSubmission, ODKGeoPoint, TextAnswer, Answer, NonResponseAnswer,
+                           VideoAnswer, AudioAnswer, ImageAnswer, MultiSelectAnswer, MultiChoiceAnswer, DateAnswer,
+                           GeopointAnswer, ListingSample)
 from survey.odk.utils.log import logger
 from functools import wraps
 from survey.utils.zip import InMemoryZip
@@ -230,6 +232,8 @@ def process_xml(interviewer, xml_blob, media_files={}, request=None):
     if submission_id:
         try:
             submission = ODKSubmission.objects.get(id=submission_id)
+            if ListingSample.objects.filter(interview__in=submission.interviews.all()).exists():
+                raise ValueError('Cannot update Listing with existing batches')
             submission.xml = xml_blob       # update the xml
             submission.save()
         except ODKSubmission.DoesNotExist:
