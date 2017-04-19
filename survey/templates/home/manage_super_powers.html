@@ -34,9 +34,9 @@
                   <div class="form-actions">
                     <button type="submit" class="btn btn-primary submit btnforall" name="save_button"  data-disabled-text="{{ loading_text }}">{% if has_powers %}Deactivate{% else %}Activate{% endif %}</button>
                         {% if cancel_url %}
-                            <a href="{{cancel_url}}" class="btn btn-primary" name="cancel_button">Cancel</a>
+                            <a href="{{cancel_url}}" class="btn btn-primary" name="cancel_button"><i class="fa fa-close"></i> Cancel</a>
                         {% else %}
-                            <button class="btn btn-primary btnforall" data-dismiss="modal">Cancel</button>
+                            <button class="btn btn-primary btnforall" data-dismiss="modal"><i class="fa fa-close"></i> Cancel</button>
                         {% endif %}
                   </div>
                 </form>
