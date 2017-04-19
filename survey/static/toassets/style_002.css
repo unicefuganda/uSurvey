@@ -1164,22 +1164,23 @@ div.pp_default .pp_close{
     color: #fff;
 }
 .footerContent p{
-    font-size: 30px;
-    line-height: .9;
+    
+    
     color: #fff;
 }
 .copyRight{
-    padding: 10px;
+    padding: 0px;
+    padding-bottom: 5px;
     background: #0099ff;
 	color:#fff;
 }
 .copyRight p{
     font-size: 12px;
-    line-height: .9;
+    
 }
 .copyRight .copy_text{
-
-    font-size:12px;color: #fff;line-height: 30px;
+    line-height: 5px !important;
+    font-size:12px;color: #fff;
 }
 .copyRight p a{
     color: #48e1fd;
