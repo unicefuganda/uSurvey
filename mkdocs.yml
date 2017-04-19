@@ -1,7 +1,7 @@
 site_name: uSurvey
 pages:
 User Guides:
-- uSurvey_manual.md
+- index.md
 Groups: 
 - Groups.md
 Modules:
