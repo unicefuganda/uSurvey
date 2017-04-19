@@ -151,7 +151,7 @@
                     <li id="menu-item-120" class="menu-item menu-item-type-custom menu-item-object-custom menu-ancestor menu-parent menu-item-has-children menu-item-120"><a href="{% url 'home_page' %}" class="home_page"><i class="fa fa-dashboard"></i> DASHBOARD</a>
                     </li>
                     <li>
-                        <a href='#' class="survey_list_page new_survey_page edit_survey_page clone_survey_page delete_survey batch_index_page survey_batches_page new_batch_page batch_show_page  delete_batch listing_criteria_page delete_listing_criterion clone_qset_page  listing_template_home  new_listing_template_page  edit_listing_template_page  delete_listing_template_page  sampling_criteria new_question_module_page  question_module_listing_page  edit_question_module_page  delete_question_module_page respondent_groups_page new_respondent_groups_page  respondent_groups_edit  respondent_groups_delete show_question_library new_question_library edit_show_question_library  delete_question_template_page export_question_template_page filter_question_list show_parameter_template new_parameter_template edit_parameter_template export_parameter_template"><i class="fa fa-file-picture-o"></i> DESIGN</a>
+                        <a href='#' class="survey_list_page new_survey_page edit_survey_page clone_survey_page delete_survey batch_index_page survey_batches_page new_batch_page batch_show_page  delete_batch listing_criteria_page delete_listing_criterion clone_qset_page  listing_template_home  new_listing_template_page  edit_listing_template_page  delete_listing_template_page  sampling_criteria new_question_module_page  question_module_listing_page  edit_question_module_page  delete_question_module_page respondent_groups_page new_respondent_groups_page  respondent_groups_edit  respondent_groups_delete show_question_library new_question_library edit_show_question_library  delete_question_template_page export_question_template_page filter_question_list show_parameter_template new_parameter_template edit_parameter_template export_parameter_template submenu-button1"><i class="fa fa-file-picture-o"></i> DESIGN</a>
                         <ul>
                             {% if perms.auth.can_view_batches %}
                             <li><a href="{% url 'survey_list_page' %}" class="survey_list_page new_survey_page edit_survey_page clone_survey_page delete_survey batch_index_page survey_batches_page new_batch_page batch_show_page  delete_batch listing_criteria_page delete_listing_criterion" >Surveys</a></li>
@@ -169,7 +169,7 @@
                         </ul>
                     </li>
                     <li>
-                        <a href='#' class="interviewers_page  new_interviewer_page  show_interviewer_page  block_interviewer_page check_mobile_number edit_interviewer_page view_interviewer_page  unblock_interviewer_page  unblock_interviewer_ussd  unblock_interviewer_odk block_interviewer_ussd block_interviewer_odk bulk_sms  send_bulk_sms online_interviewer_view"><i class="fa fa-user-md"></i> ADMINISTRATION</a>
+                        <a href='#' class="interviewers_page  new_interviewer_page  show_interviewer_page  block_interviewer_page check_mobile_number edit_interviewer_page view_interviewer_page  unblock_interviewer_page  unblock_interviewer_ussd  unblock_interviewer_odk block_interviewer_ussd block_interviewer_odk bulk_sms  send_bulk_sms online_interviewer_view submenu-button1"><i class="fa fa-user-md"></i> ADMINISTRATION</a>
                         <ul>
                             <li>
                                 <a href="{% url 'interviewers_page' %}" class="interviewers_page  new_interviewer_page  show_interviewer_page  block_interviewer_page check_mobile_number edit_interviewer_page view_interviewer_page  unblock_interviewer_page  unblock_interviewer_ussd  unblock_interviewer_odk block_interviewer_ussd block_interviewer_odk">Interviewers</a>
@@ -183,7 +183,7 @@
                         </ul>
                     </li>
                     <li>
-                        <a href='#' class="show_interviewer_completion_summary view_listing_data view_batch_data odk_submission_list "><i class="fa fa-desktop"></i> MONITOR</a>
+                        <a href='#' class="show_interviewer_completion_summary view_listing_data view_batch_data odk_submission_list submenu-button1"><i class="fa fa-desktop"></i> MONITOR</a>
                         <ul>
                             {% if perms.auth.view_completed_survey %}
                             <li>
@@ -203,7 +203,7 @@
                     </li>
                     {% if perms.auth.can_view_batches or perms.auth.view_completed_survey %}
                     <li>
-                        <a href='#' class="new_indicator_page validate_formulae add_formula_page delete_indicator_variable delete_indicator_criteria add_indicator_variable view_indicator_variables add_formula_page indicator_variables list_indicator_page  edit_indicator_page delete_indicator_page simple_indicator_chart_page edit_indicator_variable download_indicator_analysis list_weights_page upload_weights weights_error_logs_page get_location_children get_enumeration_areas"><i class="fa fa-line-chart"></i> ANALYSE</a>
+                        <a href='#' class="new_indicator_page validate_formulae add_formula_page delete_indicator_variable delete_indicator_criteria add_indicator_variable view_indicator_variables add_formula_page indicator_variables list_indicator_page  edit_indicator_page delete_indicator_page simple_indicator_chart_page edit_indicator_variable download_indicator_analysis list_weights_page upload_weights weights_error_logs_page get_location_children get_enumeration_areas submenu-button1"><i class="fa fa-line-chart"></i> ANALYSE</a>
                         <ul>
                             <li>
                                 <a href="{% url 'list_indicator_page' %}" class="new_indicator_page validate_formulae add_formula_page delete_indicator_variable delete_indicator_criteria add_indicator_variable view_indicator_variables add_formula_page indicator_variables list_indicator_page  edit_indicator_page delete_indicator_page simple_indicator_chart_page edit_indicator_variable download_indicator_analysis">Indicators</a>
@@ -216,7 +216,7 @@
                     </li>
                     {% if perms.auth.can_view_aggregates %}
                     <li>
-                        <a href='#' class="download_excel interviewer_report_page excel_report download_export_results"><i class="fa fa-download"></i> DOWNLOADS</a>
+                        <a href='#' class="download_excel interviewer_report_page excel_report download_export_results submenu-button1"><i class="fa fa-download"></i> DOWNLOADS</a>
                         <ul>
                             <li>
                                 <a href="{% url 'download_excel' %}" class="download_excel excel_report download_export_results">Survey Data</a>
@@ -229,7 +229,7 @@
                     </li>
                     {% if user.is_authenticated %}
                     <li>
-                        <a href='#' class="new_user_page users_index  users_show_details activate_user deactivate_user users_edit new_user_page enumeration_area_home"><i class="fa fa-cog"></i> SETTINGS</a>
+                        <a href='#' class="new_user_page users_index  users_show_details activate_user deactivate_user users_edit new_user_page enumeration_area_home submenu-button1"><i class="fa fa-cog"></i> SETTINGS</a>
                         <ul>
                             {% if user.is_superuser == True %}
                             <li>
@@ -250,6 +250,7 @@
                     </li>
                     {% endif %}
                     <li>
+                        <a href="#" class="submenu-button1 last">
                         {% has_super_powers request as has_powers %}
                         {% if user.is_authenticated %}
                         <span class="dropdown-toggle" data-toggle="dropdown" data-position="auto" style="background:  none !important; border: none !important;">
@@ -259,9 +260,10 @@
                         <img src="{{ STATIC_URL }}images/userICON.png" width="40px;" height="40px;" style="margin-left: 150px;margin-top: 10px;">
                         {% endif %}
                         </span>
+                        </a>
                         <ul>
                             <li>
-                                <a href="#">{% if user.first_name %}{{ user.first_name }} {% else %} Settings {% endif %}</a>
+                                <a href="#" >{% if user.first_name %}{{ user.first_name }} {% else %} Settings {% endif %}</a>
                             </li>
                             {% if perms.auth.can_have_super_powers %}
                             {% if has_powers %}
