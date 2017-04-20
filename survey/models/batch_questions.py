@@ -11,13 +11,14 @@ class BatchQuestion(Question):
         "QuestionModule", related_name="questions", default='', on_delete=models.SET_NULL, null=True, blank=True)
 
     def save(self, *args, **kwargs):
-        new_group = False
-        # check if this group has been previously assigned to this Question set.
-        if self.group and RespondentGroup.objects.filter(questions__qset__id=self.qset.id, id=self.group.id).exists():
-            new_group = True
         instance = super(BatchQuestion, self).save(*args, **kwargs)
-        # if this group is new for this batch, refresh the parameter list
-        if new_group:       # if new group has been introduced, update the parameter list
-            SurveyParameterList.update_parameter_list(self)
+        update_parameter_list(self)
         return instance
 
+
+def update_parameter_list(batch_question):
+    # check if this group has been previously assigned to this Question set.
+    from survey.models import Batch
+    if batch_question.group and RespondentGroup.objects.filter(questions__qset__id=batch_question.qset.id,
+                                                               id=batch_question.group.id).exists():
+        SurveyParameterList.update_parameter_list(Batch.get(pk=batch_question.qset.pk))

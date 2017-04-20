@@ -1,5 +1,6 @@
 import re
 import pandas as pd
+from cacheops import cached_as
 from asteval import Interpreter
 from django.template import Template, Context
 from django.db import models
@@ -73,8 +74,8 @@ class Indicator(BaseModel):
         return self.country_wide_report()[self.REPORT_FIELD_NAME]
 
     def country_wide_report(self):
-        country = Location.country()
-        return self.get_data([country, ]).transpose().to_dict()[country.name]
+        return self.get_data(Location.objects.filter(parent__isnull=True)
+                             ).transpose().to_dict()[Location.country().name]
 
     def get_data(self, locations, *args, **kxargs):
         """Used to get the compute indicator values.
@@ -83,26 +84,29 @@ class Indicator(BaseModel):
         :param kxargs:
         :return:
         """
-        SortedDict()
-        variable_names = self.active_variables()
-        # options = self.parameter.options.order_by('order')
-        # answer_class = Answer.get_class(self.parameter.answer_type)
-        report = {}
-        for child_location in locations:
-            target_locations = child_location.get_leafnodes(include_self=True)
-            report[child_location.name] = [self.get_variable_value(target_locations,
-                                                                   name) for name in variable_names]
-        # for name in variable_names:
-        #     report[name] = self.get_variable_aggregates(base_location, name)
-        df = pd.DataFrame(report).transpose()
-        if df.columns.shape[0] == len(variable_names):
-            df.columns = variable_names
-            # now include the formula results per location
-            aeval = Interpreter()       # to avoid the recreating each time
-            df[self.REPORT_FIELD_NAME] = df.apply(self.get_indicator_value, axis=1, args=(aeval, ))
-        else:
-            df = pd.DataFrame(columns=list(variable_names)+[self.REPORT_FIELD_NAME, ])
-        return df
+        @cached_as(self, locations)
+        def _get_data():
+            SortedDict()
+            variable_names = self.active_variables()
+            # options = self.parameter.options.order_by('order')
+            # answer_class = Answer.get_class(self.parameter.answer_type)
+            report = {}
+            for child_location in locations:
+                target_locations = child_location.get_leafnodes(include_self=True)
+                report[child_location.name] = [self.get_variable_value(target_locations,
+                                                                       name) for name in variable_names]
+            # for name in variable_names:
+            #     report[name] = self.get_variable_aggregates(base_location, name)
+            df = pd.DataFrame(report).transpose()
+            if df.columns.shape[0] == len(variable_names):
+                df.columns = variable_names
+                # now include the formula results per location
+                aeval = Interpreter()       # to avoid the recreating each time
+                df[self.REPORT_FIELD_NAME] = df.apply(self.get_indicator_value, axis=1, args=(aeval, ))
+            else:
+                df = pd.DataFrame(columns=list(variable_names)+[self.REPORT_FIELD_NAME, ])
+            return df
+        return _get_data()
 
     def get_variable_aggregates(self, base_location, variable_name):
         variable = self.variables.get(name__iexact=variable_name)

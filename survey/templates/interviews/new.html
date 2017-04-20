@@ -3,6 +3,16 @@
 {% block title %}
     Data Entry/Simulator
 {% endblock %}
+{% block page_actions %}
+  {% if access %}
+    <div class="col-md-12">
+        <a class="btn btn-white btn-warning btn-bold" href="{% url 'refresh_data_entry' access.id %}">
+          <i class="ace-icon fa fa-refresh bigger-120"></i>
+												Restart
+											</a>
+                      </div>
+   {% endif %}
+{% endblock %}
 
 {% block extra_head %}
 <link rel="stylesheet" href="{{ STATIC_URL }}assets/formstyleres.css" />
