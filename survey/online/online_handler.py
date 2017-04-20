@@ -2,7 +2,9 @@
 __author__ = 'anthony <antsmc2@gmail.com>'
 from django.utils import timezone
 from django.conf import settings
+from django.http import HttpResponseRedirect
 from django.shortcuts import render
+from django.core.urlresolvers import reverse
 from survey.models import (InterviewerAccess, QuestionLoop, QuestionSet, Answer, Question,
                            SurveyAllocation, AnswerAccessDefinition, ODKAccess, Interviewer, Interview)
 from survey.forms.answer import (get_answer_form, UserAccessForm, UssdTimeoutForm,
@@ -21,6 +23,12 @@ def get_display_format(request):
 
 def show_only_answer_form(request):
     return request.is_ajax() or get_display_format(request) == 'text'
+
+
+def restart(request, access_id):
+    access = InterviewerAccess.get(id=access_id)
+    delete_entry(access)
+    return HttpResponseRedirect(reverse('online_interviewer_view'))
 
 
 class OnlineHandler(object):
