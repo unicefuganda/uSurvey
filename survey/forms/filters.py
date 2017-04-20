@@ -9,15 +9,16 @@ class QuestionFilterForm(forms.Form):
     question_types = forms.ChoiceField(
         label='Answer Type', widget=forms.Select(), choices=[], required=False)
 
-    def __init__(self, data=None, initial=None, read_only=[], qset=None):  # ttype can be batch, listing question, etc
+    # ttype can be batch, listing question, etc
+    def __init__(self, data=None, initial=None, read_only=[], qset=None):
         super(QuestionFilterForm, self).__init__(data=data, initial=initial)
         question_type_choices = [('All', 'All')]
         if qset is None:
             map(lambda question_type: question_type_choices.append(
                 question_type), list(Question.ANSWER_TYPES))
         else:
-            map(lambda question_type: question_type_choices.append(question_type),
-                [(name, name) for name in qset.answer_types])
+            map(lambda question_type: question_type_choices.append(
+                question_type), [(name, name) for name in qset.answer_types])
         self.fields['question_types'].choices = question_type_choices
         for field in read_only:
             self.fields[field].widget.attrs['readonly'] = True
@@ -25,7 +26,8 @@ class QuestionFilterForm(forms.Form):
 
     def filter(self, questions):
         if self.is_valid() and self.cleaned_data['question_types'] != 'All':
-            return questions.filter(answer_type=self.cleaned_data['question_types'])
+            return questions.filter(
+                answer_type=self.cleaned_data['question_types'])
         return questions
 
 
@@ -37,11 +39,18 @@ class BatchQuestionFilterForm(QuestionFilterForm):
         label='Module', widget=forms.Select(), choices=[], required=False)
 
     def __init__(self, data=None, initial=None, read_only=[], batch=None):
-        super(BatchQuestionFilterForm, self).__init__(data=data, initial=initial, read_only=read_only, qset=batch)
+        super(
+            BatchQuestionFilterForm,
+            self).__init__(
+            data=data,
+            initial=initial,
+            read_only=read_only,
+            qset=batch)
         group_choices = [('All', 'All')]
         module_choices = [('All', 'All')]
         # map(lambda group: group_choices.append((group.id, group.name)),
-        #     HouseholdMemberGroup.objects.all().exclude(name='REGISTRATION GROUP'))
+        # HouseholdMemberGroup.objects.all().exclude(name='REGISTRATION
+        # GROUP'))
         map(lambda question_module: module_choices.append(
             (question_module.id, question_module.name)), QuestionModule.objects.all())
         self.fields['groups'].choices = group_choices
@@ -60,10 +69,16 @@ class BatchQuestionFilterForm(QuestionFilterForm):
                 if val == 'All' or not val:
                     del query_dict[key]
         if query_dict is None:
-            query_dict = {'group__in': [key for key, val in self.fields['groups'].choices if not val == 'All'],
-                          'module__in': [key for key, val in self.fields['modules'].choices if not val == 'All'],
-                          'answer_type__in': [key for key, val in
-                                              self.fields['question_types'].choices if not val == 'All']}
+            query_dict = {
+                'group__in': [
+                    key for key,
+                    val in self.fields['groups'].choices if not val == 'All'],
+                'module__in': [
+                    key for key,
+                    val in self.fields['modules'].choices if not val == 'All'],
+                'answer_type__in': [
+                    key for key,
+                    val in self.fields['question_types'].choices if not val == 'All']}
         return query_dict
 
 
@@ -104,7 +119,9 @@ class LocationFilterForm(forms.Form):
     batch = forms.ModelChoiceField(
         queryset=Batch.objects.none(), empty_label='----')
     location = forms.ModelChoiceField(
-        queryset=Location.objects.all(), widget=forms.HiddenInput(), required=False)
+        queryset=Location.objects.all(),
+        widget=forms.HiddenInput(),
+        required=False)
     ea = forms.ModelChoiceField(
         queryset=None, widget=forms.HiddenInput(), required=False)
 
@@ -121,12 +138,24 @@ class LocationFilterForm(forms.Form):
 class SurveyBatchFilterForm(forms.Form):
     AS_TEXT = 1
     AS_LABEL = 0
-    survey = forms.ModelChoiceField(queryset=Survey.objects.all().order_by('name'), empty_label='Choose Survey',
-                                    widget=forms.Select(attrs={'class': 'chzn-select'}))
-    batch = forms.ModelChoiceField(queryset=Batch.objects.all().order_by('name'), empty_label='Choose Batch',
-                                   required=False, widget=forms.Select(attrs={'class': 'chzn-select'}))
+    survey = forms.ModelChoiceField(
+        queryset=Survey.objects.all().order_by('name'),
+        empty_label='Choose Survey',
+        widget=forms.Select(
+            attrs={
+                'class': 'chzn-select'}))
+    batch = forms.ModelChoiceField(
+        queryset=Batch.objects.all().order_by('name'),
+        empty_label='Choose Batch',
+        required=False,
+        widget=forms.Select(
+            attrs={
+                'class': 'chzn-select'}))
     multi_option = forms.ChoiceField(
-        choices=[(AS_TEXT, 'As Text'), (AS_LABEL, 'As Value'), ], widget=forms.Select(attrs={'class': 'chzn-select'}))
+        choices=[
+            (AS_TEXT, 'As Text'), (AS_LABEL, 'As Value'), ], widget=forms.Select(
+            attrs={
+                'class': 'chzn-select'}))
 
     def __init__(self, *args, **kwargs):
         super(SurveyBatchFilterForm, self).__init__(*args, **kwargs)
@@ -138,9 +167,8 @@ class SurveyBatchFilterForm(forms.Form):
 class BatchOpenStatusFilterForm(forms.Form):
     OPEN = 1
     CLOSED = 2
-    status = forms.ChoiceField(
-        label='Status', widget=forms.Select(), choices=[(0, '-- All Status --'), (OPEN, 'Open'),
-                                                        (CLOSED, 'Closed')], required=False)
+    status = forms.ChoiceField(label='Status', widget=forms.Select(), choices=[(
+        0, '-- All Status --'), (OPEN, 'Open'), (CLOSED, 'Closed')], required=False)
 
     def __init__(self, batch, *args, **kwargs):
         super(BatchOpenStatusFilterForm, self).__init__(*args, **kwargs)
@@ -156,7 +184,8 @@ class BatchOpenStatusFilterForm(forms.Form):
         prime_location_type = LocationType.largest_unit()
         locations = Location.objects.filter(
             type=prime_location_type).order_by('name')
-        batch_location_ids = self.batch.open_locations.values_list('location_id', flat=True)
+        batch_location_ids = self.batch.open_locations.values_list(
+            'location_id', flat=True)
         if status and status == self.OPEN:
             return locations.filter(id__in=batch_location_ids)
         elif status and status == self.CLOSED:
@@ -168,8 +197,16 @@ class UsersFilterForm(forms.Form):
     ACTIVE = 1
     DEACTIVATED = 2
     status = forms.ChoiceField(
-        label='Status', widget=forms.Select(), choices=[(0, '-- All Status --'), (ACTIVE, 'Active'),
-                                                        (DEACTIVATED, 'Deactivated')], required=False)
+        label='Status',
+        widget=forms.Select(),
+        choices=[
+            (0,
+             '-- All Status --'),
+            (ACTIVE,
+             'Active'),
+            (DEACTIVATED,
+             'Deactivated')],
+        required=False)
 
     def get_users(self):
         from django.contrib.auth.models import User
@@ -180,18 +217,32 @@ class UsersFilterForm(forms.Form):
         except forms.ValidationError:
             pass
         if status:
-            return User.objects.filter(is_active=(status==self.ACTIVE)).exclude(is_superuser=True).order_by('first_name')
+            return User.objects.filter(
+                is_active=(
+                    status == self.ACTIVE)).exclude(
+                is_superuser=True).order_by('first_name')
         return User.objects.exclude(is_superuser=True).order_by('first_name')
 
 
 class IndicatorMetricFilterForm(forms.Form):
-    metric = forms.ChoiceField(choices=[(Indicator.COUNT, 'Count'), (Indicator.PERCENTAGE, 'Percentage')],
-                                initial=Indicator.COUNT)
+    metric = forms.ChoiceField(
+        choices=[
+            (Indicator.COUNT,
+             'Count'),
+            (Indicator.PERCENTAGE,
+             'Percentage')],
+        initial=Indicator.COUNT)
 
 
 class MapFilterForm(forms.Form):
-    survey = forms.ModelChoiceField(queryset=Survey.objects.all(), required=False, empty_label='Choose Survey',
-                                    widget=forms.Select(attrs={'class': 'map-filter chzn-select'}), label='')
+    survey = forms.ModelChoiceField(
+        queryset=Survey.objects.all(),
+        required=False,
+        empty_label='Choose Survey',
+        widget=forms.Select(
+            attrs={
+                'class': 'map-filter chzn-select'}),
+        label='')
 
 
 class QuestionSetResultsFilterForm(forms.Form):
@@ -200,8 +251,8 @@ class QuestionSetResultsFilterForm(forms.Form):
         super(QuestionSetResultsFilterForm, self).__init__(*args, **kwargs)
         self.qset = QuestionSet.get(pk=qset.pk)
         if hasattr(self.qset, 'survey') is False:
-            self.fields['survey'] = forms.ModelChoiceField(queryset=Survey.objects.filter(listing_form__pk=self.qset.pk),
-                                                           required=False, empty_label='Choose Survey')
+            self.fields['survey'] = forms.ModelChoiceField(queryset=Survey.objects.filter(
+                listing_form__pk=self.qset.pk), required=False, empty_label='Choose Survey')
 
     def get_interviews(self):
         kwargs = {'question_set': self.qset}
@@ -211,8 +262,10 @@ class QuestionSetResultsFilterForm(forms.Form):
 
 
 class SurveyResultsFilterForm(forms.Form):
-    survey = forms.ModelChoiceField(queryset=Survey.objects.all(), required=False)
-    question_set = forms.ModelChoiceField(queryset=QuestionSet.objects.all(), required=False)
+    survey = forms.ModelChoiceField(
+        queryset=Survey.objects.all(), required=False)
+    question_set = forms.ModelChoiceField(
+        queryset=QuestionSet.objects.all(), required=False)
 
     def __init__(self, model_class, disabled_fields=[], *args, **kwargs):
         super(SurveyResultsFilterForm, self).__init__(*args, **kwargs)
@@ -224,12 +277,15 @@ class SurveyResultsFilterForm(forms.Form):
         model_queryset = model_class.objects.all()
         self.fields['question_set'].queryset = model_queryset
         if self.data.get('survey', None) and model_class == ListingTemplate:
-            self.fields['question_set'].queryset = model_queryset.filter(survey_settings__id=self.data['survey'])
+            self.fields['question_set'].queryset = model_queryset.filter(
+                survey_settings__id=self.data['survey'])
         elif self.data.get('survey', None) and model_class == Batch:
-            self.fields['question_set'].queryset = model_queryset.filter(survey__id=self.data['survey'])
+            self.fields['question_set'].queryset = model_queryset.filter(
+                survey__id=self.data['survey'])
         elif 'question_set' in disabled_fields and (self.data.get('question_set', None)
                                                     and model_class == ListingTemplate):
-            self.fields['survey'].queryset = Survey.objects.filter(listing_form__id=self.data['question_set'])
+            self.fields['survey'].queryset = Survey.objects.filter(
+                listing_form__id=self.data['question_set'])
 
     def get_interviews(self, interviews=Interview.objects):
         kwargs = {}

@@ -8,24 +8,35 @@ from survey.models.users import UserProfile
 
 
 class UserForm(UserCreationForm):
-    mobile_number = forms.DecimalField(min_value=100000000,
-                                       max_digits=9,
-                                       widget=forms.TextInput(attrs={'placeholder': 'Format: 771234567',
-                                                                     'style': "width:172px;",
-                                                                     'maxlength': '10'}))
+    mobile_number = forms.DecimalField(
+        min_value=100000000,
+        max_digits=9,
+        widget=forms.TextInput(
+            attrs={
+                'placeholder': 'Format: 771234567',
+                'style': "width:172px;",
+                'maxlength': '10'}))
 
     def __init__(self, *args, **kwargs):
         super(UserForm, self).__init__(*args, **kwargs)
         self.fields['password2'].label = 'Confirm Password'
-        self.fields.keyOrder = ['username', 'password1', 'password2', 'first_name', 'last_name',
-                                'mobile_number', 'email', 'groups']
+        self.fields.keyOrder = [
+            'username',
+            'password1',
+            'password2',
+            'first_name',
+            'last_name',
+            'mobile_number',
+            'email',
+            'groups']
         self.fields['groups'].queryset = Group.objects.all().order_by('name')
 
     def _clean_attribute(self, Klass, **kwargs):
         attribute_name = kwargs.keys()[0]
         data_attr = kwargs[attribute_name]
         users_with_same_attr = Klass.objects.filter(**kwargs)
-        if users_with_same_attr and self.initial.get(attribute_name, None) != str(data_attr):
+        if users_with_same_attr and self.initial.get(
+                attribute_name, None) != str(data_attr):
             message = "%s is already associated to a different user." % data_attr
             self._errors[attribute_name] = self.error_class([message])
             del self.cleaned_data[attribute_name]
@@ -59,11 +70,14 @@ class UserForm(UserCreationForm):
 
 
 class EditUserForm(ModelForm):
-    mobile_number = forms.DecimalField(min_value=100000000,
-                                       max_digits=9,
-                                       widget=forms.TextInput(attrs={'placeholder': 'Format: 771234567',
-                                                                     'style': "width:172px;",
-                                                                     'maxlength': '10'}))
+    mobile_number = forms.DecimalField(
+        min_value=100000000,
+        max_digits=9,
+        widget=forms.TextInput(
+            attrs={
+                'placeholder': 'Format: 771234567',
+                'style': "width:172px;",
+                'maxlength': '10'}))
     password = forms.CharField(label="Password", required=False,
                                widget=forms.PasswordInput())
 
@@ -86,7 +100,8 @@ class EditUserForm(ModelForm):
         attribute_name = kwargs.keys()[0]
         data_attr = kwargs[attribute_name]
         users_with_same_attr = Klass.objects.filter(**kwargs)
-        if users_with_same_attr and self.initial.get(attribute_name, None) != str(data_attr):
+        if users_with_same_attr and self.initial.get(
+                attribute_name, None) != str(data_attr):
             message = "%s is already associated to a different user." % data_attr
             self._errors[attribute_name] = self.error_class([message])
             del self.cleaned_data[attribute_name]
@@ -95,7 +110,8 @@ class EditUserForm(ModelForm):
     def clean_username(self):
         username = self.cleaned_data['username']
         users_with_same_username = User.objects.filter(username=username)
-        if self.initial.get('username', None) != str(username) or not users_with_same_username:
+        if self.initial.get('username', None) != str(
+                username) or not users_with_same_username:
             message = "username cannot be changed."
             self._errors['username'] = self.error_class([message])
             del self.cleaned_data['username']

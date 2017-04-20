@@ -11,7 +11,8 @@ from survey.models.questions import QuestionSet
 
 
 class ODKFileDownload(BaseModel):
-    assignments = models.ManyToManyField('SurveyAllocation', related_name='file_downloads')
+    assignments = models.ManyToManyField(
+        'SurveyAllocation', related_name='file_downloads')
 
 
 class ODKSubmission(BaseModel):
@@ -20,16 +21,27 @@ class ODKSubmission(BaseModel):
     interviewer = models.ForeignKey(
         Interviewer, related_name="odk_submissions")
     survey = models.ForeignKey(Survey, related_name="odk_submissions")
-    ea = models.ForeignKey(EnumerationArea, related_name="odk_submissions",null=True, blank=True)
-    question_set = models.ForeignKey(QuestionSet, related_name='odk_submissions',null=True, blank=True)
+    ea = models.ForeignKey(
+        EnumerationArea,
+        related_name="odk_submissions",
+        null=True,
+        blank=True)
+    question_set = models.ForeignKey(
+        QuestionSet,
+        related_name='odk_submissions',
+        null=True,
+        blank=True)
     form_id = models.CharField(max_length=256)
     description = models.CharField(max_length=256, null=True, blank=True)
     instance_id = models.CharField(max_length=256)
     instance_name = models.CharField(max_length=256, null=True, blank=True)
     xml = models.TextField()
-    status = models.IntegerField(choices=[( STARTED, 'Started'), (COMPLETED, 'Completed')], default=STARTED)
-    # this keeps track of all interviews entries created as a result of this submisssion
-    interviews = models.ManyToManyField('Interview', related_name='odk_submissions')
+    status = models.IntegerField(
+        choices=[(STARTED, 'Started'), (COMPLETED, 'Completed')], default=STARTED)
+    # this keeps track of all interviews entries created as a result of this
+    # submisssion
+    interviews = models.ManyToManyField(
+        'Interview', related_name='odk_submissions')
 
     class Meta:
         app_label = 'survey'
@@ -40,10 +52,8 @@ class ODKSubmission(BaseModel):
     def save_attachments(self, media_files):
         for name, f in media_files.items():
             content_type = f.content_type if hasattr(f, 'content_type') else ''
-            attach, created = Attachment.objects.get_or_create(upload_field_name=name,
-                                                               submission=self,
-                                                               media_file=f,
-                                                               mimetype=content_type)
+            attach, created = Attachment.objects.get_or_create(
+                upload_field_name=name, submission=self, media_file=f, mimetype=content_type)
 
     def update_submission(self):
         tree = etree.fromstring(self.xml)
@@ -66,14 +76,17 @@ class ODKSubmission(BaseModel):
         last_modified_node = etree.Element('lastModified')
         last_modified_node.text = str(self.modified)
         dates_node.insert(0, last_modified_node)
-        # now update the locked meta so fields expressly defined on blank form as locked is honoured
+        # now update the locked meta so fields expressly defined on blank form
+        # as locked is honoured
         try:
             locked_node = tree.xpath('//qset/meta/locked')[0]
         except IndexError:
             locked_node = etree.Element('locked')
             meta_node = tree.xpath('//qset/meta')[0]
             meta_node.insert(0, locked_node)
-        locked_node.text = str(1)      # present implementation on customized ODK only requires this to be not null
+        # present implementation on customized ODK only requires this to be not
+        # null
+        locked_node.text = str(1)
         self.xml = etree.tostring(tree)
 
     def save(self, *args, **kwargs):

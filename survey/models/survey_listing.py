@@ -26,10 +26,15 @@ class ListingQuestion(Question):
 
 
 class RandomizationCriterion(BaseModel):
-    VALIDATION_TESTS = [(validator.__name__, validator.__name__) for validator in Answer.validators()]
+    VALIDATION_TESTS = [(validator.__name__, validator.__name__)
+                        for validator in Answer.validators()]
     survey = models.ForeignKey(Survey, related_name='randomization_criteria')
     listing_question = models.ForeignKey(Question, related_name='criteria')
-    validation_test = models.CharField(max_length=200, choices=VALIDATION_TESTS,null=True, blank=True)
+    validation_test = models.CharField(
+        max_length=200,
+        choices=VALIDATION_TESTS,
+        null=True,
+        blank=True)
 
     class Meta:
         app_label = 'survey'
@@ -56,7 +61,8 @@ class RandomizationCriterion(BaseModel):
         answer_class = Answer.get_class(self.listing_question.answer_type)
         method = getattr(answer_class, self.validation_test, None)
         if method is None:
-            raise ValueError('unsupported validator defined on listing question')
+            raise ValueError(
+                'unsupported validator defined on listing question')
         return method(value, *self.test_params)
 
     def qs_passes_test(self, value_key, queryset):
@@ -66,12 +72,15 @@ class RandomizationCriterion(BaseModel):
 
     @property
     def test_arguments(self):
-        return CriterionTestArgument.objects.filter(test_condition=self).values_list('param',
-                                                                                     flat=True).order_by('position')
+        return CriterionTestArgument.objects.filter(
+            test_condition=self).values_list(
+            'param', flat=True).order_by('position')
 
 
 class CriterionTestArgument(BaseModel):
-    test_condition = models.ForeignKey(RandomizationCriterion, related_name='arguments')
+    test_condition = models.ForeignKey(
+        RandomizationCriterion,
+        related_name='arguments')
     position = models.PositiveIntegerField()
     param = models.CharField(max_length=100)
 
@@ -84,14 +93,18 @@ class CriterionTestArgument(BaseModel):
 
 
 class ListingSample(BaseModel):
-    survey = models.ForeignKey(Survey, related_name='listing_samples', db_index=True)
+    survey = models.ForeignKey(
+        Survey,
+        related_name='listing_samples',
+        db_index=True)
     interview = models.ForeignKey(Interview, related_name='listing_samples')
 
     @classmethod
     def samples(cls, survey, ea):
         return cls.objects.filter(survey=survey, interview__ea=ea)
 
-    class SamplesAlreadyGenerated(Exception):    # just used to indicated generate random samples has already run
+    class SamplesAlreadyGenerated(
+            Exception):    # just used to indicated generate random samples has already run
         pass
 
     @classmethod
@@ -107,13 +120,15 @@ class ListingSample(BaseModel):
             raise cls.SamplesAlreadyGenerated('Samples already generated')
 
         if to_survey.has_sampling is False or from_survey.has_sampling is False:
-            raise ValueError('Either source or destination survey does not support sampling')
+            raise ValueError(
+                'Either source or destination survey does not support sampling')
         valid_interviews = from_survey.interviews.filter(ea=ea,     # the listed interviews in the ea
                                                          question_set=from_survey.listing_form).values_list('id',
                                                                                                             flat=True)
         #valid_interviews = set(valid_interviews)
         # now get the interviews that meet the randomization criteria
-        for criterion in to_survey.randomization_criteria.all():  # need to optimize this
+        for criterion in to_survey.randomization_criteria.all(
+        ):  # need to optimize this
             answer_type = criterion.listing_question.answer_type
             if answer_type == MultiChoiceAnswer.choice_name():
                 value_key = 'value__text'
@@ -124,15 +139,18 @@ class ListingSample(BaseModel):
                 'question': criterion.listing_question,
                 'interview__id__in': valid_interviews,
             }
-            #if qs:
+            # if qs:
             # kwargs['interview__id__in'] = valid_interviews
-            valid_interviews = criterion.qs_passes_test(value_key, answer_class.objects.filter(**kwargs).
-                                                        only('interview__id').values_list('interview__id', flat=True))
+            valid_interviews = criterion.qs_passes_test(value_key, answer_class.objects.filter(
+                **kwargs). only('interview__id').values_list('interview__id', flat=True))
         valid_interviews = list(valid_interviews)
         random.shuffle(valid_interviews)
         random_samples = valid_interviews[:to_survey.sample_size]
         samples = []
         for interview_id in random_samples:
-            samples.append(ListingSample(survey=to_survey, interview_id=interview_id))
+            samples.append(
+                ListingSample(
+                    survey=to_survey,
+                    interview_id=interview_id))
         with transaction.atomic():
             ListingSample.objects.bulk_create(samples)

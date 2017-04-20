@@ -14,28 +14,45 @@ import phonenumbers
 class InterviewerForm(ModelForm):
     survey = forms.ModelChoiceField(
         queryset=Survey.objects.all(), required=False)
-    date_of_birth = forms.DateField(label="Date of birth", required=True, input_formats=[settings.DATE_FORMAT, ],
-                                    widget=forms.DateInput(attrs={'placeholder': 'Date Of Birth',
-                                                                  'class': 'datepicker'}, format=settings.DATE_FORMAT))
-    ea = forms.ModelMultipleChoiceField(queryset=EnumerationArea.objects.none(),
-                                        widget=forms.SelectMultiple(attrs={'class': 'multi-select ea_filter',
-                                                                           }))
+    date_of_birth = forms.DateField(
+        label="Date of birth",
+        required=True,
+        input_formats=[
+            settings.DATE_FORMAT,
+        ],
+        widget=forms.DateInput(
+            attrs={
+                'placeholder': 'Date Of Birth',
+                'class': 'datepicker'},
+            format=settings.DATE_FORMAT))
+    ea = forms.ModelMultipleChoiceField(
+        queryset=EnumerationArea.objects.none(),
+        widget=forms.SelectMultiple(
+            attrs={
+                'class': 'multi-select ea_filter',
+            }))
 
     def __init__(self, eas, data=None, *args, **kwargs):
         super(InterviewerForm, self).__init__(data=data, *args, **kwargs)
-        self.fields.keyOrder = ['name', 'gender', 'date_of_birth',
-                                'level_of_education', 'language',  'ea', 'survey']
+        self.fields.keyOrder = [
+            'name',
+            'gender',
+            'date_of_birth',
+            'level_of_education',
+            'language',
+            'ea',
+            'survey']
         self.fields['ea'].label = 'Enumeration Area'
         if self.instance:
             try:
-                self.fields['survey'].initial = SurveyAllocation.objects.filter(interviewer=self.instance,
-                                                                                status__in=[SurveyAllocation.PENDING,
-                                                                                            SurveyAllocation.COMPLETED]
-                                                                                ).order_by('status')[0].survey.pk
-                self.fields['ea'].initial = EnumerationArea.objects.filter(survey_allocations__survey=
-                                                                           self.fields['survey'].initial,
-                                                                           survey_allocations__interviewer=
-                                                                           self.instance)
+                self.fields['survey'].initial = SurveyAllocation.objects.filter(
+                    interviewer=self.instance,
+                    status__in=[
+                        SurveyAllocation.PENDING,
+                        SurveyAllocation.COMPLETED]).order_by('status')[0].survey.pk
+                self.fields['ea'].initial = EnumerationArea.objects.filter(
+                    survey_allocations__survey=self.fields['survey'].initial,
+                    survey_allocations__interviewer=self.instance)
             except IndexError:
                 pass
         self.fields['ea'].queryset = eas
@@ -44,12 +61,14 @@ class InterviewerForm(ModelForm):
 
     class Meta:
         model = Interviewer
-        fields = ['name',  'date_of_birth', 'gender',
-                  'level_of_education', 'language',  ]
+        fields = ['name', 'date_of_birth', 'gender',
+                  'level_of_education', 'language', ]
         widgets = {
-            'name': forms.TextInput(attrs={'placeholder': 'Name'}),
-            'gender': forms.RadioSelect(choices=((True, 'Male'), (False, 'Female'))),
-        }
+            'name': forms.TextInput(
+                attrs={
+                    'placeholder': 'Name'}), 'gender': forms.RadioSelect(
+                choices=(
+                    (True, 'Male'), (False, 'Female'))), }
 
     def clean_survey(self):
         eas = self.data.get('ea', '')
@@ -58,10 +77,15 @@ class InterviewerForm(ModelForm):
         survey = self.cleaned_data['survey']
         if survey:
             # check if this has already been allocated to someone else
-            allocs = SurveyAllocation.objects.filter(survey=survey, status__in=[SurveyAllocation.PENDING,
-                                                                                SurveyAllocation.COMPLETED,],
-                                                     interviewer__ea__in=eas,
-                                                     allocation_ea__in=eas).exclude(interviewer=self.instance)
+            allocs = SurveyAllocation.objects.filter(
+                survey=survey,
+                status__in=[
+                    SurveyAllocation.PENDING,
+                    SurveyAllocation.COMPLETED,
+                ],
+                interviewer__ea__in=eas,
+                allocation_ea__in=eas).exclude(
+                interviewer=self.instance)
             # if self.instance and self.instance.pk:
             #     allocs = allocs.exclude(interviewer=self.instance)
             if allocs.exists():
@@ -96,13 +120,16 @@ class InterviewerForm(ModelForm):
 
 
 class USSDAccessForm(ModelForm):
-    user_identifier = forms.CharField(label='Mobile Number',
-                                      max_length=settings.MOBILE_NUM_MAX_LENGTH,
-                                      min_length=settings.MOBILE_NUM_MIN_LENGTH,
-                                      widget=forms.TextInput(attrs={'placeholder': 'Format: 771234567',
-                                                                    'style': "width:172px; margin-top:5px;",
-                                                                    'maxlength': settings.MOBILE_NUM_MAX_LENGTH,
-                                                                    'minlength': settings.MOBILE_NUM_MIN_LENGTH}))
+    user_identifier = forms.CharField(
+        label='Mobile Number',
+        max_length=settings.MOBILE_NUM_MAX_LENGTH,
+        min_length=settings.MOBILE_NUM_MIN_LENGTH,
+        widget=forms.TextInput(
+            attrs={
+                'placeholder': 'Format: 771234567',
+                'style': "width:172px; margin-top:5px;",
+                'maxlength': settings.MOBILE_NUM_MAX_LENGTH,
+                'minlength': settings.MOBILE_NUM_MIN_LENGTH}))
 
     def __init__(self, *args, **kwargs):
         super(USSDAccessForm, self).__init__(*args, **kwargs)
@@ -116,7 +143,8 @@ class USSDAccessForm(ModelForm):
         identifier = self.cleaned_data.get('user_identifier', '')
         try:
             identifier = phonenumbers.parse(identifier, settings.COUNTRY_CODE)
-            if phonenumbers.is_valid_number_for_region(identifier, settings.COUNTRY_CODE):
+            if phonenumbers.is_valid_number_for_region(
+                    identifier, settings.COUNTRY_CODE):
                 self.cleaned_data[
                     'user_identifier'] = identifier.national_number
             else:
@@ -125,9 +153,12 @@ class USSDAccessForm(ModelForm):
             raise ValidationError('Invalid mobile number')
         accesses = USSDAccess.objects.filter(
             user_identifier=identifier.national_number)
-        if self.instance and accesses.exclude(interviewer=self.instance.interviewer).exists():
-            raise ValidationError('This mobile number is already in use by %s' % accesses.
-                                  exclude(interviewer=self.instance.interviewer)[0].interviewer.name)
+        if self.instance and accesses.exclude(
+                interviewer=self.instance.interviewer).exists():
+            raise ValidationError(
+                'This mobile number is already in use by %s' %
+                accesses. exclude(
+                    interviewer=self.instance.interviewer)[0].interviewer.name)
         return self.cleaned_data['user_identifier']
 
 
@@ -149,8 +180,9 @@ class ODKAccessForm(ModelForm):
             except Interviewer.DoesNotExist:
                 pass
         if accesses.exists():
-            raise ValidationError('This ODK ID is already in use by %s' % accesses[
-                                  0].interviewer.name)
+            raise ValidationError(
+                'This ODK ID is already in use by %s' %
+                accesses[0].interviewer.name)
         return self.cleaned_data['user_identifier']
 
     class Meta:
