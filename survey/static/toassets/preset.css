@@ -120,11 +120,16 @@ a{
     color: #fff;
 }
 /************** Commmon Content Style ********************/
-.commonSection{
-  /*  padding: 116px 0 118px;*/
+/*.commonSection{
   padding:20px 0 20px;
     position: relative;
     background: rgba(0, 0, 0, 0);
+}*/
+.commonSection {
+    background: rgba(0, 0, 0, 0) none repeat scroll 0 0;
+    margin-top: 20px;
+    padding: 20px 10px;
+    position: relative;
 }
 /*img{
     width: 100%;
