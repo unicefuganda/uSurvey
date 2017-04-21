@@ -22,7 +22,8 @@ def validate_min_date_of_birth(value):
 def validate_max_date_of_birth(value):
     if relativedelta(timezone.now().date(), value).years > INTERVIEWER_MAX_AGE:
         raise ValidationError(
-            'interviewers must not be at more than %s years' % INTERVIEWER_MAX_AGE)
+            'interviewers must not be at more than %s years' %
+            INTERVIEWER_MAX_AGE)
 
 
 class Interviewer(BaseModel):
@@ -33,16 +34,28 @@ class Interviewer(BaseModel):
                               (MALE, "M"), (FEMALE, "F")], max_length=10)
 #     age = models.PositiveIntegerField(validators=[MinValueValidator(18), MaxValueValidator(50)], null=True)
     date_of_birth = models.DateField(
-        null=True, validators=[validate_min_date_of_birth, validate_max_date_of_birth])
-    level_of_education = models.CharField(max_length=100, null=True, choices=LEVEL_OF_EDUCATION,
-                                          blank=False, default='Primary',
-                                          verbose_name="Education")
+        null=True,
+        validators=[
+            validate_min_date_of_birth,
+            validate_max_date_of_birth])
+    level_of_education = models.CharField(
+        max_length=100,
+        null=True,
+        choices=LEVEL_OF_EDUCATION,
+        blank=False,
+        default='Primary',
+        verbose_name="Education")
     is_blocked = models.BooleanField(default=False)
     ea = models.ForeignKey('EnumerationArea', null=True,        # shall use this to track the interviewer present ea
                            related_name="interviewers", verbose_name='Enumeration Area', blank=True,
                            on_delete=models.SET_NULL)  # reporting mostly
-    language = models.CharField(max_length=100, null=True, choices=LANGUAGES,
-                                blank=False, default='English', verbose_name="Preferred language")
+    language = models.CharField(
+        max_length=100,
+        null=True,
+        choices=LANGUAGES,
+        blank=False,
+        default='English',
+        verbose_name="Preferred language")
     weights = models.FloatField(default=0, blank=False)
 
     class Meta:
@@ -57,8 +70,8 @@ class Interviewer(BaseModel):
 
     @property
     def present_interviews(self):
-        return self.interviews.filter(ea__in=[a.allocation_ea for a in self.unfinished_assignments]).count()
-
+        return self.interviews.filter(
+            ea__in=[a.allocation_ea for a in self.unfinished_assignments]).count()
 
     @property
     def age(self):
@@ -72,7 +85,9 @@ class Interviewer(BaseModel):
     def locations_in_hierarchy(self):
         locs = self.ea.locations.all()  # this should evaluate to country
         if locs:
-            return locs[0].get_ancestors(include_self=True).exclude(parent__isnull=True)
+            return locs[0].get_ancestors(
+                include_self=True).exclude(
+                parent__isnull=True)
         else:
             Location.objects.none()
 
@@ -93,13 +108,16 @@ class Interviewer(BaseModel):
         return ODKAccess.objects.filter(interviewer=self)
 
     def get_ussd_access(self, mobile_number):
-        return USSDAccess.objects.get(interviewer=self, user_identifier=mobile_number)
+        return USSDAccess.objects.get(
+            interviewer=self, user_identifier=mobile_number)
 
     def get_odk_access(self, identifier):
-        return ODKAccess.objects.get(interviewer=self, user_identifier=identifier)
+        return ODKAccess.objects.get(
+            interviewer=self, user_identifier=identifier)
 
     def has_survey(self):
-        return self.assignments.filter(status=SurveyAllocation.PENDING).count() > 0
+        return self.assignments.filter(
+            status=SurveyAllocation.PENDING).count() > 0
 
     @property
     def has_access(self):
@@ -114,15 +132,17 @@ class Interviewer(BaseModel):
         # send(text, interviewers)
 
     def allocated_surveys(self):
-        return self.assignments.filter(status=SurveyAllocation.PENDING, allocation_ea=self.ea)
-   
+        return self.assignments.filter(
+            status=SurveyAllocation.PENDING,
+            allocation_ea=self.ea)
+
     def survey_name(self):
         ea_obj = SurveyAllocation.objects.filter(interviewer_id=self.id)
-        survey_name  = ''
+        survey_name = ''
         if ea_obj:
             survey_name = ea_obj[0].survey.name
         return survey_name
-        
+
 
 class SurveyAllocation(BaseModel):
     LISTING = 1
@@ -137,8 +157,9 @@ class SurveyAllocation(BaseModel):
     stage = models.CharField(max_length=20, choices=[(LISTING, 'LISTING'),
                                                      (SURVEY, 'SURVEY'), ],
                              null=True, blank=True)
-    status = models.IntegerField(default=PENDING, choices=[(PENDING, 'PENDING'), (DEALLOCATED, 'DEALLOCATED'),
-                                                           (COMPLETED, 'COMPLETED')])
+    status = models.IntegerField(
+        default=PENDING, choices=[
+            (PENDING, 'PENDING'), (DEALLOCATED, 'DEALLOCATED'), (COMPLETED, 'COMPLETED')])
 
     class Meta:
         app_label = 'survey'
@@ -181,9 +202,12 @@ class SurveyAllocation(BaseModel):
         survey_allocations = interviewer.unfinished_assignments
         if survey_allocations.first().survey.has_sampling:
             # essentially allocation usually happens with same survey at a time
-            completed = filter(lambda allocation: allocation.sample_size_reached(), survey_allocations)
-            return (1.0 * len(completed))/survey_allocations.count() >= getattr(settings,
-                                                                                'EAS_PERCENT_TO_START_SURVEY', 0.5)
+            completed = filter(
+                lambda allocation: allocation.sample_size_reached(),
+                survey_allocations)
+            return (
+                1.0 * len(completed)) / survey_allocations.count() >= getattr(
+                settings, 'EAS_PERCENT_TO_START_SURVEY', 0.5)
         else:
             return True
 
@@ -200,13 +224,17 @@ class SurveyAllocation(BaseModel):
         if self.survey.preferred_listing:
             survey = self.survey.preferred_listing
         # more than one interviewer can result in the sample size for that EA
-        return Interview.objects.filter( survey__in=[survey, self.survey],
-                                        ea=self.allocation_ea).count() >= self.survey.sample_size
+        return Interview.objects.filter(
+            survey__in=[
+                survey,
+                self.survey],
+            ea=self.allocation_ea).count() >= self.survey.sample_size
 
     def batches_enabled(self):
         if self.is_valid():
             if self.survey.has_sampling:
-                if self.interviewer.present_households(self.survey).count() < self.survey.sample_size:
+                if self.interviewer.present_households(
+                        self.survey).count() < self.survey.sample_size:
                     return False
             return True
         else:

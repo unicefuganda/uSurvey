@@ -23,9 +23,10 @@ from survey.models.upload_error_logs import UploadErrorLog
 from survey.models.users import UserProfile
 from survey.models.question_module import QuestionModule
 from survey.models.indicators import Indicator, IndicatorVariableCriteria, IndicatorVariable
-from survey.models.about_us_content import AboutUs,SuccessStories
+from survey.models.about_us_content import AboutUs, SuccessStories
 from survey.models.odk_submission import ODKSubmission, Attachment, ODKFileDownload
 from survey.models.interviews import AnswerAccessDefinition
 from survey.models.locations import Location, LocationType
 
-# removed __all__ for now since all modules are are made available.. might bring back if absolutely neccessary.
+# removed __all__ for now since all modules are are made available.. might
+# bring back if absolutely neccessary.

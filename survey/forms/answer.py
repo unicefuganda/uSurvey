@@ -4,10 +4,26 @@ from django.core.exceptions import ValidationError
 from django.utils.safestring import mark_safe
 from django import forms
 from form_helper import FormOrderMixin, get_form_field_no_validation
-from survey.models import (Answer, Interview, VideoAnswer, AudioAnswer, ImageAnswer, TextAnswer, NumericalAnswer,
-                           MultiChoiceAnswer, MultiSelectAnswer, DateAnswer, SurveyAllocation, EnumerationArea,
-                           Survey, QuestionSet, Interviewer, InterviewerAccess, USSDAccess, QuestionOption,
-                           GeopointAnswer)
+from survey.models import (
+    Answer,
+    Interview,
+    VideoAnswer,
+    AudioAnswer,
+    ImageAnswer,
+    TextAnswer,
+    NumericalAnswer,
+    MultiChoiceAnswer,
+    MultiSelectAnswer,
+    DateAnswer,
+    SurveyAllocation,
+    EnumerationArea,
+    Survey,
+    QuestionSet,
+    Interviewer,
+    InterviewerAccess,
+    USSDAccess,
+    QuestionOption,
+    GeopointAnswer)
 
 
 class USSDSerializable(object):
@@ -16,13 +32,15 @@ class USSDSerializable(object):
         return ''
 
     def render_extra_ussd(self):
-        """Basically used by implementing classes to render ussd versions of their forms
+        """Basically used by implementing classes\
+        to render ussd versions of their forms
         :return:
         """
         pass
 
     def render_extra_ussd_html(self):
-        """Basically used by implementing classes to render ussd Preview versions of their forms on HTML
+        """Basically used by implementing classes to render
+        \ussd Preview versions of their forms on HTML
         :return:
         """
         pass
@@ -48,35 +66,48 @@ def get_answer_form(interview, access=None):
 
         def __init__(self, *args, **kwargs):
             super(AnswerForm, self).__init__(*args, **kwargs)
-            self.fields['uid'] = forms.CharField(initial=access.user_identifier,
-                                                 widget=forms.HiddenInput)
+            self.fields['uid'] = forms.CharField(
+                initial=access.user_identifier, widget=forms.HiddenInput)
             if question.answer_type == DateAnswer.choice_name():
-                self.fields['value'] = forms.DateField(label='Answer',
-                                                       input_formats=[settings.DATE_FORMAT, ],
-                                                       widget=forms.DateInput(attrs={'placeholder': 'Date Of Birth',
-                                                                                     'class': 'datepicker'},
-                                                                              format=settings.DATE_FORMAT))
+                self.fields['value'] = forms.DateField(
+                    label='Answer',
+                    input_formats=[
+                        settings.DATE_FORMAT,
+                    ],
+                    widget=forms.DateInput(
+                        attrs={
+                            'placeholder': 'Date Of Birth',
+                            'class': 'datepicker'},
+                        format=settings.DATE_FORMAT))
             if question.answer_type == GeopointAnswer.choice_name():
                 model_field = get_form_field_no_validation(forms.CharField)
-                self.fields['value'] = model_field(label='Answer', widget=forms.TextInput(attrs={'placeholder': 'Lat[space4]Long[space4'
-                                                                                  'Altitude[space4]Precision'}))
+                self.fields['value'] = model_field(label='Answer', widget=forms.TextInput(
+                    attrs={'placeholder': 'Lat[space4]Long[space4' 'Altitude[space4]Precision'}))
             if question.answer_type == MultiChoiceAnswer.choice_name() and \
-                            access.choice_name() == USSDAccess.choice_name():
+                    access.choice_name() == USSDAccess.choice_name():
                 self.fields['value'] = forms.IntegerField()
             elif question.answer_type == MultiChoiceAnswer.choice_name():
-                self.fields['value'] = forms.ChoiceField(choices=[(opt.order, opt.text) for opt
-                                                                  in question.options.all()], widget=forms.RadioSelect)
+                self.fields['value'] = forms.ChoiceField(
+                    choices=[
+                        (opt.order,
+                         opt.text) for opt in question.options.all()],
+                    widget=forms.RadioSelect)
                 self.fields['value'].empty_label = None
             if question.answer_type == MultiSelectAnswer.choice_name():
-                self.fields['value'] = forms.ModelMultipleChoiceField(queryset=question.options.all(),
-                                                                      widget=forms.CheckboxSelectMultiple)
+                self.fields['value'] = forms.ModelMultipleChoiceField(
+                    queryset=question.options.all(), widget=forms.CheckboxSelectMultiple)
             accept_types = {AudioAnswer.choice_name(): 'audio/*',
                             VideoAnswer.choice_name(): 'video/*',
                             ImageAnswer.choice_name(): 'image/*'
                             }
-            if question.answer_type in [AudioAnswer.choice_name(), VideoAnswer.choice_name(), ImageAnswer.choice_name()]:
-                self.fields['value'].widget.attrs = {'accept': accept_types.get(question.answer_type,
-                                                                                '|'.join(accept_types.values()))}
+            if question.answer_type in [
+                    AudioAnswer.choice_name(),
+                    VideoAnswer.choice_name(),
+                    ImageAnswer.choice_name()]:
+                self.fields['value'].widget.attrs = {
+                    'accept': accept_types.get(
+                        question.answer_type, '|'.join(
+                            accept_types.values()))}
             self.fields['value'].label = 'Answer'
 
         def full_clean(self):
@@ -91,24 +122,29 @@ def get_answer_form(interview, access=None):
         def render_extra_ussd(self):
             text = []
             if question.options.count() > 0:
-                map(lambda opt: text.append('%s: %s' % (opt.order, opt.text)), question.options.all())
+                map(lambda opt: text.append('%s: %s' %
+                                            (opt.order, opt.text)), question.options.all())
             elif hasattr(interview.last_question, 'loop_started'):
-                text.append('%s: %s' % (question.text, self.initial.get('value', 1)))
+                text.append('%s: %s' %
+                            (question.text, self.initial.get('value', 1)))
                 text.append('Enter any key to continue')
             return mark_safe('\n'.join(text))
 
         def render_extra_ussd_html(self):
             text = []
             if question.options.count() > 0:
-                map(lambda opt: text.append('%s: %s' % (opt.order, opt.text)), question.options.all())
+                map(lambda opt: text.append('%s: %s' %
+                                            (opt.order, opt.text)), question.options.all())
             elif hasattr(interview.last_question, 'loop_started'):
-                text.append('%s: %s' % (question.text, self.initial.get('value', 1)))
+                text.append('%s: %s' %
+                            (question.text, self.initial.get('value', 1)))
             return mark_safe('<br />'.join(text))
 
         def clean_value(self):
             if question.answer_type == MultiChoiceAnswer.choice_name():
                 try:
-                    self.cleaned_data['value'] = question.options.get(order=self.cleaned_data['value'])
+                    self.cleaned_data['value'] = question.options.get(
+                        order=self.cleaned_data['value'])
                 except QuestionOption.DoesNotExist:
                     raise ValidationError('Please select a valid option')
             if question.answer_type == GeopointAnswer.choice_name():
@@ -118,15 +154,17 @@ def get_answer_form(interview, access=None):
                     map(lambda entry: float(entry), float_entries)
                     if len(float_entries) == 4:
                         valid = True
-                except:
+                except BaseException:
                     pass
                 if not valid:
-                    raise ValidationError('Please enter in format: lat[space]long[space]altitude[space]precision')
+                    raise ValidationError(
+                        'Please enter in format: lat[space]long[space]altitude[space]precision')
 
             return self.cleaned_data['value']
 
         def save(self, *args, **kwargs):
-            return answer_class.create(interview, question, self.cleaned_data['value'])
+            return answer_class.create(
+                interview, question, self.cleaned_data['value'])
 
     return AnswerForm
 
@@ -145,7 +183,9 @@ class BaseSelectInterview(forms.ModelForm):
         else:
             self.user = None
         self.interviewer = access.interviewer
-        self.fields['uid'] = forms.CharField(initial=access.user_identifier, widget=forms.HiddenInput)
+        self.fields['uid'] = forms.CharField(
+            initial=access.user_identifier,
+            widget=forms.HiddenInput)
 
     class Meta:
         model = Interview
@@ -174,7 +214,8 @@ class AddMoreLoopForm(BaseSelectInterview, USSDSerializable):
         if self.access.choice_name() == USSDAccess.choice_name():
             self.fields['value'] = forms.IntegerField()
         else:
-            self.fields['value'] = forms.ChoiceField(choices=self.CHOICES, widget=forms.RadioSelect)
+            self.fields['value'] = forms.ChoiceField(
+                choices=self.CHOICES, widget=forms.RadioSelect)
         self.fields['value'].label = 'Answer'
 
     def render_extra_ussd(self):
@@ -201,24 +242,38 @@ class UserAccessForm(forms.Form):
 
     def clean_uid(self):
         try:
-            access = InterviewerAccess.get(user_identifier=self.cleaned_data['uid'])
+            access = InterviewerAccess.get(
+                user_identifier=self.cleaned_data['uid'])
         except InterviewerAccess.DoesNotExist:
             raise ValidationError('No such interviewer')
         return access
 
 
 class UssdTimeoutForm(forms.Form):
-    use_timeout = forms.ChoiceField(widget=forms.RadioSelect,
-                                    choices=[(1, 'Use Timeout'), (2, 'No Timeout')],
-                                    initial=2, label='')
+    use_timeout = forms.ChoiceField(
+        widget=forms.RadioSelect, choices=[
+            (1, 'Use Timeout'), (2, 'No Timeout')], initial=2, label='')
 
 
-class SurveyAllocationForm(BaseSelectInterview, FormOrderMixin, USSDSerializable):
+class SurveyAllocationForm(
+        BaseSelectInterview,
+        FormOrderMixin,
+        USSDSerializable):
 
     def __init__(self, request, access, *args, **kwargs):
-        super(SurveyAllocationForm, self).__init__(request, access, *args, **kwargs)
-        self.CHOICES = [(idx+1, sa.allocation_ea.name) for idx, sa in
-                        enumerate(self.interviewer.unfinished_assignments.order_by('allocation_ea__name'))]
+        super(
+            SurveyAllocationForm,
+            self).__init__(
+            request,
+            access,
+            *
+            args,
+            **kwargs)
+        self.CHOICES = [
+            (idx + 1,
+             sa.allocation_ea.name) for idx,
+            sa in enumerate(
+                self.interviewer.unfinished_assignments.order_by('allocation_ea__name'))]
         if self.access.choice_name() == USSDAccess.choice_name():
             self.fields['value'] = forms.IntegerField()
         else:
@@ -242,12 +297,14 @@ class SurveyAllocationForm(BaseSelectInterview, FormOrderMixin, USSDSerializable
 
     def clean_value(self):
         selected = int(self.cleaned_data['value'])
-        return self.interviewer.unfinished_assignments.order_by('allocation_ea__name')[selected - 1].allocation_ea
+        return self.interviewer.unfinished_assignments.order_by(
+            'allocation_ea__name')[selected - 1].allocation_ea
 
     def selected_allocation(self):
         if self.is_valid():
             selected = int(self.data['value'])
-            return self.interviewer.unfinished_assignments.order_by('allocation_ea__name')[selected - 1]
+            return self.interviewer.unfinished_assignments.order_by('allocation_ea__name')[
+                selected - 1]
 
     def save(self, commit=True):
         instance = super(SurveyAllocationForm, self).save(commit=commit)
@@ -267,25 +324,30 @@ class SelectBatchForm(BaseSelectInterview, USSDSerializable):
         super(SelectBatchForm, self).__init__(request, access, *args, **kwargs)
         self.survey = survey
         self.fields['value'] = forms.ChoiceField()
-        self.fields['value'].choices = [(idx+1, batch.name) for idx, batch in
-                                        enumerate(survey.batches.all().order_by('name'))]
+        self.fields['value'].choices = [
+            (idx + 1,
+             batch.name) for idx,
+            batch in enumerate(
+                survey.batches.all().order_by('name'))]
         self.fields['value'].label = 'Select Batch'
 
     def clean_batch(self):
         selected = int(self.cleaned_data['value'])
-        return self.survey.batches.all().order_by('name')[selected-1]
+        return self.survey.batches.all().order_by('name')[selected - 1]
 
     def render_prepend_ussd(self):
         return 'Select Batch'
 
     def render_extra_ussd(self):
         text = []
-        map(lambda choice: text.append('%s: %s' % choice), self.fields['value'].choices)
+        map(lambda choice: text.append('%s: %s' %
+                                       choice), self.fields['value'].choices)
         return mark_safe('\n'.join(text))
 
     def render_extra_ussd_html(self):
         text = []
-        map(lambda choice: text.append('%s: %s' % choice), self.fields['value'].choices)
+        map(lambda choice: text.append('%s: %s' %
+                                       choice), self.fields['value'].choices)
         return mark_safe('<br />'.join(text))
 
 
@@ -296,6 +358,3 @@ class SelectInterviewerForm(forms.Form):
         widgets = {
             'interviewer': forms.Select(attrs={'class': 'chzn-select', }),
         }
-
-
-

@@ -22,10 +22,18 @@ class EnumerationAreaForm(ModelForm):
         model = EnumerationArea
         exclude = []
         widgets = {
-            'name': forms.TextInput(attrs={"id": 'ea_name', "class": 'enumeration_area'}),
-            'total_households': forms.TextInput({'id': 'total_households',  "class": 'enumeration_area'}),
-            'locations': forms.SelectMultiple(attrs={'class': 'multi-select enumeration_area', 'id': 'ea-locations'})
-        }
+            'name': forms.TextInput(
+                attrs={
+                    "id": 'ea_name',
+                    "class": 'enumeration_area'}),
+            'total_households': forms.TextInput(
+                {
+                    'id': 'total_households',
+                    "class": 'enumeration_area'}),
+            'locations': forms.SelectMultiple(
+                attrs={
+                    'class': 'multi-select enumeration_area',
+                    'id': 'ea-locations'})}
 
 
 class LocationsFilterForm(Form):
@@ -55,7 +63,8 @@ class LocationsFilterForm(Form):
                     last_selected_pk = data.get(
                         location_type.name, None) or parent_selection
                     kw['parent__pk'] = parent_selection
-                locations = Location.objects.filter(**kw).only('id', 'name').order_by('name')
+                locations = Location.objects.filter(
+                    **kw).only('id', 'name').order_by('name')
             else:
                 self.data[location_type.name] = ''
                 locations = Location.objects.none()
@@ -72,8 +81,9 @@ class LocationsFilterForm(Form):
                 pk=last_selected_pk)
         if include_ea:
             if self.last_location_selected:
-                eas = EnumerationArea.objects.filter(locations__in=get_leaf_locs(
-                    loc=self.last_location_selected)).distinct()
+                eas = EnumerationArea.objects.filter(
+                    locations__in=get_leaf_locs(
+                        loc=self.last_location_selected)).distinct()
             else:
                 eas = EnumerationArea.objects.none()
             choices = [(ea.pk, ea.name) for ea in eas]
@@ -100,9 +110,15 @@ class LocationsFilterForm(Form):
         return get_leaf_locs(loc, ea)
 
     def get_enumerations(self):
-        if hasattr(self, 'cleaned_data') and self.cleaned_data.get('enumeration_area', None):
-            return EnumerationArea.objects.filter(pk=self.cleaned_data['enumeration_area'].pk)
-        return EnumerationArea.objects.filter(locations__in=self.get_locations()).distinct().order_by('name')
+        if hasattr(
+                self,
+                'cleaned_data') and self.cleaned_data.get(
+                'enumeration_area',
+                None):
+            return EnumerationArea.objects.filter(
+                pk=self.cleaned_data['enumeration_area'].pk)
+        return EnumerationArea.objects.filter(
+            locations__in=self.get_locations()).distinct().order_by('name')
 
 
 def get_leaf_locs(loc=None, ea=None):

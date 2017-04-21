@@ -4,9 +4,11 @@ from survey.models import Batch, BatchChannel, QuestionTemplate, WebAccess
 
 
 class BatchForm(ModelForm):
-    access_channels = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple(attrs={'class': 'access_channels'}),
-                                                choices=[opt for opt in BatchChannel.ACCESS_CHANNELS
-                                                         if not opt[0] == WebAccess.choice_name()])
+    access_channels = forms.MultipleChoiceField(
+        widget=forms.CheckboxSelectMultiple(
+            attrs={
+                'class': 'access_channels'}), choices=[
+            opt for opt in BatchChannel.ACCESS_CHANNELS if not opt[0] == WebAccess.choice_name()])
 
     def __init__(self, *args, **kwargs):
         if kwargs.get('instance'):
@@ -33,8 +35,12 @@ class BatchForm(ModelForm):
 
 
 class BatchQuestionsForm(ModelForm):
-    questions = forms.ModelMultipleChoiceField(label=u'', queryset=QuestionTemplate.objects.filter(),
-                                               widget=forms.SelectMultiple(attrs={'class': 'multi-select'}))
+    questions = forms.ModelMultipleChoiceField(
+        label=u'',
+        queryset=QuestionTemplate.objects.filter(),
+        widget=forms.SelectMultiple(
+            attrs={
+                'class': 'multi-select'}))
 
     class Meta:
         model = Batch

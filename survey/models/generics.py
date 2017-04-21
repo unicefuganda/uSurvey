@@ -24,7 +24,9 @@ class GenericQuestion(BaseModel):
         return Answer.get_class(self.answer_type).validators()
 
     def validator_names(self):
-        return [v.__name__ for v in Answer.get_class(self.answer_type).validators()]
+        return [
+            v.__name__ for v in Answer.get_class(
+                self.answer_type).validators()]
 
 
 class TemplateQuestion(GenericQuestion):
@@ -35,11 +37,13 @@ class TemplateQuestion(GenericQuestion):
 
 
 class TemplateOption(BaseModel):
-    question = models.ForeignKey(TemplateQuestion, null=True, related_name="options")
+    question = models.ForeignKey(
+        TemplateQuestion,
+        null=True,
+        related_name="options")
     text = models.CharField(max_length=150, blank=False, null=False)
     order = models.PositiveIntegerField()
 
     @property
     def to_text(self):
         return "%d: %s" % (self.order, self.text)
-

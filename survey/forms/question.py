@@ -17,7 +17,14 @@ def get_question_form(model_class):
         options = forms.CharField(
             max_length=50, widget=forms.HiddenInput(), required=False)
 
-        def __init__(self, qset, data=None, initial=None, parent_question=None, instance=None, prev_question=None):
+        def __init__(
+                self,
+                qset,
+                data=None,
+                initial=None,
+                parent_question=None,
+                instance=None,
+                prev_question=None):
             super(QuestionForm, self).__init__(
                 data=data, initial=initial, instance=instance)
             self.fields['identifier'].label = "Variable name"
@@ -29,12 +36,14 @@ def get_question_form(model_class):
             self.prev_question = prev_question
             # depending on type of ussd/odk access of qset restrict the answer
             # type
-            self.fields['answer_type'].choices = [choice for choice in self.fields['answer_type'].choices
-                                                  if choice[0] in qset.answer_types]
-            self.fields['answer_type'].choices.insert(0, ('', 'Select Answer Type'))
+            self.fields['answer_type'].choices = [
+                choice for choice in self.fields['answer_type'].choices if choice[0] in qset.answer_types]
+            self.fields['answer_type'].choices.insert(
+                0, ('', 'Select Answer Type'))
             if instance:
                 self.help_text = ' and '.join(
-                    AnswerAccessDefinition.access_channels(instance.answer_type))
+                    AnswerAccessDefinition.access_channels(
+                        instance.answer_type))
                 self.fields['answer_type'].help_text = self.help_text
             self.answer_map = {}
             definitions = AnswerAccessDefinition.objects.all()
@@ -42,19 +51,26 @@ def get_question_form(model_class):
                 self.answer_map[defi.answer_type] = self.answer_map.get(
                     defi.answer_type, [])
                 self.answer_map[defi.answer_type].append(defi.channel)
-            if self.fields.has_key('module'):
+            if 'module' in self.fields:
                 self.fields['module'].empty_label = 'Select Module'
-            if self.fields.has_key('group'):
+            if 'group' in self.fields:
                 self.fields['group'].empty_label = 'Select Group'
-            self.fields['text'].help_text = "To get previous identifier suggestions, type {{ any time"
+            self.fields[
+                'text'].help_text = "To get previous identifier suggestions, type {{ any time"
             self.parent_question = parent_question
-            self.order_fields(['module', 'group', 'identifier', 'text', 'answer_type', 'mandatory'])
+            self.order_fields(['module', 'group', 'identifier',
+                               'text', 'answer_type', 'mandatory'])
 
         class Meta:
             model = model_class
             exclude = []
             widgets = {
-                'text': forms.Textarea(attrs={"rows": 5, "cols": 30, "maxlength": "150",}),
+                'text': forms.Textarea(
+                    attrs={
+                        "rows": 5,
+                        "cols": 30,
+                        "maxlength": "150",
+                    }),
             }
 
         def clean_options(self):
@@ -62,7 +78,9 @@ def get_question_form(model_class):
             if options:
                 options = filter(lambda text: text.strip(), options)
                 # options = map(lambda option: re.sub("[%s]" % settings.USSD_IGNORED_CHARACTERS, '', option), options)
-                options = map(lambda option: re.sub("  ", ' ', option), options)
+                options = map(
+                    lambda option: re.sub(
+                        "  ", ' ', option), options)
                 options = map(lambda option: option.strip(), options)
                 self.cleaned_data['options'] = options
             return options
@@ -71,19 +89,27 @@ def get_question_form(model_class):
             identifier = self.cleaned_data['identifier']
             pattern = '^[a-zA-Z][0-9a-zA-Z_]+$'
             if re.match(pattern, identifier) is None:
-                raise ValidationError('Identifier must start with a letter, and must contain alphanumeric values or _')
-            if Question.objects.filter(identifier__iexact=identifier, qset__pk=self.qset.pk).exists():
+                raise ValidationError(
+                    'Identifier must start with a letter, and must contain alphanumeric values or _')
+            if Question.objects.filter(
+                    identifier__iexact=identifier,
+                    qset__pk=self.qset.pk).exists():
                 if self.instance and self.instance.identifier == identifier:
                     pass
                 else:
                     raise ValidationError(
-                        '%s already in use for this %s' % (identifier, model_class.type_name()))
-            # if this is a batch question also check if there are parameter questions with this name
+                        '%s already in use for this %s' %
+                        (identifier, model_class.type_name()))
+            # if this is a batch question also check if there are parameter
+            # questions with this name
             qset = QuestionSet.get(id=self.qset.pk)
-            if hasattr(qset, 'parameter_list') and qset.parameter_list and \
-                    qset.parameter_list.parameters.filter(identifier__iexact=identifier).exists():
-                raise ValidationError('%s is already in captured as a group parameter for this %s' %
-                                      (identifier, model_class.type_name()))
+            if hasattr(
+                    qset,
+                    'parameter_list') and qset.parameter_list and qset.parameter_list.parameters.filter(
+                    identifier__iexact=identifier).exists():
+                raise ValidationError(
+                    '%s is already in captured as a group parameter for this %s' %
+                    (identifier, model_class.type_name()))
             return self.cleaned_data['identifier']
 
         def clean_text(self):
@@ -94,12 +120,16 @@ def get_question_form(model_class):
             label = self.data.get('text', '')
             requested_identifiers = re.findall(pattern, label)
             if requested_identifiers:
-                ids = self.qset.questions.filter(identifier__in=requested_identifiers).values_list('identifier',
-                                                                                                   flat=True)
+                ids = self.qset.questions.filter(
+                    identifier__in=requested_identifiers).values_list(
+                    'identifier', flat=True)
                 ids = list(ids)
                 if len(set(ids)) != len(set(requested_identifiers)):
-                    raise ValidationError('%s is not in %s' %
-                                          (', '.join(set(requested_identifiers).difference(ids)), self.qset.name))
+                    raise ValidationError(
+                        '%s is not in %s' %
+                        (', '.join(
+                            set(requested_identifiers).difference(ids)),
+                            self.qset.name))
             return self.cleaned_data['text']
 
         def clean(self):
@@ -112,18 +142,27 @@ def get_question_form(model_class):
             self._prevent_duplicate_subquestions(text)
             return self.cleaned_data
 
-        def _check__multichoice_and_options_compatibility(self, answer_type, options):
-            if answer_type in [MultiChoiceAnswer.choice_name(), MultiSelectAnswer.choice_name()] and not options:
+        def _check__multichoice_and_options_compatibility(
+                self, answer_type, options):
+            if answer_type in [
+                    MultiChoiceAnswer.choice_name(),
+                    MultiSelectAnswer.choice_name()] and not options:
                 message = 'Question Options missing.'
                 self._errors['answer_type'] = self.error_class([message])
                 del self.cleaned_data['answer_type']
 
-            if answer_type not in [MultiChoiceAnswer.choice_name(), MultiSelectAnswer.choice_name()] and options:
+            if answer_type not in [
+                    MultiChoiceAnswer.choice_name(),
+                    MultiSelectAnswer.choice_name()] and options:
                 del self.cleaned_data['options']
 
         def _strip_special_characters_for_ussd(self, text):
             if text:
-                text = re.sub("[%s]" % settings.USSD_IGNORED_CHARACTERS, '', text)
+                text = re.sub(
+                    "[%s]" %
+                    settings.USSD_IGNORED_CHARACTERS,
+                    '',
+                    text)
                 self.cleaned_data['text'] = re.sub("  ", ' ', text)
 
         def _prevent_duplicate_subquestions(self, text):
@@ -132,13 +171,14 @@ def get_question_form(model_class):
                 has_instance_id_different = (
                     self.instance.id and self.instance.id != duplicate_sub_question[0].id)
 
-                if duplicate_sub_question.exists() and (not self.instance.id or has_instance_id_different):
+                if duplicate_sub_question.exists() and (
+                        not self.instance.id or has_instance_id_different):
                     self._errors['text'] = self.error_class(
                         ["Sub question for this question with this text already exists."])
                     del self.cleaned_data['text']
 
         def kwargs_has_batch(self, **kwargs):
-            return kwargs.has_key('qset') and isinstance(kwargs['qset'], Batch)
+            return 'qset' in kwargs and isinstance(kwargs['qset'], Batch)
 
         def options_supplied(self, commit):
             return commit and self.cleaned_data.get('options', None)
@@ -167,14 +207,16 @@ def get_question_form(model_class):
                         last_question = qset.last_question_inline()
                     if last_question:
                         if zombie is False:
-                            # incase, inline flow with no next quest already exists
+                            # incase, inline flow with no next quest already
+                            # exists
                             flow, _ = QuestionFlow.objects.get_or_create(
                                 question=last_question, validation_test__isnull=True)
                             prev_next_question = flow.next_question
                             flow.next_question = question
                             flow.save()
-                            #now connect present question back to the flow
-                            QuestionFlow.objects.create(question=question, next_question=prev_next_question)
+                            # now connect present question back to the flow
+                            QuestionFlow.objects.create(
+                                question=question, next_question=prev_next_question)
                     elif qset.start_question is None:
                         qset.start_question = question
                         qset.save()
@@ -186,6 +228,7 @@ def get_question_form(model_class):
             return question
 
     return QuestionForm
+
 
 QuestionForm = get_question_form(Question)
 BatchQuestionForm = get_question_form(BatchQuestion)

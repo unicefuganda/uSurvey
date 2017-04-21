@@ -22,8 +22,8 @@ class RespondentGroup(BaseModel):
 
     def has_interviews(self):
         from survey.models import Interview
-        return self.questions.exists() and Interview.objects.filter(question_set__pk=
-                                                                    self.questions.first().qset.pk).exists()
+        return self.questions.exists() and Interview.objects.filter(
+            question_set__pk=self.questions.first().qset.pk).exists()
 
     def remove_related_questions(self):
         self.question_templates.all().delete()
@@ -35,8 +35,11 @@ class RespondentGroup(BaseModel):
 class RespondentGroupCondition(BaseModel):
     VALIDATION_TESTS = [(validator.__name__, validator.__name__)
                         for validator in Answer.validators()]
-    respondent_group = models.ForeignKey(RespondentGroup, related_name='group_conditions')
-    test_question = models.ForeignKey(ParameterTemplate, related_name='group_condition')
+    respondent_group = models.ForeignKey(
+        RespondentGroup, related_name='group_conditions')
+    test_question = models.ForeignKey(
+        ParameterTemplate,
+        related_name='group_condition')
     validation_test = models.CharField(
         max_length=200, null=True, blank=True, choices=VALIDATION_TESTS)
 
@@ -58,11 +61,14 @@ class RespondentGroupCondition(BaseModel):
 
     @property
     def test_arguments(self):
-        return GroupTestArgument.objects.filter(group_condition=self).order_by('position')
+        return GroupTestArgument.objects.filter(
+            group_condition=self).order_by('position')
 
 
 class GroupTestArgument(BaseModel):
-    group_condition = models.ForeignKey(RespondentGroupCondition, related_name='arguments')
+    group_condition = models.ForeignKey(
+        RespondentGroupCondition,
+        related_name='arguments')
     position = models.PositiveIntegerField()
     param = models.CharField(max_length=100)
 
@@ -83,8 +89,13 @@ class ParameterQuestion(Question):
         return next_question
 
 
-class SurveyParameterList(QuestionSet):             # basically used to tag survey grouping questions
-    batch = models.OneToOneField('Batch', related_name='parameter_list', null=True, blank=True)
+class SurveyParameterList(
+        QuestionSet):             # basically used to tag survey grouping questions
+    batch = models.OneToOneField(
+        'Batch',
+        related_name='parameter_list',
+        null=True,
+        blank=True)
 
     @property
     def parameters(self):
@@ -106,27 +117,34 @@ class SurveyParameterList(QuestionSet):             # basically used to tag surv
         param_list, _ = cls.objects.get_or_create(batch=batch)
         param_list.questions.all().delete()
         # now create a new
-        target_groups = RespondentGroup.objects.filter(questions__qset__id=batch.id)
+        target_groups = RespondentGroup.objects.filter(
+            questions__qset__id=batch.id)
         question_ids = []
         # loop through target_groups to get required template parameters
         for group in target_groups:
-            map(lambda condition: question_ids.append(condition.test_question.id), group.group_conditions.all())
-        parameters = ParameterTemplate.objects.filter(id__in=question_ids).order_by('identifier')
+            map(lambda condition: question_ids.append(
+                condition.test_question.id), group.group_conditions.all())
+        parameters = ParameterTemplate.objects.filter(
+            id__in=question_ids).order_by('identifier')
         prev_question = None
         for param in parameters:
             # going this route because param questions typically would be small
-            question = ParameterQuestion(**{'identifier': param.identifier, 'text': param.text,
-                                            'answer_type': param.answer_type, 'qset': param_list})
+            question = ParameterQuestion(**{'identifier': param.identifier,
+                                            'text': param.text,
+                                            'answer_type': param.answer_type,
+                                            'qset': param_list})
             question.save()
             if prev_question:
-                QuestionFlow.objects.create(question=prev_question, next_question=question)
+                QuestionFlow.objects.create(
+                    question=prev_question, next_question=question)
             prev_question = question
-            if question.answer_type in [MultiChoiceAnswer.choice_name(), MultiChoiceAnswer]:
+            if question.answer_type in [
+                    MultiChoiceAnswer.choice_name(),
+                    MultiChoiceAnswer]:
                 for option in param.options.all():
-                    QuestionOption.objects.create(order=option.order, text=option.text, question=question)
+                    QuestionOption.objects.create(
+                        order=option.order, text=option.text, question=question)
         return param_list
-
-
 
 
 # class SurveyParameter(Question):        # this essentially shall be made from copying from survey paramaters.

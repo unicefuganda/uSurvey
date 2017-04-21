@@ -37,5 +37,3 @@ class BaseModel(TimeStampedModel):
     @classmethod
     def field_names(cls):
         return cls._meta.get_all_field_names()
-
-

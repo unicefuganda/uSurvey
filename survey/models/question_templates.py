@@ -4,7 +4,10 @@ from survey.models.generics import TemplateQuestion
 
 class QuestionTemplate(TemplateQuestion):
     module = models.ForeignKey(
-        "QuestionModule", related_name="question_templates", null=True, blank=True)
+        "QuestionModule",
+        related_name="question_templates",
+        null=True,
+        blank=True)
 
     @classmethod
     def resolve_tag(cls):
@@ -12,6 +15,3 @@ class QuestionTemplate(TemplateQuestion):
 
     class Meta:
         app_label = 'survey'
-
-
-

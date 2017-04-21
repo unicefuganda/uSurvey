@@ -35,7 +35,7 @@ class UploadCSVFileForm(forms.Form):
 
 class UploadLocationsForm(UploadCSVFileForm):
 
-    def __init__(self,  *args, **kwargs):
+    def __init__(self, *args, **kwargs):
         super(UploadLocationsForm, self).__init__(
             UploadLocation, *args, **kwargs)
 
@@ -79,13 +79,16 @@ class UploadLocationsForm(UploadCSVFileForm):
 
     def clean_has_code(self, type, location_detail, headers, index):
         if location_detail.has_code:
-            if index == 0 or headers[index - 1].replace('Code', '') != type.name:
+            if index == 0 or headers[index -
+                                     1].replace('Code', '') != type.name:
                 raise ValidationError(
-                    '%sCode column should be before %sName column. Please refer to input file format.' % (type.name, type.name))
+                    '%sCode column should be before %sName column. Please refer to input file format.' %
+                    (type.name, type.name))
         else:
             if headers[index - 1].replace('Code', '') == type.name:
                 raise ValidationError(
-                    '%s has no code. The column %sCode should be removed. Please refer to input file format.' % (type.name, type.name))
+                    '%s has no code. The column %sCode should be removed. Please refer to input file format.' %
+                    (type.name, type.name))
 
     def clean_headers_location_type_order(self, headers):
         headers = UploadService.remove_trailing(
@@ -94,7 +97,8 @@ class UploadLocationsForm(UploadCSVFileForm):
         if headers[0] == 'COUNTRY':
             headers.pop(0)
         location_types = [
-            loc.name.upper() for loc in LocationType.all().exclude(name__iexact='COUNTRY')]
+            loc.name.upper() for loc in LocationType.all().exclude(
+                name__iexact='COUNTRY')]
         if not location_types == headers:
             raise ValidationError(
                 'Location types not in order. Please refer to input file format.')
@@ -104,7 +108,7 @@ class UploadWithSurveyForm(UploadCSVFileForm):
     survey = forms.ModelChoiceField(
         queryset=Survey.objects.all(), empty_label=None)
 
-    def __init__(self,  uploader, *args, **kwargs):
+    def __init__(self, uploader, *args, **kwargs):
         super(UploadWithSurveyForm, self).__init__(uploader, *args, **kwargs)
         self.fields.keyOrder = ['survey', 'file']
 
@@ -117,7 +121,7 @@ class UploadWithSurveyForm(UploadCSVFileForm):
 
 class UploadWeightsForm(UploadWithSurveyForm):
 
-    def __init__(self,  *args, **kwargs):
+    def __init__(self, *args, **kwargs):
         super(UploadWeightsForm, self).__init__(
             UploadLocationWeights, *args, **kwargs)
         self.fields['file'].label = 'Location weights file'
@@ -125,6 +129,6 @@ class UploadWeightsForm(UploadWithSurveyForm):
 
 class UploadEAForm(UploadWithSurveyForm):
 
-    def __init__(self,  *args, **kwargs):
+    def __init__(self, *args, **kwargs):
         super(UploadEAForm, self).__init__(UploadEA, *args, **kwargs)
         self.fields['file'].label = 'EA file'
