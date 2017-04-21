@@ -3,8 +3,7 @@ import os
 import pytz
 from lxml import etree
 from django.forms import ValidationError
-from django.http import HttpResponse,\
-    HttpResponseNotFound, StreamingHttpResponse
+from django.http import HttpResponse, HttpResponseNotFound, StreamingHttpResponse
 from django.core.servers.basehttp import FileWrapper
 from django.core.files.storage import get_storage_class
 from django.conf import settings
@@ -13,28 +12,10 @@ from django.utils import timezone
 from djangohttpdigest.digest import Digestor
 from djangohttpdigest.authentication import SimpleHardcodedAuthenticator
 from django.utils.translation import ugettext as _
-from survey.models import (
-    Survey,
-    Interviewer,
-    Interview,
-    SurveyAllocation,
-    ODKAccess,
-    QuestionSet,
-    Question,
-    Batch,
-    ODKSubmission,
-    ODKGeoPoint,
-    TextAnswer,
-    Answer,
-    NonResponseAnswer,
-    VideoAnswer,
-    AudioAnswer,
-    ImageAnswer,
-    MultiSelectAnswer,
-    MultiChoiceAnswer,
-    DateAnswer,
-    GeopointAnswer,
-    ListingSample)
+from survey.models import (Survey, Interviewer, Interview, SurveyAllocation, ODKAccess, QuestionSet,
+                           Question, Batch, ODKSubmission, ODKGeoPoint, TextAnswer, Answer, NonResponseAnswer,
+                           VideoAnswer, AudioAnswer, ImageAnswer, MultiSelectAnswer, MultiChoiceAnswer, DateAnswer,
+                           GeopointAnswer, ListingSample)
 from survey.odk.utils.log import logger
 from functools import wraps
 from survey.utils.zip import InMemoryZip
@@ -76,22 +57,14 @@ def _get_nodes(search_path, tree=None, xml_string=None):
         tree = etree.fromstring(xml_string)
     try:
         return tree.xpath(search_path)
-    except Exception as ex:
+    except Exception, ex:
         logger.error('Error retrieving path: %s, Desc: %s' %
                      (search_path, str(ex)))
 
 
 @job('odk', connection=get_connection())
-def process_answers(
-        xml,
-        qset,
-        access_channel,
-        question_map,
-        survey_allocation,
-        submission,
-        media_files):
-    """Process answers for this answers_node. It's supposed to \
-        handle for all question answers in this xform.
+def process_answers(xml, qset, access_channel, question_map, survey_allocation, submission, media_files):
+    """Process answers for this answers_node. It's supposed to handle for all question answers in this xform.
     :param answers_node:
     :param qset:
     :param interviewer:
@@ -105,60 +78,41 @@ def process_answers(
         # answers = []
         survey_parameters = []
         survey = survey_allocation.survey
-        question_answers_node = _get_nodes(
-            './questions/surveyQuestions', answers_node)[0]
+        question_answers_node = _get_nodes('./questions/surveyQuestions', answers_node)[0]
         reference_interview = None          # typically used if
         if _get_nodes('./sampleData/selectedSample', answers_node):
-            # the following looks ugly but ./sampleData/selectedSample is \
-                #calculated in xform by a concat of
-            # sampleData/iq{{ ea_id }} values with -. See question_set.xml \
-                #binding for ./sampleData/selectedSample
-            # if for some reason more than one interview value is reflected,
-            # choose the first one
-            reference_interview = _get_nodes(
-                './sampleData/selectedSample',
-                answers_node)[0].text.strip('-').split('-')[0]
-        # map(lambda node: answers.extend(
-            #get_answers(node, qset, question_map)),
-            #question_answers_node.getchildren())
-        # map(lambda node: survey_parameters.extend(get_answers(
-            #node, qset, question_map)),
+            # the following looks ugly but ./sampleData/selectedSample is calculated in xform by a concat of
+            # sampleData/iq{{ ea_id }} values with -. See question_set.xml binding for ./sampleData/selectedSample
+            # if for some reason more than one interview value is reflected, choose the first one
+            reference_interview = _get_nodes('./sampleData/selectedSample',
+                                             answers_node)[0].text.strip('-').split('-')[0]
+        # map(lambda node: answers.extend(get_answers(node, qset, question_map)), question_answers_node.getchildren())
+        # map(lambda node: survey_parameters.extend(get_answers(node, qset, question_map)),
         #     survey_parameters_node.getchildren())
         answers = get_answers(question_answers_node, qset, question_map)
         survey_parameters = None
         if hasattr(qset, 'parameter_list'):
-            survey_parameters_node = _get_nodes(
-                './questions/groupQuestions', answers_node)[0]
+            survey_parameters_node = _get_nodes('./questions/groupQuestions', answers_node)[0]
             # survey paramaters does not have any single repeat
-            survey_parameters = get_answers(
-                survey_parameters_node, qset, question_map)[0]
+            survey_parameters = get_answers(survey_parameters_node, qset, question_map)[0]
         if survey_allocation.stage in [None, SurveyAllocation.LISTING] and \
                 survey.has_sampling and survey.sample_size > len(answers):
             raise NotEnoughData()
-        created_interviews = save_answers(
-            qset,
-            access_channel,
-            question_map,
-            answers,
-            survey_allocation,
-            survey_parameters=survey_parameters,
-            reference_interview=reference_interview,
-            media_files=media_files)
+        created_interviews = Interview.save_answers(qset, survey, survey_allocation.allocation_ea, access_channel,
+                                                    question_map, answers, survey_parameters=survey_parameters,
+                                                    reference_interview=reference_interview, media_files=media_files)
         if survey.has_sampling:
             survey_allocation.stage = SurveyAllocation.SURVEY
             survey_allocation.save()
     submission.status = ODKSubmission.COMPLETED
-    # wipe off the old interviews for this submission
-    submission.interviews.all().delete()
-    map(lambda interview: submission.interviews.add(interview),
-        created_interviews)    # update with present interviews
+    submission.interviews.all().delete()          # wipe off the old interviews for this submission
+    map(lambda interview: submission.interviews.add(interview), created_interviews)    # update with present interviews
     submission.save()
     submission.save_attachments(media_files)
 
 
 def get_answers(node, qset, question_map):
-    """get answers for the node set. \Would work for nested loops but for \
-        loops sitting in same inline question thread
+    """get answers for the node set. Would work for nested loops but for loops sitting in same inline question thread
     """
     answers = []
     inline_record = {}
@@ -177,62 +131,6 @@ def get_answers(node, qset, question_map):
     return answers
 
 
-def save_answers(
-        qset,
-        access_channel,
-        question_map,
-        answers,
-        survey_allocation,
-        survey_parameters=None,
-        reference_interview=None,
-        media_files=None):
-    survey = survey_allocation.survey
-    ea = survey_allocation.allocation_ea
-    interviewer = access_channel.interviewer
-    interviews = []
-
-    def _save_record(record):
-        interview = Interview.objects.create(
-            survey=survey,
-            question_set=qset,
-            ea=ea,
-            interviewer=interviewer,
-            interview_channel=access_channel,
-            closure_date=timezone.now(),
-            interview_reference_id=reference_interview)
-        interviews.append(interview)
-        map(lambda q_id_answer1: _save_answer(
-            interview,
-            q_id_answer1[0],
-            q_id_answer1[1]),
-            record.items())
-        if survey_parameters:
-            map(lambda q_id_answer: _save_answer(
-                interview,
-                q_id_answer[0],
-                q_id_answer[1]), survey_parameters.items())
-
-    def _save_answer(interview, q_id, answer):
-        question = question_map.get(q_id, None)
-        if question and answer:
-            answer_class = Answer.get_class(question.answer_type)
-            if question.answer_type in [
-                    AudioAnswer.choice_name(),
-                    ImageAnswer.choice_name(),
-                    VideoAnswer.choice_name()]:
-                answer = media_files.get(answer, None)
-            try:
-                old_answer = answer_class.objects.get(
-                    interview=interview, question=question)
-                old_answer.update(answer)
-            except answer_class.DoesNotExist:
-                answer_class.create(interview, question, answer)
-            except Exception as ex:
-                print 'exception: %s' % str(ex)
-    map(_save_record, answers)
-    return interviews
-
-
 def _update_answer_dict(question, answer, answers):
     for d in answers:
         d[question.pk] = answer
@@ -246,8 +144,7 @@ def _update_loop_answers(inline_record, loop_answers):
 
 
 def _get_answer_nodes(tree, qset):
-    answer_path = template.Template(ANSWER_NODE_PATH).render(
-        template.Context({'qset_id': qset.pk}))
+    answer_path = template.Template(ANSWER_NODE_PATH).render(template.Context({'qset_id': qset.pk}))
     return _get_nodes(answer_path, tree)
 
 
@@ -285,11 +182,7 @@ def process_submission(interviewer, xml_file, media_files={}, request=None):
     """extracts and saves the collected data from associated xform.
     """
     # media_files = dict([(os.path.basename(f.name), f) for f in media_files])
-    return process_xml(
-        interviewer,
-        xml_file.read(),
-        media_files=media_files,
-        request=request)
+    return process_xml(interviewer, xml_file.read(), media_files=media_files, request=request)
 
 
 def process_xml(interviewer, xml_blob, media_files={}, request=None):
@@ -300,43 +193,26 @@ def process_xml(interviewer, xml_blob, media_files={}, request=None):
     instance_name = _get_instance_name(survey_tree)
     qset = _get_qset(survey_tree)
     survey_allocation = _get_allocation(interviewer, survey_tree)
-    # since interviewers may have downloaded this submission file before,
-    # fetch old instance if exists
+    # since interviewers may have downloaded this submission file before, fetch old instance if exists
     if submission_id:
         try:
             submission = ODKSubmission.objects.get(id=submission_id)
-            if ListingSample.objects.filter(
-                    interview__in=submission.interviews.all()).exists():
+            if ListingSample.objects.filter(interview__in=submission.interviews.all()).exists():
                 raise ValueError('Cannot update Listing with existing batches')
             submission.xml = xml_blob       # update the xml
             submission.save()
         except ODKSubmission.DoesNotExist:
             submission_id = None
     if not submission_id:
-        # first things first. save the submission incase all else background
-        # task fails... enables recover
-        submission = ODKSubmission.objects.create(
-            interviewer=interviewer,
-            survey=survey_allocation.survey,
-            question_set=qset,
-            ea=survey_allocation.allocation_ea,
-            form_id=form_id,
-            xml=xml_blob,
-            instance_id=instance_id,
-            instance_name=instance_name)
+        # first things first. save the submission incase all else background task fails... enables recover
+        submission = ODKSubmission.objects.create(interviewer=interviewer, survey=survey_allocation.survey,
+                                                  question_set=qset, ea=survey_allocation.allocation_ea,
+                                                  form_id=form_id, xml=xml_blob, instance_id=instance_id,
+                                                  instance_name=instance_name)
     question_map = dict([(str(q.pk), q) for q in qset.flow_questions])
     access_channel = ODKAccess.objects.get(interviewer=interviewer)
-    #>process_answers.delay(xml_blob, qset, \
-        #access_channel, question_map, survey_allocation, \
-            #submission, media_files)
-    process_answers(
-        xml_blob,
-        qset,
-        access_channel,
-        question_map,
-        survey_allocation,
-        submission,
-        media_files)
+    #>process_answers.delay(xml_blob, qset, access_channel, question_map, survey_allocation, submission, media_files)
+    process_answers(xml_blob, qset, access_channel, question_map, survey_allocation, submission, media_files)
     return submission
 
 
@@ -345,8 +221,7 @@ def get_survey(interviewer):
 
 
 def get_survey_allocation(interviewer):
-    '''Just helper function to put additional \
-        layer of abstraction to allocation retrival
+    '''Just helper function to put additional layer of abstraction to allocation retrival
     @param: interviewer. Interviewer to which to get survey allocation
     '''
     return SurveyAllocation.get_allocation_details(interviewer)
@@ -452,7 +327,7 @@ class OpenRosaServerError(OpenRosaResponse):
 def http_basic_interviewer_auth(func):
     @wraps(func)
     def _decorator(request, *args, **kwargs):
-        if 'HTTP_AUTHORIZATION' in request.META:
+        if request.META.has_key('HTTP_AUTHORIZATION'):
             authmeth, auth = request.META['HTTP_AUTHORIZATION'].split(' ', 1)
             logger.debug('request meta: %s' %
                          request.META['HTTP_AUTHORIZATION'])
@@ -461,11 +336,8 @@ def http_basic_interviewer_auth(func):
                 username, password = auth.split(':', 1)
                 try:
                     request.user = ODKAccess.objects.get(
-                        user_identifier=username,
-                        odk_token=password,
-                        is_active=True).interviewer
-                        #Interviewer.objects.get(
-                            #mobile_number=username, odk_token=password)
+                        user_identifier=username, odk_token=password, is_active=True).interviewer
+                    #Interviewer.objects.get(mobile_number=username, odk_token=password)
                     return func(request, *args, **kwargs)
                 except ODKAccess.DoesNotExist:
                     return OpenRosaResponseNotFound()
@@ -476,35 +348,31 @@ def http_basic_interviewer_auth(func):
 def http_digest_interviewer_auth(func):
     @wraps(func)
     def _decorator(request, *args, **kwargs):
-        if 'HTTP_HOST' in request.META:
+        if request.META.has_key('HTTP_HOST'):
             realm = request.META['HTTP_HOST']
         else:
             realm = Site.objects.get_current().name
         digestor = Digestor(method=request.method,
                             path=request.get_full_path(), realm=realm)
-        if 'HTTP_AUTHORIZATION' in request.META:
+        if request.META.has_key('HTTP_AUTHORIZATION'):
             logger.debug('request meta: %s' %
                          request.META['HTTP_AUTHORIZATION'])
             try:
                 parsed_header = digestor.parse_authorization_header(
                     request.META['HTTP_AUTHORIZATION'])
                 if parsed_header['realm'] == realm:
-                    odk_access = ODKAccess.objects.get(
-                        user_identifier=parsed_header['username'],
-                        is_active=True)
-                    # interviewer = Interviewer.objects.get(
-                    #mobile_number=parsed_header['username'],
-                    #is_blocked=False)
-                    authenticator = SimpleHardcodedAuthenticator(
-                        server_realm=realm,
-                        server_username=odk_access.user_identifier,
-                        server_password=odk_access.odk_token)
+                    odk_access = ODKAccess.objects.get(user_identifier=parsed_header[
+                                                       'username'], is_active=True)
+                    # interviewer = Interviewer.objects.get(mobile_number=parsed_header['username'], is_blocked=False)
+                    authenticator = SimpleHardcodedAuthenticator(server_realm=realm,
+                                                                 server_username=odk_access.user_identifier,
+                                                                 server_password=odk_access.odk_token)
                     if authenticator.secret_passed(digestor):
                         request.user = odk_access.interviewer
                         return func(request, *args, **kwargs)
             except ODKAccess.DoesNotExist:
                 return OpenRosaResponseNotFound()
-            except ValueError as err:
+            except ValueError, err:
                 return OpenRosaResponseBadRequest()
         response = HttpResponseNotAuthorized()
         response['www-authenticate'] = digestor.get_digest_challenge()
@@ -520,4 +388,3 @@ def get_zipped_dir(dirpath):
             zipf.append(filename, f.read())
             f.close()
     return zipf.read()
-

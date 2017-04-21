@@ -9,7 +9,8 @@ from django.shortcuts import render
 from django.core.urlresolvers import reverse
 from survey.models import (InterviewerAccess, QuestionLoop, QuestionSet, Answer, Question,
                            SurveyAllocation, AnswerAccessDefinition, ODKAccess, Interviewer, Interview)
-from survey.forms.answer import (get_answer_form, UserAccessForm, UssdTimeoutForm, SelectBatchForm, AddMoreLoopForm)
+from survey.forms.answer import (get_answer_form, UserAccessForm, UssdTimeoutForm,
+                                 SurveyAllocationForm, SelectBatchForm, AddMoreLoopForm)
 from .utils import get_entry, set_entry, delete_entry
 from survey.utils.logger import slogger
 
