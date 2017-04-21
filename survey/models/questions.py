@@ -429,14 +429,14 @@ class QuestionSet(CloneableMixin, BaseModel):   # can be qset, listing, responde
 
     def inlines_between(self, start_question, end_question):
         inlines = list(self.questions_inline())
-        start_index = None
-        end_index = None
+        start_index = 0
+        end_index = 0
         for idx, q in enumerate(inlines):
             if q.identifier == start_question.identifier:
                 if end_index:
                     raise ValidationError('End question before start')
                 start_index = idx
-            if q.identifier == start_question.identifier:
+            if q.identifier == end_question.identifier:
                 end_index = idx
                 break
         if start_index is None or end_index is None:
@@ -672,7 +672,9 @@ class QuestionLoop(BaseModel):
     loop_prompt = models.CharField(max_length=50, null=True, blank=True)
 
     def loop_questions(self):
-        return self.loop_starter.qset.inlines_between(self.loop_starter, self.loop_ender)
+        questions = self.loop_starter.qset.inlines_between(self.loop_starter, self.loop_ender)
+        questions.add(self.loop_ender)
+        return questions
 
     def save(self, *args, **kwargs):
         invalidate_obj(self.loop_starter)

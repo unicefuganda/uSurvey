@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 __author__ = 'anthony <antsmc2@gmail.com>'
 from django.utils import timezone
+from collections import OrderedDict
+from copy import deepcopy
 from django.conf import settings
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
@@ -67,12 +69,40 @@ class OnlineHandler(object):
         elif interview:
             return self.respond_interview(request, interview, session_data)
 
+    def _save_answers(self, request, session_data, navigation_interview):
+        answers = session_data['answers']
+        reference_interview = session_data.get('ref_interview', None)
+        qset = QuestionSet.get(pk=navigation_interview.question_set.pk)
+        question_map = dict([(q.identifier, q) for q in qset.all_questions])
+        survey = navigation_interview.survey
+        ea = navigation_interview.ea
+        Interview.save_answers(qset, survey, ea, navigation_interview.interview_channel, question_map, answers,
+                               reference_interview=reference_interview)
+
+    def _update_answer(self, request, session_data, question, answer):
+        if session_data['loops']['count'].keys():       # basically check if there are ongoing loops
+            session_data['answers'][-1].update({question.identifier: answer})
+        else:
+            map(lambda answer_dict: answer_dict.update({question.identifier: answer}), session_data['answers'])
+
+    def _add_loop_answer_entry(self, request, loop, session_data):
+        """Each loop entry is stored as in seperate row for ease of reporting
+        :param request:
+        :param session_data:
+        :return:
+        """
+        last_answer_dict = session_data['answers'][-1]
+        loop_answers_row = deepcopy(last_answer_dict)
+        # clear entries belonging to this loop, to avoid old loop responses on a new loop
+        map(lambda question: loop_answers_row.update({question.identifier: ''}), loop.loop_questions())
+        session_data['answers'].append(loop_answers_row)
+
     def init_responses(self, request, interview, session_data):
-        interview.save()
-        session_data['interview'] = interview
+        #interview.save()
+        session_data['interview'] = interview       # This interview is only used for question navigation purposes
         session_data['last_question'] = None
-        session_data['answers'] = {}
-        session_data['loops'] = {}
+        session_data['answers'] = [{}, ]
+        session_data['loops'] = {'count': OrderedDict(), }
         return self.respond(request, session_data)
 
     def start_interview(self, request, session_data):
@@ -89,32 +119,34 @@ class OnlineHandler(object):
         access = self.access
         request_data = request.GET if request.method == 'GET' else request.POST
         if hasattr(interview.last_question, 'loop_started'):
-            initial = {'value': session_data['loops'].get(interview.last_question.loop_started.id, 1)}
+            initial = {'value': session_data['loops']['count'].get(interview.last_question.loop_started.id, 1)}
             if 'value' in request_data:
                 request_data = request_data.copy()
                 request_data['value'] = initial['value']
         if str(session_data['last_question']) == str(interview.last_question.id):
             answer_form = get_answer_form(interview, access)(request_data, request.FILES)
             if answer_form.is_valid():
-                answer = answer_form.save()     # even for test data, to make sure the answer can actually save
+                # answer = answer_form.save()     # even for test data, to make sure the answer can actually save
                 # decided to keep both as text and as value
-                session_data['answers'][interview.last_question.identifier] = answer
+                self._update_answer(request, session_data, interview.last_question,
+                                    answer_form.cleaned_data['value'])           # update in session
                 next_question = self.get_loop_next(request, interview, session_data)
                 if next_question is None:
-                    next_question = self.get_group_aware_next(request, answer, interview, session_data)
+                    next_question = self.get_group_aware_next(request, answer_form.cleaned_data['value'],
+                                                              interview, session_data)
                 if next_question is None:
                     interview.closure_date = timezone.now()
                     session_data['last_question'] = None
+                    if interview.test_data is False:
+                        self._save_answers(request, session_data, interview)    # save when entire questions are asked
                 else:
                     interview.last_question = next_question
-                interview.save()
+                # interview.save()       #just a navigation interview only. No need to save
                 return self.respond(request, session_data)
         else:
             answer_form = get_answer_form(interview, access)(initial=initial)
             session_data['last_question'] = interview.last_question.id
         if interview.closure_date:
-            if interview.test_data:
-                interview.delete()
             template_file = "interviews/completed.html"
             del session_data['interview']
             if 'answers' in session_data:
@@ -147,9 +179,13 @@ class OnlineHandler(object):
         return render(request, 'interviews/new.html', context)
 
     def get_loop_next(self, request, interview, session_data):
-        if hasattr(interview.last_question, 'loop_ended'):
+        if hasattr(interview.last_question, 'loop_started'):
+            loop_id = interview.last_question.loop_started.id
+            if loop_id not in session_data['loops']['count']:
+                session_data['loops']['count'][loop_id] = 1
+        elif hasattr(interview.last_question, 'loop_ended'):
             loop = interview.last_question.loop_ended
-            count = session_data['loops'].get(loop.id, 1)
+            count = session_data['loops']['count'].get(loop.id, 1)
 
             loop_next = None
             if loop.repeat_logic in [QuestionLoop.FIXED_REPEATS, QuestionLoop.PREVIOUS_QUESTION]:
@@ -166,7 +202,7 @@ class OnlineHandler(object):
                 # if so, attempt to validate, the selection and accordingly repeat loop or not.
                 # else set the add_loop attribute. And provide the loop form needed for validation
                 if loop.repeat_logic is None:
-                    if 'prompt_user_loop' in session_data.get('loops', []):
+                    if 'prompt_user_loop' in session_data.get('loops', {}):
                         add_more_form = AddMoreLoopForm(request, self.access, data=request_data)
                         if add_more_form.is_valid():
                             if int(add_more_form.cleaned_data['value']) == AddMoreLoopForm.ADD_MORE:
@@ -180,9 +216,11 @@ class OnlineHandler(object):
                 loop_next = loop.loop_ender         # stay at last loop question
                 session_data['last_question'] = None
             elif loop_next:     # not prompt
-                session_data['loops'][loop.id] = count + 1
-            elif loop.id in session_data['loops']:
-                del session_data['loops'][loop.id]
+                # update answers with new loop row
+                session_data['loops']['count'][loop.id] = count + 1
+                self._add_loop_answer_entry(request, loop, session_data)     # add another entry every extra loop
+            elif loop.id in session_data['loops']['count']:
+                del session_data['loops']['count'][loop.id]
             return loop_next
 
     def get_group_aware_next(self, request, answer, interview, session_data):
@@ -201,7 +239,7 @@ class OnlineHandler(object):
             present_question_group = question.group if hasattr(question, 'group') else None
             if next_question and AnswerAccessDefinition.is_valid(access.choice_name(),
                                                                  next_question.answer_type) is False:
-                next_question = _get_group_next_question(question, next_question.next_question(answer.as_value))
+                next_question = _get_group_next_question(question, next_question.next_question(answer))
             # I hope the next line is not so confusing!
             # Basically it means treat only if the next question belongs to a different group from the present.
             # That's if present has a group
@@ -214,8 +252,8 @@ class OnlineHandler(object):
                         # we are interested in the qset param list with same identifier name as condition.test_question
                         test_question = qset.parameter_list.questions.get(identifier=condition.test_question.identifier)
                         param_value = ''            # use answer.as value
-                        if session_data['answers'].get(test_question.identifier, None):
-                            param_value = session_data['answers'][test_question.identifier].as_value
+                        if session_data['answers'][-1].get(test_question.identifier, None):    # last answer entry
+                            param_value = session_data['answers'][-1][test_question.identifier]
                         answer_class = Answer.get_class(condition.test_question.answer_type)
                         validator = getattr(answer_class, condition.validation_test, None)
                         if validator is None:
@@ -229,7 +267,7 @@ class OnlineHandler(object):
                             valid_group = False
                             break   # fail if any condition fails
                     if valid_group is False:
-                        next_question = _get_group_next_question(question, next_question.next_question(answer.as_value))
+                        next_question = _get_group_next_question(question, next_question.next_question(answer))
             return next_question
         return _get_group_next_question(interview.last_question,
-                                        interview.last_question.next_question(answer.as_value))
+                                        interview.last_question.next_question(answer))

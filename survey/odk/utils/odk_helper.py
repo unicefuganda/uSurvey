@@ -98,9 +98,9 @@ def process_answers(xml, qset, access_channel, question_map, survey_allocation, 
         if survey_allocation.stage in [None, SurveyAllocation.LISTING] and \
                 survey.has_sampling and survey.sample_size > len(answers):
             raise NotEnoughData()
-        created_interviews = save_answers(qset, access_channel, question_map, answers, survey_allocation,
-                                          survey_parameters=survey_parameters, reference_interview=reference_interview,
-                                          media_files=media_files)
+        created_interviews = Interview.save_answers(qset, survey, survey_allocation.allocation_ea, access_channel,
+                                                    question_map, answers, survey_parameters=survey_parameters,
+                                                    reference_interview=reference_interview, media_files=media_files)
         if survey.has_sampling:
             survey_allocation.stage = SurveyAllocation.SURVEY
             survey_allocation.save()
@@ -129,42 +129,6 @@ def get_answers(node, qset, question_map):
     if len(answers) == 0:
         answers.append(inline_record)
     return answers
-
-
-def save_answers(qset, access_channel, question_map, answers, survey_allocation, survey_parameters=None,
-                 reference_interview=None, media_files=None):
-    survey = survey_allocation.survey
-    ea = survey_allocation.allocation_ea
-    interviewer = access_channel.interviewer
-    interviews = []
-
-    def _save_record(record):
-        interview = Interview.objects.create(survey=survey, question_set=qset,
-                                             ea=ea, interviewer=interviewer, interview_channel=access_channel,
-                                             closure_date=timezone.now(),
-                                             interview_reference_id=reference_interview)
-        interviews.append(interview)
-        map(lambda (q_id, answer): _save_answer(interview, q_id, answer), record.items())
-        if survey_parameters:
-            map(lambda (q_id, answer): _save_answer(interview, q_id, answer), survey_parameters.items())
-
-    def _save_answer(interview, q_id, answer):
-        question = question_map.get(q_id, None)
-        if question and answer:
-            answer_class = Answer.get_class(question.answer_type)
-            if question.answer_type in [AudioAnswer.choice_name(), ImageAnswer.choice_name(),
-                                        VideoAnswer.choice_name()]:
-                answer = media_files.get(answer, None)
-            try:
-                old_answer = answer_class.objects.get(interview=interview, question=question)
-                old_answer.update(answer)
-            except answer_class.DoesNotExist:
-                answer_class.create(interview, question, answer)
-            except Exception, ex:
-                print 'exception: %s' % str(ex)
-    map(_save_record, answers)
-    return interviews
-
 
 def _update_answer_dict(question, answer, answers):
     for d in answers:

@@ -2,6 +2,7 @@ import string
 from datetime import datetime
 from django_rq import job
 from django.contrib.auth.models import User
+from django.utils import timezone
 from dateutil.parser import parse as extract_date
 from django.conf import settings
 from django.core.exceptions import ValidationError
@@ -62,14 +63,59 @@ class Interview(BaseModel):
             return reply
         return ''
 
+    @classmethod
+    def save_answers(cls, qset, survey, ea, access_channel, question_map, answers, survey_parameters=None,
+                     reference_interview=None, media_files=None):
+        """Used to save a dictionary list of answers. keys in each answer dict must be keys in the question map
+        :param qset:
+        :param survey:
+        :param ea:
+        :param access_channel:
+        :param question_map:
+        :param answers:
+        :param survey_parameters:
+        :param reference_interview:
+        :param media_files:
+        :return:
+        """
+        interviewer = access_channel.interviewer
+        interviews = []
+
+        def _save_record(record):
+            interview = Interview.objects.create(survey=survey, question_set=qset,
+                                                 ea=ea, interviewer=interviewer, interview_channel=access_channel,
+                                                 closure_date=timezone.now(),
+                                                 interview_reference_id=reference_interview)
+            interviews.append(interview)
+            map(lambda (q_id, answer): _save_answer(interview, q_id, answer), record.items())
+            if survey_parameters:
+                map(lambda (q_id, answer): _save_answer(interview, q_id, answer), survey_parameters.items())
+
+        def _save_answer(interview, q_id, answer):
+            question = question_map.get(q_id, None)
+            if question and answer:
+                answer_class = Answer.get_class(question.answer_type)
+                if question.answer_type in [AudioAnswer.choice_name(), ImageAnswer.choice_name(),
+                                            VideoAnswer.choice_name()]:
+                    answer = media_files.get(answer, None)
+                try:
+                    old_answer = answer_class.objects.get(interview=interview, question=question)
+                    old_answer.update(answer)
+                except answer_class.DoesNotExist:
+                    answer_class.create(interview, question, answer)
+                except Exception, ex:
+                    print 'exception: %s' % str(ex)
+        map(_save_record, answers)
+        return interviews
+
     def respond(self, reply=None, channel=ODKAccess.choice_name()):
-        '''
+        """
             Respond to given reply for specified channel.
             This method is volatile.Raises exception if some error happens in the process
         :param reply:
         :param channel:
         :return: Returns next question if any
-        '''
+        """
         if self.is_closed():
             return
         if self.last_question and reply is None:
