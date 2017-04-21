@@ -129,6 +129,13 @@ class SurveyForm(ModelForm, FormOrderMixin):
 
         return self.cleaned_data['name']
 
+    def save(self, *args, **kwargs):
+        instance = super(SurveyForm, self).save(*args, **kwargs)
+        if instance.pk:
+            map(lambda user: instance.email_group.add(user), self.cleaned_data['email_group'])
+        return instance
+
+
 
 class SamplingCriterionForm(forms.ModelForm, FormOrderMixin):
     min = forms.IntegerField(required=False)
