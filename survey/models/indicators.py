@@ -25,7 +25,8 @@ class Indicator(BaseModel):
     survey = models.ForeignKey(Survey, related_name='indicators')
     question_set = models.ForeignKey(QuestionSet, related_name='indicators')
     display_on_dashboard = models.BooleanField(default=False)
-    formulae = models.TextField()        # I'm allowing that the formula can contain long names
+    # I'm allowing that the formula can contain long names
+    formulae = models.TextField()
     # parameter = models.ForeignKey(BatchQuestion, related_name='indicators', null=True, blank=True)
 
     def __unicode__(self):
@@ -39,13 +40,16 @@ class Indicator(BaseModel):
         return QuestionSet.get(id=self.question_set.id)
 
     def is_percentage_indicator(self):
-        percentage_measure = [Indicator.MEASURE_CHOICES[0][1], Indicator.MEASURE_CHOICES[0][0]]
+        percentage_measure = [
+            Indicator.MEASURE_CHOICES[0][1],
+            Indicator.MEASURE_CHOICES[0][0]]
         return self.measure in percentage_measure
 
     def get_matching_interviews(self, batch, loc):
         pass
 
-    def compute_for_next_location_type_in_the_hierarchy(self, current_location):
+    def compute_for_next_location_type_in_the_hierarchy(
+            self, current_location):
         locations = current_location.get_children()
         data = {}
         for location in locations:
@@ -68,7 +72,8 @@ class Indicator(BaseModel):
         return round(result, self.DECIMAL_PLACES)
 
     def formulae_string(self):
-        return Template(self.formulae).render(Context(dict([(name, name) for name in self.active_variables()])))
+        return Template(self.formulae).render(
+            Context(dict([(name, name) for name in self.active_variables()])))
 
     def country_wide_value(self):
         return self.country_wide_report()[self.REPORT_FIELD_NAME]
@@ -92,9 +97,10 @@ class Indicator(BaseModel):
             # answer_class = Answer.get_class(self.parameter.answer_type)
             report = {}
             for child_location in locations:
-                target_locations = child_location.get_leafnodes(include_self=True)
-                report[child_location.name] = [self.get_variable_value(target_locations,
-                                                                       name) for name in variable_names]
+                target_locations = child_location.get_leafnodes(
+                    include_self=True)
+                report[child_location.name] = [self.get_variable_value(
+                    target_locations, name) for name in variable_names]
             # for name in variable_names:
             #     report[name] = self.get_variable_aggregates(base_location, name)
             df = pd.DataFrame(report).transpose()
@@ -102,20 +108,26 @@ class Indicator(BaseModel):
                 df.columns = variable_names
                 # now include the formula results per location
                 aeval = Interpreter()       # to avoid the recreating each time
-                df[self.REPORT_FIELD_NAME] = df.apply(self.get_indicator_value, axis=1, args=(aeval, ))
+                df[self.REPORT_FIELD_NAME] = df.apply(
+                    self.get_indicator_value, axis=1, args=(aeval, ))
             else:
-                df = pd.DataFrame(columns=list(variable_names)+[self.REPORT_FIELD_NAME, ])
+                df = pd.DataFrame(columns=list(
+                    variable_names) + [self.REPORT_FIELD_NAME, ])
             return df
         return _get_data()
 
     def get_variable_aggregates(self, base_location, variable_name):
         variable = self.variables.get(name__iexact=variable_name)
-        ikwargs = {'question_set__pk': self.question_set.id, 'survey': self.survey}
+        ikwargs = {
+            'question_set__pk': self.question_set.id,
+            'survey': self.survey}
         parent_loc = 'ea__locations'
-        for i in base_location.type.get_descendants(include_self=False):    # just to know how many levels down
+        for i in base_location.type.get_descendants(
+                include_self=False):    # just to know how many levels down
             parent_loc = '%s__parent' % parent_loc
         ikwargs['%s__id' % parent_loc] = base_location.id
-        valid_interviews = Interview.objects.filter(**ikwargs).values_list('id', flat=True)
+        valid_interviews = Interview.objects.filter(
+            **ikwargs).values_list('id', flat=True)
         for criterion in variable.criteria.all():
             if criterion.test_question.answer_type == MultiChoiceAnswer.choice_name():
                 value_key = 'as_value'
@@ -125,18 +137,22 @@ class Indicator(BaseModel):
                 'question__id': criterion.test_question.id,
                 'interview__id__in': valid_interviews
             }
-            valid_interviews = criterion.qs_passes_test(value_key, Answer.objects.filter(**kwargs).
-                                                        only('interview__id').values_list('interview__id', flat=True))
+            valid_interviews = criterion.qs_passes_test(value_key, Answer.objects.filter(
+                **kwargs). only('interview__id').values_list('interview__id', flat=True))
         parent_loc = 'interview__%s__name' % parent_loc
-        aggregate = valid_interviews.values(parent_loc).annotate(total=Count(parent_loc))
+        aggregate = valid_interviews.values(
+            parent_loc).annotate(total=Count(parent_loc))
         return SortedDict([(d[parent_loc], d['total']) for d in aggregate])
 
     def get_variable_value(self, locations, variable_name):
         variable = self.variables.get(name__iexact=variable_name)
-        valid_interviews = Interview.objects.filter(ea__locations__in=locations,
-                                                    question_set__pk=self.question_set.id,
-                                                    survey=self.survey,
-                                                    ).values_list('id', flat=True)
+        valid_interviews = Interview.objects.filter(
+            ea__locations__in=locations,
+            question_set__pk=self.question_set.id,
+            survey=self.survey,
+        ).values_list(
+            'id',
+            flat=True)
         for criterion in variable.criteria.all():
             if criterion.test_question.answer_type == MultiChoiceAnswer.choice_name():
                 value_key = 'as_value'
@@ -144,10 +160,9 @@ class Indicator(BaseModel):
                 value_key = 'as_text'
             kwargs = {
                 'question__identifier__iexact': criterion.test_question.identifier,
-                'interview__id__in': valid_interviews
-            }
-            valid_interviews = criterion.qs_passes_test(value_key, Answer.objects.filter(**kwargs).
-                                                        only('interview__id').values_list('interview__id', flat=True))
+                'interview__id__in': valid_interviews}
+            valid_interviews = criterion.qs_passes_test(value_key, Answer.objects.filter(
+                **kwargs). only('interview__id').values_list('interview__id', flat=True))
         return valid_interviews.count()
 
 
@@ -157,9 +172,12 @@ class IndicatorVariable(BaseModel):
     """
     name = models.CharField(max_length=150)
     description = models.TextField()
-    indicator = models.ForeignKey(Indicator, related_name='variables', null=True,
-                                  blank=True)   # just to accomodate creation of
-                                                                # variables then assigning them to indicators
+    indicator = models.ForeignKey(
+        Indicator,
+        related_name='variables',
+        null=True,
+        blank=True)  # just to accomodate creation of
+    # variables then assigning them to indicators
 
     def __unicode__(self):
         return self.name
@@ -174,8 +192,14 @@ class IndicatorVariableCriteria(BaseModel):
                         for validator in Answer.validators()]
     variable = models.ForeignKey(IndicatorVariable, related_name='criteria')
     # batch & parameter_list questions
-    test_question = models.ForeignKey(Question, related_name='indicator_criteria', verbose_name='Filter')
-    validation_test = models.CharField(max_length=200, choices=VALIDATION_TESTS, verbose_name='Condition')
+    test_question = models.ForeignKey(
+        Question,
+        related_name='indicator_criteria',
+        verbose_name='Filter')
+    validation_test = models.CharField(
+        max_length=200,
+        choices=VALIDATION_TESTS,
+        verbose_name='Condition')
 
     class Meta:
         app_label = 'survey'
@@ -195,7 +219,8 @@ class IndicatorVariableCriteria(BaseModel):
 
     @property
     def test_arguments(self):
-        return IndicatorCriteriaTestArgument.objects.filter(criteria=self).order_by('position')
+        return IndicatorCriteriaTestArgument.objects.filter(
+            criteria=self).order_by('position')
 
     def qs_passes_test(self, value_key, queryset):
         answer_class = Answer.get_class(self.test_question.answer_type)
@@ -205,7 +230,9 @@ class IndicatorVariableCriteria(BaseModel):
 
 
 class IndicatorCriteriaTestArgument(BaseModel):
-    criteria = models.ForeignKey(IndicatorVariableCriteria, related_name='arguments')
+    criteria = models.ForeignKey(
+        IndicatorVariableCriteria,
+        related_name='arguments')
     position = models.PositiveIntegerField()
     param = models.CharField(max_length=100)
 

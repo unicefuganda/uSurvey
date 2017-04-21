@@ -23,7 +23,7 @@ class Question(CloneableMixin, GenericQuestion):
     qset = models.ForeignKey('QuestionSet', related_name='questions')
     mandatory = models.BooleanField(default=True)
     # contraint_msg = models.CharField(max_length=80, null=True, blank=True,
-    #                                  help_text='This is error message shown to interviewer')
+    # help_text='This is error message shown to interviewer')
 
     class Meta:
         abstract = False
@@ -52,7 +52,9 @@ class Question(CloneableMixin, GenericQuestion):
 
     # just utility to get number of times this question has been answered
     def total_answers(self):
-        return Answer.get_class(self.answer_type).objects.filter(question=self).count()
+        return Answer.get_class(
+            self.answer_type).objects.filter(
+            question=self).count()
 
     def delete(self, using=None):
         '''
@@ -66,7 +68,8 @@ class Question(CloneableMixin, GenericQuestion):
 
     def display_text(self, channel=None):
         text = self.text
-        if channel and channel == USSDAccess.choice_name() and self.answer_type == MultiChoiceAnswer.choice_name():
+        if channel and channel == USSDAccess.choice_name(
+        ) and self.answer_type == MultiChoiceAnswer.choice_name():
             extras = []
             # append question options
             for option in self.options.all().order_by('order'):
@@ -81,13 +84,18 @@ class Question(CloneableMixin, GenericQuestion):
         for flow in flows:
             if flow.validation_test:
                 test_values = [arg.param for arg in flow.text_arguments]
-                if getattr(answer_class, flow.validation_test)(reply, *test_values) is True:
+                if getattr(
+                        answer_class,
+                        flow.validation_test)(
+                        reply,
+                        *test_values) is True:
                     resulting_flow = flow
                     break
             else:
                 resulting_flow = flow
         if resulting_flow and resulting_flow.next_question:
-            return Question.get(id=resulting_flow.next_question.id)     # better for it to know who it is
+            # better for it to know who it is
+            return Question.get(id=resulting_flow.next_question.id)
 
     def previous_inlines(self):
         return self.qset.previous_inlines(self)
@@ -124,21 +132,27 @@ class Question(CloneableMixin, GenericQuestion):
         return " - ".join([self.identifier, self.text])
 
     def save(self, *args, **kwargs):
-        if self.answer_type not in [MultiChoiceAnswer.choice_name(), MultiSelectAnswer.choice_name()]:
+        if self.answer_type not in [
+                MultiChoiceAnswer.choice_name(),
+                MultiSelectAnswer.choice_name()]:
             self.options.all().delete()
         invalidate_obj(self.qset)       # to fix update of flow_question update
         return super(Question, self).save(*args, **kwargs)
 
     @classmethod
     def index_breadcrumbs(cls, **kwargs):
-        if kwargs.has_key('qset'):
-            return kwargs['qset'].edit_breadcrumbs(**kwargs)  # important to select correct type
+        if 'qset' in kwargs:
+            return kwargs['qset'].edit_breadcrumbs(
+                **kwargs)  # important to select correct type
         return []
 
     @classmethod
     def edit_breadcrumbs(cls, **kwargs):
         breadcrumbs = cls.index_breadcrumbs(**kwargs)
-        breadcrumbs.append((kwargs['qset'].name, reverse('qset_questions_page',  args=(kwargs['qset'].pk, ))))
+        breadcrumbs.append(
+            (kwargs['qset'].name, reverse(
+                'qset_questions_page', args=(
+                    kwargs['qset'].pk, ))))
         return breadcrumbs
 
     @classmethod
@@ -147,7 +161,7 @@ class Question(CloneableMixin, GenericQuestion):
         return cls.edit_breadcrumbs(**kwargs)
 
     @classmethod
-    def zombies(cls,  qset):
+    def zombies(cls, qset):
         # these are the qset questions that do not belong to any flow in any
         # way
         flow_questions = qset.flow_questions
@@ -175,7 +189,11 @@ class QuestionFlow(CloneableMixin, BaseModel):
     # this would provide a brief description of this flow
     desc = models.CharField(max_length=200, null=True, blank=True)
     next_question = models.ForeignKey(
-        Question, related_name='connecting_flows', null=True, blank=True, on_delete=models.SET_NULL)
+        Question,
+        related_name='connecting_flows',
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL)
     next_question_type = models.CharField(max_length=100)
 
     class Meta:
@@ -282,12 +300,23 @@ class QuestionOption(CloneableMixin, BaseModel):
         return self.text
 
 
-class QuestionSet(CloneableMixin, BaseModel):   # can be qset, listing, respondent personal
+class QuestionSet(
+        CloneableMixin,
+        BaseModel):   # can be qset, listing, respondent personal
     objects = InheritanceManager()
-    name = models.CharField(max_length=100, blank=False, null=True, db_index=True)
+    name = models.CharField(
+        max_length=100,
+        blank=False,
+        null=True,
+        db_index=True)
     description = models.CharField(max_length=300, blank=True, null=True)
-    start_question = models.OneToOneField(Question, related_name='qset_started',
-                                          null=True, blank=True, on_delete=models.SET_NULL)
+    start_question = models.OneToOneField(
+        Question,
+        related_name='qset_started',
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL)
+
     @property
     def to_exact(self):
         """This one basically means exact question set. Should retrieve batch, Listing template, etc
@@ -322,7 +351,7 @@ class QuestionSet(CloneableMixin, BaseModel):   # can be qset, listing, responde
         :return:
         """
         @cached_as(QuestionSet.objects.get(id=self.id),
-                    QuestionLoop.objects.filter(loop_starter__qset__id=self.id),
+                   QuestionLoop.objects.filter(loop_starter__qset__id=self.id),
                    Question.objects.filter(qset__id=self.id))
         def _loop_story():
             inlines = self.questions_inline()
@@ -332,8 +361,9 @@ class QuestionSet(CloneableMixin, BaseModel):   # can be qset, listing, responde
                 if hasattr(inline_ques, 'loop_started'):
                     loops.append(inline_ques.loop_started)
                 loop_story[inline_ques.pk] = copy.deepcopy(loops)
-                #also include all direct subquestions
-                map(lambda q: loop_story.update({q.pk: copy.deepcopy(loops)}), inline_ques.direct_sub_questions())
+                # also include all direct subquestions
+                map(lambda q: loop_story.update(
+                    {q.pk: copy.deepcopy(loops)}), inline_ques.direct_sub_questions())
                 if hasattr(inline_ques, 'loop_ended'):
                     loops.pop(-1)
             return loop_story
@@ -341,12 +371,15 @@ class QuestionSet(CloneableMixin, BaseModel):   # can be qset, listing, responde
 
     @property
     def has_loop(self):
-        return QuestionLoop.objects.filter(loop_starter__qset__pk=self.pk).exists()
+        return QuestionLoop.objects.filter(
+            loop_starter__qset__pk=self.pk).exists()
 
     @property
     def has_skip(self):
         from survey.forms.logic import LogicForm
-        return QuestionFlow.objects.filter(question__qset__pk=self.pk, desc=LogicForm.SKIP_TO).exists()
+        return QuestionFlow.objects.filter(
+            question__qset__pk=self.pk,
+            desc=LogicForm.SKIP_TO).exists()
 
     def non_response_enabled(self, ea):
         locations = []
@@ -354,28 +387,36 @@ class QuestionSet(CloneableMixin, BaseModel):   # can be qset, listing, responde
         if ea_locations:
             map(lambda loc: locations.extend(
                 loc.get_ancestors(include_self=True)), ea_locations)
-        return self.open_locations.filter(non_response=True, location__pk__in=[location.pk
-                                                                               for location in locations]).exists()
+        return self.open_locations.filter(
+            non_response=True, location__pk__in=[
+                location.pk for location in locations]).exists()
 
     def inline_flows(self):
-        return QuestionFlow.objects.filter(question__qset=self, validation_test__isnull=True,
-                                           next_question__isnull=False)
+        return QuestionFlow.objects.filter(
+            question__qset=self,
+            validation_test__isnull=True,
+            next_question__isnull=False)
 
     @property
     def answer_types(self):
         access_channels = self.access_channels.values_list(
             'channel', flat=True)
-        return set(AnswerAccessDefinition.objects.filter(channel__in=access_channels).values_list('answer_type',
-                                                                                                  flat=True))
+        return set(
+            AnswerAccessDefinition.objects.filter(
+                channel__in=access_channels).values_list(
+                'answer_type', flat=True))
 
     def next_inline(self, question, channel=ODKAccess.choice_name()):
-        @cached_as(QuestionSet.objects.get(id=self.id), QuestionLoop.objects.filter(loop_starter__qset__id=self.id),
-                   Question.objects.filter(qset__id=self.id),
-                   self.inline_flows())
+        @cached_as(
+            QuestionSet.objects.get(
+                id=self.id), QuestionLoop.objects.filter(
+                loop_starter__qset__id=self.id), Question.objects.filter(
+                qset__id=self.id), self.inline_flows())
         def _next_inline():
             qflows = self.inline_flows()
             if qflows.exists():
-                return next_inline_question(question, qflows, AnswerAccessDefinition.answer_types(channel))
+                return next_inline_question(
+                    question, qflows, AnswerAccessDefinition.answer_types(channel))
         return _next_inline()
 
     def last_question_inline(self):
@@ -388,6 +429,7 @@ class QuestionSet(CloneableMixin, BaseModel):   # can be qset, listing, responde
     def questions_inline(self):
         qflows = self.inline_flows()
         start_question_id = None
+
         @cached_as(QuestionSet.objects.get(id=self.id),
                    Question.objects.filter(qset__id=self.id),
                    QuestionFlow.objects.filter(question__qset__id=self.id),
@@ -398,7 +440,8 @@ class QuestionSet(CloneableMixin, BaseModel):   # can be qset, listing, responde
                 inlines = inline_questions(self.start_question, qflows)
                 if inlines and inlines[-1] is None:
                     inlines.pop(-1)
-                inlines = [Question.get(pk=q.pk) for q in inlines] # this is to convert question to correct type
+                # this is to convert question to correct type
+                inlines = [Question.get(pk=q.pk) for q in inlines]
                 return inlines
             else:
                 return []
@@ -476,9 +519,12 @@ class QuestionSet(CloneableMixin, BaseModel):   # can be qset, listing, responde
     @classmethod
     def edit_breadcrumbs(cls, **kwargs):
         breadcrumbs = cls.index_breadcrumbs(**kwargs)
-        if kwargs.has_key('qset'):
+        if 'qset' in kwargs:
             cls = kwargs['qset'].__class__
-        breadcrumbs.append((cls.verbose_name(), reverse('%s_home' % cls.resolve_tag())))
+        breadcrumbs.append(
+            (cls.verbose_name(), reverse(
+                '%s_home' %
+                cls.resolve_tag())))
         return breadcrumbs
 
     @classmethod
@@ -503,44 +549,60 @@ class QuestionSet(CloneableMixin, BaseModel):   # can be qset, listing, responde
             if flows.exists():
                 # now clone all flows for this batch.
                 treated = {}
-                flows = QuestionFlow.objects.filter(question__qset__id=old_batch.id)
+                flows = QuestionFlow.objects.filter(
+                    question__qset__id=old_batch.id)
                 for flow in flows:
-                    # except for the first question, every other is a next question
+                    # except for the first question, every other is a next
+                    # question
                     question = flow.question
                     old_question_id = question.id
                     question = treated.get(question.identifier, None)
                     if question is None:
-                        question = Question.get(pk=flow.question.pk).clone(attrs={'qset': batch})
+                        question = Question.get(
+                            pk=flow.question.pk).clone(
+                            attrs={
+                                'qset': batch})
                         for option in flow.question.options.all():
                             # to do, appearantly clone question_opt not workng
-                            QuestionOption.objects.create(question=question, order=option.order, text=option.text)
+                            QuestionOption.objects.create(
+                                question=question, order=option.order, text=option.text)
                         treated[question.identifier] = question
                         if old_question_id == start_question_id:
                             batch.start_question = question
-                            # just take this opportunity to update the access channels once
+                            # just take this opportunity to update the access
+                            # channels once
                             for channel in old_batch.access_channels.all():
                                 channel.clone(attrs={'qset': batch})
                             batch.save()
                     next_question = flow.next_question
                     if next_question:
-                        next_question = treated.get(next_question.identifier, None)
+                        next_question = treated.get(
+                            next_question.identifier, None)
                         if next_question is None:
-                            next_question = Question.get(pk=flow.next_question.pk).clone(attrs={'qset': batch})
+                            next_question = Question.get(
+                                pk=flow.next_question.pk).clone(
+                                attrs={
+                                    'qset': batch})
                             treated[next_question.identifier] = next_question
                             for option in flow.next_question.options.all():
-                                # to do, appearantly clone question_opt not workng
-                                QuestionOption.objects.create(question=next_question, order=option.order,
-                                                              text=option.text)
+                                # to do, appearantly clone question_opt not
+                                # workng
+                                QuestionOption.objects.create(
+                                    question=next_question, order=option.order, text=option.text)
                     # first clone all flow parameters
                     args = flow.text_arguments
-                    flow = flow.clone(attrs={'next_question': next_question, 'question': question})
+                    flow = flow.clone(
+                        attrs={
+                            'next_question': next_question,
+                            'question': question})
                     for arg in args:
                         arg = arg.clone()
                         arg.flow = flow
                         arg.save()
                     flow.save()
             else:
-                batch.start_question = start_question.clone(attrs={'qset': batch})
+                batch.start_question = start_question.clone(
+                    attrs={'qset': batch})
                 batch.save()
         return batch
 
@@ -558,7 +620,8 @@ def next_inline_question(question, flows, answer_types=ALL_ANSWERS):
         if next_question and next_question.answer_type in answer_types:
             return next_question
         else:
-            return next_inline_question(next_question, flows, answer_types=answer_types)
+            return next_inline_question(
+                next_question, flows, answer_types=answer_types)
     except QuestionFlow.DoesNotExist:
         return None
 
@@ -566,7 +629,9 @@ def next_inline_question(question, flows, answer_types=ALL_ANSWERS):
 def last_inline(question, flows):
     try:
         qflow = flows.get(
-            question=question, validation_test__isnull=True, next_question__isnull=False)
+            question=question,
+            validation_test__isnull=True,
+            next_question__isnull=False)
         return last_inline(qflow.next_question, flows)
     except QuestionFlow.DoesNotExist:
         return question
@@ -578,7 +643,9 @@ def first_inline_flow_with_desc(question, desc):
             return question.flows.get(desc=desc)
         if question.connecting_flows.filter(desc=desc).exists():
             return None
-        iflow = question.flows.get(validation_test__isnull=True, next_question__isnull=False)
+        iflow = question.flows.get(
+            validation_test__isnull=True,
+            next_question__isnull=False)
         return first_inline_flow_with_desc(iflow.next_question, desc)
     except QuestionFlow.DoesNotExist:
         return None
@@ -647,10 +714,11 @@ class PreviousAnswerCount(LoopCount):
 
     def get_count(self, interview):
         #  previous question must be numeric
-        return NumericalAnswer.objects.filter(interview=interview, question=self.value).last().value
+        return NumericalAnswer.objects.filter(
+            interview=interview, question=self.value).last().value
 
     def odk_get_count(self, interview):
-        raise Exception('need to do!') #to do
+        raise Exception('need to do!')  # to do
 
     def save(self, *args, **kwargs):
         if self.value.answer_type != NumericalAnswer.choice_name():
@@ -663,11 +731,15 @@ class QuestionLoop(BaseModel):
     FIXED_REPEATS = FixedLoopCount.choice_name()
     PREVIOUS_QUESTION = PreviousAnswerCount.choice_name()
     REPEAT_OPTIONS = [(USER_DEFINED, 'User Defined'),
-                       (FIXED_REPEATS, 'Fixed number of Repeats'),
-                       (PREVIOUS_QUESTION, 'Response from previous question'),
-                       ]
+                      (FIXED_REPEATS, 'Fixed number of Repeats'),
+                      (PREVIOUS_QUESTION, 'Response from previous question'),
+                      ]
     loop_starter = models.OneToOneField(Question, related_name='loop_started')
-    repeat_logic = models.CharField(max_length=64, choices=REPEAT_OPTIONS, null=True, blank=True)
+    repeat_logic = models.CharField(
+        max_length=64,
+        choices=REPEAT_OPTIONS,
+        null=True,
+        blank=True)
     loop_ender = models.OneToOneField(Question, related_name='loop_ended')
     loop_prompt = models.CharField(max_length=50, null=True, blank=True)
 
@@ -680,8 +752,3 @@ class QuestionLoop(BaseModel):
         invalidate_obj(self.loop_starter)
         invalidate_obj(self.loop_ender)
         return super(QuestionLoop, self).save(*args, **kwargs)
-
-
-
-
-

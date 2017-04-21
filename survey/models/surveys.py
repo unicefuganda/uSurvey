@@ -8,19 +8,32 @@ class Survey(CloneableMixin, BaseModel):
     name = models.CharField(max_length=100, blank=False,
                             null=True, unique=True)
     description = models.CharField(max_length=300, blank=False, null=True)
-    has_sampling = models.BooleanField(default=True, verbose_name='Survey Type')
-    # next three are only relevant for listing data. I believe it saves unnecessary extra tables to refer to them here
-    sample_size = models.PositiveIntegerField(null=False, blank=False, default=10)
-    listing_form = models.ForeignKey('ListingTemplate', related_name='survey_settings', null=True, blank=True)
-    preferred_listing = models.ForeignKey('Survey', related_name='listing_users',
-                                          help_text='Select which survey listing to reuse. '
-                                                    'Leave empty for fresh listing',
-                                          null=True, blank=True)
-    random_sample_label = models.TextField(null=True, blank=True,
-                                           verbose_name='Randomly selected data label',
-                                           help_text='Include double curly brackets to automatically insert '
-                                                     'identifiers from the listing form e.g {{structure_address}}')
-    email_group = models.ManyToManyField(UserProfile, related_name='email_surveys')
+    has_sampling = models.BooleanField(
+        default=True, verbose_name='Survey Type')
+    # next three are only relevant for listing data. I believe it saves
+    # unnecessary extra tables to refer to them here
+    sample_size = models.PositiveIntegerField(
+        null=False, blank=False, default=10)
+    listing_form = models.ForeignKey(
+        'ListingTemplate',
+        related_name='survey_settings',
+        null=True,
+        blank=True)
+    preferred_listing = models.ForeignKey(
+        'Survey',
+        related_name='listing_users',
+        help_text='Select which survey listing to reuse. '
+        'Leave empty for fresh listing',
+        null=True,
+        blank=True)
+    random_sample_label = models.TextField(
+        null=True,
+        blank=True,
+        verbose_name='Randomly selected data label',
+        help_text='Include double curly brackets to automatically insert '
+        'identifiers from the listing form e.g {{structure_address}}')
+    email_group = models.ManyToManyField(
+        UserProfile, related_name='email_surveys')
     # random_sample_description = models.TextField()
 
     class Meta:
@@ -83,7 +96,8 @@ class Survey(CloneableMixin, BaseModel):
 
     def total_interviews(self, qset):
         from survey.models import Interview
-        return Interview.objects.filter(survey=self, question_set__pk=qset.pk).count()
+        return Interview.objects.filter(
+            survey=self, question_set__pk=qset.pk).count()
 
     def bulk_enable_batches(self, eas):
         register = []

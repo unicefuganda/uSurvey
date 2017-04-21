@@ -43,9 +43,12 @@ class Batch(QuestionSet):
     @classmethod
     def edit_breadcrumbs(cls, **kwargs):
         breadcrumbs = cls.index_breadcrumbs(**kwargs)
-        if kwargs.has_key('survey') or kwargs.has_key('qset'):
+        if 'survey' in kwargs or 'qset' in kwargs:
             survey = kwargs.get('survey') or kwargs['qset'].survey
-            breadcrumbs.append((survey.name, reverse('batch_index_page', args=(survey.pk, ))))
+            breadcrumbs.append(
+                (survey.name, reverse(
+                    'batch_index_page', args=(
+                        survey.pk, ))))
         return breadcrumbs
 
     def non_response_enabled(self, ea):
@@ -54,8 +57,9 @@ class Batch(QuestionSet):
         if ea_locations:
             map(lambda loc: locations.update(
                 loc.get_ancestors(include_self=True)), ea_locations)
-        return self.open_locations.filter(non_response=True, location__pk__in=[location.pk
-                                                                               for location in locations]).exists()
+        return self.open_locations.filter(
+            non_response=True, location__pk__in=[
+                location.pk for location in locations]).exists()
 
     def get_non_response_active_locations(self):
         locations = set()
@@ -88,7 +92,8 @@ class Batch(QuestionSet):
     def is_closed_for(self, location):
         # its closed if its closed in any parent loc or self
         locations = location.get_ancestors(include_self=True)
-        return self.open_locations.filter(location__pk__in=locations).count() == 0
+        return self.open_locations.filter(
+            location__pk__in=locations).count() == 0
 
     def is_open_for(self, location):
         return not self.is_closed_for(location)

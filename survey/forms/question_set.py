@@ -9,9 +9,11 @@ from survey.models import Batch
 def get_question_set_form(model_class):
 
     class QuestionSetForm(ModelForm):
-        access_channels = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple(attrs={'class': 'access_channels'}),
-                                                    choices=[opt for opt in QuestionSetChannel.ACCESS_CHANNELS
-                                                             if not opt[0] == WebAccess.choice_name()])
+        access_channels = forms.MultipleChoiceField(
+            widget=forms.CheckboxSelectMultiple(
+                attrs={
+                    'class': 'access_channels'}), choices=[
+                opt for opt in QuestionSetChannel.ACCESS_CHANNELS if not opt[0] == WebAccess.choice_name()])
 
         def __init__(self, *args, **kwargs):
             if kwargs.get('instance'):
@@ -21,19 +23,26 @@ def get_question_set_form(model_class):
             super(QuestionSetForm, self).__init__(*args, **kwargs)
             # import pdb; pdb.set_trace()
 
-
         class Meta:
             model = model_class
             fields = ['name', 'description', ]
 
             widgets = {
-                'name' : forms.TextInput(attrs={'size': 29, 'title': 'Your name','style': 'height: 2em;'}),
-                'description': forms.Textarea(attrs={"rows": 5, "cols": 30}),
+                'name': forms.TextInput(
+                    attrs={
+                        'size': 29,
+                        'title': 'Your name',
+                        'style': 'height: 2em;'}),
+                'description': forms.Textarea(
+                    attrs={
+                        "rows": 5,
+                        "cols": 30}),
             }
 
         def clean_name(self):
             name = self.cleaned_data['name'].strip()
-            if self.instance is None and model_class.objects.filter(name=name).exists():
+            if self.instance is None and model_class.objects.filter(
+                    name=name).exists():
                 raise ValidationError('Name already exists')
             return name
 
@@ -42,7 +51,8 @@ def get_question_set_form(model_class):
             bc = QuestionSetChannel.objects.filter(qset=question_set)
             bc.delete()
             for val in kwargs['access_channels']:
-                QuestionSetChannel.objects.create(qset=question_set, channel=val)
+                QuestionSetChannel.objects.create(
+                    qset=question_set, channel=val)
             return question_set
     return QuestionSetForm
 

@@ -27,7 +27,8 @@ class FormulaForm(ModelForm):
             self.fields['numerator'].choices = question_choices
             self.fields['denominator'].choices = question_choices
             self.fields['count'].choices = question_choices
-            self.fields['groups'].choices = [(group.id, group.name) for group in groups]
+            self.fields['groups'].choices = [
+                (group.id, group.name) for group in groups]
 
         if indicator:
             self.delete_fields_based_on(indicator)
@@ -57,11 +58,13 @@ class FormulaForm(ModelForm):
         if self.indicator and self.indicator.is_percentage_indicator():
 
             if denominator:
-                existing_formula = Formula.objects.filter(indicator=self.indicator, numerator=cleaned_data['numerator'],
-                                                          denominator=denominator)
+                existing_formula = Formula.objects.filter(
+                    indicator=self.indicator,
+                    numerator=cleaned_data['numerator'],
+                    denominator=denominator)
             if groups and not is_question_selected:
-                existing_formula = Formula.objects.filter(indicator=self.indicator, numerator=cleaned_data['numerator'],
-                                                          groups=groups)
+                existing_formula = Formula.objects.filter(
+                    indicator=self.indicator, numerator=cleaned_data['numerator'], groups=groups)
 
         if self.indicator and not self.indicator.is_percentage_indicator():
             if count:
@@ -79,8 +82,14 @@ class FormulaForm(ModelForm):
 
     class Meta:
         model = Formula
-        fields = ['numerator', 'numerator_options', 'denominator_type', 'groups', 'denominator', 'count',
-                  'denominator_options']
+        fields = [
+            'numerator',
+            'numerator_options',
+            'denominator_type',
+            'groups',
+            'denominator',
+            'count',
+            'denominator_options']
 
     denominator_type = forms.CharField(
         label="Denominator", widget=forms.Select(choices=OPTIONS))

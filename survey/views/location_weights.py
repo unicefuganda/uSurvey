@@ -37,8 +37,12 @@ def upload(request):
                 request, "Upload in progress. This could take a while.")
             return HttpResponseRedirect('/locations/weights/upload/')
 
-    context = {'button_label': 'Upload', 'id': 'upload-location-weights-form',
-               'upload_form': upload_form, 'location_types': LocationType.objects.all(), 'range': range(3)}
+    context = {
+        'button_label': 'Upload',
+        'id': 'upload-location-weights-form',
+        'upload_form': upload_form,
+        'location_types': LocationType.objects.all(),
+        'range': range(3)}
 
     return render(request, 'locations/weights/upload.html', context)
 
@@ -79,14 +83,20 @@ def error_logs(request):
     params = request.GET
     if params.get('from_date', None) and params.get('to_date', None):
         selected_from_date = parse(
-            params['from_date'], dayfirst=False, fuzzy=True).replace(tzinfo=utc)
+            params['from_date'],
+            dayfirst=False,
+            fuzzy=True).replace(
+            tzinfo=utc)
         selected_to_date = parse(
             params['to_date'], dayfirst=False, fuzzy=True).replace(tzinfo=utc)
 
-        location_weights_error_logs = location_weights_error_logs.filter(created__range=[selected_from_date,
-                                                                                         selected_to_date])
+        location_weights_error_logs = location_weights_error_logs.filter(
+            created__range=[selected_from_date, selected_to_date])
 
-    context = {'error_logs': location_weights_error_logs, 'request': request,
-               'selected_from_date': selected_from_date, 'selected_to_date': selected_to_date}
+    context = {
+        'error_logs': location_weights_error_logs,
+        'request': request,
+        'selected_from_date': selected_from_date,
+        'selected_to_date': selected_to_date}
 
     return render(request, 'locations/weights/error_logs.html', context)

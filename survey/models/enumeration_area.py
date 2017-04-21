@@ -7,7 +7,11 @@ from survey.models.batch import BatchLocationStatus
 
 
 class EnumerationArea(BaseModel):
-    name = models.CharField(max_length=200, blank=False, null=True, db_index=True)
+    name = models.CharField(
+        max_length=200,
+        blank=False,
+        null=True,
+        db_index=True)
     code = models.CharField(max_length=200, editable=False,
                             blank=True, null=True, unique=True)
     # total_households = models.PositiveIntegerField(null=True, blank=True)
@@ -38,7 +42,10 @@ class EnumerationArea(BaseModel):
 
     def open_surveys(self):
         location_registry = self.get_survey_openings()
-        return list(Survey.objects.filter(pk__in=[reg.batch.survey.pk for reg in location_registry]))
+        return list(
+            Survey.objects.filter(
+                pk__in=[
+                    reg.batch.survey.pk for reg in location_registry]))
 
     def open_batches(self, survey, access_channel=None):
         location_registry = self.get_survey_openings(survey)
@@ -50,7 +57,8 @@ class EnumerationArea(BaseModel):
 
     @classmethod
     def under_(cls, selected_location):
-        return cls.objects.filter(locations__in=selected_location.get_leafnodes()).distinct('name')
+        return cls.objects.filter(
+            locations__in=selected_location.get_leafnodes()).distinct('name')
 
 #     def validate_unique(self, *args, **kwargs):
 #         super(EnumerationArea, self).validate_unique(*args, **kwargs)

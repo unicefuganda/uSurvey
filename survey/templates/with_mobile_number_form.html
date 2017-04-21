@@ -70,31 +70,6 @@ legend {
 }
 .controls{margin-bottom: 15px;}
 </style>
-<div id="legend">
-    <legend class="_heading_color">User Credentials</legend>
-  </div>
-
-  <div class="control-group">
-    <label class="control-label-1 col-md-4">{{form.username.label}}</label>
-    <div class="controls col-md-8">
-      {{form.username}}
-      <label class="error">{{form.username.errors}}</label>
-    </div>
-  </div>
-  <div class="control-group">
-    <label class="control-label-1 col-md-4">{{form.password1.label}}</label>
-    <div class="controls col-md-8">
-      {{form.password1}}
-      <label class="error">{{form.password1.errors}}</label>
-    </div>
-  </div>
-  <div class="control-group">
-    <label class="control-label-1 col-md-4">{{form.password2.label}}</label>
-    <div class="controls col-md-8">
-      {{form.password2}}
-      <label class="error">{{form.password2.errors}}</label>
-    </div>
-  </div>
   <div id="legend">
     <legend class="_heading_color">User Details</legend>
   </div>
@@ -136,6 +111,32 @@ legend {
     <div class="controls col-md-8">
       {{form.groups}}
       <label class="error">{{form.groups.errors}}</label>
+    </div>
+  </div>
+
+  <div id="legend">
+    <legend class="_heading_color">User Credentials</legend>
+  </div>
+
+  <div class="control-group">
+    <label class="control-label-1 col-md-4">{{form.username.label}}</label>
+    <div class="controls col-md-8">
+      {{form.username}}
+      <label class="error">{{form.username.errors}}</label>
+    </div>
+  </div>
+  <div class="control-group">
+    <label class="control-label-1 col-md-4">{{form.password1.label}}</label>
+    <div class="controls col-md-8">
+      {{form.password1}}
+      <label class="error">{{form.password1.errors}}</label>
+    </div>
+  </div>
+  <div class="control-group">
+    <label class="control-label-1 col-md-4">{{form.password2.label}}</label>
+    <div class="controls col-md-8">
+      {{form.password2}}
+      <label class="error">{{form.password2.errors}}</label>
     </div>
   </div>
 

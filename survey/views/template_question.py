@@ -20,7 +20,7 @@ def index(request):
     question_filter_form = QuestionFilterForm(data=request.GET or None)
     questions = question_filter_form.filter(QuestionTemplate.objects.all())
     search_fields = ['identifier', 'text', ]
-    if request.GET.has_key('q'):
+    if 'q' in request.GET:
         questions = get_filterset(questions, request.GET['q'], search_fields)
     context = {'questions': questions, 'request': request,
                'placeholder': 'identifier, text',
@@ -32,7 +32,7 @@ def index(request):
 def filter(request):
     question_lib = QuestionTemplate.objects.all()
     search_fields = ['identifier', 'text', ]
-    if request.GET.has_key('q'):
+    if 'q' in request.GET:
         question_lib = get_filterset(
             question_lib, request.GET['q'], search_fields)
     question_filter_form = QuestionFilterForm(data=request.GET)
@@ -77,7 +77,8 @@ def _render_question_view(request, instance=None):
                'questionform': question_form}
 
     if options:
-        #options = map(lambda option: re.sub("[%s]" % settings.USSD_IGNORED_CHARACTERS, '', option), options)
+        #options = map(lambda option: re.sub("[%s]" % \
+            #settings.USSD_IGNORED_CHARACTERS, '', option), options)
         # map(lambda option: re.sub("  ", ' ', option), options)
         context['options'] = options
     return response, context
@@ -122,6 +123,7 @@ def export_questions(request):
     questions = QuestionTemplate.objects.all()
     formatted_responses = get_question_template_as_dump(questions)
     response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = 'attachment; filename="%s.csv"' % filename
+    response['Content-Disposition'] = 'attachment; \
+        filename="%s.csv"' % filename
     response.write("\r\n".join(formatted_responses))
     return response

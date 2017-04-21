@@ -1,14 +1,16 @@
 import os
 import json
 from django.utils.safestring import mark_safe
-from django.http import HttpResponse, HttpResponseRedirect, HttpResponseNotAllowed, HttpResponseNotFound
+from django.http import HttpResponse, HttpResponseRedirect,\
+    HttpResponseNotAllowed, HttpResponseNotFound
 from django.shortcuts import render, get_object_or_404
 from django.core.urlresolvers import reverse
 from django.contrib import messages
 from django.contrib.auth.decorators import permission_required, login_required
 from django.utils.decorators import method_decorator
 from django.conf import settings
-from survey.models import Survey, Location, LocationType, QuestionSet, ListingTemplate, Batch, \
+from survey.models import Survey, Location, LocationType,\
+    QuestionSet, ListingTemplate, Batch,\
     Question, QuestionTemplate, QuestionOption, QuestionFlow, Answer
 from survey.utils.query_helper import get_filterset
 from survey.models import LocationType
@@ -33,39 +35,63 @@ class QuestionSetView(object):
     def __init__(self, model_class=model, *args, **kwargs):
         if issubclass(model_class, QuestionSet):
             self.model = model_class
-            self.questionSetForm = get_question_set_form(model_class)    # create appropriate qset form
+            self.questionSetForm = get_question_set_form(
+                model_class)    # create appropriate qset form
         else:
             raise HttpResponseNotAllowed('Illegal access')
 
     @method_decorator(permission_required('auth.can_view_batches'))
-    def index(self, request, qsets, extra_context={}, template_name='question_set/index.html', **form_extra):
+    def index(
+            self,
+            request,
+            qsets,
+            extra_context={},
+            template_name='question_set/index.html',
+            **form_extra):
         search_fields = ['name', 'description']
-        if request.GET.has_key('q'):
+        if 'q' in request.GET:
             qsets = get_filterset(qsets, request.GET['q'], search_fields)
-        context = {'question_sets': qsets, 'request': request, 'model': self.model,
-                   'placeholder': 'name, description', 'question_set_form': self.questionSetForm(**form_extra)}
+        context = {
+            'question_sets': qsets,
+            'request': request,
+            'model': self.model,
+            'placeholder': 'name, description',
+            'question_set_form': self.questionSetForm(
+                **form_extra)}
         context.update(extra_context)
         return render(request, template_name,
                       context)
 
     @method_decorator(permission_required('auth.can_view_batches'))
-    def new(self, request, extra_context={}, template_name='question_set/new.html', **form_extra):
+    def new(
+            self,
+            request,
+            extra_context={},
+            template_name='question_set/new.html',
+            **form_extra):
         # self._set_bread_crumbs(request)
         response = None
         if request.method == 'POST':
             qset_form = self.questionSetForm(request.POST, **form_extra)
             if qset_form.is_valid():
                 qset_form = self._save_form(request, qset_form)
-                messages.success(request, '%s successfully added.' % self.model.verbose_name())
-                response = HttpResponseRedirect(reverse('%s_home' % self.model.resolve_tag()))
+                messages.success(
+                    request, '%s successfully added.' %
+                    self.model.verbose_name())
+                response = HttpResponseRedirect(
+                    reverse(
+                        '%s_home' %
+                        self.model.resolve_tag()))
         else:
             qset_form = self.questionSetForm(**form_extra)
         # if qset_form.errors:
         #     messages.error(request, qset_form.errors.values()[0])
-        cancel_url =  reverse('%s_home'%self.model.resolve_tag())
+        cancel_url = reverse('%s_home' % self.model.resolve_tag())
         if "initial" in form_extra:
             if "survey" in form_extra['initial']:
-                cancel_url = reverse('batch_index_page', args=[form_extra['initial']['survey']])
+                cancel_url = reverse(
+                    'batch_index_page', args=[
+                        form_extra['initial']['survey']])
         context = {'question_set_form': qset_form,
                    'title': "New %s" % self.model.verbose_name(),
                    'button_label': 'Create',
@@ -80,46 +106,76 @@ class QuestionSetView(object):
         return qset_form.save(**request.POST)
 
     @method_decorator(permission_required('auth.can_view_batches'))
-    def edit(self, request, qset, extra_context={}, template_name='question_set/new.html', **form_extra):
+    def edit(
+            self,
+            request,
+            qset,
+            extra_context={},
+            template_name='question_set/new.html',
+            **form_extra):
         if request.method == 'POST':
             qset_form = self.questionSetForm(instance=qset, data=request.POST)
             if qset_form.is_valid():
                 qset_form = self._save_form(request, qset_form)
-                messages.success(request, '%s successfully edited.' % self.model.verbose_name())
-                return HttpResponseRedirect(reverse('%s_home'%self.model.resolve_tag()))
+                messages.success(
+                    request, '%s successfully edited.' %
+                    self.model.verbose_name())
+                return HttpResponseRedirect(
+                    reverse(
+                        '%s_home' %
+                        self.model.resolve_tag()))
         else:
             qset_form = self.questionSetForm(instance=qset, **form_extra)
-        context = {'request': request, 'model': self.model, 'listing_model': ListingTemplate,
-                   'id': 'edit-question-set-form', 'placeholder': 'name, description', 'question_set_form': qset_form,
-                   'action': '', 'cancel_url': reverse('%s_home'%self.model.resolve_tag())}
+        context = {
+            'request': request,
+            'model': self.model,
+            'listing_model': ListingTemplate,
+            'id': 'edit-question-set-form',
+            'placeholder': 'name, description',
+            'question_set_form': qset_form,
+            'action': '',
+            'cancel_url': reverse(
+                '%s_home' %
+                self.model.resolve_tag())}
         context.update(extra_context)
         return render(request, template_name, context)
 
     @permission_required('auth.can_view_batches')
     def delete(self, request, qset):
         if qset.interviews.exists():
-            messages.error(request,
-                           "%s cannot be deleted because it already has interviews." % self.model.verbose_name())
+            messages.error(
+                request,
+                "%s cannot be deleted because it already has interviews." %
+                self.model.verbose_name())
         else:
             qset.delete()
-        return HttpResponseRedirect('%s_home'%self.model.resolve_tag())
+        return HttpResponseRedirect('%s_home' % self.model.resolve_tag())
 
 
 def delete(request, question_id, batch_id):
     qset = QuestionSet.get(pk=question_id)
     if qset.interviews.exists():
-        messages.error(request,
-                       "%s cannot be deleted because it already has interviews." % qset.verbose_name())
+        messages.error(
+            request,
+            "%s cannot be deleted because it already has interviews." %
+            qset.verbose_name())
     else:
         qset.delete()
-    return HttpResponseRedirect(reverse('batch_index_page', args=(qset.survey.id,)))
+    return HttpResponseRedirect(
+        reverse(
+            'batch_index_page',
+            args=(
+                qset.survey.id,
+            )))
 
 
 def delete_qset_listingform(request, question_id):
     qset = QuestionSet.get(pk=question_id)
     if qset.interviews.exists():
-        messages.error(request,
-                       "%s cannot be deleted because it already has interviews." % qset.verbose_name())
+        messages.error(
+            request,
+            "%s cannot be deleted because it already has interviews." %
+            qset.verbose_name())
     else:
         qset.delete()
     messages.success(request, "Listing form successfully deleted.")
@@ -138,59 +194,83 @@ def view_data(request, qset_id):
     if hasattr(qset, 'survey'):
         request.GET['survey'] = qset.survey.id
         disabled_fields.append('survey')
-    return _view_qset_data(request, qset.__class__, Interview.objects.filter(question_set__id=qset_id),
-                           disabled_fields=disabled_fields)
-
+    return _view_qset_data(
+        request,
+        qset.__class__,
+        Interview.objects.filter(
+            question_set__id=qset_id),
+        disabled_fields=disabled_fields)
 
 
 @login_required
 @permission_required('auth.can_view_aggregates')
 def view_listing_data(request):
-    interviews = Interview.objects.filter(question_set__id__in=ListingTemplate.objects.values_list('id', flat=True))
+    interviews = Interview.objects.filter(
+        question_set__id__in=ListingTemplate.objects.values_list(
+            'id', flat=True))
     return _view_qset_data(request, ListingTemplate, interviews)
 
 
 @login_required
 @permission_required('auth.can_view_aggregates')
 def view_batch_data(request):
-    interviews = Interview.objects.filter(question_set__id__in=Batch.objects.values_list('id', flat=True))
+    interviews = Interview.objects.filter(
+        question_set__id__in=Batch.objects.values_list(
+            'id', flat=True))
     return _view_qset_data(request, Batch, interviews)
 
 
 def _view_qset_data(request, model_class, interviews, disabled_fields=[]):
     params = request.GET if request.method == 'GET' else request.POST
-    survey_filter = SurveyResultsFilterForm(model_class, disabled_fields=disabled_fields, data=params)
+    survey_filter = SurveyResultsFilterForm(
+        model_class, disabled_fields=disabled_fields, data=params)
     locations_filter = LocationsFilterForm(data=request.GET, include_ea=True)
     selected_qset = None
     survey = None
     items_per_page = 50
     try:
         page_index = int(params.get('page', 1)) - 1
-    except:
+    except BaseException:
         page_index = 0
     if survey_filter.is_valid():
         interviews = survey_filter.get_interviews(interviews=interviews)
         selected_qset = survey_filter.cleaned_data['question_set']
         survey = survey_filter.cleaned_data['survey']
     if locations_filter.is_valid():
-        interviews = interviews.filter(ea__in=locations_filter.get_enumerations()).order_by('created')
-    search_fields = ['ea__name', 'survey__name', 'question_set__name', 'answer__as_text', ]
+        interviews = interviews.filter(
+            ea__in=locations_filter.get_enumerations()).order_by('created')
+    search_fields = [
+        'ea__name',
+        'survey__name',
+        'question_set__name',
+        'answer__as_text',
+    ]
     if 'q' in request.GET:
         interviews = get_filterset(interviews, request.GET['q'], search_fields)
-    context = {'survey_filter': survey_filter,
-               'interviews': interviews, 'locations_filter': locations_filter,
-               'location_filter_types': LocationType.in_between(),
-               'placeholder': 'Response, EA, Survey, %s' % model_class.verbose_name(),
-               'selected_qset': selected_qset, 'model_class': model_class,
-               'items_per_page': items_per_page}
+    context = {
+        'survey_filter': survey_filter,
+        'interviews': interviews,
+        'locations_filter': locations_filter,
+        'location_filter_types': LocationType.in_between(),
+        'placeholder': 'Response, EA, Survey, %s' % model_class.verbose_name(),
+        'selected_qset': selected_qset,
+        'model_class': model_class,
+        'items_per_page': items_per_page}
     if selected_qset and survey:
         # page_start = page_index * items_per_page
         # interviews = interviews[page_start: page_start + items_per_page]()
-        download_service = ResultsDownloadService(selected_qset, survey=survey, interviews=interviews,
-                                                  page_index=page_index, items_per_page=items_per_page)
+        download_service = ResultsDownloadService(
+            selected_qset,
+            survey=survey,
+            interviews=interviews,
+            page_index=page_index,
+            items_per_page=items_per_page)
         df = download_service.get_interview_answers()
-        context['report'] = mark_safe(df.to_html(classes='table table-striped dataTable table-bordered table-hover table-sort',
-                                                 max_rows=items_per_page))
+        context['report'] = mark_safe(
+            df.to_html(
+                classes='table table-striped\
+                    dataTable table-bordered table-hover table-sort',
+                max_rows=items_per_page))
     return render(request, 'question_set/view_all_data.html', context)
 
 
@@ -207,19 +287,28 @@ def listing_entries(request, qset_id):
         request.breadcrumbs(listing_qset.edit_breadcrumbs(qset=listing_qset))
         request.GET
         search_fields = ['name', ]
-        if request.GET.has_key('q'):
+        if 'q' in request.GET:
             surveys = get_filterset(surveys, request.GET['q'], search_fields)
-        context = {'question_set': listing_qset, 'surveys': surveys, 'placeholder': 'name,'}
+        context = {
+            'question_set': listing_qset,
+            'surveys': surveys,
+            'placeholder': 'name,'}
         return render(request, 'question_set/listing_entries.html', context)
     except ListingTemplate.DoesNotExist:
         return HttpResponseNotFound()
+
 
 @login_required
 def identifiers(request):
     id = request.GET.get('id', None)
     last_question_id = request.GET.get('q_id', None)
     if last_question_id is None:
-        json_dump = json.dumps(list(Question.objects.filter(qset__id=id).values_list('identifier', flat=True)))
+        json_dump = json.dumps(
+            list(
+                Question.objects.filter(
+                    qset__id=id).values_list(
+                    'identifier',
+                    flat=True)))
     else:
         # return questions before last question
         qset = QuestionSet.get(pk=id)
@@ -231,7 +320,8 @@ def identifiers(request):
         # try:
         #     qset = Batch.get(pk=qset.pk)
         #     if hasattr(qset, 'parameter_list'):
-        #         identifiers.union(qset.parameter_list.questions.values_list('identifier', flat=True))
+        #         identifiers.union(qset.parameter_list.questions.values_list\
+            #('identifier', flat=True))
         # except Batch.DoesNotExist:
         #     pass
         json_dump = json.dumps(list(identifiers))
@@ -242,7 +332,7 @@ def clone_qset(request, qset_id):
     qset = QuestionSet.get(pk=qset_id)
     qset.deep_clone()
     messages.info(request, 'Successfully cloned %s' % qset.name)
-    return HttpResponseRedirect(reverse('%s_home'% qset.resolve_tag()))
+    return HttpResponseRedirect(reverse('%s_home' % qset.resolve_tag()))
 
 
 @permission_required('auth.can_view_aggregates')
@@ -252,7 +342,10 @@ def download_attachment(request, question_id, interview_id):
     answer_class = Answer.get_class(question.answer_type)
     filename = '%s-%s.zip' % (question.identifier, question_id)
     attachment_dir = os.path.join(
-        settings.SUBMISSION_UPLOAD_BASE, str(answer_class.get(interview=interview, question=question).value),
+        settings.SUBMISSION_UPLOAD_BASE,
+        str(answer_class.get(
+            interview=interview,
+            question=question).value),
         'attachments')
     response = HttpResponse(content_type='application/zip')
     response['Content-Disposition'] = 'attachment; filename="%s"' % filename
@@ -267,43 +360,65 @@ def download_data(request, qset_id):
     locations_filter = LocationsFilterForm(data=request.GET, include_ea=True)
     interviews = survey_filter.get_interviews()
     if locations_filter.is_valid():
-        interviews = interviews.filter(ea__in=locations_filter.get_enumerations()).order_by('created')
+        interviews = interviews.filter(
+            ea__in=locations_filter.get_enumerations()).order_by('created')
     last_selected_loc = locations_filter.last_location_selected
     download_service = ResultsDownloadService(qset, interviews=interviews)
-    file_name = '%s%s' % ('%s-%s-' % (last_selected_loc.type.name, last_selected_loc.name) if
-                          last_selected_loc else '', qset.name)
+    file_name = '%s%s' % ('%s-%s-' % (
+        last_selected_loc.type.name,
+        last_selected_loc.name) if last_selected_loc else '',
+        qset.name)
     reports_df = download_service.generate_interview_reports()
     response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = 'attachment; filename="%s.csv"' % file_name
-    reports_df.to_csv(response, date_format='%Y-%m-%d %H:%M:%S', encoding='utf-8')   #exclude interview id
+    response['Content-Disposition'] = 'attachment;\
+        filename="%s.csv"' % file_name
+    reports_df.to_csv(
+        response,
+        date_format='%Y-%m-%d %H:%M:%S',
+        encoding='utf-8')  # exclude interview id
     return response
 
 
 @login_required
 def list_qsets(request):
     if request.GET.get('survey_id'):
-        values = Survey.get(id=request.GET.get('survey_id')).qsets.values('id', 'name')
+        values = Survey.get(
+            id=request.GET.get('survey_id')).qsets.values(
+            'id', 'name')
     else:
         values = QuestionSet.objects.values('id', 'name')
-    return HttpResponse(json.dumps(list(values)), content_type='application/json')
+    return HttpResponse(
+        json.dumps(
+            list(values)),
+        content_type='application/json')
 
 
 @login_required
 def list_questions(request):
     if request.GET.get('id'):
-        values = [{'id': q.id, 'identifier': q.identifier, 'text': q.text} for q
-                  in QuestionSet.get(id=request.GET.get('id')).all_questions]
+        values = [{
+            'id': q.id,
+            'identifier': q.identifier,
+            'text': q.text}
+            for q in QuestionSet.get(id=request.GET.get('id')).all_questions]
     else:
-        values = list(QuestionSet.objects.questions.values('id', 'identifier', 'text'))
-    return HttpResponse(json.dumps(list(values)), content_type='application/json')
+        values = list(
+            QuestionSet.objects.questions.values(
+                'id', 'identifier', 'text'))
+    return HttpResponse(
+        json.dumps(
+            list(values)),
+        content_type='application/json')
 
 
 @login_required
 def question_validators(request):
     values = {}
     if request.GET.get('id'):
-        for question in QuestionSet.get(id=request.GET.get('id')).all_questions:
-            values['%s' % question.id] = [validator for validator in question.validator_names()]
+        for question in QuestionSet.get(
+                id=request.GET.get('id')).all_questions:
+            values['%s' % question.id] = [
+                validator for validator in question.validator_names()]
     elif request.GET.get('ques_id'):
         values = Question.get(id=request.GET.get('ques_id')).validator_names()
     return HttpResponse(json.dumps(values), content_type='application/json')
@@ -313,8 +428,14 @@ def question_validators(request):
 def question_options(request):
     values = {}
     if request.GET.get('id'):
-        for question in QuestionSet.get(id=request.GET.get('id')).all_questions:
-            values['%s' % question.id] = dict([(opt.order, opt.text) for opt in question.options.all()])
+        for question in QuestionSet.get(
+                id=request.GET.get('id')).all_questions:
+            values['%s' % question.id] = dict(
+                [(opt.order, opt.text) for opt in question.options.all()])
     elif request.GET.get('ques_id'):
-        values = dict(Question.get(id=request.GET.get('ques_id')).options.values_list('order', 'text'))
+        values = dict(
+            Question.get(
+                id=request.GET.get('ques_id')).options.values_list(
+                'order',
+                'text'))
     return HttpResponse(json.dumps(values), content_type='application/json')

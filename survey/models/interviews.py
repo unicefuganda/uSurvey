@@ -17,23 +17,41 @@ from survey.utils.decorators import static_var
 @job('default')
 def update_model_obj_serial(model_obj, serial_name, filter_criteria):
     # get last assigned serial for interview survey in the interviewe ea
-    max_serial = model_obj.__class__.objects.filter(**filter_criteria
-                                                    ).aggregate(Max(serial_name)).get('%s__max'%serial_name, 0)
+    max_serial = model_obj.__class__.objects.filter(
+        **filter_criteria).aggregate(Max(serial_name)).get('%s__max' % serial_name, 0)
     setattr(model_obj, serial_name, max_serial + 1)
     model_obj.save()
 
 
 class Interview(BaseModel):
     interviewer = models.ForeignKey(
-        "Interviewer", null=True, related_name="interviews")    # nullable for simulation & backend load
+        "Interviewer",
+        null=True,
+        related_name="interviews")  # nullable for simulation & backend load
     ea = models.ForeignKey(
-        'EnumerationArea', related_name='interviews', db_index=True, null=True)    # repeated here for easy reporting
-    survey = models.ForeignKey('Survey', related_name='interviews', db_index=True, null=True)
-    question_set = models.ForeignKey('QuestionSet', related_name='interviews', db_index=True)
-    interview_reference = models.ForeignKey('Interview', related_name='follow_up_interviews', null=True, blank=True)
-    interview_channel = models.ForeignKey(InterviewerAccess, related_name='interviews', null=True)
+        'EnumerationArea',
+        related_name='interviews',
+        db_index=True,
+        null=True)  # repeated here for easy reporting
+    survey = models.ForeignKey(
+        'Survey',
+        related_name='interviews',
+        db_index=True,
+        null=True)
+    question_set = models.ForeignKey(
+        'QuestionSet',
+        related_name='interviews',
+        db_index=True)
+    interview_reference = models.ForeignKey(
+        'Interview',
+        related_name='follow_up_interviews',
+        null=True,
+        blank=True)
+    interview_channel = models.ForeignKey(
+        InterviewerAccess, related_name='interviews', null=True)
     closure_date = models.DateTimeField(null=True, blank=True, editable=False)
-    uploaded_by = models.ForeignKey(User, null=True, blank=True)     # just used to capture preview/data entry tester
+    # just used to capture preview/data entry tester
+    uploaded_by = models.ForeignKey(User, null=True, blank=True)
     test_data = models.BooleanField(default=False)
     #instance_id = models.CharField(max_length=200, null=True, blank=True)
     last_question = models.ForeignKey(
@@ -119,7 +137,9 @@ class Interview(BaseModel):
         if self.is_closed():
             return
         if self.last_question and reply is None:
-            return self.householdmember.get_composed(self.last_question.display_text(USSDAccess.choice_name()))
+            return self.householdmember.get_composed(
+                self.last_question.display_text(
+                    USSDAccess.choice_name()))
         next_question = None
         if self.has_started:
             # save reply
@@ -130,10 +150,15 @@ class Interview(BaseModel):
         else:
             next_question = self.batch.start_question
         # now confirm the question is applicable
-        if next_question and (self.householdmember.belongs_to(next_question.group)
-                              and AnswerAccessDefinition.is_valid(channel, next_question.answer_type)) is False:
-            next_question = self.batch.next_inline(self.last_question, groups=self.householdmember.groups,
-                                                   channel=channel)  # if not get next line question
+        if next_question and (
+            self.householdmember.belongs_to(
+                next_question.group) and AnswerAccessDefinition.is_valid(
+                channel,
+                next_question.answer_type)) is False:
+            next_question = self.batch.next_inline(
+                self.last_question,
+                groups=self.householdmember.groups,
+                channel=channel)  # if not get next line question
         response_text = None
         if next_question:
             self.last_question = next_question
@@ -158,11 +183,14 @@ class Interview(BaseModel):
         if available_batches is None:
             available_batches = ea.open_batches(survey)
         print 'available batches: ', available_batches
-        completed_interviews = Interview.objects.filter(householdmember=house_member, batch__in=available_batches,
-                                                        closure_date__isnull=False)
+        completed_interviews = Interview.objects.filter(
+            householdmember=house_member,
+            batch__in=available_batches,
+            closure_date__isnull=False)
         completed_batches = [
             interview.batch for interview in completed_interviews]
-        return [batch for batch in available_batches if batch.start_question and batch not in completed_batches]
+        return [
+            batch for batch in available_batches if batch.start_question and batch not in completed_batches]
 
     @classmethod
     def interviews(cls, house_member, interviewer, survey):
@@ -170,7 +198,10 @@ class Interview(BaseModel):
         interviews = Interview.objects.filter(
             householdmember=house_member, batch__in=available_batches)
         # return (completed_interviews, pending_interviews)
-        return (interviews.filter(closure_date__isnull=False), interviews.filter(closure_date__isnull=True))
+        return (
+            interviews.filter(
+                closure_date__isnull=False), interviews.filter(
+                closure_date__isnull=True))
 #         completed_batches = [interview.batch for interview in completed_interviews]
 # return [batch for batch in available_batches if batch not in
 # completed_batches]
@@ -194,28 +225,45 @@ class Interview(BaseModel):
 
 
 class Answer(BaseModel):
-    # now question_type is used to store the exact question we are answering (Listing, Batch, personal info)
-    question_type = models.CharField(max_length=100)  # I think using generic models is an overkill since they're all
+    # now question_type is used to store the exact question we are answering
+    # (Listing, Batch, personal info)
+    # I think using generic models is an overkill since they're all
+    question_type = models.CharField(max_length=100)
     # questions
-    interview = models.ForeignKey(Interview, related_name='%(class)s', db_index=True)
-    question = models.ForeignKey("Question", null=True, related_name="%(class)s",
-                                 on_delete=models.PROTECT, db_index=True)
-    identifier = models.CharField(max_length=200, db_index=True)    # basically calculated field for reporting
-    as_text = models.CharField(max_length=200, db_index=True)      # basically calculated field for reporting
-    as_value = models.CharField(max_length=200, db_index=True)     # basically calculated field for reporting
+    interview = models.ForeignKey(
+        Interview,
+        related_name='%(class)s',
+        db_index=True)
+    question = models.ForeignKey(
+        "Question",
+        null=True,
+        related_name="%(class)s",
+        on_delete=models.PROTECT,
+        db_index=True)
+    # basically calculated field for reporting
+    identifier = models.CharField(max_length=200, db_index=True)
+    # basically calculated field for reporting
+    as_text = models.CharField(max_length=200, db_index=True)
+    # basically calculated field for reporting
+    as_value = models.CharField(max_length=200, db_index=True)
 
     @classmethod
     def create(cls, interview, question, answer, as_text=None, as_value=None):
-        try: # check if text and value is convertable to strings
+        try:  # check if text and value is convertable to strings
             if as_text is None:
                 as_text = str(answer)[:200]
             if as_value is None:
                 as_value = str(answer)[:200]
-        except:
+        except BaseException:
             pass
-        return cls.objects.create(question=question, value=answer, question_type=question.__class__.type_name(),
-                                  interview=interview, identifier=question.identifier,
-                                  as_text=cls.prep_text(as_text), as_value=cls.prep_value(as_value))
+        return cls.objects.create(
+            question=question,
+            value=answer,
+            question_type=question.__class__.type_name(),
+            interview=interview,
+            identifier=question.identifier,
+            as_text=cls.prep_text(as_text),
+            as_value=cls.prep_value(as_value))
 
     def __unicode__(self):
         return unicode(self.as_text)
@@ -239,7 +287,8 @@ class Answer(BaseModel):
 
     @classmethod
     def answer_types(cls):
-        return sorted([cl.choice_name() for cl in Answer.__subclasses__() if cl is not NonResponseAnswer])
+        return sorted([cl.choice_name()
+                       for cl in Answer.__subclasses__() if cl is not NonResponseAnswer])
 
     @classmethod
     def get_class(cls, verbose_name):
@@ -360,11 +409,14 @@ class Answer(BaseModel):
     def fetch_between(cls, answer_key, lowerlmt, upperlmt, qs=None):
         if qs is None:
             qs = cls.objects
-        return qs.filter(**{'%s__lt' % answer_key: upperlmt, '%s__gte' % answer_key: lowerlmt})
+        return qs.filter(**{'%s__lt' %
+                            answer_key: upperlmt, '%s__gte' %
+                            answer_key: lowerlmt})
 
     @classmethod
     def odk_between(cls, node_path, lowerlmt, upperlmt):
-        return "(%s &gt; '%s') and (%s &lt; '%s')" % (node_path, lowerlmt, node_path, upperlmt)
+        return "(%s &gt; '%s') and (%s &lt; '%s')" % (
+            node_path, lowerlmt, node_path, upperlmt)
 
     @classmethod
     def print_odk_validation(cls, node_path, validator_name, *args):
@@ -377,8 +429,15 @@ class Answer(BaseModel):
 
     @classmethod
     def validators(cls):
-        return [cls.starts_with, cls.ends_with, cls.equals, cls.between, cls.less_than,
-                cls.greater_than, cls.contains, ]
+        return [
+            cls.starts_with,
+            cls.ends_with,
+            cls.equals,
+            cls.between,
+            cls.less_than,
+            cls.greater_than,
+            cls.contains,
+        ]
 
     @classmethod
     def validate_test_value(cls, value):
@@ -424,11 +483,18 @@ class AutoResponse(Answer):
             prefix = 'flow-test'
             if interview.interview_channel:
                 prefix = interview.interview_channel.user_identifier
-            text_value = '%s-%s' % (prefix, cls.prep_value(value))    # zero fill to 1billion
+            # zero fill to 1billion
+            text_value = '%s-%s' % (prefix, cls.prep_value(value))
         except Exception:
             raise
-        return super(AutoResponse, cls).create(interview, question, answer,
-                                               as_text=value, as_value=text_value)
+        return super(
+            AutoResponse,
+            cls).create(
+            interview,
+            question,
+            answer,
+            as_text=value,
+            as_value=text_value)
 
 
 class NumericalAnswer(Answer):
@@ -445,8 +511,14 @@ class NumericalAnswer(Answer):
             text_value = cls.prep_value(value)    # zero fill to 1billion
         except Exception:
             raise
-        return super(NumericalAnswer, cls).create(interview, question, answer,
-                                                  as_text=value, as_value=text_value)
+        return super(
+            NumericalAnswer,
+            cls).create(
+            interview,
+            question,
+            answer,
+            as_text=value,
+            as_value=text_value)
 
     @classmethod
     def prep_value(cls, val):
@@ -481,13 +553,14 @@ class NumericalAnswer(Answer):
 
     @classmethod
     def odk_between(cls, node_path, lowerlmt, upperlmt):
-        return "(%s &gt; %s) and (%s &lt; %s)" % (node_path, lowerlmt, node_path, upperlmt)
+        return "(%s &gt; %s) and (%s &lt; %s)" % (
+            node_path, lowerlmt, node_path, upperlmt)
 
     @classmethod
     def validate_test_value(cls, value):
         try:
             int(value)
-        except ValueError, ex:
+        except ValueError as ex:
             raise ValidationError([unicode(ex), ])
 
     class Meta:
@@ -533,10 +606,16 @@ class MultiChoiceAnswer(Answer):
                 answer = question.options.get(order=answer)
             else:
                 answer = question.options.get(text__iexact=answer)
-        except:
+        except BaseException:
             pass
-        return super(MultiChoiceAnswer, cls).create(interview, question, answer,
-                                                    as_text=answer.text, as_value=answer.order)
+        return super(
+            MultiChoiceAnswer,
+            cls).create(
+            interview,
+            question,
+            answer,
+            as_text=answer.text,
+            as_value=answer.order)
 
     def update(self, answer):
         try:
@@ -545,7 +624,7 @@ class MultiChoiceAnswer(Answer):
                 answer = self.options.get(order=answer)
             else:
                 answer = self.options.get(text__iexact=answer)
-        except:
+        except BaseException:
             pass
         self.as_text = answer.text
         self.as_value = answer.order
@@ -590,9 +669,13 @@ class MultiSelectAnswer(Answer):
             selected = question.options.filter(pk__in=chosen)
         else:
             selected = answer
-        ans = cls.objects.create(question=question, question_type=question.__class__.type_name(),
-                                 interview=interview, identifier=question.identifier,
-                                 as_text=raw_answer, as_value=raw_answer)
+        ans = cls.objects.create(
+            question=question,
+            question_type=question.__class__.type_name(),
+            interview=interview,
+            identifier=question.identifier,
+            as_text=raw_answer,
+            as_value=raw_answer)
         for opt in selected:
             ans.value.add(opt)
         return ans
@@ -634,8 +717,14 @@ class DateAnswer(Answer):
         raw_answer = answer
         if isinstance(answer, basestring):
             answer = extract_date(answer)
-        return super(DateAnswer, cls).create(interview, question, answer,
-                                             as_text=raw_answer, as_value=raw_answer)
+        return super(
+            DateAnswer,
+            cls).create(
+            interview,
+            question,
+            answer,
+            as_text=raw_answer,
+            as_value=raw_answer)
 
     class Meta:
         app_label = 'survey'
@@ -652,7 +741,7 @@ class DateAnswer(Answer):
         '''
         try:
             extract_date(value, fuzzy=True)
-        except ValueError, ex:
+        except ValueError as ex:
             raise ValidationError([unicode(ex), ])
 
 
@@ -709,10 +798,19 @@ class GeopointAnswer(Answer):
         raw_answer = answer
         if isinstance(answer, basestring):
             answer = answer.split(' ')
-            answer = ODKGeoPoint.objects.create(latitude=answer[0], longitude=answer[1],
-                                                altitude=answer[2], precision=answer[3])
-        return super(GeopointAnswer, cls).create(interview, question, answer,
-                                                 as_text=raw_answer, as_value=raw_answer)
+            answer = ODKGeoPoint.objects.create(
+                latitude=answer[0],
+                longitude=answer[1],
+                altitude=answer[2],
+                precision=answer[3])
+        return super(
+            GeopointAnswer,
+            cls).create(
+            interview,
+            question,
+            answer,
+            as_text=raw_answer,
+            as_value=raw_answer)
 
     class Meta:
         app_label = 'survey'
@@ -727,7 +825,10 @@ class GeopointAnswer(Answer):
 
 
 class NonResponseAnswer(BaseModel):
-    interview = models.ForeignKey(Interview, related_name='non_response_answers', db_index=True)
+    interview = models.ForeignKey(
+        Interview,
+        related_name='non_response_answers',
+        db_index=True)
     value = models.CharField(max_length=200, blank=False, null=False)
     interviewer = models.ForeignKey(
         "Interviewer", null=True, related_name='non_response_answers')
@@ -755,14 +856,22 @@ class AnswerAccessDefinition(BaseModel):
     @classmethod
     def is_valid(cls, channel, answer_type):
         try:
-            return cls.objects.get(answer_type=answer_type, channel=channel) is not None
+            return cls.objects.get(
+                answer_type=answer_type,
+                channel=channel) is not None
         except cls.DoesNotExist:
             return False
 
     @classmethod
     def access_channels(cls, answer_type):
-        return set(AnswerAccessDefinition.objects.filter(answer_type=answer_type).values_list('channel', flat=True))
+        return set(
+            AnswerAccessDefinition.objects.filter(
+                answer_type=answer_type).values_list(
+                'channel', flat=True))
 
     @classmethod
     def answer_types(cls, channel):
-        return set(AnswerAccessDefinition.objects.filter(channel=channel).values_list('answer_type', flat=True))
+        return set(
+            AnswerAccessDefinition.objects.filter(
+                channel=channel).values_list(
+                'answer_type', flat=True))
