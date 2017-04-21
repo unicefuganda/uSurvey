@@ -57,7 +57,8 @@ def then_i_should_see_ea_upload_form_fields(step):
 @step(u'Then I should see table of EA layout')
 def then_i_should_see_table_of_ea_layout(step):
     world.type_names = [
-        type.name for type in LocationType.objects.exclude(name__iexact="country")]
+        type.name for type in LocationType.objects.exclude(
+            name__iexact="country")]
     world.page.validate_fields_present(world.type_names)
 
 
@@ -65,14 +66,14 @@ def then_i_should_see_table_of_ea_layout(step):
 def when_i_have_a_ea_csv_file(step):
     filedata = [
         ['Regiontype', 'Districttype', 'Counttype',
-         'EA',                   'Parishtype', 'EA'],
-        ['region1',    'district1',    'county1',
-         'ea_containing_parish', 'parish_1',   ''],
-        ['region1',    'district1',    'county1',
-         'ea_containing_parish', 'parish_1b',  ''],
-        ['region2',    'district2',    'county2',   '',
-         'parish2',    'ea_under_parish'],
-        ['region2',    'district2',    'county2',   '',                     'parish2',    'ea_under_parish']]
+         'EA', 'Parishtype', 'EA'],
+        ['region1', 'district1', 'county1',
+         'ea_containing_parish', 'parish_1', ''],
+        ['region1', 'district1', 'county1',
+         'ea_containing_parish', 'parish_1b', ''],
+        ['region2', 'district2', 'county2', '',
+         'parish2', 'ea_under_parish'],
+        ['region2', 'district2', 'county2', '', 'parish2', 'ea_under_parish']]
 
     write_to_csv('wb', filedata, 'test.csv')
 

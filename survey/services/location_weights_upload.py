@@ -7,8 +7,11 @@ class UploadLocationWeights(UploadService):
 
     @classmethod
     def parents_locations_match(cls, location, given_parents):
-        location_parents = location.get_ancestors().values_list('name', flat=True)
-        check = [parent_name in location_parents for parent_name in given_parents]
+        location_parents = location.get_ancestors().values_list(
+            'name',
+            flat=True)
+        check = [
+            parent_name in location_parents for parent_name in given_parents]
         return check.count(True) == len(given_parents)
 
     def check_location_errors(self, index, row, headers):
@@ -21,15 +24,18 @@ class UploadLocationWeights(UploadService):
             return
         if not self.parents_locations_match(location[0], row[:-3]):
             self.log_error(
-                index + 1, 'The location hierarchy %s does not exist.' % ((' >> '.join(row[:-1]))))
+                index + 1, 'The location \
+                    hierarchy %s does not exist.' % ((' >> '.join(row[:-1]))))
             return
         return location
 
     def save_weight(self, index, row, location, survey):
         try:
             LocationWeight.objects.create(
-                location=location[0], selection_probability=float(row[-1]), survey=survey)
-        except ValueError, e:
+                location=location[0],
+                selection_probability=float(row[-1]),
+                survey=survey)
+        except ValueError as e:
             self.log_error(
                 index + 1, 'Selection probability must be a number.')
 
@@ -43,7 +49,11 @@ class UploadLocationWeights(UploadService):
         headers, reader = self.csv_uploader.split_content()
         cleaned_headers = self.remove_trailing('Name', in_array=headers)
         if not cleaned_headers:
-            UploadErrorLog.objects.create(model=self.MODEL, filename=self.file.name,
-                                          error='Location weights not uploaded. %s is not a valid csv file.' % self.file.name)
+            UploadErrorLog.objects.create(
+                model=self.MODEL,
+                filename=self.file.name,
+                error='Location weights not \
+                    uploaded. %s is not a valid csv file.' %
+                self.file.name)
         else:
             self.create_locations_weights(reader, cleaned_headers, survey)

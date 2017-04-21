@@ -28,7 +28,11 @@ def handle_request(request, qset_id):
     mock_access = MockAccess(request, qset)
     if 'uid' in request_data:
         mock_access.id = str(request_data['uid'])
-    handler = SimulatorView(mock_access, action_url=reverse('test_qset_flow', args=(qset_id, )))
+    handler = SimulatorView(
+        mock_access,
+        action_url=reverse(
+            'test_qset_flow',
+            args=(qset_id, )))
     return handler.handle_session(request)
 
 
@@ -43,7 +47,9 @@ class SimulatorView(OnlineHandler):
         """
         access = self.access
         if hasattr(access, 'question_set'):
-            interview = Interview.objects.create(test_data=True, question_set=access.question_set,
-                                                 last_question=access.question_set.g_first_question)
+            interview = Interview.objects.create(
+                test_data=True,
+                question_set=access.question_set,
+                last_question=access.question_set.g_first_question)
             session_data['interview'] = interview
             return self.init_responses(request, interview, session_data)

@@ -129,10 +129,16 @@ def and_i_visit_the_list_location_weights_page(step):
 
 @step(u'Then I should see the locations weights')
 def then_i_should_see_the_locations_weights(step):
-    weight_1_details = [world.weight_1.location.name, str(world.weight_1.selection_probability),
-                        str(world.weight_1.survey.get_total_respondents()), str(world.weight_1.survey.sample_size)]
-    weight_2_details = [world.weight_2.location.name, str(world.weight_2.selection_probability),
-                        str(world.weight_2.survey.get_total_respondents()), str(world.weight_1.survey.sample_size)]
+    weight_1_details = [
+        world.weight_1.location.name, str(
+            world.weight_1.selection_probability), str(
+            world.weight_1.survey.get_total_respondents()), str(
+                world.weight_1.survey.sample_size)]
+    weight_2_details = [
+        world.weight_2.location.name, str(
+            world.weight_2.selection_probability), str(
+            world.weight_2.survey.get_total_respondents()), str(
+                world.weight_1.survey.sample_size)]
     world.page.validate_fields_present(weight_1_details)
     world.page.validate_fields_present(weight_2_details)
 
@@ -174,11 +180,17 @@ def and_i_have_a_number_of_locations_and_weights_in_each_survey(step):
     world.county2 = Location.objects.create(
         name="county2", type=county, tree_parent=uganda)
     world.weight_1 = LocationWeight.objects.create(
-        location=world.county1, selection_probability=0.1, survey=world.survey_1)
+        location=world.county1,
+        selection_probability=0.1,
+        survey=world.survey_1)
     world.weight_2 = LocationWeight.objects.create(
-        location=world.county2, selection_probability=0.2, survey=world.survey_2)
+        location=world.county2,
+        selection_probability=0.2,
+        survey=world.survey_2)
     world.weight_3 = LocationWeight.objects.create(
-        location=world.county1, selection_probability=0.22, survey=world.survey_2)
+        location=world.county1,
+        selection_probability=0.22,
+        survey=world.survey_2)
 
 
 @step(u'And I click get list')
@@ -189,10 +201,16 @@ def and_i_click_get_list(step):
 
 @step(u'Then I should see the location weights in that survey')
 def then_i_should_see_the_location_weights_in_that_survey(step):
-    weight_3_details = [world.weight_3.location.name, str(world.weight_3.selection_probability),
-                        str(world.weight_3.survey.get_total_respondents()), str(world.weight_3.survey.sample_size)]
-    weight_2_details = [world.weight_2.location.name, str(world.weight_2.selection_probability),
-                        str(world.weight_2.survey.get_total_respondents()), str(world.weight_1.survey.sample_size)]
+    weight_3_details = [
+        world.weight_3.location.name, str(
+            world.weight_3.selection_probability), str(
+            world.weight_3.survey.get_total_respondents()), str(
+                world.weight_3.survey.sample_size)]
+    weight_2_details = [
+        world.weight_2.location.name, str(
+            world.weight_2.selection_probability), str(
+            world.weight_2.survey.get_total_respondents()), str(
+                world.weight_1.survey.sample_size)]
     world.page.validate_fields_present(weight_3_details)
     world.page.validate_fields_present(weight_2_details)
 
@@ -204,8 +222,11 @@ def when_i_select_a_location(step):
 
 @step(u'Then I should see the weights for that location and survey')
 def then_i_should_see_the_weights_for_that_location_and_survey(step):
-    weight_3_details = [world.weight_3.location.name, str(world.weight_3.selection_probability),
-                        str(world.weight_3.survey.get_total_respondents()), str(world.weight_3.survey.sample_size)]
+    weight_3_details = [
+        world.weight_3.location.name, str(
+            world.weight_3.selection_probability), str(
+            world.weight_3.survey.get_total_respondents()), str(
+                world.weight_3.survey.sample_size)]
     world.page.validate_fields_present(weight_3_details)
 
 
@@ -242,7 +263,9 @@ def and_i_have_some_100_locations_with_weights(step):
         location = Location.objects.create(
             name=str(i), tree_parent=district, type=county_type)
         LocationWeight.objects.create(
-            location=location, selection_probability=i / 100.0, survey=world.survey)
+            location=location,
+            selection_probability=i / 100.0,
+            survey=world.survey)
 
 
 @step(u'Then I see locations weights paginated')
