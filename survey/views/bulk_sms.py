@@ -31,7 +31,7 @@ def send(request):
 
 
 def valid_parameters(params, request):
-    if not params.has_key('locations'):
+    if 'locations' not in params:
         messages.error(request, "Please select a location.")
         return False
     if len(params['text'][0]) < 1:

@@ -5,7 +5,8 @@ from django.shortcuts import render
 from django.contrib import messages
 from django.contrib.auth.decorators import permission_required
 from django.core.urlresolvers import reverse
-from survey.models import RespondentGroup, ParameterTemplate, RespondentGroupCondition
+from survey.models import RespondentGroup, ParameterTemplate,\
+    RespondentGroupCondition
 from survey.forms.respondent_group import GroupForm
 from survey.utils.views_helper import contains_key
 from survey.utils.query_helper import get_filterset
@@ -15,9 +16,10 @@ from survey.utils.query_helper import get_filterset
 def index(request):
     groups = RespondentGroup.objects.all()
     search_fields = ['name', 'description']
-    if request.GET.has_key('q'):
+    if 'q' in request.GET:
         groups = get_filterset(groups, request.GET['q'], search_fields)
-    return render(request, 'respondent_groups/index.html', {'groups': groups, 'request': request})
+    return render(request, 'respondent_groups/index.html',
+                  {'groups': groups, 'request': request})
 
 
 def _process_condition_form(request, condition_form):
@@ -36,7 +38,12 @@ def _process_groupform(request, group_form, action):
     if group_form.is_valid():
         group = group_form.save()
         messages.success(request, 'Group successfully %s.' % action)
-        return HttpResponseRedirect(reverse('respondent_groups_edit', args=(group.id,)))
+        return HttpResponseRedirect(
+            reverse(
+                'respondent_groups_edit',
+                args=(
+                    group.id,
+                )))
     else:
         errors = group_form.non_field_errors()
         if errors:
@@ -91,14 +98,14 @@ def edit_group(request, group_id):
 
 
 @permission_required('auth.can_view_household_groups')
-def delete_group(request, group_id):    
+def delete_group(request, group_id):
     try:
         member_group = RespondentGroup.objects.get(id=group_id)
         print member_group, "membergroup"
-        #member_group.remove_related_questions()
+        # member_group.remove_related_questions()
         member_group.delete()
         messages.success(request, "Group successfully deleted.")
-    except Exception,err:
+    except Exception as err:
         print err
         messages.success(request, "Group does not exist.")
     return HttpResponseRedirect("/groups/")
@@ -106,12 +113,13 @@ def delete_group(request, group_id):
 
 @permission_required('auth.can_view_household_groups')
 def delete_condition(request, condition_id):
-  try:
-    respondent_group_condition = RespondentGroupCondition.objects.filter(id=condition_id).values_list("respondent_group__id")
-    respondent_group_condition[0][0]
-    RespondentGroupCondition.objects.get(id=condition_id).delete()
-  except Exception,err:
-    print err
-  messages.success(request, "Criteria successfully deleted.")
-  # return HttpResponseRedirect("/conditions/")
-  return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+    try:
+        respondent_group_condition = RespondentGroupCondition.objects.filter(
+            id=condition_id).values_list("respondent_group__id")
+        respondent_group_condition[0][0]
+        RespondentGroupCondition.objects.get(id=condition_id).delete()
+    except Exception as err:
+        print err
+    messages.success(request, "Criteria successfully deleted.")
+    # return HttpResponseRedirect("/conditions/")
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))

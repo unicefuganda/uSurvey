@@ -22,8 +22,11 @@ def new(request):
     request.breadcrumbs([
         ('Modules', reverse('question_module_listing_page')),
     ])
-    return render(request, 'question_module/new.html',
-                  {'question_module_form': question_module_form, 'title': 'New Module', 'button_label': 'Create',
+    return render(request,
+                  'question_module/new.html',
+                  {'question_module_form': question_module_form,
+                   'title': 'New Module',
+                   'button_label': 'Create',
                    'action': '/modules/new/'})
 
 
@@ -31,8 +34,9 @@ def new(request):
 def index(request):
     all_question_modules = QuestionModule.objects.all()
     search_fields = ['name', 'description']
-    if request.GET.has_key('q'):
-        all_question_modules = get_filterset(all_question_modules, request.GET['q'], search_fields)
+    if 'q' in request.GET:
+        all_question_modules = get_filterset(
+            all_question_modules, request.GET['q'], search_fields)
     context = {'question_modules': all_question_modules}
     return render(request, "question_module/index.html", context)
 
@@ -69,6 +73,9 @@ def edit(request, module_id):
     request.breadcrumbs([
         ('Modules', reverse('question_module_listing_page')),
     ])
-    return response or render(request, 'question_module/new.html',
-                              {'question_module_form': question_module_form, 'title': 'Edit Module', 'button_label': 'Save',
+    return response or render(request,
+                              'question_module/new.html',
+                              {'question_module_form': question_module_form,
+                               'title': 'Edit Module',
+                               'button_label': 'Save',
                                'action': '/modules/%s/edit/' % module.id})

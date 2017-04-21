@@ -52,7 +52,7 @@ CACHES = {
 
 # Hosts/domain names that are valid for this site; required if DEBUG is False
 # See https://docs.djangoproject.com/en/1.5/ref/settings/#allowed-hosts
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost','*']
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '*']
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -153,7 +153,8 @@ ROOT_URLCONF = 'mics.urls'
 WSGI_APPLICATION = 'mics.wsgi.application'
 
 TEMPLATE_DIRS = (
-    # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
+    # Put strings here, like "/home/html/django_templates"or
+    #"C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
     os.path.join(BASE_DIR, 'survey', 'templates'),
@@ -237,22 +238,30 @@ CACHEOPS_REDIS = {
 CACHE_REFRESH_DURATION = 10800
 CACHEOPS = {
     # refresh every 3 hrs
-    'survey.point': {'ops': 'all',  'timeout': CACHE_REFRESH_DURATION},
+    'survey.point': {'ops': 'all', 'timeout': CACHE_REFRESH_DURATION},
     'survey.questionloop': {'ops': 'all', 'timeout': CACHE_REFRESH_DURATION},
     'survey.questionflow': {'ops': (), 'timeout': CACHE_REFRESH_DURATION},
     'survey.question': {'ops': ('fetch', ), 'timeout': CACHE_REFRESH_DURATION},
     'survey.respondentgroup': {'ops': (), 'timeout': CACHE_REFRESH_DURATION},
     'survey.answer': {'ops': 'all', 'timeout': CACHE_REFRESH_DURATION},
-    'survey.numericalanswer': {'ops': 'all', 'timeout': CACHE_REFRESH_DURATION},
+    'survey.numericalanswer': {
+        'ops': 'all',
+        'timeout': CACHE_REFRESH_DURATION},
     'survey.textanswer': {'ops': 'all', 'timeout': CACHE_REFRESH_DURATION},
-    'survey.multichoiceanswer': {'ops': 'all', 'timeout': CACHE_REFRESH_DURATION},
+    'survey.multichoiceanswer': {
+        'ops': 'all',
+        'timeout': CACHE_REFRESH_DURATION},
     'survey.odkgeopoint': {'ops': 'all', 'timeout': CACHE_REFRESH_DURATION},
     # refresh every 3 hrs
     'survey.locationtype': {'ops': 'all', 'timeout': CACHE_REFRESH_DURATION},
     # refresh every 3 hrs
-    'survey.location': {'ops': ('get', ), 'timeout': CACHE_REFRESH_DURATION},
+    'survey.location': {
+        'ops': ('get', ),
+        'timeout': CACHE_REFRESH_DURATION},
     # refresh every 3 hrs
-    'survey.enumerationarea': {'ops': 'all', 'timeout': CACHE_REFRESH_DURATION},
+    'survey.enumerationarea': {
+        'ops': 'all',
+        'timeout': CACHE_REFRESH_DURATION},
     # refresh every 3 hrs,
     # 'survey.batch': {'ops': (), 'timeout': CACHE_REFRESH_DURATION},
     # # refresh every 3 hrs,
@@ -306,14 +315,21 @@ ODK_DEFAULT_TOKEN = '12345'
 SUBMISSION_UPLOAD_BASE = os.path.join(BASE_DIR, 'submissions')
 ANSWER_UPLOADS = os.path.join(BASE_DIR, 'answerFiles')
 TEMP_DIR = os.path.join(BASE_DIR, 'tmp')
-ODK_SUBMISSION_SUCCESS_MSG = "Successful submission. Your submission is been Processed"
+ODK_SUBMISSION_SUCCESS_MSG = "Successful submission.\
+    Your submission is been Processed"
 INTERVIEWER_EXPORT_HEADERS = [
-    'ea', 'name', 'age', 'level_of_education', 'language', 'mobile_numbers', 'odk_id']
+    'ea',
+    'name',
+    'age',
+    'level_of_education',
+    'language',
+    'mobile_numbers',
+    'odk_id']
 from collections import OrderedDict
 HOUSEHOLD_EXPORT_HEADERS = OrderedDict([
     ('HOUSE NUMBER', 'house_number'),
     ('PHYSICAL ADDRESS', 'physical_address'),
-    ('HEAD MEMBER',  'head_desc'),
+    ('HEAD MEMBER', 'head_desc'),
     ('SEX', 'head_sex'),
     ('ENUMERATION AREA', 'listing__ea__name'),
     ('REGISTRAR', 'last_registrar__name'),
@@ -331,8 +347,9 @@ QUESTION_EXPORT_HEADERS = OrderedDict([
     ('module', 'Module')
 ])
 
-ODK_UPLOADED_DATA_BELOW_SAMPLE_SIZE = 'Uploaded Data is below sample size. Ensure to complete enough ' \
-                                      'entries in a single form'
+ODK_UPLOADED_DATA_BELOW_SAMPLE_SIZE = 'Uploaded Data is below sample size.\
+    Ensure to complete enough ' \
+        'entries in a single form'
 ODK_ERROR_OCCURED = 'An error occurred pls try again'
 
 
@@ -357,8 +374,10 @@ LOOP_QUESTION_REPORT_DEPT = 3  # reports up to 5 question loops
 SHAPE_FILE_URI = '/static/map_resources/uganda_districts_2011_005.json'
 SHAPE_FILE_LOC_FIELD = 'DNAME_2010'
 SHAPE_FILE_LOC_ALT_FIELD = 'DNAME_2006'
-MAP_CENTER = '1.34,32.683525'           # must be in format for log lat. see: http://geojson.org/geojson-spec.html
-MAP_ADMIN_LEVEL = 1      # 0 for country level, 1 first level below country, 2 for second level etc.
+# must be in format for log lat. see: http://geojson.org/geojson-spec.html
+MAP_CENTER = '1.34,32.683525'
+# 0 for country level, 1 first level below country, 2 for second level etc.
+MAP_ADMIN_LEVEL = 1
 MAP_ZOOM_LEVEL = 7
 
 USSD_MOBILE_NUMBER_FIELD = 'msisdn'             # for get or post request
@@ -405,7 +424,7 @@ RQ_QUEUES = {
 }
 
 # super powers duration in seconds
-SUPER_POWERS_DURATION= 1800
+SUPER_POWERS_DURATION = 1800
 SUPER_POWERS_KEY = 'auth:super_powers'
 
 INTERVIEWER_SESSION_NAMESPACE = '//interviewer/'
@@ -447,4 +466,3 @@ try:
     from .localsettings import *
 except ImportError:
     pass
-

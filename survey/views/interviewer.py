@@ -7,7 +7,8 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
 from django.conf import settings
 from django.forms.models import inlineformset_factory
-from survey.forms.interviewer import InterviewerForm, USSDAccessForm, ODKAccessForm
+from survey.forms.interviewer import InterviewerForm,\
+    USSDAccessForm, ODKAccessForm
 from survey.models import EnumerationArea
 from survey.models import LocationType
 from survey.models import Interviewer
@@ -25,7 +26,11 @@ def _add_error_response_message(interviewer, request, action_text):
     messages.error(request, error_message + "See errors below.")
 
 
-def _create_or_edit(request, action_text, interviewer_id=None, interviewer=None):
+def _create_or_edit(
+        request,
+        action_text,
+        interviewer_id=None,
+        interviewer=None):
     extra = 1
     request.breadcrumbs([
         ('Interviewers', reverse('interviewers_page')),
@@ -63,8 +68,13 @@ def _create_or_edit(request, action_text, interviewer_id=None, interviewer=None)
         interviewer_form = InterviewerForm(
             eas, data=request.POST, instance=interviewer)
         ussd_access_form = USSDAccessFormSet(
-            request.POST, prefix='ussd_access', instance=interviewer)
-#         odk_access_form = ODKAccessFormSet(request.POST, prefix='odk_access', instance=interviewer)
+            request.POST,
+            prefix='ussd_access',
+            instance=interviewer)
+        #odk_access_form = ODKAccessFormSet(
+            # request.POST,
+            # prefix='odk_access',
+            # instance=interviewer)
         odk_access_form = ODKAccessForm(request.POST, instance=odk_instance)
         if interviewer_form.is_valid() and odk_access_form.is_valid():
             interviewer = interviewer_form.save()
@@ -92,9 +102,9 @@ def _create_or_edit(request, action_text, interviewer_id=None, interviewer=None)
         'locations_filter': locations_filter,
         'location_filter_types': loc_types,
         'loading_text': "Creating...",
-        'mode':action_text,
-        'interviewer_id':interviewer_id
-        })
+        'mode': action_text,
+        'interviewer_id': interviewer_id
+    })
 
 
 @login_required
@@ -106,7 +116,13 @@ def new_interviewer(request):
 @login_required
 @permission_required('auth.can_view_interviewers')
 def edit_interviewer(request, interviewer_id=None, mode=None):
-    return _create_or_edit(request, mode, interviewer_id, interviewer=get_object_or_404(Interviewer, pk=interviewer_id))
+    return _create_or_edit(
+        request,
+        mode,
+        interviewer_id,
+        interviewer=get_object_or_404(
+            Interviewer,
+            pk=interviewer_id))
 
 
 @login_required
@@ -120,10 +136,10 @@ def list_interviewers(request):
     else:
         interviewers = Interviewer.objects.all()
     search_fields = ['name', 'intervieweraccess__user_identifier']
-    if request.GET.has_key('q'):
+    if 'q' in request.GET:
         interviewers = get_filterset(
             interviewers, request.GET['q'], search_fields)
-    if params.has_key('status'):
+    if 'status' in params:
         interviewers = interviewers.filter(
             is_blocked=ast.literal_eval(params['status']))
     loc_types = LocationType.in_between()
@@ -142,20 +158,26 @@ def show_completion_summary(request, interviewer_id):
     request.breadcrumbs([
         ('Interviewers', reverse('interviewers_page')),
     ])
-    return render(request, 'interviewers/completion_summary.html', {'interviewer': interviewer})
+    return render(request,
+                  'interviewers/completion_summary.html',
+                  {'interviewer': interviewer})
 
 
 @login_required
 def check_mobile_number(request):
     response = Interviewer.objects.filter(
         mobile_number=request.GET['mobile_number']).exists()
-    return HttpResponse(json.dumps(not response), content_type="application/json")
+    return HttpResponse(
+        json.dumps(
+            not response),
+        content_type="application/json")
 
 
 @permission_required('auth.can_view_interviewers')
 def show_interviewer(request, interviewer_id):
     interviewer = Interviewer.objects.get(id=interviewer_id)
-    return render(request, 'interviewers/show.html', {'interviewer': interviewer, 'cancel_url': '/interviewers/'})
+    return render(request, 'interviewers/show.html',
+                  {'interviewer': interviewer, 'cancel_url': '/interviewers/'})
 
 
 @permission_required('auth.can_view_interviewers')
@@ -238,6 +260,7 @@ def download_interviewers(request):
     formatted_responses = ExportInterviewersService(
         settings.INTERVIEWER_EXPORT_HEADERS).formatted_responses()
     response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = 'attachment; filename="%s.csv"' % filename
+    response['Content-Disposition'] = 'attachment; \
+        filename="%s.csv"' % filename
     response.write("\r\n".join(formatted_responses))
     return response

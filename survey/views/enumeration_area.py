@@ -5,7 +5,8 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.shortcuts import render, get_object_or_404
 from django.core.urlresolvers import reverse
 from survey.models import EnumerationArea, LocationType, Location
-from survey.forms.enumeration_area import EnumerationAreaForm, LocationsFilterForm
+from survey.forms.enumeration_area import EnumerationAreaForm,\
+    LocationsFilterForm
 from survey.services.ea_upload import UploadEACSVLayoutHelper
 from django_rq import job
 import json
@@ -21,21 +22,29 @@ def uploadtask(composer):
 @permission_required('auth.can_view_batches')
 def new(request):
     locations_filter = LocationsFilterForm(data=request.GET)
-    enumeration_area_form = EnumerationAreaForm(locations=locations_filter.get_locations())
+    enumeration_area_form = EnumerationAreaForm(
+        locations=locations_filter.get_locations())
     if request.method == 'POST':
         enumeration_area_form = EnumerationAreaForm(data=request.POST)
         if enumeration_area_form.is_valid():
             enumeration_area_form.save()
             messages.success(request, "Enumeration Area successfully created.")
-            return HttpResponseRedirect(reverse('enumeration_area_home', args=()))
+            return HttpResponseRedirect(
+                reverse('enumeration_area_home', args=()))
         messages.error(request, "Enumeration area was not created.")
     request.breadcrumbs([
         ('Enumeration Areas', reverse('enumeration_area_home')),
     ])
-    return render(request, 'enumeration_area/new.html',
-                  {'enumeration_area_form': enumeration_area_form, 'locations_filter': locations_filter, 'title': 'New Enumeration Area', 'button_label': 'Create',
-                   'action': reverse('new_enumeration_area_page', args=()),
-                   'location_filter_types': LocationType.in_between(),'redirect_url':'/enumeration_area'})
+    return render(request,
+                  'enumeration_area/new.html',
+                  {'enumeration_area_form': enumeration_area_form,
+                   'locations_filter': locations_filter,
+                   'title': 'New Enumeration Area',
+                   'button_label': 'Create',
+                   'action': reverse('new_enumeration_area_page',
+                                     args=()),
+                   'location_filter_types': LocationType.in_between(),
+                   'redirect_url': '/enumeration_area'})
 
 
 @permission_required('auth.can_view_batches')
@@ -43,7 +52,7 @@ def index(request):
     locations_filter = LocationsFilterForm(data=request.GET)
     enumeration_areas = locations_filter.get_enumerations()
     search_fields = ['name', 'locations__name', ]
-    if request.GET.has_key('q'):
+    if 'q' in request.GET:
         enumeration_areas = get_filterset(
             enumeration_areas, request.GET['q'], search_fields)
     loc_types = LocationType.in_between()
@@ -90,9 +99,13 @@ def location_sub_types(request):
     child_locations = Location.objects.filter(**kwargs)
     locations = child_locations.values('id', 'name', ).order_by('name')
     parent_loc = child_locations[0].parent
-    eas = EnumerationArea.objects.filter(locations__in=parent_loc.get_leafnodes(True)).values('id', 'name')
-    json_dump = json.dumps({'sub_type': child_locations[
-                           0].type.name, 'locations': list(locations), 'eas': list(eas)}, cls=DjangoJSONEncoder)
+    eas = EnumerationArea.objects.filter(
+        locations__in=parent_loc.get_leafnodes(True)).values(
+        'id', 'name')
+    json_dump = json.dumps(
+        {'sub_type': child_locations[0].type.name,
+            'locations': list(locations),
+            'eas': list(eas)}, cls=DjangoJSONEncoder)
     return HttpResponse(json_dump, content_type='application/json')
 
 
@@ -115,24 +128,32 @@ def edit(request, ea_id):
         instance=ea, locations=locations_filter.get_locations())
     if request.method == 'POST':
         enumeration_area_form = EnumerationAreaForm(
-            data=request.POST, instance=ea, locations=locations_filter.get_locations())
+            data=request.POST,
+            instance=ea,
+            locations=locations_filter.get_locations())
 
         if enumeration_area_form.is_valid():
             enumeration_area_form.save()
             messages.success(request, "Enumeration Area successfully Changed.")
-            return HttpResponseRedirect(reverse('enumeration_area_home', args=()))
+            return HttpResponseRedirect(
+                reverse('enumeration_area_home', args=()))
         messages.error(request, "Enumeration area was not Changed.")
     request.breadcrumbs([
-        ('Enumeration Areas', reverse('enumeration_area_home')),
-        #         (_('%s %s') % (action.title(),model.title()),'/crud/%s/%s' % (model,action)),
+        ('Enumeration Areas',
+            reverse('enumeration_area_home')),
     ])
-    return render(request, 'enumeration_area/new.html',
-                  {'enumeration_area_form': enumeration_area_form, 'locations_filter': locations_filter, 'title': 'New Enumeration Area', 'button_label': 'Create',
-                   'action': reverse('edit_enumeration_area_page', args=(ea_id, )),
+    return render(request,
+                  'enumeration_area/new.html',
+                  {'enumeration_area_form': enumeration_area_form,
+                   'locations_filter': locations_filter,
+                   'title': 'New Enumeration Area',
+                   'button_label': 'Create',
+                   'action': reverse('edit_enumeration_area_page',
+                                     args=(ea_id,
+                                           )),
                    'location_filter_types': LocationType.in_between(),
                    })
 
 
 def _process_form(request, form, instance=None):
     pass
-

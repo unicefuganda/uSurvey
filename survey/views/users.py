@@ -8,7 +8,8 @@ from django.contrib.auth.decorators import login_required, permission_required
 from survey.interviewer_configs import *
 from survey.forms.users import *
 from survey.models.users import UserProfile
-from survey.views.custom_decorators import permission_required_for_perm_or_current_user
+from survey.views.custom_decorators \
+    import permission_required_for_perm_or_current_user
 from survey.utils.query_helper import get_filterset
 from django.core.urlresolvers import reverse
 from django.conf import settings
@@ -54,36 +55,44 @@ def new(request):
 
 def check_mobile_number(mobile_number):
     response = UserProfile.objects.filter(mobile_number=mobile_number).exists()
-    return HttpResponse(json.dumps(not response), content_type="application/json")
+    return HttpResponse(
+        json.dumps(
+            not response),
+        content_type="application/json")
 
 
 def check_user_attribute(**kwargs):
     response = User.objects.filter(**kwargs).exists()
-    return HttpResponse(json.dumps(not response), content_type="application/json")
+    return HttpResponse(
+        json.dumps(
+            not response),
+        content_type="application/json")
 
 
 @permission_required('auth.can_view_users')
 def index(request):
     users_filter_form = UsersFilterForm(request.GET)
     userlist = users_filter_form.get_users()
-    if request.GET.has_key('mobile_number'):
+    if 'mobile_number' in request.GET:
         return check_mobile_number(request.GET['mobile_number'])
 
-    if request.GET.has_key('username'):
+    if 'username' in request.GET:
         return check_user_attribute(
             username=request.GET['username'])
-    if request.GET.has_key('email'):
+    if 'email' in request.GET:
         return check_user_attribute(email=request.GET['email'])
     search_fields = ['first_name', 'last_name', 'groups__name']
-    if request.GET.has_key('q'):
+    if 'q' in request.GET:
         userlist = get_filterset(userlist, request.GET['q'], search_fields)
-    return render(request, 'users/index.html', {'users': userlist,
-                                                'request': request,
-                                                'users_filter_form': users_filter_form})
+    return render(request,
+                  'users/index.html',
+                  {'users': userlist,
+                   'request': request,
+                   'users_filter_form': users_filter_form})
 
 
 @permission_required_for_perm_or_current_user('auth.can_view_users')
-def edit(request, user_id,mode=None):
+def edit(request, user_id, mode=None):
     user = User.objects.get(pk=user_id)
     initial = {'mobile_number': UserProfile.objects.get(
         user=user).mobile_number}
@@ -91,19 +100,31 @@ def edit(request, user_id,mode=None):
     response = None
     if request.method == 'POST':
         userform = EditUserForm(
-            data=request.POST, user=request.user, instance=user, initial=initial)
+            data=request.POST,
+            user=request.user,
+            instance=user,
+            initial=initial)
         response = _process_form(userform, request, 'edited')
     request.breadcrumbs([
         ('User list', reverse('users_index')),
     ])
     print userform
-    context_variables = {'userform': userform,
-                         'action': reverse('users_edit', args=(user_id, mode)),
-                         'cancel_url': reverse('users_index'),
-                         'id': 'edit-user-form', 'class': 'user-form', 'button_label': 'Save',
-                         'loading_text': 'Saving...',
-                         'country_phone_code': settings.COUNTRY_CODE,
-                         'title': 'Edit User','mode':mode,'user_id':user.id}
+    context_variables = {
+        'userform': userform,
+        'action': reverse(
+            'users_edit',
+            args=(
+                user_id,
+                mode)),
+        'cancel_url': reverse('users_index'),
+        'id': 'edit-user-form',
+        'class': 'user-form',
+            'button_label': 'Save',
+            'loading_text': 'Saving...',
+            'country_phone_code': settings.COUNTRY_CODE,
+            'title': 'Edit User',
+            'mode': mode,
+            'user_id': user.id}
     return response or render(request, 'users/new.html', context_variables)
 
 
@@ -113,7 +134,8 @@ def show(request, user_id):
     if not user.exists():
         messages.error(request, "User not found.")
         return HttpResponseRedirect("/users/")
-    return render(request, 'users/show.html', {'the_user': user[0], 'cancel_url': '/users/'})
+    return render(request, 'users/show.html',
+                  {'the_user': user[0], 'cancel_url': '/users/'})
 
 
 def _set_is_active(user, status, request):

@@ -8,7 +8,8 @@ from django.http import HttpResponseRedirect, HttpResponse, JsonResponse
 from django.shortcuts import render, get_object_or_404
 from django.core.urlresolvers import reverse
 from survey.models import Location
-from survey.forms.indicator import IndicatorForm, IndicatorVariableForm, IndicatorFormulaeForm
+from survey.forms.indicator import IndicatorForm,\
+    IndicatorVariableForm, IndicatorFormulaeForm
 from survey.forms.filters import IndicatorFilterForm
 from survey.models import Indicator
 from survey.models import IndicatorVariable
@@ -119,8 +120,12 @@ def add_indicator_variable(request, indicator_id):
     indicator = Indicator.get(pk=indicator_id)
     request.breadcrumbs([
         ('Indicators', reverse('list_indicator_page')),
-        ('Variable List', reverse('view_indicator_variables', args=(indicator_id, ))),
-    ])
+        (
+            'Variable List',
+            reverse(
+                'view_indicator_variables',
+                args=(indicator_id)))
+        ])
     return _add_variable(request, indicator=indicator)
 
 
@@ -338,7 +343,8 @@ def simple_indicator(request, indicator_id):
     context['report'] = mark_safe(
         reports_df.to_html(
             na_rep='-',
-            classes='table table-striped table-bordered dataTable table-hover table-sort'))
+            classes='table table-striped\
+            table-bordered dataTable table-hover table-sort'))
     variable_names = indicator.active_variables()
     report_locations = context['report_locations']
 
@@ -353,19 +359,23 @@ def simple_indicator(request, indicator_id):
                         text=reports_df['hover-text'],)
         data = go.Data([trace1])
         margin = go.Margin(pad=15)
-        layout = go.Layout(title=indicator.name,
-                           xaxis={'title': report_locations[0].type.name},
-                           yaxis={'title': 'Values per %s' % report_locations[0].type.name},
-                           margin=margin,
-                           annotations=[dict(x=xi,
-                                             y=yi,
-                                             text=str(yi),
-                                             xanchor='center',
-                                             yanchor='bottom',
-                                             showarrow=False,
-                                             ) for xi,
-                                        yi in zip(reports_df.index,
-                                                  reports_df[indicator.REPORT_FIELD_NAME])])
+        layout = go.Layout(
+            title=indicator.name,
+            xaxis={'title': report_locations[0].type.name},
+            yaxis={'title': 'Values per %s' % report_locations[0].type.name},
+            margin=margin,
+            annotations=[
+                dict(
+                    x=xi,
+                    y=yi,
+                    text=str(yi),
+                    xanchor='center',
+                    yanchor='bottom',
+                    showarrow=False,
+                ) for xi, yi in zip(
+                    reports_df.index,
+                    reports_df[indicator.REPORT_FIELD_NAME])]
+            )
         figure = go.Figure(data=data, layout=layout)
         graph_div = opy.plot(
             figure,
@@ -382,11 +392,13 @@ def download_indicator_analysis(request, indicator_id):
     context, reports_df = _retrieve_data_frame(request, indicator_id)
     last_selected_loc = context['selected_location']
     indicator = context['indicator']
-    file_name = '%s%s' % ('%s-%s-' % (last_selected_loc.type.name,
-                                      last_selected_loc.name) if last_selected_loc else '',
-                          indicator.name)
+    file_name = '%s%s' % ('%s-%s-' % (
+        last_selected_loc.type.name,
+        last_selected_loc.name) if last_selected_loc else '',
+        indicator.name)
     response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = 'attachment; filename="%s.csv"' % file_name
+    response['Content-Disposition'] = 'attachment;\
+    filename="%s.csv"' % file_name
     reports_df.to_csv(
         response,
         date_format='%Y-%m-%d %H:%M:%S',

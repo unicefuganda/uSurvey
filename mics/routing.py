@@ -31,6 +31,7 @@ def ws_disconnect(message):
         Group(get_group_path(message.user, path)
               ).discard(message.reply_channel)
 
+
 channel_routing = [
     route("websocket.connect", ws_add, path=r"^%s$" % settings.WEBSOCKET_URL),
     route("websocket.receive", ws_message),

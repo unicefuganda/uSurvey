@@ -2,10 +2,12 @@ import json
 from django.core.serializers.json import DjangoJSONEncoder
 from django.shortcuts import render
 from django.contrib import messages
-from django.http import HttpResponseRedirect, HttpResponse, HttpResponseNotFound
+from django.http import HttpResponseRedirect, HttpResponse,\
+    HttpResponseNotFound
 from django.contrib.auth.decorators import permission_required
 from survey.forms.filters import QuestionFilterForm
-from survey.models import QuestionTemplate, ParameterTemplate, TemplateQuestion
+from survey.models import QuestionTemplate, ParameterTemplate,\
+    TemplateQuestion
 from survey.forms.question_template import get_question_templates_form
 from survey.services.export_questions import get_question_template_as_dump
 from survey.utils.query_helper import get_filterset
@@ -20,11 +22,14 @@ def index(request, model_class=QuestionTemplate):
     question_filter_form = QuestionFilterForm(data=request.GET or None)
     questions = question_filter_form.filter(model_class.objects.all())
     search_fields = ['identifier', 'text', ]
-    if request.GET.has_key('q'):
+    if 'q' in request.GET:
         questions = get_filterset(questions, request.GET['q'], search_fields)
-    context = {'questions': questions, 'request': request,
-               'placeholder': 'identifier, text',
-               'question_filter_form': question_filter_form, 'model_class': model_class}
+    context = {
+        'questions': questions,
+        'request': request,
+        'placeholder': 'identifier, text',
+        'question_filter_form': question_filter_form,
+        'model_class': model_class}
     if model_class == ParameterTemplate:
         request.breadcrumbs([
             ('Groups', reverse('respondent_groups_page')),
@@ -36,7 +41,7 @@ def index(request, model_class=QuestionTemplate):
 def filter(request):
     question_lib = QuestionTemplate.objects.all()
     search_fields = ['identifier', 'text', ]
-    if request.GET.has_key('q'):
+    if 'q' in request.GET:
         question_lib = get_filterset(
             question_lib, request.GET['q'], search_fields)
     question_filter_form = QuestionFilterForm(data=request.GET)
@@ -53,7 +58,7 @@ def _process_question_form(request, response, model_class, instance=None):
     if question_form.is_valid():
         question_form.save()
         messages.success(request, 'Question successfully %sed.' % action_str)
-        if request.POST.has_key('add_more_button'):
+        if 'add_more_button' in request.POST:
             redirect_age = ''
         else:
             redirect_age = reverse('show_%s' % model_class.resolve_tag())
@@ -76,9 +81,8 @@ def _render_question_view(request, model_class, instance=None):
     if request.method == 'POST':
         response, question_form = _process_question_form(
             request, response, model_class, instance)
-    request.breadcrumbs([
-        (model_class.verbose_name(), reverse('show_%s' % model_class.resolve_tag())),
-    ])
+    request.breadcrumbs([(model_class.verbose_name(), reverse(
+        'show_%s' % model_class.resolve_tag())), ])
     context = {'button_label': button_label,
                'id': 'add-question-form',
                'request': request,
@@ -88,7 +92,8 @@ def _render_question_view(request, model_class, instance=None):
                'model_class': model_class}
 
     if options:
-        #options = map(lambda option: re.sub("[%s]" % settings.USSD_IGNORED_CHARACTERS, '', option), options)
+        #options = map(lambda option: re.sub("[%s]" %\
+            #settings.USSD_IGNORED_CHARACTERS, '', option), options)
         # map(lambda option: re.sub("  ", ' ', option), options)
         context['options'] = options
     return response, context
@@ -112,7 +117,8 @@ def edit(request, question_id):
         question = TemplateQuestion.get(pk=question_id)
     except TemplateQuestion.DoesNotExist:
         return HttpResponseNotFound()
-    response, context = _render_question_view(request, model_class=question.__class__, instance=question)
+    response, context = _render_question_view(
+        request, model_class=question.__class__, instance=question)
     return response or render(request, 'question_templates/new.html', context)
 
 
@@ -140,6 +146,7 @@ def export_questions(request, model_class=QuestionTemplate):
     questions = model_class.objects.all()
     formatted_responses = get_question_template_as_dump(questions)
     response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = 'attachment; filename="%s.csv"' % filename
+    response['Content-Disposition'] = 'attachment;\
+        filename="%s.csv"' % filename
     response.write("\r\n".join(formatted_responses))
     return response
