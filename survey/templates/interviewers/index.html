@@ -41,7 +41,12 @@
 {% load pagination_tags %}
 {% include "search_form.html" %}
 {% autopaginate interviewers max_display_per_page %}
-<br>
+<!-- <br> -->
+<style type="text/css">
+.search{
+  margin-top: 10px !important;
+}
+</style>
 <table id="datatables" class="table table-striped table-bordered table-hover table-sort dataTable">
 <!-- <table id="" class="table table-striped table-bordered table-hover dataTable no-footer" role="grid" aria-describedby="dynamic-table_info">
  -->
