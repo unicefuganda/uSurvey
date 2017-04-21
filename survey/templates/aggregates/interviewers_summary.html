@@ -6,7 +6,7 @@
 {% block search %}
  
 {% include "horizontal_filter_form.html" with a_form=locations_filter no_button=True filter_id='locations_filter' %}
-<br />
+<!-- <br /> -->
 {% endblock %}
 {% block content %}
 {% load pagination_tags %}
@@ -16,7 +16,7 @@
 </div>
 <style type="text/css">
 .search {
-    margin-top: 14px !important;
+    margin-top: 10px !important;
 }
 </style>
     <table class="table dataTable table-striped table-bordered table-hover table-sort">

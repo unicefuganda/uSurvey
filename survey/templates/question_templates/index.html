@@ -11,6 +11,7 @@
     {{ model_class.verbose_name }}
 {% endblock %}
 {% block search %}
+{% include "search_form.html" %}
  {% include "horizontal_filter_form.html" with a_form=question_filter_form no_button=True filter_id='question_filter_form' %}
 <br />
 <br />
@@ -49,10 +50,9 @@
 {% endblock %}
 
 {% block content %}
-    {% load pagination_tags %}
-{% include "search_form.html" %}    
+    {% load pagination_tags %}    
     {% load template_tags %}
-<br>
+<!-- <br> -->
 <table id="datatables" class="table table-striped table-bordered table-hover dataTable no-footer">
     <thead>
     <tr>

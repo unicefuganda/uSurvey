@@ -7,9 +7,9 @@
 {% block page_actions %}
 
 <style type="text/css">
-.search { 
+/*.search { 
     margin-top: 11px !important;
-}
+}*/
 .dataTables_wrapper .row {
     margin: 0!important;
     display: none !important;
@@ -39,7 +39,7 @@
     {% endblock %}
 {% block content %}
 {% load pagination_tags %}
-<br/>
+<!-- <br/> -->
 {% include "search_form.html" %}
 {% load template_tags %}
 {% autopaginate groups max_display_per_page %}
