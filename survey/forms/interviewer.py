@@ -6,6 +6,7 @@ from survey.models import ODKAccess
 from survey.models import Survey
 from survey.models import SurveyAllocation
 from survey.models import USSDAccess
+from survey.models import LocationType
 from django.conf import settings
 from django.core.exceptions import ValidationError
 import phonenumbers
@@ -27,9 +28,12 @@ class InterviewerForm(ModelForm):
             format=settings.DATE_FORMAT))
     ea = forms.ModelMultipleChoiceField(
         queryset=EnumerationArea.objects.none(),
+        help_text='Needs at least one %s to be selected' % LocationType.largest_unit(),
         widget=forms.SelectMultiple(
             attrs={
-                'class': 'multi-select ea_filter',
+                'class': 'chzn-select ea_filter ',
+                'placeholder': 'Choose Multiple EAs',
+                'data-placeholder': 'Search/Choose Multiple EAs',
             }))
 
     def __init__(self, eas, data=None, *args, **kwargs):

@@ -7,24 +7,17 @@
 {% include "locations_filter_form.html" with a_form=locations_filter no_button=True filter_id='loc_filter' no_auto_refresh=True %}
 {% endblock %}
 
-{% block extra_css %}
-<style type="text/css">  
-	.radio_field {
-		margin-top: -15px;
-	height:10px;
-	  }
-	.p {
-		margin-top: -30px;
-	  }
-	label{
-	margin-top: -7px;
-	}  
-  ._heading_color{
-  color: #034b94;
-  }
-</style>
-{% endblock %}
+
 {% block display_form_fields %}
+<style type="text/css">
+  #id_ea_chosen {
+    border-left: 3px solid #0577e0;
+    display: inline-block;
+    margin-bottom: 0;
+    border-radius: 5px;
+    vertical-align: middle;
+}
+</style>
 <div id="legend">
             <legend style="color: #034b94;font-weight: bold;">Interviewer Details</legend>
           </div>

@@ -114,16 +114,7 @@
   <div id="{{field.auto_id}}-control-group" class="control-group int-part">
     <div class="controls {{ field|is_radio }}">
         <label class="control-label" for="{{field.auto_id}}" style="padding: 5px;">{{field.label}}</label>
-    {% if field.name == 'ea' %}
-      <div class="row" style="padding-bottom:20px;">
-        <div class="col-md-2 col-sm-1">
-        </div>
-        <div class="col-md-3 col-sm-2">
-            <strong style="margin-left:15px;">All EAs</strong><span style="margin-left: 210px;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><strong>Selected EAs</strong>
-        </div>
-        <div class="col-md-2 col-sm-1 "></div>
-      </div>
-    {%endif%}
+
       <span title="{{ field.help_text }}" class="{{field.auto_id}}_tip">{{field}}</span>
 
         {% if field.field.icons %}

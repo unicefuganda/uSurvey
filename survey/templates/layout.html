@@ -385,6 +385,7 @@
         <div class="secTriangle" style="background-image: url({{ STATIC_URL }}images/slider3.png); background-reapet: no-reapet; background-position: center center; "></div>
         <script src="{{STATIC_URL}}js/select2.full.js"></script>
         <script src='http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
         <script type="text/javascript" src="{{ STATIC_URL }}toassets/menjs.js"></script>
         <script type="text/javascript" src="http://cdn.jsdelivr.net/qtip2/3.0.3/jquery.qtip.min.js"></script>
         <script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
@@ -396,6 +397,8 @@
         <script type="text/javascript" src="{{ STATIC_URL }}toassets/theme.js"></script>
         <script src="{{ STATIC_URL }}multi-select/jquery.multi-select.js" type="text/javascript" charset="utf-8"></script>
         <script src="{{ STATIC_URL }}js/question_options.js" type="text/javascript" charset="utf-8"></script>
+        {% block javascripts %}
+        {% endblock %}
         <script>
             $(document).ready(function() {
 
@@ -411,19 +414,19 @@
                     $(".chzn-select").chosen();
                  }
                 catch(err) {
-                //err;
+                    //alert(err);
                 }
                
                 try { 
-                    $(".datepicker").datepicker({
-                     changeMonth: true,
-                     changeYear: true,
-                     dateFormat: 'dd-mm-yy',
-                     yearRange: "-120:+nn"
-                   });
+                        $(".datepicker").datepicker({
+                         changeMonth: true,
+                         changeYear: true,
+                         dateFormat: 'dd-mm-yy',
+                         yearRange: "-120:+nn"
+                       });
                      }
                 catch(err) {
-                //err;
+                    //alert(err);
                 }
                 
                 
@@ -431,7 +434,7 @@
                     $('form span[title]').qtip();
                     }
                 catch(err) {
-                //err;
+                    //alert(err);
                 }
 
             });
@@ -440,8 +443,6 @@
         <script type="text/javascript">
             if('ontouchstart' in document.documentElement) document.write("<script src='assets/js/jquery.mobile.custom.min.js'>"+"<"+"/script>");
         </script>
-        {% block javascripts %}
-        {% endblock %}
         <style type="text/css">
             .form-search textarea, .form-inline textarea, .form-horizontal textarea{margin-left: 4px !important}
             div.dataTables_info {
