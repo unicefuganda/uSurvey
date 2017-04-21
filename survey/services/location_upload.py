@@ -30,26 +30,33 @@ class UploadLocation(UploadService):
                 print "try"
                 try:
                     if x_index == self.EA_INDEX:
-                        ea, _ = EnumerationArea.objects.get_or_create(name=cell_value.strip(),
-                                                                      total_households=row[x_index + 1].strip() or
-                                                                      settings.DEFAULT_TOTAL_HOUSEHOLDS_IN_EA)
+                        ea, _ = EnumerationArea.objects.get_or_create(
+                            name=cell_value.strip(),
+                            total_households=row[x_index + 1].strip() or
+                            settings.DEFAULT_TOTAL_HOUSEHOLDS_IN_EA)
                         ea.locations.add(location)
                         print "b4 save"
                         ea.save()
                         break
                     print cell_value.strip(), location_types[x_index], "type"
                     location, _ = Location.objects.get_or_create(
-                        name=cell_value.strip(), type=location_types[x_index], parent=location)
-                except Exception, ex:
-                    print 'could not load entry: ', x_index, ' reason ', str(ex)
+                        name=cell_value.strip(),
+                        type=location_types[x_index],
+                        parent=location)
+                except Exception as ex:
+                    print 'could not load entry: \
+                        ', x_index, ' reason ', str(ex)
 
     def upload(self):
         headers, rows = self.csv_uploader.split_content()
         cleaned_headers = self.remove_trailing(
             'Name', in_array=headers, exclude='Code')
         if not cleaned_headers:
-            UploadErrorLog.objects.create(model=self.MODEL, filename=self.file.name,
-                                          error='Locations not uploaded. %s is not a valid csv file.' % self.file.name)
+            UploadErrorLog.objects.create(
+                model=self.MODEL,
+                filename=self.file.name,
+                error='Locations not uploaded. %s is not a valid csv file.' %
+                self.file.name)
         else:
             location_types = self._get_location_types(cleaned_headers)
             self._create_locations(rows, location_types)

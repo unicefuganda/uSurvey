@@ -30,6 +30,7 @@ class Enum(object):
     def __iter__(self):
         return self.enums.itervalues()
 
+
 Actions = Enum(
     PROFILE_ACCESSED="profile-accessed",
     PUBLIC_PROFILE_ACCESSED="public-profile-accessed",
@@ -77,7 +78,15 @@ def get_client_ip(request):
     return ip
 
 
-def audit_log(action, request_user, investigator, message, audit, request, level=logging.DEBUG):
+def audit_log(
+    action,
+    request_user,
+    investigator,
+    message,
+    audit,
+    request,
+    level=logging.DEBUG
+):
     """
     Create a log message based on these params
 
@@ -86,7 +95,8 @@ def audit_log(action, request_user, investigator, message, audit, request, level
     @param account_username: The investigator name the action was performed on
     @param message: The message to be displayed on the log
     @param level: log level
-    @param audit: a dict of key/values of other info pertaining to the action e.g. form's id_string, submission uuid
+    @param audit: a dict of key/values of other \
+        info pertaining to the action e.g. form's id_string, submission uuid
     @return: None
     """
     extra = {

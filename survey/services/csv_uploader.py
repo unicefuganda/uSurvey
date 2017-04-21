@@ -50,8 +50,10 @@ class UploadService(object):
         all_entries_before_one_month.delete()
 
     def log_error(self, row_number, error):
-        UploadErrorLog.objects.create(model=self.MODEL, filename=self.file.name[
-                                      :19], row_number=row_number, error=error)
+        UploadErrorLog.objects.create(model=self.MODEL,
+                                      filename=self.file.name[:19],
+                                      row_number=row_number,
+                                      error=error)
 
     @staticmethod
     def remove_trailing(name, in_array, exclude=None):

@@ -23,8 +23,10 @@ class ExportInterviewersService:
             info['odk_id'] = ','.join(
                 [access.user_identifier for access in interviewer.odk_access])
             row = [str(loc.name) for loc in interviewer.ea.parent_locations()]
-            row.extend(['"%s"' % str(getattr(interviewer, entry,
-                                             info.get(entry, ''))) for entry in self.HEADERS])
+            row.extend(['"%s"' % str(getattr(
+                interviewer,
+                entry,
+                info.get(entry, ''))) for entry in self.HEADERS])
             interviewer_records.append(row)
         interviewer_records = sorted(
             interviewer_records, key=operator.itemgetter(*range(len(headers))))

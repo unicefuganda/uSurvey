@@ -47,7 +47,7 @@ Feature: Users feature
       Then I fill a not allowed username
       And I click submit
       Then I should see not allowed username error message
-      
+
     Scenario: List users
       Given I am logged in as a superuser
       And I have 100 users
@@ -56,7 +56,6 @@ Feature: Users feature
       When I click add user button
       Then I should see add user page
 
-      
     Scenario: Edit a user
       Given I am logged in as a superuser
       And I visit the users list page
@@ -66,7 +65,6 @@ Feature: Users feature
       When I modify the users information
       And I click the update button
       Then I should see user information updated successfully
-    
 
     Scenario: Edit a user when logged in with no permissions
       Given I have a user

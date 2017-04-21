@@ -21,11 +21,7 @@
     #text-counter{
     margin-left: 10px !important;
   }
-  .ms-container{
-        margin-left: auto;
-        margin-right: auto;
-        width: 915px;
-    }
+  
   .ms-list{
         margin-top: -14px !important;
   }
@@ -67,8 +63,7 @@
     margin-left: 10px !important;
     }
     .ms-container{
-    margin-left: auto;
-    margin-right: auto;
+    margin-left: 60px;
     /*width: 915px;*/
     width: 100%;
     }
@@ -114,9 +109,7 @@
   <div id="{{field.auto_id}}-control-group" class="control-group int-part">
     <div class="controls {{ field|is_radio }}">
         <label class="control-label" for="{{field.auto_id}}" style="padding: 5px;">{{field.label}}</label>
-
-      <span title="{{ field.help_text }}" class="{{field.auto_id}}_tip">{{field}}</span>
-
+        <span title="{{ field.help_text }}" class="{{field.auto_id}}_tip">{{field}}</span>
         {% if field.field.icons %}
             <div class="input-prepend" style="display: inline-block; border: none;">
                 {% for icon, attrs in field.field.icons.items %}

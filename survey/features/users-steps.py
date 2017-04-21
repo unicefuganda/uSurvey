@@ -10,8 +10,12 @@ from survey.models.users import UserProfile
 
 @step(u'Given I am logged in as a superuser')
 def given_i_am_logged_in_as_a_superuser(step):
-    world.user = User.objects.create(username='Rajni', email='rajni@kant.com',
-                                     password='I_Rock', first_name='some name', last_name='last_name')
+    world.user = User.objects.create(
+        username='Rajni',
+        email='rajni@kant.com',
+        password='I_Rock',
+        first_name='some name',
+        last_name='last_name')
     world.user.is_superuser = True
     world.user.save()
     UserProfile.objects.create(user=world.user, mobile_number='123456666')
@@ -98,7 +102,8 @@ def then_i_fill_an_existing_mobile_number(step):
 @step(u'Then I should see existing mobile number error message')
 def then_i_should_see_existing_mobile_number_error_message(step):
     world.page.is_text_present(
-        '%s is already associated with a different user.' % world.user_data['mobile_number'])
+        '%s is already associated with a different user.' %
+        world.user_data['mobile_number'])
 
 
 @step(u'Then I fill an existing username')
@@ -132,7 +137,8 @@ def then_i_fill_an_existing_email(step):
 @step(u'Then I should see existing email error message')
 def then_i_should_see_existing_email_error_message(step):
     world.page.is_text_present(
-        '%s is already associated with a different user.' % world.user_data['email'])
+        '%s is already associated with a different user.' %
+        world.user_data['email'])
 
 
 @step(u'Then I fill a not allowed username')
@@ -157,11 +163,13 @@ def and_i_have_users(step):
     for i in range(100):
         random_suffix_number = str(randint(1, 99999))
         try:
-            user = User.objects.create_user('user' + random_suffix_number, random_suffix_number + "@gmail.com",
-                                            'pass' + random_suffix_number)
+            user = User.objects.create_user(
+                'user' + random_suffix_number,
+                random_suffix_number + "@gmail.com",
+                'pass' + random_suffix_number)
             UserProfile.objects.create(
                 mobile_number=random_suffix_number, user=user)
-        except:
+        except BaseException:
             pass
 
 
@@ -236,8 +244,12 @@ def then_i_should_see_add_user_page(step):
 
 @step(u'And I have one user')
 def and_i_have_one_user(step):
-    world.user = User.objects.create_user(username='hahaRajni', email='rarajni@kant.com',
-                                          password='I_Rock_0', first_name='some rajni name', last_name='last_name')
+    world.user = User.objects.create_user(
+        username='hahaRajni',
+        email='rarajni@kant.com',
+        password='I_Rock_0',
+        first_name='some rajni name',
+        last_name='last_name')
     UserProfile.objects.create(user=world.user, mobile_number='123456667')
     admin = Group.objects.get(name='mics_admin')
     admin.user_set.add(world.user)

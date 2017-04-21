@@ -8,18 +8,26 @@ PATH_FORMAT = '%(np)s/%(access_id)s/%(key)s'
 
 
 def get_entry(access, key, default=None):
-    return cache.get(PATH_FORMAT % {'np': settings.INTERVIEWER_SESSION_NAMESPACE,
-                                    'access_id': access.id,
-                                    'key': key}, default)
+    return cache.get(
+        PATH_FORMAT % {
+            'np': settings.INTERVIEWER_SESSION_NAMESPACE,
+            'access_id': access.id,
+            'key': key},
+        default)
 
 
 def set_entry(access, key, value):
-    return cache.set(PATH_FORMAT % {'np': settings.INTERVIEWER_SESSION_NAMESPACE,
-                                    'access_id': access.id,
-                                    'key': key}, value, timeout=settings.ONLINE_SURVEY_TIME_OUT)
+    return cache.set(
+        PATH_FORMAT % {
+            'np': settings.INTERVIEWER_SESSION_NAMESPACE,
+            'access_id': access.id,
+            'key': key},
+        value,
+        timeout=settings.ONLINE_SURVEY_TIME_OUT)
 
 
 def delete_entry(access):
-    cancel_path = '%(np)s/%(access_id)s/' % {'np': settings.INTERVIEWER_SESSION_NAMESPACE,
-                                             'access_id': access.id}
+    cancel_path = '%(np)s/%(access_id)s/' % {
+        'np': settings.INTERVIEWER_SESSION_NAMESPACE,
+        'access_id': access.id}
     cache.delete_pattern('%s*' % cancel_path)

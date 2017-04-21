@@ -10,7 +10,8 @@ class ExportInterviewersService:
 
     def formatted_responses(self):
         _formatted_responses = []
-        headers = [loc_type.name.upper() for loc_type in LocationType.in_between()]
+        headers = [loc_type.name.upper()
+                   for loc_type in LocationType.in_between()]
         headers.extend([entry.upper() for entry in self.HEADERS])
         _formatted_responses.append(','.join(headers))
         interviewer_records = []

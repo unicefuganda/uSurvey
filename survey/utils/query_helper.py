@@ -16,7 +16,8 @@ def normalize_query(query_string,
         ['some', 'random', 'words', 'with quotes', 'and', 'spaces']
         see http://julienphalip.com/post/2825034077/adding-search-to-a-django-site-in-a-snap for more info
     '''
-    return [normspace(' ', (t[0] or t[1]).strip()) for t in findterms(query_string)]
+    return [normspace(' ', (t[0] or t[1]).strip())
+            for t in findterms(query_string)]
 
 
 def _get_query(query_string, search_fields):
@@ -54,5 +55,6 @@ def to_df(queryset, date_cols=[]):
     @cached_as(queryset)
     def _to_df(queryset, date_cols):
         query, params = queryset.query.sql_with_params()
-        return pd.io.sql.read_sql_query(query, connection, params=params, parse_dates=date_cols)
+        return pd.io.sql.read_sql_query(
+            query, connection, params=params, parse_dates=date_cols)
     return _to_df(queryset, date_cols)
