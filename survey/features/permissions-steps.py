@@ -61,8 +61,11 @@ def given_i_have_a_researcher_user(step):
     researcher = Group.objects.create(name='researcher')
     world.user = User.objects.create_user('Rajni', 'rajni@kant.com', 'I_Rock')
     researcher.user_set.add(world.user)
-    set_permissions(researcher, [
-                    'can_view_aggregates', 'can_view_households', 'can_view_batches', 'can_view_investigators'])
+    set_permissions(researcher,
+                    ['can_view_aggregates',
+                     'can_view_households',
+                     'can_view_batches',
+                     'can_view_investigators'])
 
 
 @step(u'And I should not be seeing above researcher level tabs')
@@ -80,8 +83,12 @@ def given_i_have_a_admin_user(step):
     admin = Group.objects.create(name='mics_admin')
     world.user = User.objects.create_user('rajni', 'Rajni@kant.com', 'I_Rock')
     admin.user_set.add(world.user)
-    set_permissions(admin, ['can_view_aggregates', 'can_view_households',
-                            'can_view_batches', 'can_view_investigators', 'can_view_users'])
+    set_permissions(admin,
+                    ['can_view_aggregates',
+                     'can_view_households',
+                     'can_view_batches',
+                     'can_view_investigators',
+                     'can_view_users'])
 
 
 @step(u'Then I should all tabs')

@@ -23,7 +23,10 @@ def and_i_have_2_districts_with_investigators(step):
     Investigator.objects.create(
         name="Rajni", mobile_number="123456789", ea=world.ea, backend=backend)
     Investigator.objects.create(
-        name="Rajni", mobile_number="123456780", ea=world.ea_abim, backend=backend)
+        name="Rajni",
+        mobile_number="123456780",
+        ea=world.ea_abim,
+        backend=backend)
 
 
 @step(u'And I visit bulk SMS page')

@@ -23,8 +23,13 @@ def create_admin():
     admin = Group.objects.create(name='mics_admin')
     user = User.objects.create_user('rajni', 'Rajni@kant.com', 'I_Rock')
     admin.user_set.add(user)
-    set_permissions(admin, ['can_view_aggregates', 'can_view_households', 'can_view_batches',
-                            'can_view_investigators', 'can_view_users', 'can_add_location_types'])
+    set_permissions(admin,
+                    ['can_view_aggregates',
+                     'can_view_households',
+                     'can_view_batches',
+                     'can_view_investigators',
+                     'can_view_users',
+                     'can_add_location_types'])
 
     return user
 
@@ -47,14 +52,20 @@ def and_i_visit_upload_locations_page(step):
 def and_i_have_location_type_and_location_details_objects(step):
     world.location_type1 = LocationType.objects.create(
         name='type1', slug='type1')
-    world.location_type_details1 = LocationTypeDetails.objects.create(required=False, has_code=True,
-                                                                      location_type=world.location_type1,
-                                                                      length_of_code=3, country=world.country)
+    world.location_type_details1 = LocationTypeDetails.objects.create(
+        required=False,
+        has_code=True,
+        location_type=world.location_type1,
+        length_of_code=3,
+        country=world.country)
 
     world.location_type2 = LocationType.objects.create(
         name='type2', slug='type2')
     world.location_type_details2 = LocationTypeDetails.objects.create(
-        required=False, has_code=False, location_type=world.location_type2, country=world.country)
+        required=False,
+        has_code=False,
+        location_type=world.location_type2,
+        country=world.country)
 
 
 @step(u'Then I should see the page title')
@@ -88,8 +99,8 @@ def then_i_should_see_table_of_all_location_types(step):
 
 @step(u'And Type code should be in front of any type that has code')
 def and_type_code_should_be_in_front_of_any_type_that_has_code(step):
-    world.page.validate_typecode_appear_before_typename(world.location_type1.name,
-                                                        world.location_type_details1.length_of_code)
+    world.page.validate_typecode_appear_before_typename(
+        world.location_type1.name, world.location_type_details1.length_of_code)
     world.page.is_text_present(
         world.location_type2.name.capitalize() + 'Code', False)
 
@@ -126,9 +137,10 @@ def and_i_should_go_to_add_hierarchy_page(step):
 
 @step(u'When I have a csv locations file')
 def when_i_have_a_csv_locations_file(step):
-    data = [[world.location_type1.name + 'Code', world.location_type1.name + 'Name', world.location_type2.name + 'Name'],
-            ['001', 'district1', 'county1'],
-            ['003', 'district2', 'county2']]
+    data = [[world.location_type1.name +
+             'Code', world.location_type1.name +
+             'Name', world.location_type2.name +
+             'Name'], ['001', 'district1', 'county1'], ['003', 'district2', 'county2']]
     write_to_csv('wb', data, 'test.csv')
 
 

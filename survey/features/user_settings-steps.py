@@ -18,7 +18,8 @@ def then_i_click_change_password_link(step):
 
 
 @step(u'Then I should see a form asking me to add old password and new password')
-def then_i_should_see_a_form_asking_me_to_add_old_password_and_new_password(step):
+def then_i_should_see_a_form_asking_me_to_add_old_password_and_new_password(
+        step):
     world.page = ResetPasswordPage(world.browser)
     world.page.visit()
     world.page.is_change_password_form_visble()

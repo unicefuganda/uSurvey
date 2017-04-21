@@ -14,8 +14,13 @@ def save_batch_to_question(question, batch):
 
 @step(u'And I have a question')
 def and_i_have_a_question(step):
-    world.question = Question.objects.create(text="question1", answer_type=Question.NUMBER, order=1,
-                                             group=world.household_member_group, module=world.module, identifier='ID 1')
+    world.question = Question.objects.create(
+        text="question1",
+        answer_type=Question.NUMBER,
+        order=1,
+        group=world.household_member_group,
+        module=world.module,
+        identifier='ID 1')
 
 
 @step(u'And I assign batch to these questions')
@@ -137,8 +142,12 @@ def and_i_should_see_if_field_is_not_disabled(step):
 
 @step(u'And I should also have all other conditions in the dropdown')
 def and_i_should_also_have_all_other_conditions_in_the_dropdown(step):
-    condition_options = ['> QUESTION RESPONSE', '> VALUE', '< QUESTION RESPONSE', '< VALUE',
-                         'EQUALS']
+    condition_options = [
+        '> QUESTION RESPONSE',
+        '> VALUE',
+        '< QUESTION RESPONSE',
+        '< VALUE',
+        'EQUALS']
     world.page.see_select_option(condition_options, 'condition')
 
 
@@ -195,10 +204,18 @@ def and_i_should_see_all_the_action_dropdown_options(step):
 
 @step(u'And I have two subquestions for this question')
 def and_i_have_two_subquestions_for_this_question(step):
-    world.sub_question1 = Question.objects.create(text="sub question1", answer_type=Question.NUMBER, subquestion=True,
-                                                  parent=world.question, identifier='ID 2')
-    world.sub_question2 = Question.objects.create(text="sub question2", answer_type=Question.NUMBER, subquestion=True,
-                                                  parent=world.question, identifier='ID 3')
+    world.sub_question1 = Question.objects.create(
+        text="sub question1",
+        answer_type=Question.NUMBER,
+        subquestion=True,
+        parent=world.question,
+        identifier='ID 2')
+    world.sub_question2 = Question.objects.create(
+        text="sub question2",
+        answer_type=Question.NUMBER,
+        subquestion=True,
+        parent=world.question,
+        identifier='ID 3')
     world.sub_question1.batches.add(world.batch)
     world.sub_question2.batches.add(world.batch)
 
@@ -315,8 +332,11 @@ def and_i_should_see_question_in_the_attribute(step):
 
 @step(u'And I have a subquestion under this question')
 def and_i_have_a_subquestion_under_this_question(step):
-    world.sub_question = Question.objects.create(subquestion=True, parent=world.question,
-                                                 text="this is a subquestion", identifier='ID 4')
+    world.sub_question = Question.objects.create(
+        subquestion=True,
+        parent=world.question,
+        text="this is a subquestion",
+        identifier='ID 4')
 
 
 @step(u'When I fill the  duplicate subquestion details')
