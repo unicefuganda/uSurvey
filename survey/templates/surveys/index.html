@@ -50,6 +50,17 @@
 .dataTables_scrollBody{
                           height: 330px !important;
                         }
+#id_email_group_chosen {
+    border-left: 3px solid #0577e0;
+    display: inline-block;
+    margin-bottom: 0;
+    border-radius: 5px;
+    vertical-align: middle;
+    width: 261px!important;
+    margin-left: 4px!important;
+}
+
+
 </style>
 {% endblock %}
 
@@ -193,7 +204,6 @@
 
 {% block javascripts %}
 <link rel="stylesheet" href="{{ STATIC_URL }}css/dataTables.bootstrap.css" type="text/css">
-<script type="text/javascript" src="https://code.jquery.com/jquery-1.12.4.js"></script>
 <script src="{{ STATIC_URL }}/js/jquery.dataTables.js"></script>
 <script src="{{ STATIC_URL }}/js/dataTables.bootstrap.js" type="text/javascript" charset="utf-8"></script>
 <script src="{{STATIC_URL}}js/jquery.validate.js" type="text/javascript" charset="utf-8"></script>

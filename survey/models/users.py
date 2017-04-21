@@ -19,4 +19,4 @@ class UserProfile(BaseModel):
         app_label = 'survey'
 
     def __unicode__(self):
-        return '"%s"<%s>' % (self.user.first_name, self.user.email)
+        return '%s<%s>' % (self.user.first_name, self.user.email)

@@ -30,6 +30,8 @@ class SurveyForm(ModelForm, FormOrderMixin):
                                                          }),
             'has_sampling': InlineRadioSelect(choices=((True, 'Sampled'), (False, 'Census')),
                                               attrs={'class': 'has_sampling'}),
+            'email_group':  forms.SelectMultiple(attrs={'class': 'chzn-select',
+                                                        'data-placeholder': 'Search/Choose Users',})
         }
 
     def __init__(self, *args, **kwargs):
@@ -52,6 +54,7 @@ class SurveyForm(ModelForm, FormOrderMixin):
                 attrs={'class': 'chzn-select'})
         except Exception as err:
             pass
+        self.fields['email_group'].help_text = 'These users shall receive email notifications from this survey'
         self.fields['listing_form'].required = False
         self.order_fields(['name',
                            'description',

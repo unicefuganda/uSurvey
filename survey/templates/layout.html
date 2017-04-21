@@ -397,8 +397,6 @@
         <script type="text/javascript" src="{{ STATIC_URL }}toassets/theme.js"></script>
         <script src="{{ STATIC_URL }}multi-select/jquery.multi-select.js" type="text/javascript" charset="utf-8"></script>
         <script src="{{ STATIC_URL }}js/question_options.js" type="text/javascript" charset="utf-8"></script>
-        {% block javascripts %}
-        {% endblock %}
         <script>
             $(document).ready(function() {
 
@@ -414,7 +412,7 @@
                     $(".chzn-select").chosen();
                  }
                 catch(err) {
-                    //alert(err);
+                    alert(err);
                 }
                
                 try { 
@@ -440,6 +438,8 @@
             });
             
         </script>
+        {% block javascripts %}
+        {% endblock %}
         <script type="text/javascript">
             if('ontouchstart' in document.documentElement) document.write("<script src='assets/js/jquery.mobile.custom.min.js'>"+"<"+"/script>");
         </script>
