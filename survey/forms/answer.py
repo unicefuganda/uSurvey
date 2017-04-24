@@ -88,12 +88,10 @@ def get_answer_form(interview, access=None):
                     attrs={'placeholder': 'Lat[space4]Long[space4' 'Altitude[space4]Precision'}))
             if question.answer_type == MultiChoiceAnswer.choice_name():
                 self.fields['value'] = forms.ChoiceField(choices=[(opt.order, opt.text) for opt
-                                                                  in question.options.all()])
+                                                                  in question.options.all()], widget=forms.RadioSelect)
                 self.fields['value'].empty_label = None
-                if access.choice_name() == USSDAccess.choice_name():
-                    self.fields['value'].widget = forms.NumberInput()
-                else:
-                    self.fields['value'].widget = forms.RadioSelect()
+            if access.choice_name() == USSDAccess.choice_name():
+                self.fields['value'].widget = forms.NumberInput()
             if question.answer_type == MultiSelectAnswer.choice_name():
                 self.fields['value'] = forms.ModelMultipleChoiceField(
                     queryset=question.options.all(), widget=forms.CheckboxSelectMultiple)
@@ -215,11 +213,9 @@ class AddMoreLoopForm(BaseSelectInterview, USSDSerializable):
 
     def __init__(self, request, access, *args, **kwargs):
         super(AddMoreLoopForm, self).__init__(request, access, *args, **kwargs)
-        self.fields['value'] = forms.ChoiceField(choices=self.CHOICES)
+        self.fields['value'] = forms.ChoiceField(choices=self.CHOICES, widget=forms.RadioSelect)
         if self.access.choice_name() == USSDAccess.choice_name():
             self.fields['value'].widget = forms.NumberInput()
-        else:
-            self.fields['value'].widget = forms.RadioSelect()
         if access.choice_name() == USSDAccess.choice_name():
             self.fields['value'].label = ''
         else:
@@ -271,11 +267,9 @@ class SurveyAllocationForm(
         super(SurveyAllocationForm, self).__init__(request, access, *args, **kwargs)
         self.CHOICES = [(idx + 1, sa.allocation_ea.name) for idx, sa
                         in enumerate(self.interviewer.unfinished_assignments.order_by('allocation_ea__name'))]
-        self.fields['value'] = forms.ChoiceField(choices=self.CHOICES)
+        self.fields['value'] = forms.ChoiceField(choices=self.CHOICES,widget=forms.RadioSelect)
         if self.access.choice_name() == USSDAccess.choice_name():
             self.fields['value'].widget = forms.NumberInput()
-        else:
-            self.fields['value'].widget = forms.RadioSelect()
         self.fields['value'].label = 'Select EA'
         self.order_fields(['value', 'test_data'])
 
@@ -319,10 +313,11 @@ class ReferenceInterviewForm(BaseSelectInterview, USSDSerializable):
     def __init__(self, request, access, survey, allocation_ea, *args, **kwargs):
         super(ReferenceInterviewForm, self).__init__(request, access, *args, **kwargs)
         self.survey = survey
-        self.fields['value'] = forms.ChoiceField()
         self.random_samples = ListingSample.get_or_create_samples(survey, allocation_ea).order_by('interview__created')
-        self.fields['value'].choices = [(idx + 1, sample.get_display_label())
-                                        for idx, sample in enumerate(self.random_samples)]
+        choices = [(idx + 1, sample.get_display_label()) for idx, sample in enumerate(self.random_samples)]
+        self.fields['value'] = forms.ChoiceField(choices=choices, widget=forms.RadioSelect)
+        if self.access.choice_name() == USSDAccess.choice_name():
+            self.fields['value'].widget = forms.NumberInput()
         self.listing_form = survey.preferred_listing.listing_form if survey.preferred_listing else survey.listing_form
         self.fields['value'].label = 'Select %s' % self.listing_form.name
 
