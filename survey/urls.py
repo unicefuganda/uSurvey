@@ -834,8 +834,3 @@ if not settings.PRODUCTION:
             name='delete_interviewer'),
     )
 """
-
-handler401 = 'survey.views.home_page.custom_401'
-handler403 = 'survey.views.home_page.custom_403'
-handler404 = 'survey.views.home_page.custom_404'
-handler500 = 'survey.views.home_page.custom_500'
