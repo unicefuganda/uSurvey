@@ -173,7 +173,7 @@ class ListingSample(BaseModel):
         for question in questions:
             answer_class = Answer.get_class(question.answer_type)
             try:
-                answer = answer_class.objects.filter(interview=interview, question=question).last()
+                answer = answer_class.objects.get(interview=interview, question=question)
                 context[question.identifier] = answer.value
             except answer_class.DoesNotExist:
                 pass
