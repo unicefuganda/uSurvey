@@ -1,7 +1,10 @@
 __author__ = 'anthony <>'
 import random
+import re
 from django.db import models
 from django.db import transaction
+from django import template
+from django.utils import html
 from survey.models.base import BaseModel
 from survey.models.questions import Question, QuestionSet
 from survey.models.interviews import Answer, MultiChoiceAnswer
@@ -93,18 +96,21 @@ class CriterionTestArgument(BaseModel):
 
 
 class ListingSample(BaseModel):
-    survey = models.ForeignKey(
-        Survey,
-        related_name='listing_samples',
-        db_index=True)
+    survey = models.ForeignKey(Survey, related_name='listing_samples', db_index=True)
     interview = models.ForeignKey(Interview, related_name='listing_samples')
 
     @classmethod
     def samples(cls, survey, ea):
         return cls.objects.filter(survey=survey, interview__ea=ea)
 
-    class SamplesAlreadyGenerated(
-            Exception):    # just used to indicated generate random samples has already run
+    @classmethod
+    def get_or_create_samples(cls, survey, ea):
+        if cls.samples(survey, ea).exists() is False:
+            from_survey = survey.preferred_listing if survey.preferred_listing else survey
+            cls.generate_random_samples(from_survey, survey, ea)
+        return cls.samples(survey, ea)
+
+    class SamplesAlreadyGenerated(Exception):    # just used to indicated generate random samples has already run
         pass
 
     @classmethod
@@ -120,8 +126,7 @@ class ListingSample(BaseModel):
             raise cls.SamplesAlreadyGenerated('Samples already generated')
 
         if to_survey.has_sampling is False or from_survey.has_sampling is False:
-            raise ValueError(
-                'Either source or destination survey does not support sampling')
+            raise ValueError('Either source or destination survey does not support sampling')
         valid_interviews = from_survey.interviews.filter(ea=ea,     # the listed interviews in the ea
                                                          question_set=from_survey.listing_form).values_list('id',
                                                                                                             flat=True)
@@ -154,3 +159,30 @@ class ListingSample(BaseModel):
                     interview_id=interview_id))
         with transaction.atomic():
             ListingSample.objects.bulk_create(samples)
+
+    def get_display_label(self):
+        survey = self.survey
+        naming_label = survey.random_sample_label
+        interview = self.interview
+        # get the exact answer type
+        pattern = '{{ *([0-9a-zA-Z_]+) *}}'
+        identifiers = re.findall(pattern, naming_label)
+        listing_form = survey.preferred_listing.listing_form if survey.preferred_listing else survey.listing_form
+        questions = listing_form.questions.filter(identifier__in=identifiers)
+        context = {}
+        for question in questions:
+            answer_class = Answer.get_class(question.answer_type)
+            try:
+                answer = answer_class.objects.filter(interview=interview, question=question).last()
+                context[question.identifier] = answer.value
+            except answer_class.DoesNotExist:
+                pass
+        question_context = template.Context(context)
+        label = template.Template(html.escape(naming_label)).render(question_context)
+        # now if label happens to be empty, just use the first response as label
+        if not label:
+            try:
+                label = interview.answer.first().as_text
+            except:
+                pass
+        return label

@@ -341,29 +341,7 @@ def get_download_url(request, url_name, instance=None):
 
 @register.assignment_tag
 def get_sample_data_display(sample):
-    survey = sample.survey
-    naming_label = survey.random_sample_label
-    interview = sample.interview
-    # get the exact answer type
-    pattern = '{{ *([0-9a-zA-Z_]+) *}}'
-    identifiers = re.findall(pattern, naming_label)
-    questions = survey.listing_form.questions.filter(identifier__in=identifiers)
-    context = {}
-    for question in questions:
-        answer_class = Answer.get_class(question.answer_type)
-        try:
-            answer = answer_class.get(interview=interview, question=question)
-            context[question.identifier] = answer.value
-        except answer_class.DoesNotExist:
-            pass
-    question_context = template.Context(context)
-    label = template.Template(html.escape(naming_label)).render(question_context)
-    # now if label happens to be empty, just use the first response as label
-    try:
-        label = interview.answer.first().as_text
-    except:
-        pass
-    return label
+    return sample.get_display_label()
 
 
 @register.assignment_tag

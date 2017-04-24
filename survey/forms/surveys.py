@@ -136,7 +136,6 @@ class SurveyForm(ModelForm, FormOrderMixin):
         return instance
 
 
-
 class SamplingCriterionForm(forms.ModelForm, FormOrderMixin):
     min = forms.IntegerField(required=False)
     max = forms.IntegerField(required=False)

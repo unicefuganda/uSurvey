@@ -47,9 +47,7 @@ class SimulatorView(OnlineHandler):
         """
         access = self.access
         if hasattr(access, 'question_set'):
-            interview = Interview.objects.create(
-                test_data=True,
-                question_set=access.question_set,
-                last_question=access.question_set.g_first_question)
+            interview = Interview(test_data=True, question_set=access.question_set,
+                                  last_question=access.question_set.g_first_question)
             session_data['interview'] = interview
             return self.init_responses(request, interview, session_data)

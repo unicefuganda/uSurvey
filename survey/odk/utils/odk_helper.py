@@ -126,7 +126,7 @@ def get_answers(node, qset, question_map):
             question = question_map.get(e.tag.strip('q'), '')
             if question:
                 _update_answer_dict(question, e.text, answers)
-    if len(answers) == 0:
+    if len(answers) == 0:       # if there is no child here, you have to record the inline
         answers.append(inline_record)
     return answers
 

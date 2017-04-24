@@ -130,9 +130,8 @@ xmlns:jr="http://openrosa.org/javarosa">
 					<select1 ref="/qset/qset{{qset.pk}}/sampleData/iq{{ ea_id }}">
 						<label>Select Sample</label>
 						{% for sample in samples %}
-						{% get_sample_data_display sample as  sample_label %}
 						<item>
-							<label>{{ sample_label|default:qset.name }}</label>
+							<label>{{ sample.get_display_label|default:qset.name }}</label>
 							<value>{{ sample.interview.pk }}</value>
 						</item>
 						{% endfor %}

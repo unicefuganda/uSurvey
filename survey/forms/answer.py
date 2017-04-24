@@ -5,6 +5,7 @@ from django.utils.safestring import mark_safe
 from django import forms
 from form_helper import FormOrderMixin, get_form_field_no_validation
 from survey.models import (
+    ListingSample,
     Answer,
     Interview,
     VideoAnswer,
@@ -29,6 +30,8 @@ from survey.models import (
 class USSDSerializable(object):
 
     def render_prepend_ussd(self):
+        if 'value' in self.fields:
+            return self.fields['value'].label
         return ''
 
     def render_extra_ussd(self):
@@ -83,16 +86,14 @@ def get_answer_form(interview, access=None):
                 model_field = get_form_field_no_validation(forms.CharField)
                 self.fields['value'] = model_field(label='Answer', widget=forms.TextInput(
                     attrs={'placeholder': 'Lat[space4]Long[space4' 'Altitude[space4]Precision'}))
-            if question.answer_type == MultiChoiceAnswer.choice_name() and \
-                    access.choice_name() == USSDAccess.choice_name():
-                self.fields['value'] = forms.IntegerField()
-            elif question.answer_type == MultiChoiceAnswer.choice_name():
-                self.fields['value'] = forms.ChoiceField(
-                    choices=[
-                        (opt.order,
-                         opt.text) for opt in question.options.all()],
-                    widget=forms.RadioSelect)
+            if question.answer_type == MultiChoiceAnswer.choice_name():
+                self.fields['value'] = forms.ChoiceField(choices=[(opt.order, opt.text) for opt
+                                                                  in question.options.all()])
                 self.fields['value'].empty_label = None
+                if access.choice_name() == USSDAccess.choice_name():
+                    self.fields['value'].widget = forms.NumberInput()
+                else:
+                    self.fields['value'].widget = forms.RadioSelect()
             if question.answer_type == MultiSelectAnswer.choice_name():
                 self.fields['value'] = forms.ModelMultipleChoiceField(
                     queryset=question.options.all(), widget=forms.CheckboxSelectMultiple)
@@ -108,7 +109,10 @@ def get_answer_form(interview, access=None):
                     'accept': accept_types.get(
                         question.answer_type, '|'.join(
                             accept_types.values()))}
-            self.fields['value'].label = 'Answer'
+            if access.choice_name() == USSDAccess.choice_name():
+                self.fields['value'].label = ''
+            else:
+                self.fields['value'].label = 'Answer'
 
         def full_clean(self):
             try:
@@ -211,12 +215,15 @@ class AddMoreLoopForm(BaseSelectInterview, USSDSerializable):
 
     def __init__(self, request, access, *args, **kwargs):
         super(AddMoreLoopForm, self).__init__(request, access, *args, **kwargs)
+        self.fields['value'] = forms.ChoiceField(choices=self.CHOICES)
         if self.access.choice_name() == USSDAccess.choice_name():
-            self.fields['value'] = forms.IntegerField()
+            self.fields['value'].widget = forms.NumberInput()
         else:
-            self.fields['value'] = forms.ChoiceField(
-                choices=self.CHOICES, widget=forms.RadioSelect)
-        self.fields['value'].label = 'Answer'
+            self.fields['value'].widget = forms.RadioSelect()
+        if access.choice_name() == USSDAccess.choice_name():
+            self.fields['value'].label = ''
+        else:
+            self.fields['value'].label = 'Answer'
 
     def render_extra_ussd(self):
         text = []
@@ -261,29 +268,16 @@ class SurveyAllocationForm(
         USSDSerializable):
 
     def __init__(self, request, access, *args, **kwargs):
-        super(
-            SurveyAllocationForm,
-            self).__init__(
-            request,
-            access,
-            *
-            args,
-            **kwargs)
-        self.CHOICES = [
-            (idx + 1,
-             sa.allocation_ea.name) for idx,
-            sa in enumerate(
-                self.interviewer.unfinished_assignments.order_by('allocation_ea__name'))]
+        super(SurveyAllocationForm, self).__init__(request, access, *args, **kwargs)
+        self.CHOICES = [(idx + 1, sa.allocation_ea.name) for idx, sa
+                        in enumerate(self.interviewer.unfinished_assignments.order_by('allocation_ea__name'))]
+        self.fields['value'] = forms.ChoiceField(choices=self.CHOICES)
         if self.access.choice_name() == USSDAccess.choice_name():
-            self.fields['value'] = forms.IntegerField()
+            self.fields['value'].widget = forms.NumberInput()
         else:
-            self.fields['value'] = forms.ChoiceField(widget=forms.RadioSelect)
+            self.fields['value'].widget = forms.RadioSelect()
         self.fields['value'].label = 'Select EA'
-        self.fields['value'].choices = self.CHOICES
         self.order_fields(['value', 'test_data'])
-
-    def render_prepend_ussd(self):
-        return 'Select EA'
 
     def render_extra_ussd(self):
         text = []
@@ -318,25 +312,50 @@ class SurveyAllocationForm(
         fields = ['test_data', ]
 
 
+class ReferenceInterviewForm(BaseSelectInterview, USSDSerializable):
+    """Basically used to select random sample for sampled surveys
+    """
+
+    def __init__(self, request, access, survey, allocation_ea, *args, **kwargs):
+        super(ReferenceInterviewForm, self).__init__(request, access, *args, **kwargs)
+        self.survey = survey
+        self.fields['value'] = forms.ChoiceField()
+        self.random_samples = ListingSample.get_or_create_samples(survey, allocation_ea).order_by('interview__created')
+        self.fields['value'].choices = [(idx + 1, sample.get_display_label())
+                                        for idx, sample in enumerate(self.random_samples)]
+        self.listing_form = survey.preferred_listing.listing_form if survey.preferred_listing else survey.listing_form
+        self.fields['value'].label = 'Select %s' % self.listing_form.name
+
+    def clean_value(self):
+        selected = int(self.cleaned_data['value'])
+        return self.random_samples.values_list('interview', flat=True)[selected - 1]
+
+    def render_extra_ussd(self):
+        text = []
+        map(lambda choice: text.append('%s: %s' %
+                                       choice), self.fields['value'].choices)
+        return mark_safe('\n'.join(text))
+
+    def render_extra_ussd_html(self):
+        text = []
+        map(lambda choice: text.append('%s: %s' %
+                                       choice), self.fields['value'].choices)
+        return mark_safe('<br />'.join(text))
+
+
 class SelectBatchForm(BaseSelectInterview, USSDSerializable):
 
     def __init__(self, request, access, survey, *args, **kwargs):
         super(SelectBatchForm, self).__init__(request, access, *args, **kwargs)
         self.survey = survey
+        self.batches = survey.batches.all().order_by('name')
         self.fields['value'] = forms.ChoiceField()
-        self.fields['value'].choices = [
-            (idx + 1,
-             batch.name) for idx,
-            batch in enumerate(
-                survey.batches.all().order_by('name'))]
+        self.fields['value'].choices = [(idx + 1, batch.name) for idx, batch in enumerate(self.batches)]
         self.fields['value'].label = 'Select Batch'
 
-    def clean_batch(self):
+    def clean_value(self):
         selected = int(self.cleaned_data['value'])
-        return self.survey.batches.all().order_by('name')[selected - 1]
-
-    def render_prepend_ussd(self):
-        return 'Select Batch'
+        return self.batches[selected - 1]
 
     def render_extra_ussd(self):
         text = []

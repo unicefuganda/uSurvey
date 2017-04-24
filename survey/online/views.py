@@ -7,7 +7,7 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponse
 from survey.models import SurveyAllocation
 from survey.forms.answer import\
-    (UserAccessForm, SurveyAllocationForm, SelectBatchForm, AddMoreLoopForm)
+    (UserAccessForm, SurveyAllocationForm, SelectBatchForm, AddMoreLoopForm, ReferenceInterviewForm)
 from .online_handler import OnlineHandler,\
     show_only_answer_form, get_display_format
 
@@ -94,8 +94,9 @@ class OnlineInterview(OnlineHandler):
     def start_interview(self, request, session_data):
         """Steps:
         1. Select EA
-        2`. Select Batch if survey is ready for \
-            batch collection, else skip this step and \
+        2. 2.0. Select Random sample if survey has sampling and listing is completed.
+            2.1. Select Batch if survey is ready for \
+                batch collection, else skip this step and \
                 select available listing/batch
         3. Move to interview questions.
         This func is expected to be called only when survey is open
@@ -107,9 +108,18 @@ class OnlineInterview(OnlineHandler):
         access = self.access
         interviewer = access.interviewer
         request_data = request.GET if request.method == 'GET' else request.POST
+        context = {}
+        if '_ref_interview' in session_data:
+            # if the user is trying to select a random sample...
+            interview = session_data['_ref_interview']
+            interview_form = ReferenceInterviewForm(request, access, interview.survey, interview.ea, data=request_data)
+            if interview_form.is_valid():
+                session_data['ref_interview'] = interview_form.cleaned_data['value']
+                del session_data['_ref_interview']
+            else:
+                return self._render_init_form( request, interview_form)
         if '_interview' in session_data:
-            # this options comes when there are \
-                #multiple batches to choose from
+            # basically if the user is trying to select a batch
             survey = session_data['_interview'].survey
             interview_form = SelectBatchForm(
                 request,
@@ -117,14 +127,14 @@ class OnlineInterview(OnlineHandler):
                 survey,
                 data=request_data)
             if interview_form.is_valid():
-                batch = interview_form.cleaned_data['batch']
+                batch = interview_form.cleaned_data['value']
                 interview = session_data['_interview']
                 interview.question_set = batch
                 interview.last_question = batch.g_first_question
                 del session_data['_interview']
                 return self.init_responses(request, interview, session_data)
         elif 'interview' in session_data:
-            # though the interview value would be None
+            # though the interview value might be None
             interview_form = SurveyAllocationForm(
                 request,
                 access,
@@ -135,45 +145,44 @@ class OnlineInterview(OnlineHandler):
                 interview.interview_channel = access
                 survey = interview.survey
                 survey_allocation = interview_form.selected_allocation()
-                if interview.survey.has_sampling and (
-                    SurveyAllocation.can_start_batch(
-                        interviewer) is False):
+                interview.ea = survey_allocation.allocation_ea
+                if interview.survey.has_sampling and (SurveyAllocation.can_start_batch(interviewer) is False):
+                    # batch not yet ready
                     # go straight to listing form
-                    listing_form = survey.listing_form
-                    if listing_form is None:
-                        # assuming preferred listing did \
-                            #not cover completed for allocated ea
-                        listing_form = survey.preferred_listing.listing_form
-                    interview.question_set = listing_form
-                    interview.last_question = listing_form.g_first_question
-                    return self.init_responses(
-                        request,
-                        interview,
-                        session_data)
-                else:
+                    return self._initiate_listing(request, interview, survey, session_data)
+                elif interview.survey.has_sampling and 'ref_interview' not in session_data:
+                    session_data['_ref_interview'] = interview
+                    interview_form = ReferenceInterviewForm(request, access, survey, survey_allocation.allocation_ea)
+                else:   # ready for batch collection
                     # ask user to select the batch if batch is more than one
                     if len(survey_allocation.open_batches()) > 1:
                         session_data['_interview'] = interview
                         # semi formed, ask user to choose batch
-                        interview_form = SelectBatchForm(
-                            request,
-                            access,
-                            survey)
+                        interview_form = SelectBatchForm(request, access, survey)
                     else:
                         batch = survey_allocation.open_batches()[0]
                         interview.question_set = batch
                         interview.last_question = batch.g_first_question
-                        return self.init_responses(
-                            request,
-                            interview,
-                            session_data)
+                        return self.init_responses(request, interview, session_data)
         else:
             interview_form = SurveyAllocationForm(request, access)
         session_data['interview'] = None
+        return self._render_init_form(request, interview_form)
+
+    def _initiate_listing(self, request, interview, survey, session_data):
+        listing_form = survey.listing_form
+        if listing_form is None:
+            # assuming preferred listing did not cover completed for allocated ea
+            listing_form = survey.preferred_listing.listing_form
+        interview.question_set = listing_form
+        interview.last_question = listing_form.g_first_question
+        return self.init_responses(request, interview, session_data)
+
+    def _render_init_form(self, request, interview_form):
         template_file = "interviews/answer.html"
         context = {'button_label': 'send', 'answer_form': interview_form,
                    'template_file': template_file,
-                   'access': access,
+                   'access': self.access,
                    'ussd_session_timeout': settings.USSD_TIMEOUT,
                    'id': 'interview_form',
                    'action': self.action_url

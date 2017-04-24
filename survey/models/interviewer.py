@@ -207,7 +207,7 @@ class SurveyAllocation(BaseModel):
                 survey_allocations)
             return (
                 1.0 * len(completed)) / survey_allocations.count() >= getattr(
-                settings, 'EAS_PERCENT_TO_START_SURVEY', 0.5)
+                settings, 'EAS_PERCENT_TO_START_SURVEY', 1.0)
         else:
             return True
 
