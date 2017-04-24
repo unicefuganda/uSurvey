@@ -41,7 +41,10 @@
     margin-top: 0px !important; 
     padding: 8px 20px 20px !important;
     /* text-align: center; */
-}  
+} 
+.orange{
+    padding: 3px !important;
+} 
 </style>
 <!-- <div class="control-group">
         <label class="control-label" for="text_counter"></label>
@@ -57,8 +60,8 @@
         <label style="margin-top:10px;" class="control-label col-md-4">Option <span class="number"> {{ option.order }}</span></label>
         <div class="controls">
             <input type="text" maxlength="100" name="options" value="{{ option.text }}">
-            <a href="javascript:;" class="btn btn-white btn-warning btn-bold add-option"><i class="ace-icon fa fa-plus bigger-120 orange"></i></i></a>
-            <a href="javascript:;" class="btn btn-white btn-warning btn-bold remove-option"><i class="ace-icon fa fa-minus bigger-120 orange"></i></i></a>
+            <a style="padding: 0px !important;" href="javascript:;" class="btn btn-white btn-warning btn-bold add-option"><i class="ace-icon fa fa-plus bigger-120 orange"></i></i></a>
+            <a style="padding: 0px !important;" href="javascript:;" class="btn btn-white btn-warning btn-bold remove-option"><i class="ace-icon fa fa-minus bigger-120 orange"></i></i></a>
         </div>
     </div>
     {% endif %}

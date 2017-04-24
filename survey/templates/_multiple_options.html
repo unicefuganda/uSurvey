@@ -1,7 +1,7 @@
 <script type="text/template" id="{{ id }}">
 <style type="text/css">
     .form-horizontal .control-label {
-    padding-top: 7px !important;
+    padding-top: 0px !important;
     margin-bottom: 0;
     text-align: right;
 }
@@ -10,8 +10,8 @@
         <label class="control-label col-md-4">{{ option_label }} <span class="number"></span></label>
         <div class="controls">
             <input type="text" maxlength="100" name={{ name }}>
-            <a href="javascript:;" class="btn btn-white btn-warning btn-bold add-option"><i class="ace-icon fa fa-plus bigger-120 orange"></i></i></a>
-            <a href="javascript:;" class="btn btn-white btn-warning btn-bold remove-option"><i class="ace-icon fa fa-minus bigger-120 orange"></i></i></a>
+            <a style="padding: 0px !important;" href="javascript:;" class="btn btn-white btn-warning btn-bold add-option"><i class="ace-icon fa fa-plus bigger-120 orange"></i></i></a>
+            <a style="padding: 0px !important;" href="javascript:;" class="btn btn-white btn-warning btn-bold remove-option"><i class="ace-icon fa fa-minus bigger-120 orange"></i></i></a>
             {% if extra_fields %}
                 <label class="control-label" for="id_required">required</label>
                 <div class="controls ">
