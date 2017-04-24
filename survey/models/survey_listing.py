@@ -185,4 +185,4 @@ class ListingSample(BaseModel):
                 label = interview.answer.first().as_text
             except:
                 pass
-        return label
+        return label or interview.question_set.name
