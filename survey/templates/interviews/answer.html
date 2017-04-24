@@ -59,8 +59,7 @@
                                                             {% if interview.last_question.loops and access.choice_name != 'Ussd Access' %}
                                                             <div class="loops form_row">
                                                                {% for loop in interview.last_question.loops %}
-                                                               {% get_answer loop.loop_starter interview as loop_count %}
-                                                               &raquo; {{ loop.loop_starter.identifier }} ({{loop_count}})
+                                                               &raquo; {{ loop.loop_starter.identifier }} ({{loops.count|get_value:loop.id}})
                                                                {% endfor %}
                                                             </div>
                                                             {%  endif %}
