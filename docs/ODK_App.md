@@ -23,12 +23,12 @@ Enrolled Interviewers, has to do data collection and submission using Android Ap
 • Search for “uSurvey” and choose uSurvey App from search results <br>
 • Select ‘uSurvey App’ in the result and click the Install button <br>
 • Click OK after viewing the security settings <br>
-• Once App installation is done, now uSurvey App is available in application list and ready to launch (see image below) <br>
+• Once App installation is done, now uSurvey App is available in application list and ready to launch, as shown below in Mobile Screen-1 <br>
 • Now launch uSurvey App on mobile <br>
 
 ![ODK](./ODK-1.png)
 
-App Home/landing screen has following options as shown below in Mobile Screen-1
+App Home/landing screen has following options as shown below in Mobile Screen-2
 
 ![ODK](./ODK-2.png)
 
@@ -36,7 +36,7 @@ App Home/landing screen has following options as shown below in Mobile Screen-1
 
 For first time use and when app reset is done, one has to provide, App user credentials as a part of one-time configuration settings as follows: <br>
 • To configure, press the Menu button on the phone while the app is opened, then Select ‘General Settings’, takes you to a new screen to change setting <br>
-
+as shown below in Mobile Screen-3
 ![ODK](./ODK-3.png)
 
 • Now under ‘Server Settings’ select ‘Configure platform settings’ <br>
@@ -109,6 +109,9 @@ If the search criteria match the input data, then screen will show up with list 
 <b>Edit Download Form</b>
 This feature provides, option to view or edit download questionnaire forms and resubmit.
 
-You can select any form from list to view or edit, usually these forms, show with ‘Survey –Listing’ names, tap on the listed items or hit on ‘Go To Start’ to proceed view or edit filled questionnaire, once changes are done, don’t forget to hit on ‘Save Survey and Exit’. If any changes are done, don’t forget to repeat the steps in Send Finalized Form
+You can select any form from list to view or edit, usually these forms, show with ‘Survey –Listing’ names, tap on the listed items or hit on ‘Go To Start’ to proceed view or edit filled questionnaire, once changes are done, don’t forget to hit on ‘Save Survey and Exit’. If any changes are done,
+ don’t forget to repeat the steps in Send Finalized Form
 
 There is an option to Exit Form by pressing the default ‘BACK’ button of the Mobile at any time while filling or using this App, which prompt with message to ‘Save Changes’, ‘Ignore Changes’ and ‘Cancel’ to the Form. As shown in below Mobile Screen-24
+
+<b>Delete Saved Form</b>
