@@ -151,10 +151,9 @@ def instances_form_list(request):
     """
     interviewer = request.user
     assignments = interviewer.unfinished_assignments
-    submissions = ODKSubmission.objects.filter(
-        ea__in=[
-            a.allocation_ea for a in assignments],
-        survey=assignments.first().survey)  # pick irrespective of status
+    submissions = ODKSubmission.objects.filter(status=ODKSubmission.COMPLETED,
+                                               ea__in=[a.allocation_ea for a in assignments],
+                                               survey=assignments.first().survey)  # pick irrespective of status
     # now exclude any question already being used as a sample sample
     listing_interviews = ListingSample.objects.values_list(
         'interview', flat=True)
@@ -172,12 +171,11 @@ def instances_form_list(request):
 @http_digest_interviewer_auth
 def download_odk_submissions(request, submission_id):
     interviewer = request.user
-    submission = get_object_or_404(
-        ODKSubmission,
+    submission = get_object_or_404(ODKSubmission,
         # check if the interviewer authorized for this submission EA!
         pk=submission_id,
-        ea__in=[
-            a.allocation_ea for a in interviewer.unfinished_assignments])
+        ea__in=[a.allocation_ea for a in interviewer.unfinished_assignments],
+    )
 
     response = BaseOpenRosaResponse(submission.xml)
     response.status_code = 200

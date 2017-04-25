@@ -73,6 +73,10 @@
             .ms-container {
             margin-right: 10px !important;
             }
+
+            .qtips {
+                background:#cdf7c1; colorL#000; border-color:1px solid  #799c4b;
+            }
         </style>
         <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" >
         <link href="https://fonts.googleapis.com/css?family=Dosis" rel="stylesheet" >
@@ -429,7 +433,9 @@
                 
                 
                 try { 
-                    $('form span[title]').qtip();
+                        $('form span[title]').qtip({
+                            style: { classes: 'qtips' },
+                        });
                     }
                 catch(err) {
                     //alert(err);
