@@ -19,24 +19,24 @@ User Guides
 
 * **Administration** 
   * [Interviewers](./Interviewer.md)
-  * [Notification](http://usurvey.unicefuganda.org/bulk_sms)
+  * [Notification](#)
   * [Data Entry](#)
 
 * **Monitor**
   * [Listing Data](#)
   * [Batch Data](#)
-  * [Completion Summary](http://usurvey.unicefuganda.org/surveys/interviewers_completion/)
-  * [ODK Submission](http://usurvey.unicefuganda.org/odk/aggregate/submission_list/)
+  * [Completion Summary](#)
+  * [ODK Submission](./ODK_App.md)
 
 * **Analyse** 
-  * [Indicators](http://usurvey.unicefuganda.org/indicators/)
-  * [Location Weights](http://usurvey.unicefuganda.org/locations/weights/)
+  * [Indicators](#)
+  * [Location Weights](#)
 
 * **Download**
-  * [Survey Data](http://usurvey.unicefuganda.org/aggregates/download_spreadsheet)
-  * [Mobile Money Sheet](http://usurvey.unicefuganda.org/interviewer_report/)
+  * [Survey Data](#)
+  * [Mobile Money Sheet](#)
 
 * **Settings**
-  * [Users](http://usurvey.unicefuganda.org/users/)
-  * [Locations](http://usurvey.unicefuganda.org/enumeration_area/)
+  * [Users](#)
+  * [Locations](#)
   * [Setup](#)
