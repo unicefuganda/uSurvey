@@ -19,24 +19,25 @@ Enrolled Interviewers, has to do data collection and submission using Android Ap
 
  Interviewers has to download uSurvey App form Google play store, then 
 
-• On Android device, go to Google play store
-• Search for “uSurvey” and choose uSurvey App from search results
-• Select ‘uSurvey App’ in the result and click the Install button 
-• Click OK after viewing the security settings
-• Once App installation is done, now uSurvey App is available in application list and ready to launch (see image below)
-• Now launch uSurvey App on mobile
+• On Android device, go to Google play store <br>
+• Search for “uSurvey” and choose uSurvey App from search results <br>
+• Select ‘uSurvey App’ in the result and click the Install button <br>
+• Click OK after viewing the security settings <br>
+• Once App installation is done, now uSurvey App is available in application list and ready to launch (see image below) <br>
+• Now launch uSurvey App on mobile <br>
+![ODK](./ODK-1.png)
 
 App Home/landing screen has following options as shown below in Mobile Screen-1
 
 <b>Configure uSurvey App</b>
 
-For first time use and when app reset is done, one has to provide, App user credentials as a part of one-time configuration settings as follows:
-• To configure, press the Menu button on the phone while the app is opened, then Select ‘General Settings’, takes you to a new screen to change setting
-• Now under ‘Server Settings’ select ‘Configure platform settings’
-• In ‘Configure platform settings’ under ‘ODK Aggregate Settings’, make sure that, URL should be http://usurvey.unicefuganda.org/odk/collect/forms
-• Username: enter ‘ODK ID’ of the Interviewer
-• Password: enter ‘ODK Token’ of the Interviewer <br> (For above details, you need an interviewer defined on uSurvey portal and defined with an ODK ID)
-• then come back to App home screen using Mobile back key
+For first time use and when app reset is done, one has to provide, App user credentials as a part of one-time configuration settings as follows: <br>
+• To configure, press the Menu button on the phone while the app is opened, then Select ‘General Settings’, takes you to a new screen to change setting <br>
+• Now under ‘Server Settings’ select ‘Configure platform settings’ <br>
+• In ‘Configure platform settings’ under ‘ODK Aggregate Settings’, make sure that, URL should be http://usurvey.unicefuganda.org/odk/collect/forms <br>
+• Username: enter ‘ODK ID’ of the Interviewer <br>
+• Password: enter ‘ODK Token’ of the Interviewer <br> (For above details, you need an interviewer defined on uSurvey portal and defined with an ODK ID) <br>
+• then come back to App home screen using Mobile back key <br>
 
 <b>Using uSurvey App</b>
 
