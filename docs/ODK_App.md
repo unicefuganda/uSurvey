@@ -36,17 +36,29 @@ App Home/landing screen has following options as shown below in Mobile Screen-1
 
 For first time use and when app reset is done, one has to provide, App user credentials as a part of one-time configuration settings as follows: <br>
 • To configure, press the Menu button on the phone while the app is opened, then Select ‘General Settings’, takes you to a new screen to change setting <br>
-  ![ODK](./ODK-3.png)
+
+![ODK](./ODK-3.png)
+
 • Now under ‘Server Settings’ select ‘Configure platform settings’ <br>
+
+![ODK](./ODK-4.png)
+
 • In ‘Configure platform settings’ under ‘ODK Aggregate Settings’, make sure that, URL should be http://usurvey.unicefuganda.org/odk/collect/forms <br>
+
+![ODK](./ODK-5.png)
+
 • Username: enter ‘ODK ID’ of the Interviewer <br>
 • Password: enter ‘ODK Token’ of the Interviewer <br> (For above details, you need an interviewer defined on uSurvey portal and defined with an ODK ID) <br>
+
+![ODK](./ODK-6.png)
+
 • then come back to App home screen using Mobile back key <br>
 
 <b>Using uSurvey App</b>
 
 Follow these simple steps for survey Data collection, Get Blank Form, Fill Blank Form, Edit Save Form, Send Finalized Form, Download Data Forms, Search Forms and Edit Download Form
-Step-1
+
+<b>Step-1</b>
 
 <b>Get Blank Form</b>
 
