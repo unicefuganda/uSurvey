@@ -1,7 +1,7 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import permission_required
 from django.http import HttpResponseRedirect
-from django.shortcuts import render
+from django.shortcuts import render, render_to_response
 from django.contrib.auth import logout
 from survey.forms.aboutus_form import AboutUsForm, SuccessStoriesForm
 from survey.models import Survey, AboutUs, Indicator, SuccessStories
@@ -102,14 +102,14 @@ def home_success_story_list(request):
                   'main/home_success_story_list.html',
                   {'ss_list': ss_list})
 
-
+@login_required
 def success_story_list(request):
     ss_list = SuccessStories.objects.all()
     return render(request,
                   'home/success_story_list.html',
                   {'ss_list': ss_list})
 
-
+@login_required
 def success_story_delete(request, id=None):
     if id:
         instance = SuccessStories.objects.get(id=id)
@@ -118,6 +118,7 @@ def success_story_delete(request, id=None):
     return HttpResponseRedirect(reverse('success_story_list'))
 
 
+@login_required
 def success_story_form(request, id=None, instance=None):
     if id:
         instance = SuccessStories.objects.get(id=id)
@@ -140,21 +141,22 @@ def success_story_form(request, id=None, instance=None):
     return render(request, 'home/success_story_form.html', {'form': form})
 
 
-def custom_401(request):
-    print "*****"
-    return render_to_response('401.html')
+def custom_400(request):
+    print "*****400****"
+    return render(request, '400.html', status=400)
+
 
 
 def custom_403(request):
-    print "*****"
-    return render_to_response('403.html')
+    print "*****403*****"
+    return render(request, '403.html', status=403)
 
 
 def custom_404(request):
-    print "*****"
-    return render_to_response('404.html')
+    print "*****404******"
+    return render(request, '404.html', status=404)
 
 
 def custom_500(request):
-    print "*****"
-    return render_to_response('500.html')
+    print "*****500*****"
+    return render(request, '500.html', status=500)

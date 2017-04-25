@@ -16,6 +16,12 @@
         float: left !important;
         margin-left: 0px !important;
     }
+    #id_country_code{width: 40px !important;
+   height: 25px !important;
+margin-left: 0px !important;
+text-align: center;
+margin-top: 5px;
+ }
 
 </style>
 <fieldset>
@@ -42,7 +48,9 @@
 							<td class="horizontal-formset">
 								  {% if field.label_tag|is_mobile_number %}
 								   <div class="ccode">
-									   <span class="add-on">{{ country_phone_code }}</span>
+<span class="add-on"><input type="text" readonly="readonly" value="{{ country_phone_code }}" size="3" id="id_country_code" placeholder="256"></span>
+            <span>{{form.mobile_number}}</span>
+									   <!-- <span class="add-on">{{ country_phone_code }}</span> -->
 								  {% endif %}
 									{{field}}
 								  {% if field.label_tag|is_mobile_number %}

@@ -34,11 +34,19 @@
 </div>
 <div>
 <p style="color: #034b94;font-weight: bold;font-size: 14px;">USSD Access</p>
-  {% include "horizontal-formset.html" with formset=ussd_access_form class='ussd_form' %}  
+  <div class="ussd_mobile">{% include "horizontal-formset.html" with formset=ussd_access_form class='ussd_form' %}  </div>
 </div>
 {% endblock %}
 
 {% block javascripts %}
+<style type="text/css">
+    .dataTables_wrapper .add-on input[type="text"] {
+    width: 38px !important;
+    margin-top: 5px;
+
+}
+
+</style>
 	 <script src="{{ STATIC_URL }}js/jquery.validate.min.js" type="text/javascript" charset="utf-8"></script>
     <script src="{{STATIC_URL}}js/investigator.js" type="text/javascript" charset="utf-8"></script>
     <script src="{{STATIC_URL}}js/location-widget.js" type="text/javascript" charset="utf-8"></script>
@@ -51,7 +59,8 @@
                 addText: '<span class="add-m-text">Add Mobile Number</span>',
                 extraClasses: ['row1', 'row2', 'row3']
             });
-        })
+        });
+
     </script>
     <script type="text/javascript">
       {% if mode == 'view' %}

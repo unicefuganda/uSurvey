@@ -32,7 +32,7 @@ def get_question_set_form(model_class):
                     attrs={
                         'size': 29,
                         'title': 'Your name',
-                        'style': 'height: 2em;'}),
+                        'style': 'height: 2em;width:231px;'}),
                 'description': forms.Textarea(
                     attrs={
                         "rows": 5,
