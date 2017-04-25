@@ -102,14 +102,14 @@ def home_success_story_list(request):
                   'main/home_success_story_list.html',
                   {'ss_list': ss_list})
 
-
+@login_required
 def success_story_list(request):
     ss_list = SuccessStories.objects.all()
     return render(request,
                   'home/success_story_list.html',
                   {'ss_list': ss_list})
 
-
+@login_required
 def success_story_delete(request, id=None):
     if id:
         instance = SuccessStories.objects.get(id=id)
@@ -118,6 +118,7 @@ def success_story_delete(request, id=None):
     return HttpResponseRedirect(reverse('success_story_list'))
 
 
+@login_required
 def success_story_form(request, id=None, instance=None):
     if id:
         instance = SuccessStories.objects.get(id=id)
