@@ -39,7 +39,7 @@
     <div class="control-group options question-option">
         <label  class="control-label col-md-4" style="margin-top: 15px !important;">Option <span class="number"> {{ option.order }}</span></label>
         <div class="controls">
-                <input type="text" maxlength="100" name="options">
+                <input type="text" maxlength="100" name="options" value="{{option.text}}">
             <a style="padding: 0px !important;" href="javascript:;" class="btn btn-white btn-warning btn-bold add-option"><i class="ace-icon fa fa-plus bigger-120 orange"></i></a>
             <a style="padding: 0px !important;" href="javascript:;" class="btn btn-white btn-warning btn-bold remove-option"><i class="ace-icon fa fa-minus bigger-120 orange"></i></a>
             </div>
@@ -104,8 +104,9 @@ margin-left: 0px !important; }
 .dataTables_wrapper input[name=options] {
   width: 261px !important;
     height: 27px !important;
-margin-left: 2px !important;
+margin-left: 1px !important;
 margin-top: 10px !important;
 }
+.dataTables_wrapper .btn.btn-white, .dataTables_wrapper .question-option{margin-top: 10px !important;}
 </style>
 {% endblock %}
