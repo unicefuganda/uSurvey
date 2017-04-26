@@ -1,10 +1,10 @@
 {% extends "form.html" %}
 
 {% block title %}
- {% if enumeration_area_form.instance %}
+ {% if enumeration_area_form.name.value %}
  	Change Enumeration Area
  {% else %}
-  New Enumeration Area
+  Add Enumeration Area
  {% endif %}
 {% endblock %}
 {% block search %}
@@ -18,10 +18,13 @@
 {% block display_form_fields %}
 <style type="text/css">
 	.control-label{
-		margin-left: 90px !important;
+		margin-left: 20px !important;
 	}	
 #ea_name{
-	margin-left: 55px !important;
+	margin-left: 70px !important;
+}
+.ms-container{
+	margin-left: 100px !important;
 }
 </style>
 
@@ -69,20 +72,23 @@
     <style type="text/css">
     .form-inline .control-label { 
      margin-top: 18px;
-}
-    	#ea_name {
-    		margin-left: 10px !important;
-    	}
+}    	
     	.controls > label {
     		padding-bottom: 25px !important;
     	}
     	.ms-container {    
     margin-top: -25px !important;
-    width: 1070px !important;    
+    width: 100% !important;    
 }  
 .controls {
     margin-bottom: 20px;
     margin-top: -18px;
 }  	
+.form-horizontal .control-label{
+	width: 0px !important;
+    padding-right: 0px !important;  
+    text-align: none !important; 
+}
+
     </style>
 {% endblock %}
