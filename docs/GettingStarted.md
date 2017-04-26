@@ -11,7 +11,7 @@ Create new Module or skip this step, if you want to use existing Modules
 
 Create new Group or skip this step, if you want to use existing Groups
 
-</b>Step -3</b>
+<b>Step -3</b>
 
 Create new Listing or skip this step, if you want to use existing Listing or you can Clone existing Listing and rename it. Here we have to observe two things;
 

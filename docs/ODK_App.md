@@ -5,11 +5,11 @@ uSurvey portal is intended to design, define the Listings, Surveys and to collec
 1. Using Internet services: Android channel
 2. Using GSM Cellular Telephones services: USSD channel
 
-<b>Data collection and submission using Android channel</b>
+**Data collection and submission using Android channel**
 
 uSurvey App is exclusively designed for survey data collection and submission using the hand-held mobile devices (Android Smart Phone/ Tablet). Hence uSurvey application is paperless and carry out survey in a digitalized process with increased ease and accuracy of data. 
 
-<b>Implementing uSurvey App</b>
+**Implementing uSurvey App**
 
 Conducting Survey using uSurvey App is simple.
 
