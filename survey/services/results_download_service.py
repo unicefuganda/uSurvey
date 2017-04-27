@@ -88,7 +88,11 @@ class ResultsDownloadService(object):
         self.multi_display = int(multi_display)
 
     def get_interview_answers(self):
-        cache_filters = [QuestionSet.objects.get(id=self.batch.id), Survey.objects.get(id=self.survey.id)]
+        cache_filters = []
+        if self.batch:
+            cache_filters.append(QuestionSet.objects.get(id=self.batch.id))
+        if self.survey:
+            cache_filters.append(Survey.objects.get(id=self.survey.id))
         if self.locations:
             cache_filters.append(EnumerationArea.objects.filter(locations__in=self.locations))
         else:
