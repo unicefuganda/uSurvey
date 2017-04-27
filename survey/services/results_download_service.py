@@ -93,6 +93,7 @@ class ResultsDownloadService(object):
             cache_filters.append(EnumerationArea.objects.filter(locations__in=self.locations))
         else:
             cache_filters.append(self.interviews)
+
         @cached_as(*cache_filters)
         def _get_interview_answers():
             interview_list_args = [
