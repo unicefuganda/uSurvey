@@ -204,7 +204,7 @@
              <div class="">
                 <div class="inline pos-rel">
                        <button class="btn btn-minier btn-yellow dropdown-toggle" data-toggle="dropdown" data-position="auto">
-                           <i class="usur-icon fa fa-caret-down icon-only bigger-120"></i>
+                           {% if  batch and batch.interviews.count == 0 or question.options.all %}<i class="usur-icon fa fa-caret-down icon-only bigger-120"></i>{% endif %}
                        </button>
                         <ul class="dropdown-menu dropdown-only-icon dropdown-yellow dropdown-menu-right dropdown-caret dropdown-close">
                          {% if  batch and batch.interviews.count == 0 %}
