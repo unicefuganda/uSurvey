@@ -237,8 +237,7 @@ def _view_qset_data(request, model_class, interviews, disabled_fields=[]):
         selected_qset = survey_filter.cleaned_data['question_set']
         survey = survey_filter.cleaned_data['survey']
     if locations_filter.is_valid():
-        interviews = interviews.filter(
-            ea__in=locations_filter.get_enumerations()).order_by('created')
+        interviews = interviews.filter(ea__in=locations_filter.get_enumerations())
     search_fields = [
         'ea__name',
         'survey__name',

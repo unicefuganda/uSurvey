@@ -63,8 +63,7 @@ class LocationsFilterForm(Form):
                     last_selected_pk = data.get(
                         location_type.name, None) or parent_selection
                     kw['parent__pk'] = parent_selection
-                locations = Location.objects.filter(
-                    **kw).only('id', 'name').order_by('name')
+                locations = Location.objects.filter(**kw).only('id', 'name').order_by('name')
             else:
                 self.data[location_type.name] = ''
                 locations = Location.objects.none()
@@ -77,13 +76,11 @@ class LocationsFilterForm(Form):
             self.fields[location_type.name].widget.attrs['class'] = 'location_filter ea_filters chzn-select'
             # self.fields[location_type.name].widget.attrs['style'] = 'width: 100px;'
         if last_selected_pk:
-            self.last_location_selected = Location.objects.get(
-                pk=last_selected_pk)
+            self.last_location_selected = Location.objects.get(pk=last_selected_pk)
         if include_ea:
             if self.last_location_selected:
                 eas = EnumerationArea.objects.filter(
-                    locations__in=get_leaf_locs(
-                        loc=self.last_location_selected)).distinct()
+                    locations__in=get_leaf_locs(loc=self.last_location_selected)).distinct().order_by('name')
             else:
                 eas = EnumerationArea.objects.none()
             choices = [(ea.pk, ea.name) for ea in eas]
@@ -100,36 +97,27 @@ class LocationsFilterForm(Form):
         loc = None
         ea = None
         if self.is_valid():
-            for key in self.fields.keys():
-                if key is not 'enumeration_area':
-                    val = self.cleaned_data[key]
-                    if val:
-                        loc = val
-                else:
-                    ea = self.cleaned_data.get(key, None)
+            if 'enumeration_area' in self.cleaned_data:
+                ea = self.cleaned_data.get('enumeration_area', None)
+            loc = self.last_location_selected
         return get_leaf_locs(loc, ea)
 
     def get_enumerations(self):
-        if hasattr(
-                self,
-                'cleaned_data') and self.cleaned_data.get(
-                'enumeration_area',
-                None):
-            return EnumerationArea.objects.filter(
-                pk=self.cleaned_data['enumeration_area'].pk)
-        return EnumerationArea.objects.filter(
-            locations__in=self.get_locations()).distinct().order_by('name')
+        if hasattr(self, 'cleaned_data') and self.cleaned_data.get('enumeration_area', None):
+            # next line is just to make sure it's an EA queryset
+            return EnumerationArea.objects.filter(pk=self.cleaned_data['enumeration_area'].pk)
+        return EnumerationArea.objects.filter(locations__in=self.get_locations()).distinct().order_by('name')
 
 
 def get_leaf_locs(loc=None, ea=None):
     if Location.objects.exists():
-        if not loc:
-            location = Location.objects.get(parent=None)
-        else:
+        if loc:
             if isinstance(loc, Location):
                 location = loc
             else:
                 location = Location.objects.get(pk=loc)
+        else:
+            location = Location.objects.get(parent=None)
         locations = location.get_leafnodes(True)
         if ea:
             locations = locations.filter(enumeration_areas=ea)

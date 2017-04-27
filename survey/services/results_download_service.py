@@ -88,11 +88,12 @@ class ResultsDownloadService(object):
         self.multi_display = int(multi_display)
 
     def get_interview_answers(self):
-        @cached_as(
-            QuestionSet.objects.get(
-                id=self.batch.id), Survey.objects.get(
-                id=self.survey.id), EnumerationArea.objects.filter(
-                locations__in=self.locations))
+        cache_filters = [QuestionSet.objects.get(id=self.batch.id), Survey.objects.get(id=self.survey.id)]
+        if self.locations:
+            cache_filters.append(EnumerationArea.objects.filter(locations__in=self.locations))
+        else:
+            cache_filters.append(self.interviews)
+        @cached_as(*cache_filters)
         def _get_interview_answers():
             interview_list_args = [
                 'created',

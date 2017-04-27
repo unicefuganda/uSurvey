@@ -132,7 +132,7 @@ def list_interviewers(request):
     locations_filter = LocationsFilterForm(data=request.GET, include_ea=True)
     if locations_filter.is_valid():
         interviewers = Interviewer.objects.filter(
-            ea__in=locations_filter.get_enumerations()).order_by('name')
+            ea__in=locations_filter.get_enumerations())
     else:
         interviewers = Interviewer.objects.all()
     search_fields = ['name', 'intervieweraccess__user_identifier']
@@ -144,7 +144,7 @@ def list_interviewers(request):
             is_blocked=ast.literal_eval(params['status']))
     loc_types = LocationType.in_between()
     return render(request, 'interviewers/index.html',
-                  {'interviewers': interviewers,
+                  {'interviewers': interviewers.order_by('name'),
                    'locations_filter': locations_filter,
                    'location_filter_types': loc_types,
                    'placeholder': 'name, mobile numbers, odk id',
