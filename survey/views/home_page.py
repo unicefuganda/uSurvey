@@ -63,7 +63,7 @@ def edit(request):
             about_form.save()
             message = "About us content successfully updated."
             messages.success(request, message)
-            return HttpResponseRedirect("/about/")
+            return HttpResponseRedirect(reverse('about_page'))
     return render(request, 'home/edit.html', {'about_form': about_form})
 
 
@@ -142,21 +142,16 @@ def success_story_form(request, id=None, instance=None):
 
 
 def custom_400(request):
-    print "*****400****"
     return render(request, '400.html', status=400)
 
 
-
 def custom_403(request):
-    print "*****403*****"
-    return render(request, '403.html', status=403)
+    return HttpResponseRedirect(reverse('login_page'))
 
 
 def custom_404(request):
-    print "*****404******"
     return render(request, '404.html', status=404)
 
 
 def custom_500(request):
-    print "*****500*****"
     return render(request, '500.html', status=500)

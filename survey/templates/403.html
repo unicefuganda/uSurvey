@@ -14,7 +14,8 @@
                         <hr/>
                         {% if user.is_authenticated %}
                         	<p style="font-size: 15px;" >You don't have permisson to access the page. Head back to the dashbaord page </p><br/>
-                        	<a href="{% url 'home_page' %}" class="btn btn-primary btn-submit"><i class="glyphicon glyphicon-arrow-left"></i> Go Back</a>
+                        	<a href="{% if request.META.HTTP_REFERER %} {{ request.META.HTTP_REFERER }}
+                        	        {% else %}{% url 'home_page' %}{% endif %}" class="btn btn-primary btn-submit"><i class="glyphicon glyphicon-arrow-left"></i> Go Back</a>
                          {%else%}
                          	<p style="font-size: 15px;" >You don't have permisson to access the page. Head back to the Home page </p><br/>
                             <a href="/" class="btn btn-primary btn-submit"><i class="glyphicon glyphicon-arrow-left"></i> Go Back</a>
