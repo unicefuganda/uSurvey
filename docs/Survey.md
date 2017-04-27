@@ -1,74 +1,74 @@
 ###Create Survey
 
-Surveys are available from main menu under <b>Design</b> >> <b>Surveys</b>
+Surveys are available from main menu under **Design** >> **Surveys**
 ![Survey](./Survey1.png)
 A New Survey can be created and defined here, so before creating a survey first of all one has to know about the terminology used here.
 
-• <b>Preferred Listing</b>: List of existing Listing, which are already in the system.<br>
+• **Preferred Listing**: List of existing Listing, which are already in the system.<br>
 Is an option to choose, existing Listing for this New Survey, where already survey was conducted on these Listings, which will include total Listing questions along with the data/results.
 
-• <b>New Listing</b>: List of Newly created Listings, not previously used in any survey.<br>
+• **New Listing**: List of Newly created Listings, not previously used in any survey.<br>
 This field will enable only if option “None, Create New” is selected, in the dropdown ‘Preferred Listing’. which contains list of Newly created Listings, which are not yet used in any survey.
 
-• <b>Randomly selected data label</b>: Is the identifier for respondents while conducting a Listing survey.<br>
+• **Randomly selected data label**: Is the identifier for respondents while conducting a Listing survey.<br>
 This field will enable only when listing in dropdown ‘New Listing’ is selected.
 
-<b>How to create a Survey?</b><br>
+**How to create a Survey?**<br>
 To create a New Survey, click on ‘Create New Survey’ button at top right of the Survey page, that opens a form to create a new Survey, which has following elements;
 
 ![Survey](./Survey2.png)
 
-<b>Elements of a Survey</b>:
+**Elements of a Survey**:
 
 ![Survey](./Survey3.png)
 
-• <b>Name</b>: Is Survey Name, which is a unique identity to a survey and is a mandatory field<br>
-• <b>Description</b>: write about the importance of this survey in short<br>
-• <b>Survey Type</b>: This identifies how survey is going to take place either using Listing or not<br>
+• **Name**: Is Survey Name, which is a unique identity to a survey and is a mandatory field<br>
+• **Description**: write about the importance of this survey in short<br>
+• **Survey Type**: This identifies how survey is going to take place either using Listing or not<br>
     If Survey Type is “Sampled”, Survey uses Sample size and Listing<br>
     If Survey Type is “Census”, Survey doesn’t need Sample size and Listing
 
-• <b>Sample size</b>: Provide survey sample size<br>
-• <b>Preferred Listing</b>: select an existing Listing Or<br>
-• <b>New Listing</b>: select Newly created Listing<br>
-• <b>Randomly selected data label</b>: You need to include one listing response identifier in double curly brackets.<br>
+• **Sample size**: Provide survey sample size<br>
+• **Preferred Listing**: select an existing Listing Or<br>
+• **New Listing**: select Newly created Listing<br>
+• **Randomly selected data label**: You need to include one listing response identifier in double curly brackets.<br>
  i.e. just type, double curly brackets to automatically insert ‘Variable Name’ in above selected Listing<br>
  Ex: type {{ , system prompts with ‘Variable Name’ then select any one to insert Variable Name<br>
  Like: {{house_number}} <br>
-• <b>Email group</b>: select, User Emails Id to send report  
+• **Email group**: select, User Emails Id to send report  
 
 A New Survey is created by providing above fields and click on ‘Save’ button to Create a Survey. 
 
-<b>Search</b>: One can find Surveys in the application, using the search bar at top right side of this survey page, by providing Name or description.
+**Search**: One can find Surveys in the application, using the search bar at top right side of this survey page, by providing Name or description.
 
 On the ‘Survey’ page one can view all the Survey created in the application, in a tabular form with following column names:
 
-<b>Sts</b>: Represents Status of the Survey by color indicator, that means each of the Color code indicates as:
+**Sts**: Represents Status of the Survey by color indicator, that means each of the Color code indicates as:
  <span style="color:Gray;font-weight:bold;">•</span>– Not Started<br>
  <span style="color:Orange;font-weight:bold;">•</span>– Ongoing<br>
  <span style="color:Green;font-weight:bold;">•</span>– Completed<br>
 
-• <b>Name</b>: Is Name of a Survey, which is a unique identity to represent Survey and is a mandatory field.<br>
-• <b>Description</b>: A short description about Listing<br>
-• <b>Type</b>: Survey type Sampled or Census<br>
-• <b>Sample size</b>: Provide survey sample size<br>
-• <b>Total Respondents</b>: once the Survey is completed, this column will be updated with the count of participants/ respondents.<br>
-• <b>Eas Covered</b>: Count of Enumeration areas covered in this particular survey.
+• **Name**: Is Name of a Survey, which is a unique identity to represent Survey and is a mandatory field.<br>
+• **Description**: A short description about Listing<br>
+• **Type**: Survey type Sampled or Census<br>
+• **Sample size**: Provide survey sample size<br>
+• **Total Respondents**: once the Survey is completed, this column will be updated with the count of participants/ respondents.<br>
+• **Eas Covered**: Count of Enumeration areas covered in this particular survey.
 
-<b>Actions in Survey</b>:
+**Actions in Survey**:
 
-• <b>Edit Survey</b>: click on, Action Item ‘Edit’, User can Edit all fields in the Survey<br>
-• <b>Delete Survey</b>: click on, Action Item ‘Delete, the entire Survey is removed, before deleting you will be prompted with conformation to delete, click ‘Yes’ to Delete permanently. <br> This option is not available for completed Survey<br>
-• <b>View Batches in Survey</b>: click on, Action Item ‘View Batches’, navigates to ‘Survey Batches’ page<br>
-• <b>Clone a Survey</b>: click on, Action Item ‘Clone’, an another copy of same Survey is created along with Survey Batches and Batch Questions, except existing Looping and Logic in Batch Questions<br>
-• <b>Sampling Criteria</b>: 
+• **Edit Survey**: click on, Action Item ‘Edit’, User can Edit all fields in the Survey<br>
+• **Delete Survey**: click on, Action Item ‘Delete, the entire Survey is removed, before deleting you will be prompted with conformation to delete, click ‘Yes’ to Delete permanently. <br> This option is not available for completed Survey<br>
+• **View Batches in Survey**: click on, Action Item ‘View Batches’, navigates to ‘Survey Batches’ page<br>
+• **Clone a Survey**: click on, Action Item ‘Clone’, an another copy of same Survey is created along with Survey Batches and Batch Questions, except existing Looping and Logic in Batch Questions<br>
+• **Sampling Criteria**: 
 
 ###Batches
 Batch is a categorization of Survey Questions, that means set of Questions categorized for a Survey convenience. We can create multiple Batches in a survey.
 
 Once the Survey is created, next step is to create ‘Batch’ and ‘Add Questions’ to Batch.
 
-<b>How to create a Batch?</b>
+**How to create a Batch?**
 
 Go to Batches Page, which can be done in two ways
 On the ‘Survey’ page you can view all the Survey created in the application
@@ -76,25 +76,25 @@ Now click on Survey Name, or click on, Action Item ‘View Batches’ to go to �
 
 To create a New Batch, click on ‘Create New Batch’ button at top right of the Batch page, that opens a form to create a new Batch, which has following elements;
 
-<b>Elements of a Batch</b>:
+**Elements of a Batch**:
 
-• <b>Name</b>: Is Batch Name, which is a unique identity to a Batch and is a mandatory field<br>
-• <b>Description</b>: write about the importance of this Batch in short<br>
-• <b>Access channels</b>: This will identify on which channel this survey has to be conducted and has two channel ODK and USSD
+• **Name**: Is Batch Name, which is a unique identity to a Batch and is a mandatory field<br>
+• **Description**: write about the importance of this Batch in short<br>
+• **Access channels**: This will identify on which channel this survey has to be conducted and has two channel ODK and USSD
 
 A New Batch is created by providing above fields and click on ‘Save’ button to Create a New Batch in Survey. 
 
-<b>Actions in Batch</b>:
+**Actions in Batch**:
 
-• <b>Edit</b>: click on, Action Item ‘Edit’, User can Edit all fields in a Batch<br>
-• <b>Delete</b>: click on, Action Item ‘Delete, the entire Batch along with questions are removed, before deleting you will be prompted with conformation to delete, click ‘Yes’ to Delete permanently. This option is not available for completed Surveys<br>
-• <b>View/Edit Questions</b>: click on, Action Item ‘View /Edit Questions’, takes to the Survey ‘Batch Questions’ page <br>
-• <b>Open/Close</b>: click on, Action Item ‘Open/Close’, takes to the page where all Enumeration Areas are listed, here one can change the “status of conducting survey in a particular Enumeration Area” to Open/Close<br>
+• **Edit**: click on, Action Item ‘Edit’, User can Edit all fields in a Batch<br>
+• **Delete**: click on, Action Item ‘Delete, the entire Batch along with questions are removed, before deleting you will be prompted with conformation to delete, click ‘Yes’ to Delete permanently. This option is not available for completed Surveys<br>
+• **View/Edit Questions**: click on, Action Item ‘View /Edit Questions’, takes to the Survey ‘Batch Questions’ page <br>
+• **Open/Close**: click on, Action Item ‘Open/Close’, takes to the page where all Enumeration Areas are listed, here one can change the “status of conducting survey in a particular Enumeration Area” to Open/Close<br>
 i.e. Open- means allow to conduct survey and Close - means it prevents to conduct survey.
 
-• <b>View Data</b>: click on, Action Item ‘View Data’, shows Data collected in this Survey. This option is available only for completed Surveys.
+• **View Data**: click on, Action Item ‘View Data’, shows Data collected in this Survey. This option is available only for completed Surveys.
 
-<b>How to create Batch Questions?</b>
+**How to create Batch Questions?**
 
 Once Survey and Batches are created, next step is to ‘Add Questions’ to Batch as follows:
 
@@ -103,70 +103,70 @@ Now click on Batch Name, or click on, Action Item ‘View /Edit Question’ to g
 
 Now click on, ‘Add Question’ button at top right side of this page, this will open a form where one can create a Question, which has following elements; 
 
-<b>Elements in Batch Question form</b>:
+**Elements in Batch Question form**:
 
-• <b>Module</b>: All Modules in the application are listed here in this dropdown, one has to select, respective Module that is related to survey<br>
-• <b>Group</b>: All available Groups are listed in this dropdown, select relevant group name for the question<br>
-• <b>Variables Name</b>: This is an identifier for Question, type a code for Question<br>
-• <b>Text</b>: Is the actual Question, Write a Question. While typing a question, auto suggestion feature is available, which will prompt with the ‘Variable Name’ of preceding questions, that helps to include “Answered text of preceding question” in framing this question. 
+• **Module**: All Modules in the application are listed here in this dropdown, one has to select, respective Module that is related to survey<br>
+• **Group**: All available Groups are listed in this dropdown, select relevant group name for the question<br>
+• **Variables Name**: This is an identifier for Question, type a code for Question<br>
+• **Text**: Is the actual Question, Write a Question. While typing a question, auto suggestion feature is available, which will prompt with the ‘Variable Name’ of preceding questions, that helps to include “Answered text of preceding question” in framing this question. 
 i.e. just type, double curly brackets to automatically prompt with the ‘Variable Name’ from preceding questions, <br>
 Ex: type {{ , system prompts with ‘Variable Name’ then select any one to insert Variable Name,<br>
 Like: {{structure_address}} <br>
-• <b>Answer Type</b>: Select an Answer Type from dropdown list, such that Question has to be answered in any one of these formats only, that is ‘Answer type’ should be: “Audio, Auto Generate, Date, Geo Point, Image, Multi choice, Multi Select, Numeric, Text and Video”<br>
-• <b>Mandatory</b>: To mark the Question, that has to answered compulsory
+• **Answer Type**: Select an Answer Type from dropdown list, such that Question has to be answered in any one of these formats only, that is ‘Answer type’ should be: “Audio, Auto Generate, Date, Geo Point, Image, Multi choice, Multi Select, Numeric, Text and Video”<br>
+• **Mandatory**: To mark the Question, that has to answered compulsory
 
 A Question in Batch is created by filling above all fields, finally click on ‘Save’ button to Add Question in Batch or click on ‘Save and Add More’ button to continue adding another Question to the same Batch or click on ‘Save and Update Library’ to add same to the ‘Questions Library’.
 
-<b>Select Question</b>: On click, ‘Select Question’ button, User navigates to ‘Select Library Questions’ page where one can Add the Library Questions into Batch. 
+**Select Question**: On click, ‘Select Question’ button, User navigates to ‘Select Library Questions’ page where one can Add the Library Questions into Batch. 
 
 To Add Question from Library to Batch, just Click on “Code” or “Text” to move Question between (Library Questions << / >> Batch Questions) tables, then click on ‘Save’ button at bottom of the page, to finish adding Questions to Batch.
 
-<b>Search</b>: One can find Questions in Library by two ways:<br>
-<b>Sort</b> questions using ‘Answer Type’ dropdown at top left side of this page Or<br>
-<b>Search</b> using the search bar at top right side of this page, by providing text or code
+**Search**: One can find Questions in Library by two ways:<br>
+**Sort** questions using ‘Answer Type’ dropdown at top left side of this page Or<br>
+**Search** using the search bar at top right side of this page, by providing text or code
 
-<b>Export Questions</b>: On click, ‘Export Questions’ button, user can download the Batch Questions in “.csv” file format.
+**Export Questions**: On click, ‘Export Questions’ button, user can download the Batch Questions in “.csv” file format.
 
-<b>Update Question Order</b>:<br>
+**Update Question Order**:<br>
 Questions in the table can be rearranged.<br>
 To change the order of the Question in table, just select the Question then drag (move up or down) and drop at new position/order you want to in the table, then click on ‘Update Question Order’ button at bottom of the Questions table.
 
 On the ‘Batch Questions’ page one can view all the Questions created in that particular Batch, 
 
-<b>Search</b>: One can find Questions in Batch by two ways:<br>
-<b>Sort</b> questions using ‘Answer Type’ dropdown at top left side of this page Or<br>
-<b>Search</b> using the search bar at top right side of this page, by providing text or code.
+**Search**: One can find Questions in Batch by two ways:<br>
+**Sort** questions using ‘Answer Type’ dropdown at top left side of this page Or<br>
+**Search** using the search bar at top right side of this page, by providing text or code.
 
-<b>Actions for Batch Questions</b>:
+**Actions for Batch Questions**:
 
-* <b>Edit Question</b>: click on, Action Item ‘Edit’, User can edit respective Question, ‘Variable Name’, ‘Text’ (Question), ‘Answer Type’ and can change ‘Mandatory’ type. This option is not available and cannot be performed for completed survey.
+* **Edit Question**: click on, Action Item ‘Edit’, User can edit respective Question, ‘Variable Name’, ‘Text’ (Question), ‘Answer Type’ and can change ‘Mandatory’ type. This option is not available and cannot be performed for completed survey.
 
-* <b>Insert Question</b>: click on, Action Item, ‘Insert Question’ using which User can insert a New Question below the respective Question and rest of the process is similar to ‘Add New Question’.
+* **Insert Question**: click on, Action Item, ‘Insert Question’ using which User can insert a New Question below the respective Question and rest of the process is similar to ‘Add New Question’.
 
-* <b>Delete Question</b>: click on, Action Item ‘Delete’, the Question is removed from list, before deleting you will be prompted with conformation to delete, click ‘Yes’ to Delete permanently.
+* **Delete Question**: click on, Action Item ‘Delete’, the Question is removed from list, before deleting you will be prompted with conformation to delete, click ‘Yes’ to Delete permanently.
 
 Caution, while deleting a Question: when a user attempts to delete a question, if that particular question is assigned with Logic or Loop, then along with the question logic or entire loop is removed respectively.
 
-<b>View Options</b>: This Action item is visible only for the Questions that has Answer Type “Multi choice” and “Multi Select”, to view Answer Options.
+**View Options**: This Action item is visible only for the Questions that has Answer Type “Multi choice” and “Multi Select”, to view Answer Options.
 
-<b>Start/Edit Loop</b>:
+**Start/Edit Loop**:
 ‘Start/Edit Loop’ is an Action item available only for the Questions that has Answer Type “Auto Generated”. 
 
 Looping means repeatedly asking set of questions based up the need and purpose of the base question.  
 
 To define the Looping concept, first of all one has to understand about terms that are used in creating a Loop are as following:
 
-<b>Repeat Logic</b>: To apply Looping for a question there should be some base criteria to start loop, that is chosen from ‘Repeat Logic’ as “User Defined”, “Fixed number of repeats” and “Response from previous question”
+**Repeat Logic**: To apply Looping for a question there should be some base criteria to start loop, that is chosen from ‘Repeat Logic’ as “User Defined”, “Fixed number of repeats” and “Response from previous question”
 
-<b>User Defined</b>: Need to choose what set of Question come into loop, starting from this particular question and has to end loop with any of the consecutive question in the Batch.
+**User Defined**: Need to choose what set of Question come into loop, starting from this particular question and has to end loop with any of the consecutive question in the Batch.
 
-<b>Fixed number of repeats</b>: Is chosen, need to provide ‘Repeat count’ – any specific no of times loop to be repeated. 
+**Fixed number of repeats**: Is chosen, need to provide ‘Repeat count’ – any specific no of times loop to be repeated. 
 
-<b>Response from previous question</b>: Is chosen, only when a question that exists before this base question with Answer Type “Numerical Answer”. This logic is based up on numeric value provided in the previous question.
+**Response from previous question**: Is chosen, only when a question that exists before this base question with Answer Type “Numerical Answer”. This logic is based up on numeric value provided in the previous question.
 
-<b>Loop Ends At</b>: When a loop starts that has to be closed, here the choice at which question the loop as to be closed is selected.  
+**Loop Ends At**: When a loop starts that has to be closed, here the choice at which question the loop as to be closed is selected.  
 
-<b>Loop Prompt</b>: This is a message prompt shown on Mobile App during the time of capturing this details. This message will help the Interviewer to proceed further. 
+**Loop Prompt**: This is a message prompt shown on Mobile App during the time of capturing this details. This message will help the Interviewer to proceed further. 
 Ex: “Do you what to Add one more”, “Do you what to Add another Household”, etc
 
 ###How to create a Loop?
@@ -181,7 +181,7 @@ One should be very careful while creating a loop, first of all analyze how a loo
 • then click on ‘Save’ button to create loop.<br>
 • Now you will be viewing a looping representation on ‘Batch Questions’ page in the ‘Code’ column of the ‘Questions’ table, 
 
-<b>Loop Representation</b>:
+**Loop Representation**:
 
 * <span style="color:Chartreuse;font-weight:bold;"> | </span> - icon represents Loop - START,
 
@@ -189,12 +189,12 @@ One should be very careful while creating a loop, first of all analyze how a loo
 
 * <span style="color:Green;font-weight:bold;"> | </span> - icon represents Loop - CONTINUATION
 
-<b>Remove Loop</b>:
+**Remove Loop**:
 
 This Action item available only for the Questions that has Answer Type “Auto Generated” and a Loop is created.
 click on, Action Item ‘Remove Loop’ which will remove the existing looping logic.
 
-<b>Add Logic</b>: 
+**Add Logic**: 
 
 ‘Add Logic’ is an Action item for every question expect for the Questions that has Answer Type “Auto Generated”.
 
@@ -202,33 +202,33 @@ Add Logic option will convert a question to conditional one such that question w
 
 One has to define the Logic here for respective question by satisfying the condition by providing ‘Eligible Criteria’, ‘Attribute’ Value, and ‘Then’ as follows:
 
-<b>Eligible Criteria</b>: This is a condition made based up on this Question value “Starts With”, “Equals”, “Contains” and “Ends With”.
+**Eligible Criteria**: This is a condition made based up on this Question value “Starts With”, “Equals”, “Contains” and “Ends With”.
 
-<b>Attribute</b>: Provide the “Value” as per the above ‘Eligible Criteria’ selected
+**Attribute**: Provide the “Value” as per the above ‘Eligible Criteria’ selected
 
-<b>Then</b>: Based up on the ‘Eligible Criteria’ and ‘Attribute’ Value chosen, the condition for Question is applied here with following options:
+**Then**: Based up on the ‘Eligible Criteria’ and ‘Attribute’ Value chosen, the condition for Question is applied here with following options:
 
-<b>Reconfirm</b> – Prompts with conformation Question to validate the Answer 
+**Reconfirm** – Prompts with conformation Question to validate the Answer 
 
-<b>End Interview</b> – Skips the intermediate Question and moves to end of the questioner
+**End Interview** – Skips the intermediate Question and moves to end of the questioner
 
-<b>Ask Sub-Question</b> – Provides an option to Create a Sub-Question based upon the ‘Attribute’ value.<br>
+**Ask Sub-Question** – Provides an option to Create a Sub-Question based upon the ‘Attribute’ value.<br>
 To do this, select option “Ask Sub-Question” than you will find a button with name ‘Add Sub-Question’ beside this, 
 click on it to create a Sub-Question, same like create question, once you click on ‘Save’ button, you will find this Sub-Question in the dropdown ‘Choose Question’ 
 beside it, now select the “Sub-Question” and click on ‘Save’ button.
  
-<b>Skip To</b> - Provides the option to jump to any particular/ consecutive question in the list, by skipping / avoiding the    intermediate Question. 
+**Skip To** - Provides the option to jump to any particular/ consecutive question in the list, by skipping / avoiding the    intermediate Question. 
 
-<b>How to Apply Logic to a Question?</b>
+**How to Apply Logic to a Question?**
 
 Click on, Action Item, ‘Add Logic’ this will open a form where one can create a Logic for Question, by providing ‘Eligible Criteria’, ‘Attribute’ Value, and ‘Then’ as per the condition required, then click on ‘Save’ button to create Logic.  
 
 In the same page, logic that is created can be seen in table “Existing Logic”.
 Which shows the created logic for this particular question and has option to ‘Delete’ the applied Logic
 
-<b>Edit Logic</b>: 
+**Edit Logic**: 
 In the ‘Batch Questions’ page, Questions that has Logic are represented with hyperlink, click on the respective Question, that shows options like ‘View logic’, ‘Edit’ and ‘Delete’
 
-• <b>View Logic</b>: click to view the Logic that is Applied for this particular question <br>
-• <b>Edit Logic</b>: click to Edit the existing Logic that is Applied for this particular question <br>
-• <b>Delete Logic</b>: click to Remove the Logic that is Applied for this particular question
+• **View Logic**: click to view the Logic that is Applied for this particular question <br>
+• **Edit Logic**: click to Edit the existing Logic that is Applied for this particular question <br>
+• **Delete Logic**: click to Remove the Logic that is Applied for this particular question
