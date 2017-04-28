@@ -2,17 +2,17 @@ site_name: uSurvey
 pages:
 User Guides:
 - index.md
-#Groups: 
-#- Groups.md
-#Modules:
-#- Modules.md
-#Listing:
-#- Listing.md
-#Survey:
-#- Survey.md
-#Interviewer:
-#-Interviewer.md
-#ODK Guide:
-#-ODK_App.md
+Groups: 
+- Groups.md
+Modules:
+- Modules.md
+Listing:
+- Listing.md
+Survey:
+- Survey.md
+Interviewer:
+-Interviewer.md
+ODK Guide:
+-ODK_App.md
 #theme: readthedocs
 #theme: cerulean
