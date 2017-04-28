@@ -105,8 +105,7 @@ class InterviewerForm(ModelForm):
     #     return self.cleaned_data
 
     def save(self, commit=True, **kwargs):
-        interviewer = super(InterviewerForm, self).save(
-            commit=commit, **kwargs)
+        interviewer = super(InterviewerForm, self).save(commit=commit, **kwargs)
         eas = self.cleaned_data['ea']
         interviewer.ea = eas[0]
         if commit:
