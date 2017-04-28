@@ -21,7 +21,7 @@ def index(request):
         surveys = surveys.filter(type=ast.literal_eval(request.GET['type']))
     if 'isopen' in request.GET:
         surveys = surveys.filter(type=ast.literal_eval(request.GET['isopen']))
-    context = {'surveys': surveys, 'request': request,
+    context = {'surveys': surveys.order_by('-created'), 'request': request,
                'placeholder': 'name, description',
                'survey_form': SurveyForm(), 'batch_model': Batch}
     return render(request, 'surveys/index.html',

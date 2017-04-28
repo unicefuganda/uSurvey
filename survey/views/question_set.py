@@ -52,7 +52,7 @@ class QuestionSetView(object):
         if 'q' in request.GET:
             qsets = get_filterset(qsets, request.GET['q'], search_fields)
         context = {
-            'question_sets': qsets,
+            'question_sets': qsets.order_by('-created'),
             'request': request,
             'model': self.model,
             'placeholder': 'name, description',
