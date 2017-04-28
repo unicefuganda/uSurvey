@@ -13,7 +13,7 @@ import phonenumbers
 
 
 class InterviewerForm(ModelForm):
-    survey = forms.ModelChoiceField(queryset=Survey.objects.all())
+    survey = forms.ModelChoiceField(queryset=Survey.objects.all(), required=False)
     date_of_birth = forms.DateField(
         label="Date of birth",
         required=True,
