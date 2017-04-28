@@ -98,7 +98,7 @@ class ResultsDownloadService(object):
         else:
             cache_filters.append(self.interviews)
 
-        @cached_as(*cache_filters)
+        @cached_as(*cache_filters, extra=(self.page_start, self.items_per_page))
         def _get_interview_answers():
             interview_list_args = [
                 'created',

@@ -227,7 +227,7 @@ def _view_qset_data(request, model_class, interviews, disabled_fields=[]):
     locations_filter = LocationsFilterForm(data=request.GET, include_ea=True)
     selected_qset = None
     survey = None
-    items_per_page = 50
+    items_per_page = int(params.get('max_display_per_page', 50))
     try:
         page_index = int(params.get('page', 1)) - 1
     except BaseException:
@@ -254,7 +254,8 @@ def _view_qset_data(request, model_class, interviews, disabled_fields=[]):
         'placeholder': 'Response, EA, Survey, %s' % model_class.verbose_name(),
         'selected_qset': selected_qset,
         'model_class': model_class,
-        'items_per_page': items_per_page}
+        'items_per_page': items_per_page,
+        'max_display_per_page': items_per_page}
     if selected_qset and survey:
         # page_start = page_index * items_per_page
         # interviews = interviews[page_start: page_start + items_per_page]()
