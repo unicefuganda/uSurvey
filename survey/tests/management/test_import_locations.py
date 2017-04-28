@@ -1,6 +1,5 @@
 import os
 from survey.models.locations import *
-from survey.models import LocationTypeDetails
 from survey.management.commands.import_location import Command
 from survey.tests.base_test import BaseTest
 from survey.management.commands import *
@@ -36,12 +35,6 @@ class ImportLocationTest(BaseTest):
             name='District1', slug='district', parent=self.region)
         self.county = LocationType.objects.create(
             name='County1', slug='county', parent=self.district)
-        LocationTypeDetails.objects.create(
-            location_type=self.region, required=True, has_code=False)
-        LocationTypeDetails.objects.create(
-            location_type=self.district, required=True, has_code=False)
-        LocationTypeDetails.objects.create(
-            location_type=self.county, required=True, has_code=False)
 
     def tearDown(self):
         os.system("rm -rf %s" % self.filename)

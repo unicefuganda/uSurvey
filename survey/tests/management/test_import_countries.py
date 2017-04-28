@@ -1,6 +1,5 @@
 import os
 from survey.models.locations import *
-from survey.models import LocationTypeDetails
 from survey.management.commands.import_countries import Command
 from survey.tests.base_test import BaseTest
 
@@ -27,10 +26,6 @@ class ImportCountriesTest(BaseTest):
         self.filename = 'test.csv'
         open(self.filename, 'rb')
         self.importer = FakeCommand()
-        self.country = LocationType.objects.create(
-            name='Country', slug='country')
-        LocationTypeDetails.objects.create(
-            location_type=self.country, required=True, has_code=False)
 
     def tearDown(self):
         os.system("rm -rf %s" % self.filename)
