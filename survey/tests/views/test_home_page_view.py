@@ -3,6 +3,7 @@ from django.test.client import Client
 from survey.forms.aboutus_form import AboutUsForm
 from survey.models import Survey, AboutUs
 from survey.tests.base_test import BaseTest
+from django.core.urlresolvers import reverse
 
 
 class HomepageViewTest(BaseTest):
@@ -24,7 +25,7 @@ class HomepageViewTest(BaseTest):
         self.assertIn('main/index.html', templates)
 
     def test_no_content_available_on_about_page(self):
-        response = self.client.get('/about/')
+        response = self.client.get(reverse('about_page'))
         self.failUnlessEqual(response.status_code, 200)
         templates = [template.name for template in response.templates]
         self.assertIn('home/about.html', templates)
@@ -35,7 +36,7 @@ class HomepageViewTest(BaseTest):
 
     def test_about_page(self):
         about_us_content = AboutUs.objects.create(content="blah blah")
-        response = self.client.get('/about/')
+        response = self.client.get(reverse('about_page'))
         self.failUnlessEqual(response.status_code, 200)
         templates = [template.name for template in response.templates]
         self.assertIn('home/about.html', templates)
@@ -43,7 +44,7 @@ class HomepageViewTest(BaseTest):
 
     def test_get_edit_about_page(self):
         about_us_content = AboutUs.objects.create(content="blah blah")
-        response = self.client.get('/about/edit/')
+        response = self.client.get(reverse('edit_about_page'))
         self.failUnlessEqual(response.status_code, 200)
         templates = [template.name for template in response.templates]
         self.assertIn('home/edit.html', templates)
@@ -56,12 +57,12 @@ class HomepageViewTest(BaseTest):
         form_data = {'content': about_us_content.content +
                      "more blah blah blah"}
         self.failIf(AboutUs.objects.filter(**form_data))
-        response = self.client.post('/about/edit/', data=form_data)
-        self.assertRedirects(response, '/about/')
+        response = self.client.post(reverse('edit_about_page'), data=form_data)
+        self.assertRedirects(response, reverse('about_page'))
         self.failUnless(AboutUs.objects.filter(**form_data))
         message = "About us content successfully updated"
         self.assertIn(message, response.cookies['messages'].value)
 
     def test_restricted_permssion(self):
         AboutUs.objects.create(content="blah blah")
-        self.assert_restricted_permission_for('/about/edit/')
+        self.assert_restricted_permission_for(reverse('edit_about_page'))
