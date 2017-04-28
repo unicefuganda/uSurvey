@@ -54,9 +54,7 @@ class InterviewerForm(ModelForm):
                     status__in=[
                         SurveyAllocation.PENDING,
                         SurveyAllocation.COMPLETED]).order_by('status')[0].survey.pk
-                self.fields['ea'].initial = EnumerationArea.objects.filter(
-                    survey_allocations__survey=self.fields['survey'].initial,
-                    survey_allocations__interviewer=self.instance)
+                self.fields['ea'].initial = EnumerationArea.objects.filter(id__in=self.instance.unfinished_assignments)
             except IndexError:
                 pass
         self.fields['ea'].queryset = eas
