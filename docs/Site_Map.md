@@ -9,7 +9,6 @@
 ![uSurvey Menu](./uSurvey_LOC.jpg)
 
 
-
 ###Sitemap:
 -----------
 ###uSurvey Home
@@ -17,36 +16,38 @@
 * **Dashboard**
 
 * **Design** 
-   * [Survey](http://usurvey.unicefuganda.org/surveys/)
-   * [Listing](./Listing.md)
-   * [Modules](http://usurvey.unicefuganda.org/modules/)
-   * [Groups](http://usurvey.unicefuganda.org/groups/)
-   * [Question Library](http://usurvey.unicefuganda.org/question_library/)
+  * [Survey](./Survey.md)
+  * [Listing](./Listing.md)
+  * [Modules](./Modules.md)
+  * [Groups](./Groups.md)
+  * [Question Library](./Library.md)
 
 * **Administration** 
-  * [Interviewers](http://usurvey.unicefuganda.org/accounts/login/?next=/interviewers/)
-  * [Households](http://usurvey.unicefuganda.org/households/)
-  * [Open/Close](#)
-  * [Notification](http://usurvey.unicefuganda.org/bulk_sms)
-
-* **Collect**
-   * [Data Entry](#)
+  * [Interviewers](./Interviewer.md)
+  * [Notification](#)
+  * [Data Entry](#)
 
 * **Monitor**
-   * [Completion Rate](http://usurvehttp://usurvey.unicefuganda.org/surveys/interviewers_completion/y.unicefuganda.org/surveys/completion/)
-   * [Completion Summary](http://usurvey.unicefuganda.org/surveys/interviewers_completion/)
-   * [ODK Submission](http://usurvey.unicefuganda.org/odk/aggregate/submission_list/)
+  * [Listing Data](#)
+  * [Batch Data](#)
+  * [Completion Summary](#)
+  * [ODK Submission](./ODK_App.md)
 
 * **Analyse** 
-  * [Indicators](http://usurvey.unicefuganda.org/indicators/)
-  * [Result](#)
-  * [Location Weights](http://usurvey.unicefuganda.org/locations/weights/)
+  * [Indicators](./Indicators.md)
+  * [Location Weights](#)
 
 * **Download**
-   * [Survey Data](http://usurvey.unicefuganda.org/aggregates/download_spreadsheet)
-   * [Mobile Money Sheet](http://usurvey.unicefuganda.org/interviewer_report/)
+  * [Survey Data](#)
+  * [Mobile Money Sheet](#)
 
 * **Settings**
-   * [Users](http://usurvey.unicefuganda.org/users/)
-   * [Locations](http://usurvey.unicefuganda.org/enumeration_area/)
-   * [Setup](#)
+  * [Users](#)
+  * [Locations](#)
+  * [Setup](#)
+
+* **User Profile**
+  * [User](#)
+  * [Active Power Mode](#)
+  * [Change Password](#)
+  * [Logout](#)

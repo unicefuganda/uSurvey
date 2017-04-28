@@ -5,33 +5,28 @@ uSurvey is an innovative data collection tool designed to provide statistically 
 The system has been designed to collect a wide range of data for the structured survey; to generate and produce descriptive statistics and graphical representation of the collected information whenever desired, as well as during the process of data collection.
 Source code for this project is available on github [here]()
 
-User Guides
+User Manual
 -----------
 
-* **Dashboard**
+* **Getting Started**
 
-* **Design** 
-  * [Survey](./Survey.md)
-  * [Listing](./Listing.md)
+* **Design**
   * [Modules](./Modules.md)
   * [Groups](./Groups.md)
+  * [Listing](./Listing.md)
+  * [Survey](./Survey.md)
   * [Question Library](./Library.md)
 
 * **Administration** 
   * [Interviewers](./Interviewer.md)
-  * [Notification](#)
-  * [Data Entry](#)
 
 * **Monitor**
   * [Listing Data](#)
   * [Batch Data](#)
-  * [Completion Summary](#)
-  * [ODK Submission](./ODK_App.md)
 
 * **Analyse** 
-  * [Indicators](#)
-  * [Location Weights](#)
-
+  * [Indicators](./Indicators.md)
+  
 * **Download**
   * [Survey Data](#)
   * [Mobile Money Sheet](#)
@@ -39,4 +34,5 @@ User Guides
 * **Settings**
   * [Users](#)
   * [Locations](#)
-  * [Setup](#)
+  * [Active Power Mode](#)
+  * [Change Password](#)
