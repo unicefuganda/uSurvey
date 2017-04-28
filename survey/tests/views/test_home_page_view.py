@@ -12,8 +12,12 @@ class HomepageViewTest(BaseTest):
         self.client = Client()
         User.objects.create_user(username='useless', email='rajni@kant.com',
                                                            password='I_Suck')
-        raj = self.assign_permission_to(User.objects.create_user('Rajni', 'rajni@kant.com', 'I_Rock'),
-                                        'can_view_users')
+        raj = self.assign_permission_to(
+            User.objects.create_user(
+                'Rajni',
+                'rajni@kant.com',
+                'I_Rock'),
+            'can_view_users')
         self.client.login(username='Rajni', password='I_Rock')
 
     def test_home_page(self):

@@ -11,7 +11,7 @@ from survey.models import Question
 from survey.models import Batch, QuestionModule
 from mock import patch
 import datetime
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 
 
 class Base(TestCase):
@@ -37,7 +37,10 @@ class Base(TestCase):
 
 class BaseTest(Base):
 
-    def assign_permission_to(self, user, permission_type='can_view_investigators'):
+    def assign_permission_to(
+            self,
+            user,
+            permission_type='can_view_investigators'):
         some_group = Group.objects.create(
             name='some group that %s' % permission_type)
         auth_content = ContentType.objects.get_for_model(Permission)
@@ -47,25 +50,40 @@ class BaseTest(Base):
         some_group.user_set.add(user)
         return user
 
-
-    def assert_not_allowed_when_batch_is_open(self, url, expected_redirect_url, expected_message):
+    def assert_not_allowed_when_batch_is_open(
+            self, url, expected_redirect_url, expected_message):
         response = self.client.get(url)
-        self.assertRedirects(response, expected_url=expected_redirect_url,
-                             status_code=302, target_status_code=200, msg_prefix='')
+        self.assertRedirects(
+            response,
+            expected_url=expected_redirect_url,
+            status_code=302,
+            target_status_code=200,
+            msg_prefix='')
         self.assertIn(expected_message, response.cookies['messages'].value)
 
     def assert_restricted_permission_for(self, url):
         self.client.logout()
         self.client.login(username='useless', password='I_Suck')
         response = self.client.get(url)
-        self.assertRedirects(response, expected_url='%s?next=%s' %(reverse('login_page'),
-                             quote(url)), status_code=302, target_status_code=200, msg_prefix='')
+        self.assertRedirects(
+            response,
+            expected_url='%s?next=%s' %
+            (reverse('login_page'),
+             quote(url)),
+            status_code=302,
+            target_status_code=200,
+            msg_prefix='')
 
     def assert_login_required(self, url):
         self.client.logout()
         response = self.client.get(url)
-        self.assertRedirects(response, expected_url='%s?next=%s' %(reverse('login_page')
-                             quote(url)), status_code=302, target_status_code=200, msg_prefix='')
+        self.assertRedirects(
+            response,
+            expected_url='%s?next=%s' % (
+                reverse('login_page')uote(url)),
+            status_code=302,
+            target_status_code=200,
+            msg_prefix='')
 
     # needed as QuerySet objects can't be equated -- just to not override
     # .equals
@@ -95,7 +113,6 @@ class BaseTest(Base):
                 sheet1.write(i, j, randint(0, 100))
         book.save(filename)
 
-    
     def assert_object_does_not_exist(self, url, message):
         response = self.client.get(url)
         self.assertRedirects(
