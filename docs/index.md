@@ -36,3 +36,8 @@ User Manual
   * [Locations](#)
   * [Active Power Mode](#)
   * [Change Password](#)
+
+* **Conduct Survey**
+  * [uSurvey App](./ODK_App.md)
+  * [USSD](#)
+

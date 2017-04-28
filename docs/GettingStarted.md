@@ -57,3 +57,13 @@ Allocate Enumeration Areas, <br>
 Create ODK Access ID, <br>
 Provide Mobile Number to access via USSD channel <br>
 Finally, finish enrollment <br>
+
+**Step -6**
+
+**Conduct Survey**: 
+Data collection and submission is done in two ways:
+
+1. Android channel - [Using uSurvey App](./ODK_App.md)
+2. USSD channel
+
+At any point on the uSurvey portal, there are bread crumbs that makes navigation easy.

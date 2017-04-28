@@ -54,8 +54,8 @@ On the ‘Indicator’ page one can view all the Indicator created in the applic
 
 **Sts**: Represents Indicator display status on dashboard, that means status with color code indicates as:
 
- <span style="color:Gray;font-weight:bold;">•</span>– Not Displayed<br>
- <span style="color:Green;font-weight:bold;">•</span>– Displayed<br>
+ <span style="color:Gray;font-weight:bold;">•</span> – Not Displayed<br>
+ <span style="color:Green;font-weight:bold;">•</span> – Displayed<br>
 
 **Indicator**: Is the title of Indicator, which is a unique identity to represent Indicator of a Survey.
 
@@ -69,8 +69,6 @@ On the ‘Indicator’ page one can view all the Indicator created in the applic
 
 * **Edit**: click on, Action Item ‘Edit’, User can Edit all fields in Indicator.
 * **Delete**: click on, Action Item ‘Delete’, the Indicator is removed, before deleting you will be prompted with conformation to delete, click ‘Yes’ to Delete permanently
-* **View Variables**: click on, Action Item ‘View Variables’, navigates to ‘Variables’ page, <br>
-    here one can view list of all Variables defined in this particular Indicator, 
 * **Formula**: click on, Action Item ‘Formula’, to edit the Indicator Formula directly
 * **Analysis**: click on, Action Item ‘Analysis’, navigates to ‘Indicator Analysis’ page, here one can view two forms of district wise reports based up on the Indicator Formula,
   * A Bar chart report is generated and displayed
