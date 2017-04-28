@@ -13,8 +13,7 @@ import phonenumbers
 
 
 class InterviewerForm(ModelForm):
-    survey = forms.ModelChoiceField(
-        queryset=Survey.objects.all(), required=False)
+    survey = forms.ModelChoiceField(queryset=Survey.objects.all())
     date_of_birth = forms.DateField(
         label="Date of birth",
         required=True,
@@ -28,7 +27,7 @@ class InterviewerForm(ModelForm):
             format=settings.DATE_FORMAT))
     ea = forms.ModelMultipleChoiceField(
         queryset=EnumerationArea.objects.none(),
-        help_text='Needs at least one %s to be selected' % LocationType.largest_unit(),
+        help_text='Needs at least one %location to be selected',
         widget=forms.SelectMultiple(
             attrs={
                 'class': 'chzn-select ea_filter ',
@@ -54,10 +53,9 @@ class InterviewerForm(ModelForm):
                     status__in=[
                         SurveyAllocation.PENDING,
                         SurveyAllocation.COMPLETED]).order_by('status')[0].survey.pk
-                self.fields['ea'].initial = EnumerationArea.objects.filter(id__in=[assignment.allocation_ea.id for
-                                                                                   assignment in
-                                                                                   self.instance.unfinished_assignments
-                                                                                   ])
+                self.fields['ea'].initial = EnumerationArea.objects.filter(id__in=[
+                    assignment.allocation_ea.id for assignment in self.instance.unfinished_assignments
+                ])
             except IndexError:
                 pass
         self.fields['ea'].queryset = eas

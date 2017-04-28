@@ -65,6 +65,11 @@ class Interviewer(BaseModel):
         return self.name
 
     @property
+    def assigned_eas(self):
+        return ','.join(self.assignments.filter(status=SurveyAllocation.PENDING
+                                                ).values_list('allocation_ea__name', flat=True))
+
+    @property
     def unfinished_assignments(self):
         return self.assignments.filter(status=SurveyAllocation.PENDING)
 

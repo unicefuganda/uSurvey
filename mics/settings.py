@@ -318,7 +318,7 @@ TEMP_DIR = os.path.join(BASE_DIR, 'tmp')
 ODK_SUBMISSION_SUCCESS_MSG = "Successful submission.\
     Your submission is been Processed"
 INTERVIEWER_EXPORT_HEADERS = [
-    'ea',
+    'assigned_eas',
     'name',
     'age',
     'level_of_education',
