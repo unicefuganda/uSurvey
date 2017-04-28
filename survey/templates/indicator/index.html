@@ -124,8 +124,9 @@
                      <li>
                                 <a href="#delete_indicator_{{indicator.id}}" class="tooltip-info" data-toggle="modal" data-rel="tooltip" id="edit-indicator_{{ indicator.id }}" title="" data-original-title="Edit"><span class="red"><i class="usur-icon fa fa-trash"></i>Delete</span></a>
                             </li>
+                     {% comment %} Disabled this for now. This option is already available directly on the indicators page
                      <li><a href="{% url 'view_indicator_variables' indicator.pk %}" class="tooltip-error" data-rel="tooltip" title=""><span class="green"><i class="usur-icon fa fa-eye bigger-120"></i>View Variables</span></a></li>
-
+                     {% endcomment %}
 
 <!-- 
                     <a href="{% url 'add_formula_page' indicator.id %}" class="btn btn-small" id="add-formula-indicator_{{ indicator.id }}"><i class="icon-wrench"></i> Formula</a></li>
