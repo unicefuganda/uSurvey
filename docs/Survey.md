@@ -2,6 +2,7 @@
 
 Surveys are available from main menu under **Design** >> **Surveys**
 ![Survey0](./Survey1.png)
+<span style="text-align:center;">Screen-1</span>
 
 A New Survey can be created and defined here, so before creating a survey first of all one has to know about the terminology used here.
 
@@ -18,7 +19,7 @@ This field will enable only if option “None, Create New” is selected, in the
 To create a New Survey, click on ‘Create New Survey’ button at top right of the Survey page, that opens a form to create a new Survey, which has following elements;
 
 ![Survey1](./Survey2.png)
-<span style="text-align: center;">Screen-1 </span>
+<span style="text-align:center;">Screen-2</span>
 
 **Elements of a Survey**:
 
@@ -44,6 +45,8 @@ A New Survey is created by providing above fields and click on ‘Save’ button
 **Search**: One can find Surveys in the application, using the search bar at top right side of this survey page, by providing Name or description.
 
 On the ‘Survey’ page one can view all the Survey created in the application, in a tabular form with following column names:
+
+![Survey2](./Survey4.png)
 
 **Sts**: Represents Status of the Survey by color indicator, that means each of the Color code indicates as:
  <span style="color:Gray;font-weight:bold;">•</span> – Not Started<br>
@@ -76,7 +79,11 @@ Go to Batches Page, which can be done in two ways
 On the ‘Survey’ page you can view all the Survey created in the application
 Now click on Survey Name, or click on, Action Item ‘View Batches’ to go to ‘Batches’ Page
 
+![Batch](./Batch1.png)
+
 To create a New Batch, click on ‘Create New Batch’ button at top right of the Batch page, that opens a form to create a new Batch, which has following elements;
+
+![Batch](./Batch2.png)
 
 **Elements of a Batch**:
 
@@ -88,11 +95,17 @@ A New Batch is created by providing above fields and click on ‘Save’ button 
 
 **Actions in Batch**:
 
+![Batch](./Batch3.png)
+
 * **Edit**: click on, Action Item ‘Edit’, User can Edit all fields in a Batch<br>
 * **Delete**: click on, Action Item ‘Delete, the entire Batch along with questions are removed, before deleting you will be prompted with conformation to delete, click ‘Yes’ to Delete permanently. This option is not available for completed Surveys<br>
 * **View/Edit Questions**: click on, Action Item ‘View /Edit Questions’, takes to the Survey ‘Batch Questions’ page <br>
 * **Open/Close**: click on, Action Item ‘Open/Close’, takes to the page where all Enumeration Areas are listed, here one can change the “status of conducting survey in a particular Enumeration Area” to Open/Close<br>
 i.e. Open- means allow to conduct survey and Close - means it prevents to conduct survey.
+
+![Batch](./Batch8.png)
+
+![Batch](./Batch7.png)
 
 * **View Data**: click on, Action Item ‘View Data’, shows Data collected in this Survey. This option is available only for completed Surveys.
 
@@ -100,10 +113,14 @@ i.e. Open- means allow to conduct survey and Close - means it prevents to conduc
 
 Once Survey and Batches are created, next step is to ‘Add Questions’ to Batch as follows:
 
+![Batch](./Batch4.png)
+
 On the ‘Batch’ page you can view all the Batch created in a Survey
 Now click on Batch Name, or click on, Action Item ‘View /Edit Question’ to go to ‘Batch Questions’ Page
 
-Now click on, ‘Add Question’ button at top right side of this page, this will open a form where one can create a Question, which has following elements; 
+![Batch](./Batch5.png)
+
+Now click on, ‘Add Question’ button at top right side of this page, this will open a form where one can create a Question, which has following elements;
 
 **Elements in Batch Question form**:
 
@@ -120,6 +137,8 @@ Like: {{structure_address}} <br>
 A Question in Batch is created by filling above all fields, finally click on ‘Save’ button to Add Question in Batch or click on ‘Save and Add More’ button to continue adding another Question to the same Batch or click on ‘Save and Update Library’ to add same to the ‘Questions Library’.
 
 **Select Question**: On click, ‘Select Question’ button, User navigates to ‘Select Library Questions’ page where one can Add the Library Questions into Batch. 
+
+![Batch](./Batch6.png)
 
 To Add Question from Library to Batch, just Click on “Code” or “Text” to move Question between (Library Questions << / >> Batch Questions) tables, then click on ‘Save’ button at bottom of the page, to finish adding Questions to Batch.
 
@@ -151,6 +170,8 @@ Caution, while deleting a Question: when a user attempts to delete a question, i
 
 **View Options**: This Action item is visible only for the Questions that has Answer Type “Multi choice” and “Multi Select”, to view Answer Options.
 
+![Batch](./Batch9.png)
+
 **Start/Edit Loop**:
 ‘Start/Edit Loop’ is an Action item available only for the Questions that has Answer Type “Auto Generated”. 
 
@@ -158,15 +179,25 @@ Looping means repeatedly asking set of questions based up the need and purpose o
 
 To define the Looping concept, first of all one has to understand about terms that are used in creating a Loop are as following:
 
+![Batch](./Batch10.png)
+
 **Repeat Logic**: To apply Looping for a question there should be some base criteria to start loop, that is chosen from ‘Repeat Logic’ as “User Defined”, “Fixed number of repeats” and “Response from previous question”
+
+![Batch](./Batch11.png)
 
 **User Defined**: Need to choose what set of Question come into loop, starting from this particular question and has to end loop with any of the consecutive question in the Batch.
 
 **Fixed number of repeats**: Is chosen, need to provide ‘Repeat count’ – any specific no of times loop to be repeated. 
 
+![Batch](./Batch12.png)
+
 **Response from previous question**: Is chosen, only when a question that exists before this base question with Answer Type “Numerical Answer”. This logic is based up on numeric value provided in the previous question.
 
+![Batch](./Batch13.png)
+
 **Loop Ends At**: When a loop starts that has to be closed, here the choice at which question the loop as to be closed is selected.  
+
+![Batch](./Batch14.png)
 
 **Loop Prompt**: This is a message prompt shown on Mobile App during the time of capturing this details. This message will help the Interviewer to proceed further. 
 Ex: “Do you what to Add one more”, “Do you what to Add another Household”, etc
@@ -191,6 +222,8 @@ One should be very careful while creating a loop, first of all analyze how a loo
 
 * <span style="color:Green;font-weight:bold;"> | </span> - icon represents Loop - CONTINUATION
 
+![Batch](./Batch18.png)
+
 **Remove Loop**:
 
 This Action item available only for the Questions that has Answer Type “Auto Generated” and a Loop is created.
@@ -202,7 +235,11 @@ click on, Action Item ‘Remove Loop’ which will remove the existing looping l
 
 Add Logic option will convert a question to conditional one such that question will have choices to “Reconfirm”, “End Interview”, “Ask Sub-Question” and “Skip To” which is based up on value/Answer provided.
 
+![Batch](./Batch17.png)
+
 One has to define the Logic here for respective question by satisfying the condition by providing ‘Eligible Criteria’, ‘Attribute’ Value, and ‘Then’ as follows:
+
+![Batch](./Batch15.png)
 
 **Eligible Criteria**: This is a condition made based up on this Question value “Starts With”, “Equals”, “Contains” and “Ends With”.
 
