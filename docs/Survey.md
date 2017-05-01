@@ -18,6 +18,7 @@ This field will enable only if option “None, Create New” is selected, in the
 To create a New Survey, click on ‘Create New Survey’ button at top right of the Survey page, that opens a form to create a new Survey, which has following elements;
 
 ![Survey1](./Survey2.png)
+<span style="margin: 0 auto; width: 800px;">Screen-1</span>
 
 **Elements of a Survey**:
 
@@ -26,7 +27,7 @@ To create a New Survey, click on ‘Create New Survey’ button at top right of 
 * **Name**: Is Survey Name, which is a unique identity to a survey and is a mandatory field<br>
 * **Description**: write about the importance of this survey in short<br>
 * **Survey Type**: This identifies how survey is going to take place either using Listing or not<br>
-    If Survey Type is “Sampled”, Survey uses Sample size and Listing<br>
+    If Survey Type is “Sampled”, Survey uses Sample size and Listing <br>
     If Survey Type is “Census”, Survey doesn’t need Sample size and Listing
 
 * **Sample size**: Provide survey sample size<br>
