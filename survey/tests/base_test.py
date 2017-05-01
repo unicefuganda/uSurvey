@@ -11,7 +11,7 @@ from survey.models import Question
 from survey.models import Batch, QuestionModule
 from mock import patch
 import datetime
-from django.urls import reverse
+from django.core.urlresolvers import reverse
 
 
 class Base(TestCase):
@@ -80,7 +80,7 @@ class BaseTest(Base):
         self.assertRedirects(
             response,
             expected_url='%s?next=%s' % (
-                reverse('login_page')uote(url)),
+                reverse('login_page'),quote(url)),
             status_code=302,
             target_status_code=200,
             msg_prefix='')
