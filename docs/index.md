@@ -8,7 +8,8 @@ Source code for this project is available on github [here]()
 User Manual
 -----------
 
-* **Getting Started**
+* **uSurvey**
+  * [Getting Started](./GettingStarted.md)
 
 * **Design**
   * [Modules](./Modules.md)

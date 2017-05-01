@@ -18,7 +18,7 @@ This field will enable only if option “None, Create New” is selected, in the
 To create a New Survey, click on ‘Create New Survey’ button at top right of the Survey page, that opens a form to create a new Survey, which has following elements;
 
 ![Survey1](./Survey2.png)
-<span style="margin: 0 auto; width: 800px;">Screen-1</span>
+<span style="text-align: center;">Screen-1 </span>
 
 **Elements of a Survey**:
 
@@ -46,9 +46,9 @@ A New Survey is created by providing above fields and click on ‘Save’ button
 On the ‘Survey’ page one can view all the Survey created in the application, in a tabular form with following column names:
 
 **Sts**: Represents Status of the Survey by color indicator, that means each of the Color code indicates as:
- <span style="color:Gray;font-weight:bold;">*</span>– Not Started<br>
- <span style="color:Orange;font-weight:bold;">*</span>– Ongoing<br>
- <span style="color:Green;font-weight:bold;">*</span>– Completed<br>
+ <span style="color:Gray;font-weight:bold;">•</span> – Not Started<br>
+ <span style="color:Orange;font-weight:bold;">•</span> – Ongoing<br>
+ <span style="color:Green;font-weight:bold;">•</span> – Completed<br>
 
 * **Name**: Is Name of a Survey, which is a unique identity to represent Survey and is a mandatory field.<br>
 * **Description**: A short description about Listing<br>
