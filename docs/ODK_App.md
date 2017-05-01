@@ -65,9 +65,11 @@ Get Blank Form, Fill Blank Form, Edit Save Form, Send Finalized Form, Download D
 
 Once App is opened, in the Home screen hit on ‘Get Blank Form’ to download blank form, then you will be prompted “Please enter User name and Password for server”, then Interviewer has to conform his/her User name and Password, to proceed by clicking on ‘OK’. As shown in below Mobile Screen-2
 
+![ODK](./ODK-2_3.png)
+
 Now you will be navigated to this below Mobile Screen-3, Select ‘Blank Form’ from list, usually blank forms, show with ‘Survey –Listing’ names and hit on ‘Get Selected’ As shown in below Mobile Screen-3, then Hit ‘OK’
 
-![ODK](./ODK-2_3.png)
+
 
 **Fill Blank Form**
 
