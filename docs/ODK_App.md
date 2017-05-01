@@ -67,6 +67,8 @@ Once App is opened, in the Home screen hit on ‘Get Blank Form’ to download b
 
 Now you will be navigated to this below Mobile Screen-3, Select ‘Blank Form’ from list, usually blank forms, show with ‘Survey –Listing’ names and hit on ‘Get Selected’ As shown in below Mobile Screen-3, then Hit ‘OK’
 
+![ODK](./ODK-2_3.png)
+
 **Fill Blank Form**
 
 In the Home Screen hit on ‘Fill Blank Form’ to fill questionnaire as part of data collection. Now select any of one the forms listed here. As shown in below Mobile Screen-5
