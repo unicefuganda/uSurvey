@@ -7,12 +7,18 @@ Data researcher enrolls Interviewer, assigns Survey and defines the Enumeration 
 
 Enrolled Interviewer are available from main menu under <b>Administration</b> >> <b>Interviewers</b>
 
+![Interviewer](./Interviewer1.png)
+
 ###Interviewer Registration
 On the ‘Interviewers’ page one can view list of enrolled Interviewers in the application, Add, Manage and Edit Interviewer can be done.
 
 To register a new Interviewer, click on ‘Add Interviewer’ button at top right of the Interviewers page, this will open a registration form with following elements;
 
+![Interviewer](./Interviewer2.png)
+
 <b>Elements in the registration form</b>
+
+![Interviewer](./Interviewer4_1.png)
 
 <b>Select Locations</b>: Initially get list of Enumeration Areas (EA) by selecting respective, District, County, Sub-county and Parish from locations filters at top of this page, to allocate Enumeration areas to the Interviewer where survey has to be conducted.
 
@@ -51,6 +57,8 @@ Interviewer is enrolled by providing above all field, finally click on ‘Save�
 From this above Interviewers page, Interviewers are managed, i.e. to Edit Interviewer Details and block/unblock Interviewer
 
 <b>Actions</b>:
+
+![Interviewer](./Interviewer3.png)
 
 <b>View Details</b>: View Interviewer profile and Edit details, all profile details, Survey Details, ODK Access and USSD Access details are editable by click on ‘Edit’ button at the bottom of the page.
 
