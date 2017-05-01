@@ -1,36 +1,31 @@
-{% extends "form.html" %}
-
-{% block title %}
-  {{ title }}
-{% endblock %}
-{% block extra_css %}
+{% extends "form.html" %} {% block title %} {{ title }} {% endblock %} {% block extra_css %}
 <style type="text/css">
-  span.add-on {
-         margin-top: 5px;
-    }    
+span.add-on {
+    margin-top: 5px;
+}
 </style>
-{% endblock %}
-
-{% block display_form_fields %}
-{% include "with_mobile_number_form.html" with form=userform %}
+{% endblock %} {% block display_form_fields %} {% include "with_mobile_number_form.html" with form=userform %}
 <!-- {{user_profile_form}} -->
-{% endblock %}
-
-{% block javascripts %}
-  <script src="{{STATIC_URL}}/js/users.js" type="text/javascript" charset="utf-8"></script>
-
-  <script type="text/javascript">
-      {% if mode == 'view' %}
-        $("#id_username").attr("readonly","readonly");
-        $("#id_first_name").attr("readonly","readonly");
-        $("#id_last_name").attr("disabled","disabled");
-        $("#id_email").attr("disabled","disabled");
-        $("#id_mobile_number").attr("disabled","disabled");
-        $("#id_group").attr("disabled","disabled");
-        $("#button").text('Edit');
-        $("#button").attr({"type":"button","onclick":"window.location.href='{% url 'users_edit' user_id 'edit' %}'"});
-        $(".add-row").attr("href",'');
-        
-      {%endif%}
-    </script>
-{% endblock %}
+{% endblock %} {% block javascripts %}
+<script src="{{STATIC_URL}}/js/users.js" type="text/javascript" charset="utf-8"></script>
+{% if mode == 'view' %}
+<script type="text/javascript">
+$("#id_username").attr("readonly", "readonly");
+$("#id_first_name").attr("readonly", "readonly");
+$("#id_last_name").attr("disabled", "disabled");
+$("#id_email").attr("disabled", "disabled");
+$("#id_mobile_number").attr("disabled", "disabled");
+$("#id_groups").attr("disabled", "disabled");
+$("#button").html("<i class='fa fa-edit'></i> Edit");
+$("#button").attr({
+    "type": "button",
+    "onclick": "window.location.href='{% url 'users_edit' user_id 'edit' %}'"
+});
+$(".add-row").attr("href", '');
+</script>
+<style type="text/css">
+#id_groups {
+    background-color: #eee;
+}
+</style>
+{%endif%} {% endblock %}
