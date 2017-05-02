@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from django.test.client import Client
 from survey.forms.aboutus_form import AboutUsForm
-from survey.models import Survey, AboutUs
+from survey.models import Survey, AboutUs, SuccessStories
 from survey.tests.base_test import BaseTest
 from django.core.urlresolvers import reverse
 
@@ -21,8 +21,6 @@ class HomepageViewTest(BaseTest):
         self.client.login(username='Rajni', password='I_Rock')
 
     def test_home_page(self):
-        survey_1 = Survey.objects.create(name="A")
-        survey_2 = Survey.objects.create(name="B")
         response = self.client.get('/')
         self.failUnlessEqual(response.status_code, 200)
         templates = [template.name for template in response.templates]
@@ -32,7 +30,7 @@ class HomepageViewTest(BaseTest):
         response = self.client.get(reverse('about_page'))
         self.failUnlessEqual(response.status_code, 200)
         templates = [template.name for template in response.templates]
-        self.assertIn('home/about.html', templates)
+        self.assertIn('main/about.html', templates)
 
         about_us = AboutUs.objects.all()[0]
         self.assertEqual(about_us, response.context['about_content'])
@@ -43,7 +41,7 @@ class HomepageViewTest(BaseTest):
         response = self.client.get(reverse('about_page'))
         self.failUnlessEqual(response.status_code, 200)
         templates = [template.name for template in response.templates]
-        self.assertIn('home/about.html', templates)
+        self.assertIn('main/about.html', templates)
         self.assertEqual(about_us_content, response.context['about_content'])
 
     def test_get_edit_about_page(self):
@@ -70,3 +68,11 @@ class HomepageViewTest(BaseTest):
     def test_restricted_permssion(self):
         AboutUs.objects.create(content="blah blah")
         self.assert_restricted_permission_for(reverse('edit_about_page'))
+
+    def test_success_story_page(self):
+        ss_content = SuccessStories.objects.create(name='abc',content="blah blah",image='1.jpg')
+        response = self.client.get(reverse('home_success_story_list'))
+        self.failUnlessEqual(response.status_code, 200)
+        templates = [template.name for template in response.templates]
+        self.assertIn('main/home_success_story_list.html', templates)
+        self.assertIn(ss_content, response.context['ss_list'])
