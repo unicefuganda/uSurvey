@@ -71,7 +71,7 @@ Once App is opened, in the Home screen hit on ‘Get Blank Form’ to download b
 
 ![ODK](./ODK-7.png)
 
-Now you will be navigated to this below Mobile Screen-3, Select ‘Blank Form’ from list, usually blank forms, show with ‘Survey –Listing’ names and hit on ‘Get Selected’ As shown in below Mobile Screen-3, then Hit ‘OK’
+Now you will be navigated to this below Mobile Screen-, Select ‘Blank Form’ from list, usually blank forms, show with ‘Survey –Listing’ names and hit on ‘Get Selected’ As shown in below Mobile Screen-, then Hit ‘OK’
 
 ![ODK](./ODK-8.png)
 
@@ -81,7 +81,7 @@ Now you will be navigated to this below Mobile Screen-3, Select ‘Blank Form’
 
 **Fill Blank Form**
 
-In the Home Screen hit on ‘Fill Blank Form’ to fill questionnaire as part of data collection. Now select any of one the forms listed here. As shown in below Mobile Screen-5
+In the Home Screen hit on ‘Fill Blank Form’ to fill questionnaire as part of data collection. Now select any of one the forms listed here. As shown in below Mobile Screen-
 
 ![ODK](./ODK-2_1.png)
 
@@ -126,11 +126,11 @@ You can select any form from list to view or edit, usually filled forms, show wi
 
 The process of transmitting the completed forms to server, when there is an internet connectivity.
 
-Now in the Home Screen hit on ‘Send Finalized Form’ to submit the completed questionnaire forms, As shown in below Mobile Screen-11
+Now in the Home Screen hit on ‘Send Finalized Form’ to submit the completed questionnaire forms, As shown in below Mobile Screen-
 
 ![ODK](./ODK-17.png)
 
-Now you will be navigated to this below shown, Mobile Screen-12, Select forms individually or hit on ‘Toggle All’ to select all forms in the list, then hit on ‘Send Selected’. As shown in below Mobile Screen-12, if again you will be prompted “Please enter User name and Password for server”, then conform your credentials once again by clicking on ‘OK’. You will get success message if from is submitted or respective error message is shown.
+Now you will be navigated to this below shown, Mobile Screen-, Select forms individually or hit on ‘Toggle All’ to select all forms in the list, then hit on ‘Send Selected’. As shown in below Mobile Screen-, if again you will be prompted “Please enter User name and Password for server”, then conform your credentials once again by clicking on ‘OK’. You will get success message if from is submitted or respective error message is shown.
 
 ![ODK](./ODK-18.png)
 
@@ -144,7 +144,7 @@ Now you will be navigated to this below shown, Mobile Screen-12, Select forms in
 
 The feature to download completed Listing and Survey forms from server to make any changes.
 
-In the Home Screen hit on ‘Download Data Form’ to get list of recent/current submitted forms. Now screen opens with the complete list of submitted forms, select forms individually or hit on ‘Toggle All’ to select all forms in the list, then hit on ‘Get Selected’. As shown in below Mobile Screen-12, 
+In the Home Screen hit on ‘Download Data Form’ to get list of recent/current submitted forms. Now screen opens with the complete list of submitted forms, select forms individually or hit on ‘Toggle All’ to select all forms in the list, then hit on ‘Get Selected’. As shown in below Mobile Screen-, 
 
 ![ODK](./ODK-2_6.png)
 
@@ -152,7 +152,7 @@ In the Home Screen hit on ‘Download Data Form’ to get list of recent/current
 
 ![ODK](./ODK-23.png)
 
-Then download starts, which takes several minutes, depends up on your Internet speed. As shown below Mobile Screen-17
+Then download starts, which takes several minutes, depends up on your Internet speed. As shown below Mobile Screen-
 
 ![ODK](./ODK-24.png)
 
@@ -162,7 +162,7 @@ Note: Once Forms are downloaded then these forms are available from ‘Edit Save
 
 The feature to find completed Listing and Survey forms, to view or edit filled questionnaire.
 
-In the Home Screen hit on ‘Search Forms’ to start searching for forms, which opens a search screen, where an Interviewer can search a beneficiary using data in the filled questionnaire and Hit on Search Icon in Key Pad, as shown in below Mobile Screen-21
+In the Home Screen hit on ‘Search Forms’ to start searching for forms, which opens a search screen, where an Interviewer can search a beneficiary using data in the filled questionnaire and Hit on Search Icon in Key Pad, as shown in below Mobile Screen-
 
 ![ODK](./ODK-2_5.png)
 
@@ -191,7 +191,7 @@ You can select any form from list to view or edit, usually these forms, show wit
 
  ![ODK](./ODK-30.png)
 
-There is an option to Exit Form by pressing the default ‘BACK’ button of the Mobile at any time while filling or using this App, which prompt with message to ‘Save Changes’, ‘Ignore Changes’ and ‘Cancel’ to the Form. As shown in below Mobile Screen-24
+There is an option to Exit Form by pressing the default ‘BACK’ button of the Mobile at any time while filling or using this App, which prompt with message to ‘Save Changes’, ‘Ignore Changes’ and ‘Cancel’ to the Form. As shown in below Mobile Screen-
 
  ![ODK](./ODK-31.png)
 

@@ -39,24 +39,24 @@ Create [New Listing](./Listing.md) or skip this step, if you want to use existin
 Create [New Survey](./Survey.md) or you can Clone existing Survey and rename it,<br>
 **Clone existing Survey**: This option duplicates the survey along with the Listing data, and ready to use.
 
-Once a new Survey is created, next <br>
-Create Batch or Batches <br>
-then Create Questions in Batch <br>
-If necessary, <br>
-Create Looping in questions and <br> 
-Add Logic to questions. <br>
-Finally, don’t forget to change the status to Open, via Action Item ‘Open/Close’ for Batch
+4.0. Once a new Survey is created, next <br>
+4.1. Create Batch or Batches <br>
+4.3. then Create Questions in Batch <br>
+     If necessary, <br>
+4.4. Create Looping in questions and <br> 
+4.5. Add Logic to questions. <br>
+4.6. Finally, don’t forget to change the status to Open, via Action Item ‘Open/Close’ for Batch
 
 **Step -5**
 
 Enroll [an Interviewer](./Interviewer.md) <br>
-To conduct a Survey in the field, define an Interviewer as follows <br>
-Provide basic Interviewer details, <br>
-Assign a Survey, <br>
-Allocate Enumeration Areas, <br>
-Create ODK Access ID, <br>
-Provide Mobile Number to access via USSD channel <br>
-Finally, finish enrollment <br>
+To conduct a Survey in the field, define an Interviewer as follows: <br>
+5.0. Provide basic Interviewer details, <br>
+5.1. Assign a Survey, <br>
+5.2. Allocate Enumeration Areas, <br>
+5.3. Create ODK Access ID, <br>
+5.4. Provide Mobile Number to access via USSD channel <br>
+5.5. Finally, finish enrollment <br>
 
 **Step -6**
 
@@ -64,6 +64,6 @@ Finally, finish enrollment <br>
 Data collection and submission is done in two ways:
 
 1. Android channel - [Using uSurvey App](./ODK_App.md)
-2. USSD channel
+2. USSD channel - [Featured Phone](./ussd-integration.md)
 
 At any point on the uSurvey portal, there are bread crumbs that makes navigation easy.
