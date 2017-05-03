@@ -6,9 +6,9 @@
 * Admin creates uSurvey Users and assigns them Roles
 * User ‘Data Researcher’ defines Modules, Groups, Listing, Surveys, Batches and creates questionnaires for Listing & Batches in application
 * Data Researcher also defines ‘Interviewers’ and assigns them to an Enumeration area to conduct a Listing or Survey
-* In the field, Interviewer conduct the actual survey in the designated Enumeration area
-* Data collection is done using the hand-held mobile device like Android Smart Phone or Featured Phone via ODK and USSD channels respectively.
-* Captured data is sent to uSurvey server
+* In the field, Interviewer conducts the actual survey in the designated Enumeration area
+* Data collection is done using a hand-held mobile device like Android Smart Phone or Featured Phone via ODK and USSD channels respectively.
+* Captured data is sent to uSurvey portal
 * Data collected by Interviewers is then viewed on the uSurvey portal for reporting and analysis
 
 **A Quick step by step uSurvey process flow**
@@ -28,11 +28,11 @@ Create [New Listing](./Listing.md) or skip this step, if you want to use existin
 1. Use existing Listing: This option benefits by providing data collected earlier <br>
 2. Clone existing Listing: Duplicates Listing questions only <br>
 
-Once Listing is created, next <br> 
-Create Questions in Listing <br>
-If necessary, <br>
-Create Looping in questions and <br>
-Add Logic to questions. <br>
+3.0. Once Listing is created, next <br> 
+3.1. Create Questions in Listing <br>
+3.2. If necessary, <br>
+3.3. Create Looping in questions and <br>
+3.4. Add Logic to questions. <br>
 
 **Step -4**
 
