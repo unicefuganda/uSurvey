@@ -8,20 +8,20 @@ Source code for this project is available on github [here]()
 User Manual
 -----------
 
-+ uSurvey
-  - [Getting Started](./GettingStarted.md)
++ **uSurvey**
+    - [Getting Started](./GettingStarted.md)
 
 + **Design**
-  - [Modules](./Modules.md)
-  - [Groups](./Groups.md)
-  - [Listing](./Listing.md)
-  - [Survey](./Survey.md)
-  - [Question Library](./Library.md)
+    - [Modules](./Modules.md)
+    - [Groups](./Groups.md)
+    - [Listing](./Listing.md)
+    - [Survey](./Survey.md)
+    - [Question Library](./Library.md)
 
-* **Administration** 
-   * [Interviewers](./Interviewer.md)
++ **Administration** 
+    - [Interviewers](./Interviewer.md)
 
-* **Monitor**
++ **Monitor**
   * [Listing Data](#)
   * [Batch Data](#)
 
