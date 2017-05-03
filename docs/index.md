@@ -4,8 +4,6 @@ uSurvey is an innovative data collection tool designed to provide statistically 
 
 The system has been designed to collect a wide range of data for the structured survey; to generate and produce descriptive statistics and graphical representation of the collected information whenever desired, as well as during the process of data collection.
 Source code for this project is available on github [here]()
-
-+ **Introduction**
     
 ###Getting Started
 ------
@@ -72,10 +70,11 @@ To conduct a Survey in the field, define an Interviewer as follows: <br>
 Data collection and submission is done in two ways:
 
 1. Android channel - [Using uSurvey App](./ODK_App.md)
-2. USSD channel - [Featured Phone](./ussd-integration.md)
-
+2. USSD channel - [Featured Phone](./ussd-integration.md) <br>
 At any point on the uSurvey portal, there are bread crumbs that makes navigation easy.
 
+###User Guides
+------
 + **Administration Guide**
     - [Modules](./User_Guides.md#modules)
     - [Groups](./User_Guides.md#Groups)
