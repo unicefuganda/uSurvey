@@ -1,5 +1,6 @@
 site_name: uSurvey
 pages:
+- Home: index.md
 - User Guides: User_Guides.md
 - Online Data Collection: ODK_App.md
 - Offline Data Collection: ussd-integration.md
