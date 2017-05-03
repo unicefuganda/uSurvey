@@ -89,4 +89,24 @@
       {%endif%}
     </script>
 
+    <script type="text/javascript">
+    FORM_RULES = {
+        '{{ form.name.name }}': 'required',
+        '{{ form.date_of_birth.name }}': 'required',
+        '{{ form.gender.name }}': 'required',
+        '{{ form.level_of_education.name }}': 'required',
+        '{{ form.language.name }}': 'required',
+        '{{ form.ea.name }}': 'required',
+        '{{ odk_access_form.user_identifier.name }}': 'required',
+        '{{ odk_access_form.odk_token.name }}': 'required',
+
+    };
+     
+    $(document).ready(function() {
+        $('#create-interviewer-form').validate({
+            rules: FORM_RULES
+        });
+    });
+    </script>
+
 {% endblock %}

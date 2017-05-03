@@ -1,6 +1,6 @@
 from random import randint
 from survey.models.locations import *
-from survey.models import LocationTypeDetails, EnumerationArea
+from survey.models import EnumerationArea
 from survey.tests.base_test import BaseTest
 from survey.views.location_widget import LocationWidget
 

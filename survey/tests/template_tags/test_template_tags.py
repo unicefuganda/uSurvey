@@ -2,15 +2,11 @@ from datetime import date
 from django.test import TestCase
 from survey.models import Batch
 from survey.models import EnumerationArea
-from survey.models import Household
-from survey.models import HouseholdListing
-from survey.models import LocationTypeDetails
 from survey.models import QuestionModule
 from survey.models import Survey
 from survey.templatetags.template_tags import *
 from survey.views.location_widget import LocationWidget
 from survey.models.locations import *
-from survey.models.households import HouseholdMemberGroup
 from survey.models.questions import *
 
 
@@ -70,50 +66,9 @@ class TemplateTagsTest(TestCase):
         self.assertEqual('/surveys/1/batches/2/',
                          get_url_with_ids("1, 2", 'batch_show_page'))
 
-    def test_get_odk_mem_question(self):
-        household_member_group = HouseholdMemberGroup.objects.create(
-            name="test name1324", order=12)
-        question_mod = QuestionModule.objects.create(
-            name="Test question name", description="test desc")
-        batch = Batch.objects.create(order=1)
-        question = Question.objects.create(identifier='123.1', text="This is a question", answer_type='Numerical Answer',
-                                           group=household_member_group, batch=batch, module=question_mod)
-        self.assertEqual(question.text, get_odk_mem_question(question))
+    
 
-    def test_is_relavent_odk(self):
-        household_member_group = HouseholdMemberGroup.objects.create(
-            name="test name1324", order=12)
-        ea = EnumerationArea.objects.create(name="Kampala EA A")
-        survey = Survey.objects.create(
-            name="Test Survey", description="Desc", sample_size=10, has_sampling=True)
-        investigator = Interviewer.objects.create(name="Investigator",
-                                                  ea=ea,
-                                                  gender='1', level_of_education='Primary',
-                                                  language='Eglish', weights=0)
-        household_listing = HouseholdListing.objects.create(
-            ea=ea, list_registrar=investigator, initial_survey=survey)
-        household = Household.objects.create(house_number=123456, listing=household_listing, physical_address='Test address',
-                                             last_registrar=investigator, registration_channel="ODK Access", head_desc="Head", head_sex='MALE')
-        question_mod = QuestionModule.objects.create(
-            name="Test question name", description="test desc")
-        batch = Batch.objects.create(order=1)
-        question = Question.objects.create(identifier='123.1', text="This is a question", answer_type='Numerical Answer',
-                                           group=household_member_group, batch=batch, module=question_mod)
-        surname = HouseholdMember._meta.get_field('surname')
-        batch.survey = survey
-        batch.start_question = question
-        first_name = HouseholdMember._meta.get_field('first_name')
-        gender = HouseholdMember._meta.get_field('gender')
-        context = {
-            surname.verbose_name.upper().replace(' ', '_'):
-            mark_safe(
-                '<output value="/survey/household/householdMember/surname"/>'),
-            first_name.verbose_name.upper().replace(' ', '_'):
-            mark_safe(
-                '<output value="/survey/household/householdMember/firstName"/>'),
-            gender.verbose_name.upper().replace(' ', '_'):
-            mark_safe('<output value="/survey/household/householdMember/sex"/>'),
-        }
+    
 
     def test_should_return_concatenated_ints_in_a_single_string(self):
         self.assertEqual('1, 2', add_string(1, 2))
@@ -257,17 +212,7 @@ class TemplateTagsTest(TestCase):
             name='Subcounty', slug='subcounty')
 
         africa = Location.objects.create(name='Africa', type=country)
-        LocationTypeDetails.objects.create(
-            country=africa, location_type=country)
-        LocationTypeDetails.objects.create(
-            country=africa, location_type=region)
-        LocationTypeDetails.objects.create(country=africa, location_type=city)
-        LocationTypeDetails.objects.create(
-            country=africa, location_type=parish)
-        LocationTypeDetails.objects.create(
-            country=africa, location_type=village)
-        LocationTypeDetails.objects.create(
-            country=africa, location_type=subcounty)
+        
 
         uganda = Location.objects.create(
             name='Uganda', type=region, parent=africa)

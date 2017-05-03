@@ -1,6 +1,5 @@
 from django.test import TestCase
 from survey.models.locations import *
-from survey.models import LocationTypeDetails
 from survey.utils.views_helper import contains_key, get_descendants, get_ancestors, clean_query_params, prepend_to_keys
 
 
@@ -27,17 +26,6 @@ class ViewsHelperTest(TestCase):
             name='Subcounty', slug='subcounty', parent=village)
 
         africa = Location.objects.create(name='Africa', type=country)
-        LocationTypeDetails.objects.create(
-            country=africa, location_type=country)
-        LocationTypeDetails.objects.create(
-            country=africa, location_type=region)
-        LocationTypeDetails.objects.create(country=africa, location_type=city)
-        LocationTypeDetails.objects.create(
-            country=africa, location_type=parish)
-        LocationTypeDetails.objects.create(
-            country=africa, location_type=village)
-        LocationTypeDetails.objects.create(
-            country=africa, location_type=subcounty)
 
         uganda = Location.objects.create(
             name='Uganda', type=region, parent=africa)
@@ -62,17 +50,6 @@ class ViewsHelperTest(TestCase):
             name='Subcounty', slug='subcounty')
 
         africa = Location.objects.create(name='Africa', type=country)
-        LocationTypeDetails.objects.create(
-            country=africa, location_type=country)
-        LocationTypeDetails.objects.create(
-            country=africa, location_type=region)
-        LocationTypeDetails.objects.create(country=africa, location_type=city)
-        LocationTypeDetails.objects.create(
-            country=africa, location_type=parish)
-        LocationTypeDetails.objects.create(
-            country=africa, location_type=village)
-        LocationTypeDetails.objects.create(
-            country=africa, location_type=subcounty)
 
         uganda = Location.objects.create(
             name='Uganda', type=region, parent=africa)
@@ -112,17 +89,7 @@ class ViewsHelperTest(TestCase):
             name='Subcounty', slug='subcounty')
 
         africa = Location.objects.create(name='Africa', type=country)
-        LocationTypeDetails.objects.create(
-            country=africa, location_type=country)
-        LocationTypeDetails.objects.create(
-            country=africa, location_type=region)
-        LocationTypeDetails.objects.create(country=africa, location_type=city)
-        LocationTypeDetails.objects.create(
-            country=africa, location_type=parish)
-        LocationTypeDetails.objects.create(
-            country=africa, location_type=village)
-        LocationTypeDetails.objects.create(
-            country=africa, location_type=subcounty)
+        
 
         uganda = Location.objects.create(
             name='Uganda', type=region, parent=africa)
@@ -164,17 +131,7 @@ class ViewsHelperTest(TestCase):
             name='Subcounty', slug='subcounty')
 
         africa = Location.objects.create(name='Africa', type=country)
-        LocationTypeDetails.objects.create(
-            country=africa, location_type=country)
-        LocationTypeDetails.objects.create(
-            country=africa, location_type=region)
-        LocationTypeDetails.objects.create(country=africa, location_type=city)
-        LocationTypeDetails.objects.create(
-            country=africa, location_type=parish)
-        LocationTypeDetails.objects.create(
-            country=africa, location_type=village)
-        LocationTypeDetails.objects.create(
-            country=africa, location_type=subcounty)
+        
 
         uganda = Location.objects.create(
             name='Uganda', type=region, parent=africa)

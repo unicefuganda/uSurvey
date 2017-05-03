@@ -4,7 +4,7 @@ from django.contrib.auth.models import User, Group, Permission
 from django.contrib.contenttypes.models import ContentType
 from survey.models.locations import *
 from survey.forms.filters import SurveyBatchFilterForm
-from survey.models import GroupCondition, HouseholdMemberGroup, EnumerationArea, QuestionModule, LocationTypeDetails
+from survey.models import GroupCondition, HouseholdMemberGroup, EnumerationArea, QuestionModule
 from survey.models.batch import Batch
 # from survey.models.batch_question_order import *
 from survey.models.households import HouseholdHead, Household, HouseholdMember, HouseholdListing, SurveyHouseholdListing
@@ -116,8 +116,6 @@ class ExcelDownloadViewTest(BaseTest):
     def test_excel_download(self):
         country = LocationType.objects.create(name='Country', slug='country')
         uganda = Location.objects.create(name="Uganda", type=country)
-        LocationTypeDetails.objects.create(
-            country=uganda, location_type=country)
 
         district_type = LocationType.objects.create(
             name="Districttype", slug='districttype', parent=country)
@@ -162,8 +160,6 @@ class ExcelDownloadViewTest(BaseTest):
     def test_email(self):
         country = LocationType.objects.create(name='Country', slug='country')
         uganda = Location.objects.create(name="Uganda", type=country)
-        LocationTypeDetails.objects.create(
-            country=uganda, location_type=country)
 
         district_type = LocationType.objects.create(
             name="Districttype", slug='districttype', parent=country)
