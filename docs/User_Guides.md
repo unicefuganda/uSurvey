@@ -36,6 +36,7 @@ Population has to be segment into Groups / multiple groups and our system allows
 From this above Groups page, Groups are managed, i.e. to Create a New Group, Edit existing Group, Delete Groups and Manage Parameters
 
 **Create a New Group**
+
 Groups are available from main menu under, <b>Design</b> >> <b>Groups</b>
 
 ![Group](./Group1.png)
@@ -113,8 +114,7 @@ To Delete a Parameter – In the table under column name ‘Actions’ select �
 Click on ‘Export Parameter’ to download available list of Parameter in ‘.CSV’ file format.
 
 ###Listing
-
----
+------
 The Listing is generally carried out by field staff other than interviewers, as a separate field operation conducted before the survey starts. This pre-process has the following benefits
 
 1. It creates set of common questions to be asked before any survey is captured, as a one-time effort. For instance, the demographic details of household residents is required before conducting any household survey. Such data can be captured as part of the Listing.
@@ -355,8 +355,7 @@ In the ‘Listing Form Questions Template’ page, Questions that has Logic are 
 * **Delete Logic**: click to Remove the Logic that is Applied for this particular question
 
 ###Create Survey
-
----
+------
 Surveys are available from main menu under **Design** >> **Surveys**
 
 ![Survey0](./Survey1.png)
@@ -427,8 +426,7 @@ On the ‘Survey’ page one can view all the Survey created in the application,
 * **Sampling Criteria**: 
 
 ###Batches
-
----
+------
 Batch is a categorization of Survey Questions, that means set of Questions categorized for a Survey convenience. We can create multiple Batches in a survey.
 
 Once the Survey is created, next step is to create ‘Batch’ and ‘Add Questions’ to Batch.
@@ -632,8 +630,7 @@ In the ‘Batch Questions’ page, Questions that has Logic are represented with
 * **Delete Logic**: click to Remove the Logic that is Applied for this particular question
 
 ###Library Questions
-
----
+------
 List of Questions very common in Surveys are available here which are also categorized into Module wise.  This is a feature/ facility available to pick up questions from this library and add to Batch or Listing, by ‘Select Questions’ feature in respective pages.
 
 <b>Create Library Questions</b>
@@ -666,8 +663,7 @@ A Library Question is created by filling above all fields, finally click on ‘S
 <b>Export Questions</b>: On click, ‘Export Questions’ button, user can download the Library Questions in “.csv” file format.
 
 ###Interviewer
-
----
+------
 Interviewer is a role in the system, one who conducts a Survey in the field.   
 These Interviewers conducts the survey in the designated Enumeration areas and data collection is done using the hand-held mobile device like Android Smart Phone or Featured Phone via ODK and USSD channels respectively.
 
@@ -740,8 +736,7 @@ From this above Interviewers page, Interviewers are managed, i.e. to Edit Interv
 <b>Export Interviewers</b>: On click, ‘Export Interviewers’ button, user can download the Interviewers list in “.csv” file format.
 
 ###Indicators
-
----
+------
 Survey Indicators, which forecast statistical metrics of data collection done in a survey individually.
 
 Our system facilitates creating customized Indicators for every survey and show an analysis report in tabular and bar chart form.

@@ -4,6 +4,9 @@ pages:
 - User Guides: User_Guides.md
 - Online Data Collection: ODK_App.md
 - Offline Data Collection: ussd-integration.md
+- Installation Guide: installation.md
+- Deployment Guide: deployment_guide.md
+- Testing & Coverage: tests.md
 
 #theme: readthedocs
 #theme: cerulean

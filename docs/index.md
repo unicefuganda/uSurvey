@@ -6,11 +6,9 @@ The system has been designed to collect a wide range of data for the structured 
 Source code for this project is available on github [here]()
 
 + **Introduction**
-
     - [Getting Started](./GettingStarted.md)
 
 + **Administration Guide**
-
     - [Modules](./User_Guides.md#modules)
     - [Groups](./User_Guides.md#Groups)
     - [Listing](./User_Guides.md#Listing)
@@ -20,21 +18,16 @@ Source code for this project is available on github [here]()
     - [Indicators](./User_Guides.md#Indicators)
   
 * **ODK Guide**
-
     - [uSurvey App](./ODK_App.md)
 
 * **USSD Guide**
-
     - [USSD](ussd-integration.md)
 
 * **Installation Guide**
-
     - [Installation](installation.md)
 
-* **Testing & Coverage**
-
-    - [Tests](tests.md)
-
-* **System design & Architecture**
-
+* **Deployment Guide**
     - [Application Architecture](deployment_guide.md)
+
+* **Testing & Coverage**
+    - [Tests](tests.md)
