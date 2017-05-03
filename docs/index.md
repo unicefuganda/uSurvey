@@ -22,23 +22,23 @@ User Manual
     - [Interviewers](./Interviewer.md)
 
 + **Monitor**
-  * [Listing Data](#)
-  * [Batch Data](#)
+    - [Listing Data](#)
+    - [Batch Data](#)
 
 * **Analyse** 
-  * [Indicators](./Indicators.md)
+    - [Indicators](./Indicators.md)
   
 * **Download**
-  * [Survey Data](#)
-  * [Mobile Money Sheet](#)
+    - [Survey Data](#)
+    - [Mobile Money Sheet](#)
 
 * **Settings**
-  * [Users](#)
-  * [Locations](#)
-  * [Active Power Mode](#)
-  * [Change Password](#)
+    - [Users](#)
+    - [Locations](#)
+    - [Active Power Mode](#)
+    - [Change Password](#)
 
 * **Conduct Survey**
-  * [uSurvey App](./ODK_App.md)
-  * [USSD](#)
+    - [uSurvey App](./ODK_App.md)
+    - [USSD](#)
 
