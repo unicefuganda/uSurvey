@@ -9,7 +9,7 @@ Source code for this project is available on github [here]()
     - [Getting Started](./GettingStarted.md)
 
 + **Administration Guide**
-    - [Modules](./User Guides/#modules)
+    - [Modules](./User Guides.md/#modules)
     - [Groups](./Groups.md)
     - [Listing](./Listing.md)
     - [Survey](./Survey.md)
