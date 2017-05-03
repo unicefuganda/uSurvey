@@ -11,13 +11,13 @@ Source code for this project is available on github [here]()
 
 + **Administration Guide**
 
-    - [Modules](./User_Guides.md/#modules)
-    - [Groups](./Groups.md)
-    - [Listing](./Listing.md)
-    - [Survey](./Survey.md)
-    - [Question Library](./Library.md)
-    - [Interviewers](./Interviewer.md)
-    - [Indicators](./Indicators.md)
+    - [Modules](./User_Guides.md#modules)
+    - [Groups](./User_Guides.md#Groups)
+    - [Listing](./User_Guides.md#Listing)
+    - [Survey](./User_Guides.md#create-survey)
+    - [Question Library](./User_Guides.md#Library)
+    - [Interviewers](./User_Guides.md#Interviewer)
+    - [Indicators](./User_Guides.md#Indicators)
   
 * **ODK Guide**
 
