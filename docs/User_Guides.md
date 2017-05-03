@@ -1,6 +1,5 @@
 ###Modules
-
----
+------
 Modules are Survey based classification based up on survey type and need.
 Modules are available from main menu under, <b>Design</b> >> <b>Modules</b>
 
@@ -30,8 +29,7 @@ On the ‘Modules’ page you can view all the Modules created in the applicatio
 * Delete Module: click on, Action Item ‘Delete, the Module is removed, before deleting you will be prompted with conformation to delete, click ‘Yes’ to Delete permanently.
 
 ###Groups
-
----
+------
 Groups are Survey dependent classification of people/respondents based on their Age, Gender and combination of both into one or more survey- respondents categories called Groups.
 Population has to be segment into Groups / multiple groups and our system allows us to create as many as needed.
 
