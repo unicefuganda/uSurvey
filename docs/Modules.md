@@ -8,7 +8,7 @@ To create a new Module, click on ‘Add Module’ button at top right of the Mod
 
 ![Module](./Module2.png)
 
-<b>Elements of Module</b`>:
+<b>Elements of Module</b>:
 
 <b>Name</b>: Name of a Module, which is a unique identity to a Module and is a mandatory field.   
 
