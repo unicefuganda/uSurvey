@@ -9,7 +9,7 @@ Source code for this project is available on github [here]()
     - [Getting Started](./GettingStarted.md)
 
 + **Administration Guide**
-    - [Modules](./Modules.md)
+    - [Modules](./User Guides/#modules)
     - [Groups](./Groups.md)
     - [Listing](./Listing.md)
     - [Survey](./Survey.md)
@@ -24,10 +24,13 @@ Source code for this project is available on github [here]()
     - [Users](#)
 
 * **Conduct Survey**
-    - [USSD](#)
+    - [USSD](ussd-integration.md)
 
 * **Installation Guide**
+    - [Installation](installation.md)
 
 * **Testing & Coverage**
+    - [Tests](tests.md)
 
 * **System design & Architecture**
+    -[Application Architecture](deployment_guide.md)
