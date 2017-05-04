@@ -17,7 +17,7 @@ Source code for this project is available on github [here]()
 * Captured data is sent to uSurvey portal
 * Data collected by Interviewers is then viewed on the uSurvey portal for reporting and analysis
 
-###A Quick step by step guide
+###Glimpse of uSurvey 
 ------
 #####Step -1: Create Module
 
@@ -58,12 +58,12 @@ Create [New Survey](./User_Guides.md#create-survey) or you can Clone existing Su
 
 Enroll [an Interviewer](./User_Guides.md#interviewer) <br>
 To conduct a Survey in the field, define an Interviewer as follows: <br>
-5.0. Provide basic Interviewer details, <br>
-5.1. Assign a Survey, <br>
-5.2. Allocate Enumeration Areas, <br>
-5.3. Create ODK Access ID, <br>
-5.4. Provide Mobile Number to access via USSD channel <br>
-5.5. Finally, finish enrollment <br>
+- 5.0. Provide basic Interviewer details, <br>
+- 5.1. Assign a Survey, <br>
+- 5.2. Allocate Enumeration Areas, <br>
+- 5.3. Create ODK Access ID, <br>
+- 5.4. Provide Mobile Number to access via USSD channel <br>
+- 5.5. Finally, finish enrollment <br>
 
 #####Step -6: Conduct Survey
 
