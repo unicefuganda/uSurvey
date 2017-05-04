@@ -4,10 +4,24 @@ uSurvey is an innovative data collection tool designed to provide statistically 
 
 The system has been designed to collect a wide range of data for the structured survey; to generate and produce descriptive statistics and graphical representation of the collected information whenever desired, as well as during the process of data collection.
 Source code for this project is available on github [here]()
-    
+
+###Features
+------
+* Admin management portal
+* Classification of surveys using Modules
+* Classification of population using Groups
+* Highly customizable Listings and Surveys
+* Preview questionnaire before go-live
+* Offline data collection via USSD channel
+* Online data collection via uSurvey App
+* Download, search and edit submitted forms in uSurvey App
+* Country Map is used to demonstrate district wise Completion rates and Indicators 
+* Customizable Indicators to measure survey results
+* Configurable data analysis reports generation
+
 ###Getting Started
 ------
-**The General flow for the uSurvey is as follows**:
+**General flow of the uSurvey**:
 
 * Admin creates uSurvey Users and assigns them Roles
 * User ‘Data Researcher’ defines Modules, Groups, Listing, Surveys, Batches and creates questionnaires for Listing & Batches in application
@@ -22,7 +36,6 @@ Source code for this project is available on github [here]()
 #####Step -1: Create Module
 
 Create [New Module](./User_Guides.md#modules) or skip this step, if you want to use existing Modules
-
 #####Step -2: Create Group
 
 Create [New Group](./User_Guides.md#groups) or skip this step, if you want to use existing Groups
