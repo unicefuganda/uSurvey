@@ -28,11 +28,11 @@ Create [New Listing](./Listing.md) or skip this step, if you want to use existin
 1. Use existing Listing: This option benefits by providing data collected earlier <br>
 2. Clone existing Listing: Duplicates Listing questions only <br>
 
-3.0. Once Listing is created, next <br> 
-3.1. Create Questions in Listing <br>
-3.2. If necessary, <br>
-3.3. Create Looping in questions and <br>
-3.4. Add Logic to questions. <br>
+   3.0. Once Listing is created, next <br> 
+   3.1. Create Questions in Listing <br>
+   3.2. If necessary, <br>
+   3.3. Create Looping in questions and <br>
+   3.4. Add Logic to questions. <br>
 
 **Step -4**
 
@@ -66,4 +66,4 @@ Data collection and submission is done in two ways:
 1. Android channel - [Using uSurvey App](./ODK_App.md)
 2. USSD channel - [Featured Phone](./ussd-integration.md)
 
-At any point on the uSurvey portal, there are bread crumbs that makes navigation easy.
+At any point on the uSurvey portal, use breadcrumbs on top of each page for easy navigation.

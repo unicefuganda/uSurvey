@@ -21,15 +21,15 @@ Source code for this project is available on github [here]()
 ------
 **Step -1**
 
-Create [New Module](./User_Guides.md#Modules) or skip this step, if you want to use existing Modules
+Create [New Module](./User_Guides.md#modules) or skip this step, if you want to use existing Modules
 
 **Step -2**
 
-Create [New Group](./User_Guides.md#Groups) or skip this step, if you want to use existing Groups
+Create [New Group](./User_Guides.md#groups) or skip this step, if you want to use existing Groups
 
 **Step -3**
 
-Create [New Listing](./User_Guides.md#Listing) or skip this step, if you want to use existing Listing or you can Clone existing Listing and rename it. Here we have to observe two things;
+Create [New Listing](./User_Guides.md#listing) or skip this step, if you want to use existing Listing or you can Clone existing Listing and rename it. Here we have to observe two things;
 
 1. Use existing Listing: This option benefits by providing data collected earlier <br>
 2. Clone existing Listing: Duplicates Listing questions only <br>
@@ -42,11 +42,11 @@ Create [New Listing](./User_Guides.md#Listing) or skip this step, if you want to
 
 **Step -4**
 
-Create [New Survey](./User_Guides.md#Create-Survey) or you can Clone existing Survey and rename it,<br>
+Create [New Survey](./User_Guides.md#create-survey) or you can Clone existing Survey and rename it,<br>
 **Clone existing Survey**: This option duplicates the survey along with the Listing data, and ready to use.
 
 4.0. Once a new Survey is created, next <br>
-4.1. Create Batch or Batches <br>
+4.1. [Create Batch](./User_Guides.md#batches) <br>
 4.3. then Create Questions in Batch <br>
      If necessary, <br>
 4.4. Create Looping in questions and <br> 
@@ -55,7 +55,7 @@ Create [New Survey](./User_Guides.md#Create-Survey) or you can Clone existing Su
 
 **Step -5**
 
-Enroll [an Interviewer](./User_Guides.md#Interviewer) <br>
+Enroll [an Interviewer](./User_Guides.md#interviewer) <br>
 To conduct a Survey in the field, define an Interviewer as follows: <br>
 5.0. Provide basic Interviewer details, <br>
 5.1. Assign a Survey, <br>
@@ -77,12 +77,12 @@ At any point on the uSurvey portal, there are bread crumbs that makes navigation
 ------
 + **Administration Guide**
     - [Modules](./User_Guides.md#modules)
-    - [Groups](./User_Guides.md#Groups)
-    - [Listing](./User_Guides.md#Listing)
+    - [Groups](./User_Guides.md#groups)
+    - [Listing](./User_Guides.md#listing)
     - [Survey](./User_Guides.md#create-survey)
     - [Question Library](./User_Guides.md#Library)
-    - [Interviewers](./User_Guides.md#Interviewer)
-    - [Indicators](./User_Guides.md#Indicators)
+    - [Interviewers](./User_Guides.md#interviewer)
+    - [Indicators](./User_Guides.md#indicators)
   
 * **ODK Guide**
     - [uSurvey App](./ODK_App.md)
