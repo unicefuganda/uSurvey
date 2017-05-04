@@ -34,11 +34,11 @@ Create [New Listing](./User_Guides.md#listing) or skip this step, if you want to
 1. Use existing Listing: This option benefits by providing data collected earlier <br>
 2. Clone existing Listing: Duplicates Listing questions only <br>
 
-   3.0. Once Listing is created, next <br> 
-   3.1. Create Questions in Listing <br>
-   3.2. If necessary, <br>
-   3.3. Create Looping in questions and <br>
-   3.4. Add Logic to questions. <br>
+   - 3.0. Once Listing is created, next <br> 
+   - 3.1. Create Questions in Listing <br>
+   - 3.2. If necessary, <br>
+   - 3.3. Create Looping in questions and <br>
+   - 3.4. Add Logic to questions. <br>
 
 **Step -4**
 
@@ -80,16 +80,16 @@ At any point on the uSurvey portal, use breadcrumbs on top of each page for easy
     - [Groups](./User_Guides.md#groups)
     - [Listing](./User_Guides.md#listing)
     - [Survey](./User_Guides.md#create-survey)
-    - [Question Library](./User_Guides.md#Library)
+    - [Question Library](./User_Guides.md#library-questions)
     - [Interviewers](./User_Guides.md#interviewer)
-    - [Indicators](./User_Guides.md#indicators) --
+    - [Indicators](./User_Guides.md#indicators)
 
-    
-* **ODK Guide**
+
+* **Online Data Collection**
     - [uSurvey App](./ODK_App.md)
 
 
-* **USSD Guide**
+* **Offline Data Collection**
     - [USSD](ussd-integration.md)
 
 

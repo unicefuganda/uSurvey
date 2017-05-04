@@ -5,7 +5,7 @@ Modules are available from main menu under, <b>Design</b> >> <b>Modules</b>
 
 ![Module](./Module1.png)
 
-To create a new Module, click on ‘Add Module’ button at top right of the Modules page, that opens a form to create a new Module, which has following elements;
+To create a new Module, click on ‘Add Module’ button at top right of the Modules page, that opens a form to create a new Module.
 
 ![Module](./Module2.png)
 
@@ -41,9 +41,9 @@ Groups are available from main menu under, <b>Design</b> >> <b>Groups</b>
 
 ![Group](./Group1.png)
 
-To create a new Group, click on ‘Add Group’ button at top right of the Groups page, that opens a form to create a new Group, which has following elements;
+To create a new Group, click on ‘Add Group’ button at top right of the Groups page, that opens a form to create a new Group.
 
-![Group](./Group3.png)
+![Group](./Group2_1.png)
 
 **Elements of Group**
 
@@ -737,8 +737,7 @@ From this above Interviewers page, Interviewers are managed, i.e. to Edit Interv
 
 ###Indicators
 ------
-Survey Indicators, which forecast statistical metrics of data collection done in a survey individually.
-
+A Data Researcher can choose one or more fields from their survey and create an arithmetic expression to generate metrics as per their requirement. Each such expression is called an Indicator. Any number of indicators can be created for a Survey. A limited number of these indicators can be selected to be shown on the dashboard. <br>
 Our system facilitates creating customized Indicators for every survey and show an analysis report in tabular and bar chart form.
 
 **How to create an Indicator?**
@@ -753,7 +752,7 @@ To create an Indicator, click on ‘Add Indicator’ button at top right of the 
 
 **Listing**: Select respective Listing, for which the Indicator need to be defined.
 
-**Indicator**: Define a name to the Indicator   
+**Indicator**: Give a name to the Indicator   
 
 **Description**: A short description about Indicator
  
@@ -765,7 +764,7 @@ i.e. just type, double curly brackets to automatically prompt with the ‘Variab
 Ex: type {{ , system prompts with ‘Variables’ then select any one to insert Variable, <br>
 Like: {{hh_age}} <br>
 
-**Display on dashboard**: This option allows, this particular indicator to display on dashboard, as dashboard facilitates to display maximum five indicator.
+**Display on dashboard**: This option allows the indicator to be displayed on the dashboard. A user can select a maximum of 5 indicators to be shown on the dashboard.
 
 **Add Variable**: 
 

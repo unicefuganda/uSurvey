@@ -1,6 +1,6 @@
 ###Indicators
 
-Survey Indicators, which forecast statistical metrics of data collection done in a survey individually.
+A Data Researcher can choose one or more fields from their survey and create an arithmetic expression to generate metrics as per their requirement. Each such expression is called an Indicator. Any number of indicators can be created for a Survey. A limited number of these indicators can be selected to be shown on the dashboard.
 
 Our system facilitates creating customized Indicators for every survey and show an analysis report in tabular and bar chart form.
 
@@ -28,7 +28,7 @@ i.e. just type, double curly brackets to automatically prompt with the ‘Variab
 Ex: type {{ , system prompts with ‘Variables’ then select any one to insert Variable, <br>
 Like: {{hh_age}} <br>
 
-**Display on dashboard**: This option allows, this particular indicator to display on dashboard, as dashboard facilitates to display maximum five indicator.
+**Display on dashboard**: This option allows the indicator to be displayed on the dashboard. A user can select a maximum of 5 indicators to be shown on the dashboard.
 
 **Add Variable**: 
 

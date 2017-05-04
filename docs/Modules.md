@@ -4,7 +4,7 @@ Modules are available from main menu under, <b>Design</b> >> <b>Modules</b>
 
 ![Module](./Module1.png)
 
-To create a new Module, click on ‘Add Module’ button at top right of the Modules page, that opens a form to create a new Module, which has following elements;
+To create a new Module, click on ‘Add Module’ button at top right of the Modules page, that opens a form to create a new Module.
 
 ![Module](./Module2.png)
 

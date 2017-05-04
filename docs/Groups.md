@@ -11,9 +11,9 @@ Groups are available from main menu under, <b>Design</b> >> <b>Groups</b>
 
 ![Group](./Group1.png)
 
-To create a new Group, click on ‘Add Group’ button at top right of the Groups page, that opens a form to create a new Group, which has following elements;
+To create a new Group, click on ‘Add Group’ button at top right of the Groups page, that opens a form to create a new Group.
 
-![Group](./Group3.png)
+![Group](./Group2_1.png)
 
 ###Elements of Group
 
