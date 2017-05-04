@@ -19,15 +19,15 @@ Source code for this project is available on github [here]()
 
 ###A Quick step by step guide
 ------
-####Step -1: Create Module
+#####Step -1: Create Module
 
 Create [New Module](./User_Guides.md#modules) or skip this step, if you want to use existing Modules
 
-#####Step -2
+#####Step -2: Create Group
 
 Create [New Group](./User_Guides.md#groups) or skip this step, if you want to use existing Groups
 
-**Step -3**
+#####Step -3: Create Listing 
 
 Create [New Listing](./User_Guides.md#listing) or skip this step, if you want to use existing Listing or you can Clone existing Listing and rename it. Here we have to observe two things;
 
@@ -35,13 +35,13 @@ Create [New Listing](./User_Guides.md#listing) or skip this step, if you want to
 * Clone existing Listing: Duplicates Listing questions only
 
 
-- 3.0. Once Listing is created, next <br> 
-- 3.1. Create Questions in Listing <br>
-  - 3.2. If necessary, <br>
-  - 3.3. Create Looping in questions and <br>
-  - 3.4. Add Logic to questions. <br>
+-  3.0. Once Listing is created, next <br> 
+-  3.1. Create Questions in Listing <br>
+-  3.2. If necessary, <br>
+-  3.3. Create Looping in questions and <br>
+-  3.4. Add Logic to questions. <br>
 
-**Step -4**
+#####Step -4: Create Survey
 
 Create [New Survey](./User_Guides.md#create-survey) or you can Clone existing Survey and rename it,<br>
 **Clone existing Survey**: This option duplicates the survey along with the Listing data, and ready to use.
@@ -54,7 +54,7 @@ Create [New Survey](./User_Guides.md#create-survey) or you can Clone existing Su
 4.5. Add Logic to questions. <br>
 4.6. Finally, don’t forget to change the status to Open, via Action Item ‘Open/Close’ for Batch
 
-**Step -5**
+#####Step -5: Enroll Interviewer
 
 Enroll [an Interviewer](./User_Guides.md#interviewer) <br>
 To conduct a Survey in the field, define an Interviewer as follows: <br>
@@ -65,13 +65,12 @@ To conduct a Survey in the field, define an Interviewer as follows: <br>
 5.4. Provide Mobile Number to access via USSD channel <br>
 5.5. Finally, finish enrollment <br>
 
-**Step -6**
+#####Step -6: Conduct Survey
 
-**Conduct Survey**: 
 Data collection and submission is done in two ways:
 
 1. Android channel - [Using uSurvey App](./ODK_App.md)
-2. USSD channel - [Featured Phone](./ussd-integration.md) <br>
+2. USSD channel - [Using Featured Phone](./ussd-integration.md) <br>
 At any point on the uSurvey portal, use breadcrumbs on top of each page for easy navigation.
 
 ###User Guides
