@@ -34,36 +34,35 @@ Create [New Listing](./User_Guides.md#listing) or skip this step, if you want to
 * Use existing Listing: This option benefits by providing data collected earlier
 * Clone existing Listing: Duplicates Listing questions only
 
-
--  3.0. Once Listing is created, next <br> 
--  3.1. Create Questions in Listing <br>
--  3.2. If necessary, <br>
--  3.3. Create Looping in questions and <br>
--  3.4. Add Logic to questions. <br>
+  3.0. Once Listing is created, next <br> 
+  3.1. Create Questions in Listing <br>
+  3.2. If necessary, <br>
+  3.3. Create Looping in questions and <br>
+  3.4. Add Logic to questions. <br>
 
 #####Step -4: Create Survey
 
 Create [New Survey](./User_Guides.md#create-survey) or you can Clone existing Survey and rename it,<br>
 **Clone existing Survey**: This option duplicates the survey along with the Listing data, and ready to use.
 
-4.0. Once a new Survey is created, next <br>
-4.1. [Create Batch](./User_Guides.md#batches) <br>
-4.3. then Create Questions in Batch <br>
+  4.0. Once a new Survey is created, next <br>
+  4.1. [Create Batch](./User_Guides.md#batches) <br>
+  4.3. then Create Questions in Batch <br>
      If necessary, <br>
-4.4. Create Looping in questions and <br> 
-4.5. Add Logic to questions. <br>
-4.6. Finally, don’t forget to change the status to Open, via Action Item ‘Open/Close’ for Batch
+  4.4. Create Looping in questions and <br> 
+  4.5. Add Logic to questions. <br>
+  4.6. Finally, don’t forget to change the status to Open, via Action Item ‘Open/Close’ for Batch
 
 #####Step -5: Enroll Interviewer
 
 Enroll [an Interviewer](./User_Guides.md#interviewer) <br>
 To conduct a Survey in the field, define an Interviewer as follows: <br>
-- 5.0. Provide basic Interviewer details, <br>
-- 5.1. Assign a Survey, <br>
-- 5.2. Allocate Enumeration Areas, <br>
-- 5.3. Create ODK Access ID, <br>
-- 5.4. Provide Mobile Number to access via USSD channel <br>
-- 5.5. Finally, finish enrollment <br>
+ 5.0. Provide basic Interviewer details, <br>
+ 5.1. Assign a Survey, <br>
+ 5.2. Allocate Enumeration Areas, <br>
+ 5.3. Create ODK Access ID, <br>
+ 5.4. Provide Mobile Number to access via USSD channel <br>
+ 5.5. Finally, finish enrollment <br>
 
 #####Step -6: Conduct Survey
 
