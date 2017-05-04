@@ -34,11 +34,11 @@ Create [New Listing](./User_Guides.md#listing) or skip this step, if you want to
 1. Use existing Listing: This option benefits by providing data collected earlier <br>
 2. Clone existing Listing: Duplicates Listing questions only <br>
 
-3.0. Once Listing is created, next <br> 
-3.1. Create Questions in Listing <br>
-3.2. If necessary, <br>
-3.3. Create Looping in questions and <br>
-3.4. Add Logic to questions. <br>
+   3.0. Once Listing is created, next <br> 
+   3.1. Create Questions in Listing <br>
+   3.2. If necessary, <br>
+   3.3. Create Looping in questions and <br>
+   3.4. Add Logic to questions. <br>
 
 **Step -4**
 
@@ -71,7 +71,7 @@ Data collection and submission is done in two ways:
 
 1. Android channel - [Using uSurvey App](./ODK_App.md)
 2. USSD channel - [Featured Phone](./ussd-integration.md) <br>
-At any point on the uSurvey portal, there are bread crumbs that makes navigation easy.
+At any point on the uSurvey portal, use breadcrumbs on top of each page for easy navigation.
 
 ###User Guides
 ------
@@ -82,19 +82,24 @@ At any point on the uSurvey portal, there are bread crumbs that makes navigation
     - [Survey](./User_Guides.md#create-survey)
     - [Question Library](./User_Guides.md#Library)
     - [Interviewers](./User_Guides.md#interviewer)
-    - [Indicators](./User_Guides.md#indicators)
-  
+    - [Indicators](./User_Guides.md#indicators) --
+
+    
 * **ODK Guide**
     - [uSurvey App](./ODK_App.md)
+
 
 * **USSD Guide**
     - [USSD](ussd-integration.md)
 
+
 * **Installation Guide**
     - [Installation](installation.md)
 
+
 * **Deployment Guide**
     - [Application Architecture](deployment_guide.md)
+
 
 * **Testing & Coverage**
     - [Tests](tests.md)
