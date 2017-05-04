@@ -108,7 +108,7 @@ def edit(request, user_id, mode=None):
     request.breadcrumbs([
         ('User list', reverse('users_index')),
     ])
-    print userform
+    userform.fields['groups'].queryset = Group.objects.all().order_by('name')
     context_variables = {
         'userform': userform,
         'action': reverse(
@@ -122,7 +122,7 @@ def edit(request, user_id, mode=None):
             'button_label': 'Save',
             'loading_text': 'Saving...',
             'country_phone_code': settings.COUNTRY_CODE,
-            'title': 'Edit User',
+            'title': '%s User'%mode.title(),
             'mode': mode,
             'user_id': user.id}
     return response or render(request, 'users/new.html', context_variables)

@@ -63,7 +63,10 @@
                        </button>                      
                        <ul class="dropdown-menu dropdown-only-icon dropdown-yellow dropdown-menu-right dropdown-caret dropdown-close">
                        <li>
-                            <a href="{% url 'users_edit' user.pk 'view' %}" class="tooltip-info" data-rel="tooltip" title="" data-original-title="Edit"><span class="blue"><i class="usur-icon fa fa-eye bigger-120"></i> View Details</span></a>
+                            <a href="{% url 'users_edit' user.pk 'view' %}" class="tooltip-info" data-rel="tooltip" title="" data-original-title="View"><span class="blue"><i class="usur-icon fa fa-eye bigger-120"></i> View Details</span></a>
+                            </li>
+                            <li>
+                            <a href="{% url 'users_edit' user.pk 'edit' %}" class="tooltip-info" data-rel="tooltip" title="" data-original-title="Edit"><span class="blue"><i class="usur-icon fa fa-edit bigger-120"></i> Edit</span></a>
                             </li>
                             <!-- <li>
                             <a href="{% url 'users_show_details' user.pk %}" class="tooltip-info" data-rel="tooltip" title="" data-original-title="Details"><span class="green"><i class="usur-icon fa fa-info-circle bigger-120"></i> Details</span></a>

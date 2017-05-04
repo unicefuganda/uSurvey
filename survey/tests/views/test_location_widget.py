@@ -1,6 +1,6 @@
 from random import randint
 from survey.models.locations import *
-from survey.models import LocationTypeDetails, EnumerationArea
+from survey.models import EnumerationArea
 from survey.tests.base_test import BaseTest
 from survey.views.location_widget import LocationWidget
 
@@ -25,14 +25,11 @@ class LocationWidgetTest(BaseTest):
 
         self.generate_location_type_details(
             self.uganda, the_country=self.uganda)
-        self.country_type_details = LocationTypeDetails.objects.get(
-            location_type=self.country, country=self.uganda)
 
     def test_gets_second_level_location_ie_below_country_if_no_selected_location_given_excluding_the_lowest_level(self):
         village = LocationType.objects.create(
             name='Village', parent=self.city, slug='village')
-        LocationTypeDetails.objects.create(
-            location_type=village, country=self.uganda)
+        
         Location.objects.create(
             name="Kyanja", parent=self.kampala_city, type=village)
 
@@ -47,8 +44,7 @@ class LocationWidgetTest(BaseTest):
     def test_gets_location_sorted_by_hierarchy_given_a_location_with_parents(self):
         village = LocationType.objects.create(
             name='Village', parent=self.city, slug='village')
-        LocationTypeDetails.objects.create(
-            location_type=village, country=self.uganda)
+        
         kyanja = Location.objects.create(
             name="Kyanja", parent=self.kampala_city, type=village)
         Location.objects.create(name="Kyanja child",
@@ -79,14 +75,12 @@ class LocationWidgetTest(BaseTest):
     def test_location_widget_truncate_lowest_level_location_type(self):
         village = LocationType.objects.create(
             name='Village', parent=self.city, slug='village')
-        LocationTypeDetails.objects.create(
-            location_type=village, country=self.uganda)
+
         bukoto = Location.objects.create(
             name='Bukoto', parent=self.kampala_city, type=village)
         some_type = LocationType.objects.create(
             name='Sometype', parent=village, slug='sometype')
-        LocationTypeDetails.objects.create(
-            location_type=some_type, country=self.uganda)
+        
 
         location_widget = LocationWidget(selected_location=self.kampala_city)
         widget_data = location_widget.get_widget_data()
@@ -101,14 +95,10 @@ class LocationWidgetTest(BaseTest):
     def test_location_widget_returns_two_levels_in_the_location_hierarchy_given_two_levels(self):
         village = LocationType.objects.create(
             name='Village', parent=self.city, slug='village')
-        LocationTypeDetails.objects.create(
-            location_type=village, country=self.uganda)
         Location.objects.create(
             name='Bukoto', parent=self.kampala_city, type=village)
         some_type = LocationType.objects.create(
             name='Sometype', parent=village, slug='sometype')
-        LocationTypeDetails.objects.create(
-            location_type=some_type, country=self.uganda)
 
         location_widget = LocationWidget(
             selected_location=self.kampala_city, level=3)
@@ -123,8 +113,6 @@ class LocationWidgetTest(BaseTest):
     def test_location_widget_knows_next_location_in_hierarchy(self):
         village = LocationType.objects.create(
             name='Village', parent=self.city, slug='village')
-        LocationTypeDetails.objects.create(
-            location_type=village, country=self.uganda)
         bukoto = Location.objects.create(
             name='Bukoto', parent=self.kampala_city, type=village)
 
@@ -137,14 +125,10 @@ class LocationWidgetTest(BaseTest):
     def test_location_widget_appends_ea_data_in_place_of_the_lowest_location_level(self):
         village = LocationType.objects.create(
             name='Village', parent=self.city, slug='village')
-        LocationTypeDetails.objects.create(
-            location_type=village, country=self.uganda)
         bukoto = Location.objects.create(
             name='Bukoto123', parent=self.kampala_city, type=village)
         some_type = LocationType.objects.create(
             name='Sometype', parent=village, slug='sometype')
-        LocationTypeDetails.objects.create(
-            location_type=some_type, country=self.uganda)
         kisasi = Location.objects.create(
             name='Kisaasi', parent=bukoto, type=some_type)
 
@@ -163,14 +147,11 @@ class LocationWidgetTest(BaseTest):
     def test_location_widget_appends_siblings_ea_if_ea_is_directly_under_parish(self):
         village = LocationType.objects.create(
             name='Village', parent=self.city, slug='village')
-        LocationTypeDetails.objects.create(
-            location_type=village, country=self.uganda)
         bukoto = Location.objects.create(
             name='Bukoto', parent=self.kampala_city, type=village)
         some_type = LocationType.objects.create(
             name='Sometype', parent=village, slug='sometype')
-        LocationTypeDetails.objects.create(
-            location_type=some_type, country=self.uganda)
+        
         kisasi = Location.objects.create(
             name='Kisaasi', parent=bukoto, type=some_type)
         kisasi_2 = Location.objects.create(
@@ -190,14 +171,12 @@ class LocationWidgetTest(BaseTest):
     def test_location_widget_appends_ea_data_if_selected_location_is_parish_even_if_no_selected_ea(self):
         village = LocationType.objects.create(
             name='Village', parent=self.city, slug='village')
-        LocationTypeDetails.objects.create(
-            location_type=village, country=self.uganda)
+        
         bukoto = Location.objects.create(
             name='Bukoto', parent=self.kampala_city, type=village)
         some_type = LocationType.objects.create(
             name='Sometype',  parent=village, slug='sometype')
-        LocationTypeDetails.objects.create(
-            location_type=some_type, country=self.uganda)
+        
         kisasi = Location.objects.create(
             name='Kisaasi', parent=bukoto, type=some_type)
         kisasi_2 = Location.objects.create(
