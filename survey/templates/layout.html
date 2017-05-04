@@ -247,7 +247,7 @@
                             <li>
                                 <a href="#">Setup</a>
                             </li>
-                            {% else %}
+                            {% elif user.id %}
                             <li>
                                 <a href="{% url 'users_edit' user.id %}">Edit Profile</a>
                             </li>
