@@ -19,11 +19,11 @@ Source code for this project is available on github [here]()
 
 ###A Quick step by step guide
 ------
-**Step -1**
+####Step -1: Create Module
 
 Create [New Module](./User_Guides.md#modules) or skip this step, if you want to use existing Modules
 
-**Step -2**
+#####Step -2
 
 Create [New Group](./User_Guides.md#groups) or skip this step, if you want to use existing Groups
 
@@ -34,8 +34,9 @@ Create [New Listing](./User_Guides.md#listing) or skip this step, if you want to
 * Use existing Listing: This option benefits by providing data collected earlier
 * Clone existing Listing: Duplicates Listing questions only
 
-  - 3.0. Once Listing is created, next <br> 
-  - 3.1. Create Questions in Listing <br>
+
+- 3.0. Once Listing is created, next <br> 
+- 3.1. Create Questions in Listing <br>
   - 3.2. If necessary, <br>
   - 3.3. Create Looping in questions and <br>
   - 3.4. Add Logic to questions. <br>
