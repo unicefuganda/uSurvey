@@ -249,7 +249,7 @@
                             </li>
                             {% elif user.id %}
                             <li>
-                                <a href="{% url 'users_edit' user.id %}">Edit Profile</a>
+                                <a href="{% url 'users_edit' user.id '' %}">Edit Profile</a>
                             </li>
                             {% endif %}    
                         </ul>
