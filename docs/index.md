@@ -33,14 +33,15 @@ Source code for this project is available on github [here]()
 
 ###Glimpse of uSurvey 
 ------
-#####Step -1: Create Module
+#####Step -1: Create a Module
 
 Create [New Module](./User_Guides.md#modules) or skip this step, if you want to use existing Modules
-#####Step -2: Create Group
+
+#####Step -2: Create a Group
 
 Create [New Group](./User_Guides.md#groups) or skip this step, if you want to use existing Groups
 
-#####Step -3: Create Listing 
+#####Step -3: Create a Listing 
 
 Create [New Listing](./User_Guides.md#listing) or skip this step, if you want to use existing Listing or you can Clone existing Listing and rename it. Here we have to observe two things;
 
@@ -53,7 +54,7 @@ Create [New Listing](./User_Guides.md#listing) or skip this step, if you want to
   3.3. Create Looping in questions and <br>
   3.4. Add Logic to questions. <br>
 
-#####Step -4: Create Survey
+#####Step -4: Create a Survey
 
 Create [New Survey](./User_Guides.md#create-survey) or you can Clone existing Survey and rename it,<br>
 **Clone existing Survey**: This option duplicates the survey along with the Listing data, and ready to use.
