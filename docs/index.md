@@ -21,15 +21,15 @@ Source code for this project is available on github [here]()
 ------
 **Step -1**
 
-Create [New Module](./Modules.md) or skip this step, if you want to use existing Modules
+Create [New Module](./User_Guides.md#Modules) or skip this step, if you want to use existing Modules
 
 **Step -2**
 
-Create [New Group](./Groups.md) or skip this step, if you want to use existing Groups
+Create [New Group](./User_Guides.md#Groups) or skip this step, if you want to use existing Groups
 
 **Step -3**
 
-Create [New Listing](./Listing.md) or skip this step, if you want to use existing Listing or you can Clone existing Listing and rename it. Here we have to observe two things;
+Create [New Listing](./User_Guides.md#Listing) or skip this step, if you want to use existing Listing or you can Clone existing Listing and rename it. Here we have to observe two things;
 
 1. Use existing Listing: This option benefits by providing data collected earlier <br>
 2. Clone existing Listing: Duplicates Listing questions only <br>
@@ -42,7 +42,7 @@ Create [New Listing](./Listing.md) or skip this step, if you want to use existin
 
 **Step -4**
 
-Create [New Survey](./Survey.md) or you can Clone existing Survey and rename it,<br>
+Create [New Survey](./User_Guides.md#Create-Survey) or you can Clone existing Survey and rename it,<br>
 **Clone existing Survey**: This option duplicates the survey along with the Listing data, and ready to use.
 
 4.0. Once a new Survey is created, next <br>
@@ -55,7 +55,7 @@ Create [New Survey](./Survey.md) or you can Clone existing Survey and rename it,
 
 **Step -5**
 
-Enroll [an Interviewer](./Interviewer.md) <br>
+Enroll [an Interviewer](./User_Guides.md#Interviewer) <br>
 To conduct a Survey in the field, define an Interviewer as follows: <br>
 5.0. Provide basic Interviewer details, <br>
 5.1. Assign a Survey, <br>
