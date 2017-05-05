@@ -33,15 +33,15 @@ Source code for this project is available on github [here]()
 
 ###Glimpse of uSurvey 
 ------
-#####Step -1: Create a Module
+######Step -1: Create a Module
 
 Create [New Module](./User_Guides.md#modules) or skip this step, if you want to use existing Modules
 
-#####Step -2: Create a Group
+######Step -2: Create a Group
 
 Create [New Group](./User_Guides.md#groups) or skip this step, if you want to use existing Groups
 
-#####Step -3: Create a Listing 
+######Step -3: Create a Listing 
 
 Create [New Listing](./User_Guides.md#listing) or skip this step, if you want to use existing Listing or you can Clone existing Listing and rename it. Here we have to observe two things;
 
@@ -56,7 +56,7 @@ Create [New Listing](./User_Guides.md#listing) or skip this step, if you want to
   <li>3.4. Add Logic to questions</li>
 </ul>
 
-#####Step -4: Create a Survey
+######Step -4: Create a Survey
 
 Create [New Survey](./User_Guides.md#create-survey) or you can Clone existing Survey and rename it,<br>
 **Clone existing Survey**: This option duplicates the survey along with the Listing data, and ready to use.
@@ -69,7 +69,7 @@ Create [New Survey](./User_Guides.md#create-survey) or you can Clone existing Su
   4.5. Add Logic to questions. <br>
   4.6. Finally, don’t forget to change the status to Open, via Action Item ‘Open/Close’ for Batch
 
-#####Step -5: Enroll Interviewer
+######Step -5: Enroll Interviewer
 
 Enroll [an Interviewer](./User_Guides.md#interviewer) <br>
 To conduct a Survey in the field, define an Interviewer as follows: <br>
@@ -100,21 +100,21 @@ At any point on the uSurvey portal, use breadcrumbs on top of each page for easy
     - [Indicators](./User_Guides.md#indicators)
 
 
-* **Offline Data Collection**
+* #####Offline Data Collection
     - [uSurvey App](./ODK_App.md)
 
 
-* **Online Data Collection**
+* #####Online Data Collection
     - [USSD](ussd-integration.md)
 
 
-* **Installation Guide**
+* #####Installation Guide
     - [Installation](installation.md)
 
 
-* **Deployment Guide**
+* #####Deployment Guide
     - [Application Architecture](deployment_guide.md)
 
 
-* **Testing & Coverage**
+* #####Testing & Coverage
     - [Tests](tests.md)
