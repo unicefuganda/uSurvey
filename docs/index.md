@@ -50,11 +50,15 @@ Create [New Listing](./User_Guides.md#listing) or skip this step, if you want to
 
 <3.0. Once Listing is created, next
 3.1. Create Questions in Listing 
-3.2. If necessary,
+3.2. If necessary
 3.3. Create Looping in questions and
-3.4. Add Logic to questions.
+3.4. Add Logic to questions
 
 #####Step -4: Create a Survey
+
+<1. first
+2. second
+3. third
 
 Create [New Survey](./User_Guides.md#create-survey) or you can Clone existing Survey and rename it,<br>
 **Clone existing Survey**: This option duplicates the survey along with the Listing data, and ready to use.
