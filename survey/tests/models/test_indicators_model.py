@@ -7,7 +7,7 @@ class IndicatorTest(TestCase):
     def test_fields(self):
         indicator = Indicator()
         fields = [str(item.attname) for item in indicator._meta.fields]
-        self.assertEqual(8, len(fields))
+        self.assertEqual(9, len(fields))
         for field in ['id', 'created', 'modified', 'module_id', 'name', 'description', 'measure', 'batch_id']:
             self.assertIn(field, fields)
 
