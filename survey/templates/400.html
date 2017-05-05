@@ -13,11 +13,11 @@
                     <h1 class="text-danger"><i class="fa fa-warning"></i> Bad Request <small>(400)</small></h1>
                         <hr/>
                         {% if user.is_authenticated %}
-                        	<p style="font-size: 15px;" >Looks like someting went wrong on our end. Head back to the dashbaord page </p><br/>
+                        	<p style="font-size: 15px;" >Head back to the dashbaord page </p><br/>
                         	<a href="{% if request.META.HTTP_REFERER %} {{ request.META.HTTP_REFERER }}
                         	        {% else %}{% url 'home_page' %}{% endif %}" class="btn btn-primary btn-submit"><i class="glyphicon glyphicon-arrow-left"></i> Go Back</a>
                          {%else%}
-                         	<p style="font-size: 15px;" >Looks like someting went wrong on our end. Head back to the Home page </p><br/>
+                         	<p style="font-size: 15px;" >Head back to the Home page </p><br/>
                             <a href="/" class="btn btn-primary btn-submit"><i class="glyphicon glyphicon-arrow-left"></i> Go Back</a>
                         {%endif%}
                 </div>

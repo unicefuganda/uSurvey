@@ -461,3 +461,7 @@ class UsersViewTest(BaseTest):
         self.assert_restricted_permission_for(url)
         url = reverse('activate_user', kwargs={"user_id":  1})
         self.assert_restricted_permission_for(reverse(url))
+
+    def test_download(self):
+        response = self.client.get(reverse('download_users'))
+        self.failUnlessEqual(response.status_code, 200)
