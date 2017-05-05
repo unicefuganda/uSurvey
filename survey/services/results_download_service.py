@@ -156,8 +156,7 @@ class ResultsDownloadService(object):
                 ['Created', ] + location_names + other_sort_fields)
             reports_df = reports_df[report_columns]
             try:
-                reports_df.Created = reports_df.Created.dt.tz_convert(
-                    settings.TIME_ZONE)
+                reports_df.Created = reports_df.Created.dt.tz_convert(settings.TIME_ZONE)
             except BaseException:
                 pass        # just try to convert if possible. Else leave it
             reports_df.index += self.page_start

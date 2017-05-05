@@ -251,6 +251,10 @@ urlpatterns = patterns(
         r'^users/(?P<user_id>\d+)/$',
         'survey.views.users.show',
         name='users_show_details'),
+    url(
+        r'^users/download/$',
+        'survey.views.users.download_users',
+        name='download_users'),
     # """
     # url(r'^batches/(?P<batch_id>\d+)/assign_questions/$',
     # 'survey.views.batch./completion/json/', name='assign_questions_page'),

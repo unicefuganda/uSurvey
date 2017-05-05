@@ -1,19 +1,19 @@
 import json
-
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required, permission_required
+from django.core.urlresolvers import reverse
+from django.conf import settings
 from survey.interviewer_configs import *
 from survey.forms.users import *
 from survey.models.users import UserProfile
 from survey.views.custom_decorators \
     import permission_required_for_perm_or_current_user
 from survey.utils.query_helper import get_filterset
-from django.core.urlresolvers import reverse
-from django.conf import settings
 from survey.forms.filters import UsersFilterForm
+from survey.services.export_model import get_model_as_dump
 
 
 def _add_error_messages(userform, request, action_str='registered'):
@@ -165,3 +165,15 @@ def deactivate(request, user_id):
 @permission_required('auth.can_view_users')
 def activate(request, user_id):
     return _activate(request, user_id, status=True)
+
+
+@permission_required('auth.can_view_interviewers')
+def download_users(request):
+    filename = 'all_admin_users'
+    reports_df = get_model_as_dump(User)
+    response = HttpResponse(content_type='text/csv')
+    reports_df.to_csv(response, index=False)
+    response['Content-Disposition'] = 'attachment; \
+        filename="%s.csv"' % filename
+    return response
+

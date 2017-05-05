@@ -268,6 +268,7 @@ CACHEOPS = {
     # 'survey.survey': {'ops': (), 'timeout': CACHE_REFRESH_DURATION},
     # 'survey.questionset': {'ops': (), 'timeout': CACHE_REFRESH_DURATION},
     'survey.*': {'ops': (), 'timeout': CACHE_REFRESH_DURATION},
+    'auth.user': {'ops': (), 'timeout': CACHE_REFRESH_DURATION},
 }
 
 # DJANGO-WS CONFIG
@@ -345,6 +346,14 @@ QUESTION_EXPORT_HEADERS = OrderedDict([
     ('options', 'Options'),
     ('group', 'Group'),
     ('module', 'Module')
+])
+
+USER_EXPORT_HEADERS = OrderedDict([
+    ('first_name', 'First Name'),
+    ('last_name', 'Last Name'),
+    ('username', 'User Name'),
+    ('email', 'Email'),
+    ('groups__name', 'groups'),
 ])
 
 ODK_UPLOADED_DATA_BELOW_SAMPLE_SIZE = 'Uploaded Data is below sample size.\

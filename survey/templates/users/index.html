@@ -1,4 +1,5 @@
-{% extends "layout.html" %}
+
+-{% extends "layout.html" %}
 {% block title %}
   Users List
 {% endblock %}
@@ -13,10 +14,13 @@
     }
 </style>
 <ul id="horizontal-filter">
-                <li>
-                    <a style="padding: 3px 5px" href="{% url 'new_user_page' %}" class="btn btn-white btn-warning btn-bold pull-right" id="add-user"><i class="ace-icon fa fa-plus bigger-120"></i> Add User</a>
-                </li>
-            </ul>
+    <li>
+        <a style="padding: 3px 5px" href="{% url 'new_user_page' %}" class="btn btn-white btn-warning btn-bold pull-right" id="add-user"><i class="ace-icon fa fa-plus bigger-120"></i> Add User</a>
+    </li>
+    <li>
+        <a style="padding: 3px 5px" href="{% url 'download_users' %}" class="btn btn-white btn-warning btn-bold pull-right" id="export-users"><i class="ce-icon fa fa-external-link bigger-120"></i>Download Users</a>
+    </li>
+</ul>
 {% endblock %}
 {% block content %}
 {% load pagination_tags %}
