@@ -98,11 +98,11 @@ At any point on the uSurvey portal, use breadcrumbs on top of each page for easy
     - [Indicators](./User_Guides.md#indicators)
 
 
-* **Online Data Collection**
+* **Offline Data Collection**
     - [uSurvey App](./ODK_App.md)
 
 
-* **Offline Data Collection**
+* **Online Data Collection**
     - [USSD](ussd-integration.md)
 
 
