@@ -124,8 +124,7 @@ def edit(request, question_id):
 
 @permission_required('auth.can_view_batches')
 def delete(request, question_id):
-    '''
-        Delete library question
+    '''Delete library question
     '''
     try:
         try:
