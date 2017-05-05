@@ -48,7 +48,7 @@ Create [New Listing](./User_Guides.md#listing) or skip this step, if you want to
 * Use existing Listing: This option benefits by providing data collected earlier
 * Clone existing Listing: Duplicates Listing questions only
 
-<ul>
+<ul style="list-style-type:none">
   <li>3.0. Once Listing is created, next</li>
   <li>3.1. Create Questions in Listing</li>
   <li>3.2. If necessary</li>
