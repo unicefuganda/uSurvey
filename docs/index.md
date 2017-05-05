@@ -78,7 +78,7 @@ To conduct a Survey in the field, define an Interviewer as follows: <br>
  5.4. Provide Mobile Number to access via USSD channel <br>
  5.5. Finally, finish enrollment <br>
 
-#####Step -6: Conduct Survey
+######Step -6: Conduct Survey
 
 Data collection and submission is done in two ways:
 
@@ -88,7 +88,7 @@ At any point on the uSurvey portal, use breadcrumbs on top of each page for easy
 
 ###User Guides
 ------
-+ **Administration Guide**
++ #####Administration Guide
     - [Modules](./User_Guides.md#modules)
     - [Groups](./User_Guides.md#groups)
     - [Listing](./User_Guides.md#listing)
