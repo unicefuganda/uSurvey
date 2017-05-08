@@ -146,7 +146,7 @@ def custom_400(request):
 
 
 def custom_403(request):
-    return HttpResponseRedirect(reverse('login_page'))
+    return HttpResponseRedirect(reverse('.'))
 
 
 def custom_404(request):

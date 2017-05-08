@@ -237,7 +237,7 @@
                     <li>
                         <a href='#' class="new_user_page users_index  users_show_details activate_user deactivate_user users_edit new_user_page enumeration_area_home submenu-button1"><i class="fa fa-cog"></i> SETTINGS</a>
                         <ul>
-                            {% if user.is_superuser == True %}
+                            {% if perms.auth.can_view_users %}
                             <li>
                                 <a href="{% url 'users_index' %}" class="new_user_page users_index  users_show_details activate_user deactivate_user users_edit new_user_page">Users</a>
                             </li>

@@ -340,6 +340,16 @@ def get_download_url(request, url_name, instance=None):
 
 
 @register.assignment_tag
+def get_absolute_url(request, url_name, *args):
+    return request.build_absolute_uri(reverse(url_name, args=args))
+
+
+@register.assignment_tag
+def get_home_url(request, url_name, *args):
+    return request.build_absolute_uri('/')
+
+
+@register.assignment_tag
 def get_sample_data_display(sample):
     return sample.get_display_label()
 
