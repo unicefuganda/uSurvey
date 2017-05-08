@@ -1,7 +1,7 @@
 ###Modules
 ------
 Modules are Survey based classification based up on survey type and need.
-Modules are available from main menu under, <b>Design</b> >> <b>Modules</b>
+Modules are accessible from main menu under, **Design** >> **Modules**
 
 ![Module](./Module1.png)
 
@@ -9,11 +9,11 @@ To create a new Module, click on ‘Add Module’ button at top right of the Mod
 
 ![Module](./Module2.png)
 
-<b>Elements of Module</b>:
+**Elements of Module**:
 
-<b>Name</b>: Name of a Module, which is a unique identity to a Module and is a mandatory field.   
+**Name**: Name of a Module, which is a unique identity to a Module and is a mandatory field.   
 
-<b>Description</b>: A short description about Module
+**Description**: A short description about Module
 
 ![Module](./Module3.png)
 
@@ -21,7 +21,7 @@ A Module is created by providing above field and click on ‘Create’ button to
 
 On the ‘Modules’ page you can view all the Modules created in the application. each of these Module has Actions to ‘Edit’ and ‘Delete’.
 
-<b>Actions in Modules</b>:
+**Actions in Modules**:
 
 ![Module](./Module4.png)
 
@@ -37,7 +37,7 @@ From this above Groups page, Groups are managed, i.e. to Create a New Group, Edi
 
 **Create a New Group**
 
-Groups are available from main menu under, <b>Design</b> >> <b>Groups</b>
+Groups are accessible from main menu under, **Design** >> **Groups**
 
 ![Group](./Group1.png)
 
@@ -47,22 +47,22 @@ To create a new Group, click on ‘Add Group’ button at top right of the Group
 
 **Elements of Group**
 
-<b>Name</b>: Is Group Name, which is a unique identity to a Group and is a mandatory field.   
+**Name**: Is Group Name, which is a unique identity to a Group and is a mandatory field.   
 
-<b>Description</b>: A short description about Group
+**Description**: A short description about Group
 
-<b>Parameter</b>: Need to select a parameter, based on which Group is created. Like Age, Gender  
+**Parameter**: Need to select a parameter, based on which Group is created. Like Age, Gender  
 
-<b>Operator</b>: Also need to select an Operator based on the Parameter value, like value starts with, equals to and between, etc.
+**Operator**: Also need to select an Operator based on the Parameter value, like value starts with, equals to and between, etc.
 
 ![Group](./Group3.png)
 
 A Group is created by providing above all field, such that a Group can be created using a single or combination of Parameters, finally click on ‘Save’ button to Create Group. 
 
-<b>Existing Criteria</b>
+**Existing Criteria**
 This table shows list of parameters used in creating a Group and can be altered by Deleting the existing one and assigning a different parameter to the same Group Name, by changing the ‘Parameter’ and ‘Operator’ values, then click ‘Save’ button.
 
-<b>Edit and Delete Groups</b>
+**Edit and Delete Groups**
 From the Groups Table each of the Group has Action items to ‘Edit’ and ‘Delete’ Group.
 
 ![Group](./Group4.png)
@@ -79,25 +79,25 @@ Parameters plays a major portion in creating a Group, to check what are the Para
 
 ![Group](./Group6.png)
 
-<b>Add Parameters</b>
+**Add Parameters**
 
 To Add Parameter, click on ‘Add Parameter’ button at top right of the Parameter page, that opens a form to create a new Parameter, which has following elements;
 
 ![Group](./Group7.png)
 
-<b>Elements of Parameter</b>
+**Elements of Parameter**
 
-<b>Variables Name</b>: Is an identifier for Parameter, Enter the name of the Parameter 
+**Variables Name**: Is an identifier for Parameter, Enter the name of the Parameter 
 
-<b>Text</b>: A short description about Parameter
+**Text**: A short description about Parameter
 
-<b>Answer Type</b>: Select an Answer Type for Parameter from dropdown list, such that Parameter is of type Text, Numeric and Multi choice.
+**Answer Type**: Select an Answer Type for Parameter from dropdown list, such that Parameter is of type Text, Numeric and Multi choice.
 
 ![Group](./Group8.png)
 
 A Parameter is created by providing above all field, finally click on ‘Save’ button to Create Parameter or click on ‘Save and Add More’ button to continue adding more Parameters to the list.
 
-<b>Edit and Delete Parameter</b>
+**Edit and Delete Parameter**
 From the Parameter Table each of the Parameter has Action items to ‘Edit’ and ‘Delete’ Parameter.
 
 ![Group](./Group9.png)
@@ -108,9 +108,9 @@ To Edit a Parameter – In the table under column name ‘Actions’ select ‘E
 
 To Delete a Parameter – In the table under column name ‘Actions’ select ‘Delete’ to remove from list, before deleting you will be prompted with conformation to delete, click ‘Yes’ to Delete permanently.
 
-<b>View Options</b>: This Action item is visible only for the Questions that has Answer Type “Multi choice”, to view Answer Choices.
+**View Options**: This Action item is visible only for the Questions that has Answer Type “Multi choice”, to view Answer Choices.
 
-<b>Export Parameter</b>
+**Export Parameter**
 Click on ‘Export Parameter’ to download available list of Parameter in ‘.CSV’ file format.
 
 ###Listing
@@ -121,7 +121,7 @@ The Listing is generally carried out by field staff other than interviewers, as 
 
 2. By creating a separate Listing the system gives the user flexibility to use the same Listing for multiple surveys.
 
-Listing is available from main menu under **Design** >> **Listing Form**
+Listings are accessible from main menu under **Design** >> **Listing Form**
 
 Listing is a set of Questions that can be customized/configured for any survey by reusing same Listing.
 
@@ -356,7 +356,7 @@ In the ‘Listing Form Questions Template’ page, Questions that has Logic are 
 
 ###Create Survey
 ------
-Surveys are available from main menu under **Design** >> **Surveys**
+Surveys are accessible from main menu under **Design** >> **Surveys**
 
 ![Survey0](./Survey1.png)
 Screen-1
@@ -423,7 +423,35 @@ On the ‘Survey’ page one can view all the Survey created in the application,
 * **Delete Survey**: click on, Action Item ‘Delete, the entire Survey is removed, before deleting you will be prompted with conformation to delete, click ‘Yes’ to Delete permanently. <br> This option is not available for completed Survey<br>
 * **View Batches in Survey**: click on, Action Item ‘View Batches’, navigates to ‘Survey Batches’ page<br>
 * **Clone a Survey**: click on, Action Item ‘Clone’, an another copy of same Survey is created along with Survey Batches and Batch Questions, except existing Looping and Logic in Batch Questions<br>
-* **Sampling Criteria**: 
+* **Sampling Criteria**:
+  This feature helps Data researcher to sort collected data for sampling according to listing data, in some cases, the Data researcher might be interested in restricting sampling, so that only listing data which meets specific criteria are sampled.
+
+For example: if interviewer had collected data for houses in a particular Enumeration area, the Data researcher might be interested in sampling only those houses with at least one child. Or
+Data researcher might be interested in sampling only residential houses.
+
+Defining Sampling Criteria provides the admin user to describe how to define the rules for Sampling Criteria
+
+**Define Sampling Criteria**
+
+To define Sampling Criteria, click on, Action Item ‘Sampling Criteria’, that opens a form with the following elements;
+
+![Survey](./Survey4_1.png)
+
+![Survey](./Survey5.png)
+
+![Survey](./Survey6.png)
+
+**Listing Question**: Listing Questions with code, used for this Survey are lorded here, one can select respective question for defining the Sampling Criteria.
+
+**Validation Test**: Based on the above selected question, choose the eligible criteria to validate the collected data 
+
+**Value / Options**: To sort collected data for sampling, provide valid input for above Validation Test.
+
+Sampling Criteria is created by satisfying above fields, then click on ‘Save Changes’. 
+
+In the same page, Sampling Criteria that is created can be seen in table the “Existing Criteria”.
+Which shows the defined Sampling Criteria and has option to ‘Delete’.
+
 
 ###Batches
 ------
@@ -633,107 +661,116 @@ In the ‘Batch Questions’ page, Questions that has Logic are represented with
 ------
 List of Questions very common in Surveys are available here which are also categorized into Module wise.  This is a feature/ facility available to pick up questions from this library and add to Batch or Listing, by ‘Select Questions’ feature in respective pages.
 
-<b>Create Library Questions</b>
+**Create Library Questions**
 
 To add new questions in Library can be done in 2 ways.
 
 1. Adding directly question to Library 
 2. Using feature ‘Update Library’ while creating Batch or Listing Questions
 
-<b>Adding Directly</b>:
+Library Questions are accessible from main menu under **Design** >> **Questions Library**
+
+![Library](./QL1.png)
+
+![Library](./QL4.png)
+
+**Adding Directly**:
 On the ‘Library’ page one can view all the list of Library Questions, 
 Now click on, ‘Add Question’ button at top right side of this page, this will open a form where one can create a Question, which has following elements; 
 
-<b>Elements in Library Question</b>:
+![Library](./QL2.png)
 
-<b>Module</b>: All Modules in the application are listed here in this dropdown, one has to select, respective Module that is related to survey.
+![Library](./QL3.png)
 
-<b>Variables Name</b>: This is an identifier for Question, type a code for Question
+**Elements in Library Question**:
 
-<b>Text</b>: Is the actual Question, Write a Question.
+**Module**: All Modules in the application are listed here in this dropdown, one has to select, respective Module that is related to survey.
+
+**Variables Name**: This is an identifier for Question, type a code for Question
+
+**Text**: Is the actual Question, Write a Question.
  
-<b>Answer Type</b>: Select an Answer Type from dropdown list, such that Question has to be answered in any one of these formats only, that is ‘Answer type’ should be: “Audio, Auto Generate, Date, Geo Point, Image, Multi choice, Multi Select, Numeric, Text and Video”
+**Answer Type**: Select an Answer Type from dropdown list, such that Question has to be answered in any one of these formats only, that is ‘Answer type’ should be: “Audio, Auto Generate, Date, Geo Point, Image, Multi choice, Multi Select, Numeric, Text and Video”
 
 A Library Question is created by filling above all fields, finally click on ‘Save’ button to Add Question to Library or click on ‘Save and Add More’ button to continue adding another Question.
 
-<b>Search</b>: One can find Questions in Library by two ways:
-<b>Sort</b> questions using ‘Answer Type’ dropdown at top left side of this page. Or
-<b>Search</b> using the search bar at top right side of this page, by providing text or code.
+**Search**: One can find Questions in Library by two ways:
+**Sort** questions using ‘Answer Type’ dropdown at top left side of this page. Or
+**Search** using the search bar at top right side of this page, by providing text or code.
 
-<b>Export Questions</b>: On click, ‘Export Questions’ button, user can download the Library Questions in “.csv” file format.
+**Export Questions**: On click, ‘Export Questions’ button, user can download the Library Questions in “.csv” file format.
 
 ###Interviewer
 ------
 Interviewer is a role in the system, one who conducts a Survey in the field.   
-These Interviewers conducts the survey in the designated Enumeration areas and data collection is done using the hand-held mobile device like Android Smart Phone or Featured Phone via ODK and USSD channels respectively.
+These Interviewers conducts the survey in the designated Enumeration areas and data collection is done using the hand-held mobile device like Android Smart Phone or Featured Phone using uSurvey App and USSD channels respectively.
 
-Data researcher enrolls Interviewer, assigns Survey and defines the Enumeration areas.
+Data researcher enrolls Interviewer, assigns Survey and allocates to the Enumeration areas.
 
-Enrolled Interviewer are available from main menu under <b>Administration</b> >> <b>Interviewers</b>
+Enrolled Interviewer are accessible from main menu under **Administration** >> **Interviewers**
 
 ![Interviewer](./Interviewer1.png)
 
 **Interviewer Registration**
 
-On the ‘Interviewers’ page one can view list of enrolled Interviewers in the application, Add, Manage and Edit Interviewer can be done.
+On the ‘Interviewers’ page one can view list of enrolled Interviewers in the application, also can Add and Manage Interviewers.
 
 To register a new Interviewer, click on ‘Add Interviewer’ button at top right of the Interviewers page, this will open a registration form with following elements;
 
 ![Interviewer](./Interviewer2.png)
 
-<b>Elements in the registration form</b>
+**Elements in the registration form**
 
 ![Interviewer](./Interviewer4_1.png)
 
-<b>Select Locations</b>: Initially get list of Enumeration Areas (EA) by selecting respective, District, County, Sub-county and Parish from locations filters at top of this page, to allocate Enumeration areas to the Interviewer where survey has to be conducted.
+**Select Locations**: Initially get list of Enumeration Areas (EA) by selecting respective, District, County, Sub-county and Parish from locations filters at top of this page, to allocate Enumeration areas to the Interviewer where survey has to be conducted.
 
-<b>Name</b>: Name of the Interviewer
+**Name**: Name of the Interviewer
 
-<b>Date of Birth</b>: Date of birth of the Interviewer
+**Date of Birth**: Date of birth of the Interviewer
 
-<b>Gender</b>: Gender of the Interviewer
+**Gender**: Gender of the Interviewer
 
-<b>Education</b>: Education qualification of the Interviewer
+**Education**: Education qualification of the Interviewer
 
-<b>Preferred Language</b>: select, Interviewer’s preferred language to write and speak
+**Preferred Language**: select, Interviewer’s preferred language to write and speak
 
-<b>Survey</b>: Assign a Survey to the Interviewer, select a Survey from the list
+**Survey**: Assign a Survey to the Interviewer, select a Survey from the list
 
-<b>Enumeration Area</b>: The places or locations where assigned Survey is supposed to be conducted by the Interviewer. Select EAs from ‘All EAs’ list by clicking on the list item, that is on listed EA.
+**Enumeration Area**: The places or locations where assigned Survey is supposed to be conducted by the Interviewer.<br>
+To Search/choose EAs, at least a ‘District’ has to be selected from locations filters at top of this page, then EAs are available.
 
-<b>ODK Access</b>: The process of collecting data using Android channel is known as ODK Access, to provide permissions to access this channel, an Interviewer needs following ODK Access credentials;
+**ODK Access**: The process of collecting data using Android channel is known as ODK Access, to provide permissions to access this channel, an Interviewer needs following ODK Access credentials;
 
-<b>ODK ID</b>: It is the User Id / User Name to access ODK channel, only alphabets are accepted
+**ODK ID**: It is the User Id / User Name to access ODK channel, only alphabets are accepted
 
-<b>ODK Token</b>: It nothing but password to access ODK channel, only numeric values are accepted
+**ODK Token**: It nothing but password to access ODK channel, only numeric values are accepted
 
-<b>Activated</b>: Allow access or prevent access to ODK channel
+**Activated**: Allow access or prevent access to ODK channel
 
-<b>USSD Access</b>: The process of collecting data using Featured Phone is known as USSD Access, to access this channel, an Interviewer needs to provide Mobile Number. 
+**USSD Access**: The process of collecting data using Featured Phone is known as USSD Access, to access this channel, an Interviewer needs to provide Mobile Number. 
 
-Options in USSD Access:
+**Add Mobile Number**: System facilitates, accessing from multiple mobile numbers also. So one can add multiple mobile numbers or remove here using ‘Add’ and ‘Delete’ options.
 
-<b>Add Mobile Number</b>: System facilitates, accessing from multiple mobile numbers also. So one can add multiple mobile numbers or remove here using ‘Add’ and ‘Delete’ options.
-
-<b>Activated</b>: Allow access or prevent access to USSD channel
+**Activated**: Allow access or prevent access to USSD channel
 
 Interviewer is enrolled by providing above all field, finally click on ‘Save’ button to complete the process. 
 
-From this above Interviewers page, Interviewers are managed, i.e. to Edit Interviewer Details and block/unblock Interviewer
+In this page, Interviewers are also managed, i.e. to Edit Details and block/unblock Interviewer.
 
-<b>Actions</b>:
+**Actions**:
 
 ![Interviewer](./Interviewer3.png)
 
-<b>View Details</b>: View Interviewer profile and Edit details, all profile details, Survey Details, ODK Access and USSD Access details are editable by click on ‘Edit’ button at the bottom of the page.
+**View Details**: View Interviewer profile and Edit details, all profile details, Survey Details, ODK Access and USSD Access details can be modified, just click on ‘Edit’ button at the bottom of the page.
 
-<b>Un Block/ Block</b>: Option to make Interviewer active or in active.
+**Un Block/ Block**: Option to make Interviewer Active or In-Active to retain in the system.
 
-<b>Search</b>: One can find Interviewers in system by two ways:
-<b>Sort</b> Interviewers location wise by selecting respective, District, County, Sub-county and Parish from locations filters at top of this page. Or
-<b>Search</b> using the search bar at top right side of this page, by providing Interviewer’s Name.
+**Search**: One can find Interviewers in system by two ways:
+**Sort** Interviewers location wise by selecting respective, District, County, Sub-county and Parish using locations filters at top of this page. Or
+**Search** using the search bar at top right side of this page, by providing Interviewer’s Name.
 
-<b>Export Interviewers</b>: On click, ‘Export Interviewers’ button, user can download the Interviewers list in “.csv” file format.
+**Export Interviewers**: On click, ‘Export Interviewers’ button, user can download the Interviewers list in “.csv” file format.
 
 ###Indicators
 ------
@@ -808,5 +845,77 @@ On the ‘Indicator’ page one can view all the Indicator created in the applic
 * **Formula**: click on, Action Item ‘Formula’, to edit the Indicator Formula directly
 * **Analysis**: click on, Action Item ‘Analysis’, navigates to ‘Indicator Analysis’ page, here one can view two forms of district wise reports based up on the Indicator Formula,
   * A Bar chart report is generated and displayed
-  * A tabular report 
+  * A tabular report
+
+###Manage Users
+------
+This section allows to add additional administration users to uSurvey.<br>
+Portal Users’ enrollment is done here by Administrator, this system is developed in the model of ‘Role-based User access’, hence in the system we will find different ‘Roles’, based on application access privileges, these roles are defined. In this context, based on the ‘Roles’ of individual ‘Users’ access to perform a specific task, such as view, create or modify a form are given.
+
+######Roles in the System
+
+**Administrator**: Granted full access to View, Add, Edit and Delete in entire application, including creating the users, uploading the location and also clear the data of any Survey/ Listing using ‘Power Mode’, etc.<br>
+**Please note**: This Role is very powerful and one should be very careful while allocation
+
+**Data collector**: Have permission to View access only, but cannot create new Listing/Survey or any other new records.
+
+**Data Email Reports**: System will send daily email report of the latest data collected for the last day. who can also monitor the data on the Portal. 
+
+**Researcher**: Have permission to View, Add and Edit Interviewer, Listing, Survey, Group, Module and create questionnaire.
+
+**Supervisor**: One who is superior to Interviewers, who can view the data of any Interviewer on the phone before submitting to the portal. And have permission to monitor the data on the Portal.
+
+**Viewer**: Have permission to View Dashboard and Analysis.
+
+#####Create Users 
+
+Administrator enrolls portal Users and assign Roles.
+
+Enrolled Users are accessible from main menu under **Settings** >> **Users**
+
+![Users](./Users1.png)
+
+On the ‘Users’ page one can view list of enrolled Users in the application, also can Add and Manage Users.
+
+To enroll a new User, click on ‘Add User’ button at top right of the Users page, this will open a registration form with following elements;
+
+![Users](./Users2.png)
+
+![Users](./Users3.png)
+
+**Elements in the registration form**
+
+**First Name**: First Name of the User
+
+**Last Name**: Last Name of the User
+
+**Email Address**: email id of the User
+
+**Mobile Number**: Contact number of the User
+
+**Roles**: Assign a desired Role to the User
+
+**User Name**: Enter the desired username for the User, to access the portal
+
+**Password**: provide password
+
+**Confirm Password**: conform once again password provided
+
+A New User is enrolled by providing above all field, finally click on ‘Save Changes’ button to complete the process.
+
+In this page, Users are also managed, i.e. to Edit Details and Activate/Deactivate User
+
+**Actions**:
+
+**View Details**: View User profile and Edit details, just click on ‘Edit’ button at the bottom of the page.
+
+**Edit**: To quickly edit User profile
+
+**Activate/Deactivate**: Option to make User Active or In-Active to retain in the system.
+
+**Search**: One can find Users in system by two ways:
+**Sort** Users by their ‘Status’ by selecting status at top of this page. Or
+**Search** using the search bar at top right side of this page, by providing User’s Name.
+
+**Export Users**: On click, ‘Download Users’ button, one can export the Users list in “.csv” file format.
 
