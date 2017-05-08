@@ -6,7 +6,7 @@ To login, click on ‘Login’ at top right of the Home page
 
 ![Home](./Home.png)
 
-Now login using your Username and Password, after successful login you will be navigated to uSurvey Dashboard, which is displayed with Uganda Map.
+Now login using your Username and Password, after successful login you will be navigated to uSurvey Dashboard, which shows Uganda Map.
 
 ![Login](./Login.png)
 
@@ -14,8 +14,8 @@ Now login using your Username and Password, after successful login you will be n
 ------
 The Dashboard, contains Survey Map, which is used to display survey report on a country map as per primary Administrative divisions. Eg for Uganda, that would be District, For South Africa, that might correspond to Provinces.
 
-This page is basically divided into two Tabs
-1. **Locations**
+This page is basically divided into two Tabs<br>
+1. **Locations**<br>
 2. **Indicators**
 
 On this page, drop down at top left corner contains Surveys, whose District wise completion rates with respect to legend and respective Indicators to display on map.
