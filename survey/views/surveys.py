@@ -93,6 +93,7 @@ def new(request):
     request.breadcrumbs([
         ('Surveys', reverse('survey_list_page')),
     ])
+    print survey_form
     return response or render(request, 'surveys/new.html', context)
 
 
