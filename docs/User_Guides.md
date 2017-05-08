@@ -1,3 +1,38 @@
+###Login
+------
+Welcome to uSurvey portal, enrolled users can access the portal by their Login credentials provided by Administrator.
+
+To login, click on ‘Login’ at top right of the Home page
+
+![Home](./Home.png)
+
+Now login using your Username and Password, after successful login you will be navigated to uSurvey Dashboard, which is displayed with Uganda Map.
+
+![Login](./Login.png)
+
+###Dashboard
+------
+The Dashboard, contains Survey Map, which is used to display survey report on a country map as per primary Administrative divisions. Eg for Uganda, that would be District, For South Africa, that might correspond to Provinces.
+
+This page is basically divided into two Tabs
+1. **Locations**
+2. **Indicators**
+
+On this page, drop down at top left corner contains Surveys, whose District wise completion rates with respect to legend and respective Indicators to display on map.
+
+In the ‘Locations’ tab, <br>
+Shows District wise survey report based on completion rates, select a Survey and point on relevant District on the map, then the report is loaded into the map.
+
+![Map](./Map1.png)
+
+Hover over the relevant Administrative division on map to view completion report at the left side of the page.
+Legend at bottom left of page shows color codes used to indicate completion status on map.
+ 
+In the ‘Indicators’ tab,<br>
+Shows Indicators that defined for selected Survey. select a Survey and point on relevant District on the map, that show up with the Indicators.
+
+![Map](./Map2.png)
+
 ###Modules
 ------
 Modules are Survey based classification based up on survey type and need.
@@ -913,9 +948,9 @@ In this page, Users are also managed, i.e. to Edit Details and Activate/Deactiva
 
 **Activate/Deactivate**: Option to make User Active or In-Active to retain in the system.
 
-**Search**: One can find Users in system by two ways:
-**Sort** Users by their ‘Status’ by selecting status at top of this page. Or
-**Search** using the search bar at top right side of this page, by providing User’s Name.
+* **Search**: One can find Users in system by two ways:
+* **Sort** Users by their ‘Status’ by selecting status at top of this page. Or
+* **Search** using the search bar at top right side of this page, by providing User’s Name.
 
 **Export Users**: On click, ‘Download Users’ button, one can export the Users list in “.csv” file format.
 
