@@ -446,6 +446,29 @@
             });
             
         </script>
+        <script type="text/javascript">
+            // clear all input elements on cancel
+            $('.modal').on('hidden.bs.modal', function (e) {
+                  $(this)
+                    .find("input[type=text],textarea,select")
+                       .val('')
+                       .end()
+                    .find("input[type=checkbox], input[type=radio]")
+                       .prop("checked", "")
+                       .end();
+                })
+        </script>
+        <script type="text/javascript">
+            $(function(){
+                var $btn = $('#button');
+                $btn.click(function(){
+                    var $this = $(this);
+                    $this.html("Processing the form Please wait..");
+                    $(this).submit();
+                    
+                });
+            })
+        </script>
         {% block javascripts %}
         {% endblock %}
         <script type="text/javascript">

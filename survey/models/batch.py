@@ -36,8 +36,10 @@ class Batch(QuestionSet):
     @classmethod
     def index_breadcrumbs(cls, **kwargs):
         breadcrumbs = [
-            ('Surveys', reverse('survey_list_page')),
+            ('Surveys', reverse('survey_list_page'))
         ]
+        if kwargs.get('survey'):
+             breadcrumbs.append((kwargs.get('survey'), reverse('batch_index_page', args=(kwargs.get('survey').pk, ))))
         return breadcrumbs
 
     @classmethod

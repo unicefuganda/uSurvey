@@ -1,11 +1,9 @@
 from django.test.client import Client
 from django.contrib.auth.models import User
 from survey.models.batch import Batch
-from survey.models import QuestionModule, Survey
-from survey.models.questions import Question
+from survey.models import QuestionTemplate, Survey, QuestionModule, Batch
 
 from survey.tests.base_test import BaseTest
-from survey.models.householdgroups import HouseholdMemberGroup
 
 
 class QuestionsTemplateViews(BaseTest):
@@ -17,31 +15,31 @@ class QuestionsTemplateViews(BaseTest):
         raj = self.assign_permission_to(User.objects.create_user('Rajni', 'rajni@kant.com', 'I_Rock'),
                                         'can_view_batches')
         self.client.login(username='Rajni', password='I_Rock')
-        self.household_member_group = HouseholdMemberGroup.objects.create(
-            name='Age 4-5', order=1)
         self.module = QuestionModule.objects.create(name="Education")
-        self.survey = Survey.objects.create(name="haha")
-        self.batch = Batch.objects.create(
-            order=1, name="Batch A", survey=self.survey)
-        self.question_1 = Question.objects.create(identifier='1.1', text="This is a question1", answer_type='Numerical Answer',
-                                                  group=self.household_member_group, batch=self.batch, module=self.module)
-        self.question_2 = Question.objects.create(identifier='1.2', text="This is a question2", answer_type='Numerical Answer',
-                                                  group=self.household_member_group, batch=self.batch, module=self.module)
+        self.question_1 = QuestionTemplate.objects.create(module=self.module,variable_name='a',text='ttt',answer_type='Numerical Answer')
 
     def test_index(self):
-        response = self.client.get('/question_library/')
+        response = self.client.get(reverse('show_question_library'))
         self.failUnlessEqual(response.status_code, 200)
 
     def test_export(self):
-        response = self.client.get('/question_library/export/')
+        response = self.client.get(reverse('export_question_library'))
         self.failUnlessEqual(response.status_code, 200)
 
     def test_add(self):
-        data = {'group': [self.household_member_group.id], 'text': [self.question_1.text],
+        data = { 'text': [self.question_1.text],
                 'module': [self.module.id], 'answer_type': ['Numerical Answer']}
-        response = self.client.post('/question_library/new/', data=data)
+        response = self.client.post(reverse('new_question_library'), data=data)
         self.failUnlessEqual(response.status_code, 200)
 
     def test_filter(self):
-        response = self.client.get('/question_library/json_filter/')
+        response = self.client.get(reverse('filter_question_list'))
         self.failUnlessEqual(response.status_code, 200)
+
+    def test_qt_does_not_exist(self):
+        message = "Question Template does not exist."
+        self.assert_object_does_not_exist(reverse('edit_question_library',kwargs={"question_id":500}), message)
+
+    def test_should_throw_error_if_deleting_non_existing_qt(self):
+        message = "Question Template does not exist."
+        self.assert_object_does_not_exist(reverse('delete_question_library',kwargs={"question_id":500}), message)
