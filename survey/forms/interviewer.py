@@ -33,7 +33,7 @@ class InterviewerForm(ModelForm):
                 'class': 'chzn-select ea_filter ',
                 'placeholder': 'Choose Multiple EAs',
                 'data-placeholder': 'Search/Choose Multiple EAs',
-            }))
+            }), required=True)
 
     def __init__(self, eas, data=None, *args, **kwargs):
         super(InterviewerForm, self).__init__(data=data, *args, **kwargs)
@@ -74,9 +74,7 @@ class InterviewerForm(ModelForm):
                     (True, 'Male'), (False, 'Female'))), }
 
     def clean_survey(self):
-        eas = self.data.get('ea', '')
-        if not eas:
-            raise ValidationError('No Enumeration Area selected')
+        eas = self.cleaned_data.get('ea', [])
         survey = self.cleaned_data['survey']
         if survey:
             # check if this has already been allocated to someone else
