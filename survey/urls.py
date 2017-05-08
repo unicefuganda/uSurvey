@@ -605,9 +605,9 @@ urlpatterns = patterns(
         'survey.views.question_set.view_listing_data',
         name='view_listing_data'),
     url(
-        r'^qset/view_batch_data/$',
-        'survey.views.question_set.view_batch_data',
-        name='view_batch_data'),
+        r'^qset/view_survey_data/$',
+        'survey.views.question_set.view_survey_data',
+        name='view_survey_data'),
     url(
         r'^qset/view_data/(?P<qset_id>\d+)/$',
         'survey.views.question_set.listing_entries',

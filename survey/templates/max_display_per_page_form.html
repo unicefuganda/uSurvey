@@ -1,4 +1,30 @@
 <script type="text/javascript">
+
+function getURLParameter(name) {
+        return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search)||[,""])[1].replace(/\+/g, '%20'))||null;
+    }
+
+function changeUrlParam (param, value) {
+        var currentURL = window.location.href+'&';
+        var change = new RegExp('('+param+')=(.*)&', 'g');
+        var newURL = currentURL.replace(change, '$1='+value+'&');
+
+        if (getURLParameter(param) !== null){
+            try {
+                window.history.replaceState('', '', newURL.slice(0, - 1) );
+            } catch (e) {
+                console.log(e);
+            }
+        } else {
+            var currURL = window.location.href;
+            if (currURL.indexOf("?") !== -1){
+                window.history.replaceState('', '', currentURL.slice(0, - 1) + '&' + param + '=' + value);
+            } else {
+                window.history.replaceState('', '', currentURL.slice(0, - 1) + '?' + param + '=' + value);
+            }
+        }
+        location.reload();
+    }
 $(document).ready(function() {  
           $('.dataTable').DataTable( {
                   "scrollY":        "250px",
@@ -24,7 +50,7 @@ $(document).ready(function() {
             {
               window.location = url+"?max_display_per_page="+ea_length;
             }else{
-              window.location = url+"&max_display_per_page="+ea_length;
+             changeUrlParam('max_display_per_page', ea_length);
             }
         });
         
@@ -36,7 +62,7 @@ $(document).ready(function() {
             {
               window.location = url+"?max_display_per_page="+ea_length;
             }else{
-              window.location = url+"&max_display_per_page="+ea_length;
+             changeUrlParam('max_display_per_page', ea_length);
             }
         });
         $("select[name='DataTables_Table_0_length']").change(function(){
@@ -47,7 +73,7 @@ $(document).ready(function() {
             {
               window.location = url+"?max_display_per_page="+ea_length;
             }else{
-              window.location = url+"&max_display_per_page="+ea_length;
+              changeUrlParam('max_display_per_page', ea_length);
             }
         });
         

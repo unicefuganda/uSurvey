@@ -196,7 +196,7 @@
                                 <a href="{% url 'view_listing_data' %}" class="view_listing_data">Listing Data</a>
                             </li>
                             <li>
-                                <a href="{% url 'view_batch_data' %}" class="view_batch_data">Batch Data</a>
+                                <a href="{% url 'view_survey_data' %}" class="view_survey_data">Survey Data</a>
                             </li>
                             <li>
                                 <a href="{% url 'show_interviewer_completion_summary' %}" class="show_interviewer_completion_summary"> Completion
@@ -458,6 +458,8 @@
                        .end();
                 })
         </script>
+        {% block javascripts %}
+        {% endblock %}
         <script type="text/javascript">
             $(function(){
                 var $btn = $('#button');
@@ -469,8 +471,7 @@
                 });
             })
         </script>
-        {% block javascripts %}
-        {% endblock %}
+        
         <script type="text/javascript">
             if('ontouchstart' in document.documentElement) document.write("<script src='assets/js/jquery.mobile.custom.min.js'>"+"<"+"/script>");
         </script>

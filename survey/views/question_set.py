@@ -213,7 +213,7 @@ def view_listing_data(request):
 
 @login_required
 @permission_required('auth.can_view_aggregates')
-def view_batch_data(request):
+def view_survey_data(request):
     interviews = Interview.objects.filter(
         question_set__id__in=Batch.objects.values_list(
             'id', flat=True))
