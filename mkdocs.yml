@@ -1,7 +1,7 @@
 site_name: uSurvey
 pages:
 - Home: index.md
-- Administration Guide: User_Guides.md
+- Admin User Guide: User_Guides.md
 - Offline Data Collection: ODK_App.md 
 - Online Data Collection: ussd-integration.md
 - Installation Guide: installation.md

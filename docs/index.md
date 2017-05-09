@@ -96,12 +96,13 @@ At any point on the uSurvey portal, use breadcrumbs on top of each page for easy
     - [Question Library](./User_Guides.md#library-questions)
     - [Interviewers](./User_Guides.md#interviewer)
     - [Indicators](./User_Guides.md#indicators)
-<br>
+
+
 + #####Offline Data Collection
-    - [uSurvey App](./ODK_App.md)
+- [uSurvey App](./ODK_App.md)
 
 + #####Online Data Collection
-    - [USSD](ussd-integration.md)
+- [USSD](ussd-integration.md)
 
 
 + #####Installation Guide
