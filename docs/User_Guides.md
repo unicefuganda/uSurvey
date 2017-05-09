@@ -35,7 +35,7 @@ Shows maximum five Indicators that defined for each Survey. select a Survey and 
 ###Modules
 ------
 Modules are Survey based classification based up on survey type and need.   
-   Modules are accessible from main menu under, **Design** >> **Modules**
+   Modules are accessible from main menu under **Design** >> **Modules**
 
 ![Module](./Module1.png)
 
@@ -71,7 +71,7 @@ From this above Groups page, Groups are managed, i.e. to Create a New Group, Edi
 
 **Create a New Group**
 
-Groups are accessible from main menu under, **Design** >> **Groups**
+Groups are accessible from main menu under **Design** >> **Groups**
 
 ![Group](./Group1.png)
 
@@ -813,35 +813,44 @@ A Data Researcher can choose one or more fields from their survey and create an 
 Our system facilitates creating customized Indicators for every survey and show an analysis report in tabular and bar chart form.   
    Indicators are accessible from main menu under **Analyse** >> **Indicators**
 
+![Indicators](./Ind1.png)
+
 **How to create an Indicator?**
 
 On the ‘Indicator’ page one can view list of all survey wise Indicators in the application and can view analysis report.
 
 To create an Indicator, click on ‘Add Indicator’ button at top right of the Indicator page, this will open a blank form with following elements;
 
+![Indicators](./Ind2.png)
+
+![Indicators](./Ind3.png)
+
 **Elements in the Indicator form**
 
-**Survey**: Select Survey from list, for which the Indicator need to be defined.
+![Indicators](./Ind3.png)
 
-**Listing**: Select respective Listing, for which the Indicator need to be defined.
-
-**Indicator**: Give a name to the Indicator   
-
-**Description**: A short description about Indicator
- 
-**Variables**: To create an Indicator, certain metrics are needed for calculation, which are derived from survey/ listing questions   
-
-**Formulae**: compose a formula based up on available Variables, <br>
+**Survey**: Select Survey from list, for which the Indicator need to be defined   
+   **Listing**: Select respective Listing, for which the Indicator need to be defined   
+   **Indicator**: Give a name to the Indicator   
+   **Description**: A short description about Indicator   
+   **Variables**: To create an Indicator, certain metrics are needed for calculation, which are derived from survey/ listing questions   
+   **Formulae**: compose a formula based up on available Variables, <br>
 Auto suggestion feature is available, which will prompt with the ‘Variables’ already defined above for composing. <br>
 i.e. just type, double curly brackets to automatically prompt with the ‘Variables’ already defined, <br>
 Ex: type {{ , system prompts with ‘Variables’ then select any one to insert Variable, <br>
-Like: {{hh_age}} <br>
+Like: {{hh_age}}   
 
 **Display on dashboard**: This option allows the indicator to be displayed on the dashboard. A user can select a maximum of 5 indicators to be shown on the dashboard.
 
 **Add Variable**: 
 
 To Add a Variable, click on respective ‘+’ icon adjacent to ‘Variables’ Text box, that opens form to define a Variable, following parameters are involved and expressed.
+
+![Indicators](./Ind5.png)
+
+![Indicators](./Ind6.png)
+
+![Indicators](./Ind7.png)
 
 **Name**: Define a name to the Variable
 
@@ -853,9 +862,21 @@ To Add a Variable, click on respective ‘+’ icon adjacent to ‘Variables’ 
 
 Once all the above fields are filled, then click on ‘Add’ button to add to below table ‘Settings for this Variable’, since you can add more Variables for combination, once all Variables are defined then, finally click on ‘Save’ button to add to Variables list.
 
+![Indicators](./Ind8.png)
+
+![Indicators](./Ind9.png)
+
+![Indicators](./Ind10.png)
+
 One can also ‘Edit’ and ‘Delete’ Variables using the respective icons adjacent to ‘Variables’ Text box.
 
+![Indicators](./Ind11.png)
+
 Once Variables are defined, now you can compose the formula in ‘Formulae’ Text box, the composed formula is validated automatically and a message is shown here as ‘Valid’ or ‘in valid’.
+
+![Indicators](./Ind12.png)
+
+![Indicators](./Ind13.png)
 
 Once Variables are defined, formula is composed and validated, finally click on ‘Save’ button to create an Indicator.
 
@@ -875,6 +896,8 @@ On the ‘Indicator’ page one can view all the Indicator created in the applic
 **Batch**: Name of the Survey Batch to which this Indicator belongs
 
 **Actions**: 
+
+![Indicators](./Ind4.png)
 
 * **Edit**: click on, Action Item ‘Edit’, User can Edit all fields in Indicator.
 * **Delete**: click on, Action Item ‘Delete’, the Indicator is removed, before deleting you will be prompted with conformation to delete, click ‘Yes’ to Delete permanently
