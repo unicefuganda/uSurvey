@@ -940,33 +940,23 @@ To enroll a new User, click on ‘Add User’ button at top right of the Users p
 
 **Elements in the registration form**
 
-**First Name**: First Name of the User
+* **First Name**: First Name of the User
+* **Last Name**: Last Name of the User
+* **Email Address**: email id of the User
+* **Mobile Number**: Contact number of the User
+* **Roles**: Assign a desired Role to the User
+* **User Name**: Enter the desired username for the User, to access the portal
+* **Password**: provide password
+* **Confirm Password**: conform once again password provided
 
-**Last Name**: Last Name of the User
-
-**Email Address**: email id of the User
-
-**Mobile Number**: Contact number of the User
-
-**Roles**: Assign a desired Role to the User
-
-**User Name**: Enter the desired username for the User, to access the portal
-
-**Password**: provide password
-
-**Confirm Password**: conform once again password provided
-
-A New User is enrolled by providing above all field, finally click on ‘Save Changes’ button to complete the process.
-
-In this page, Users are also managed, i.e. to Edit Details and Activate/Deactivate User
+A New User is enrolled by providing above all field, finally click on ‘Save Changes’ button to complete the process.   
+   In this page, Users are also managed, i.e. to Edit Details and Activate/Deactivate User
 
 **Actions**:
 
-**View Details**: View User profile and Edit details, just click on ‘Edit’ button at the bottom of the page.
-
-**Edit**: To quickly edit User profile
-
-**Activate/Deactivate**: Option to make User Active or In-Active to retain in the system.
+**View Details**: View User profile and Edit details, just click on ‘Edit’ button at the bottom of the page   
+   **Edit**: To quickly edit User profile   
+   **Activate/Deactivate**: Option to make User Active or In-Active to retain in the system.
 
 * **Search**: One can find Users in system by two ways:
 * **Sort** Users by their ‘Status’ by selecting status at top of this page. Or
