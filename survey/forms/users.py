@@ -67,6 +67,9 @@ class UserForm(UserCreationForm):
     class Meta:
         model = User
         fields = ("username", "first_name", "last_name", "email", "groups")
+        labels = {
+            "groups": ("Roles"),
+        }
 
 
 class EditUserForm(ModelForm):
@@ -164,6 +167,9 @@ class EditUserForm(ModelForm):
         fields = ("username", "first_name", "last_name", "email", "groups")
         widgets = {
             'username': forms.TextInput(attrs={'readonly': 'readonly'}),
+        }
+        labels = {
+            "groups": ("Roles"),
         }
 
 
