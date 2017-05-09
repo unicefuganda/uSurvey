@@ -59,10 +59,10 @@ Create [New Listing](./User_Guides.md#listing) or skip this step, if you want to
 Create [New Survey](./User_Guides.md#create-survey) or you can Clone existing Survey and rename it,<br>
 **Clone existing Survey**: This option duplicates the survey along with the Listing data, and ready to use.
 
-  4.0. Once a new Survey is created, next <br>
+4.0. Once a new Survey is created, next <br>
   4.1. [Create Batch](./User_Guides.md#batches) <br>
   4.3. then Create Questions in Batch <br>
-       If necessary, <br>
+     If necessary, <br>
   4.4. Create Looping in questions and <br> 
   4.5. Add Logic to questions. <br>
   4.6. Finally, don’t forget to [enable batch for data collection](./User_Guides.md#enable-batch), via Action Item ‘Open/Close’ for Batch
@@ -71,9 +71,9 @@ Create [New Survey](./User_Guides.md#create-survey) or you can Clone existing Su
 
 Enroll [an Interviewer](./User_Guides.md#interviewer) <br>
 To conduct a Survey in the field, define an Interviewer as follows: <br>
- 5.0. Provide basic Interviewer details, <br>
- 5.1. Assign a Survey, <br>
- 5.2. Allocate Enumeration Areas, <br>
+5.0. Provide basic Interviewer details, <br>
+..5.1. Assign a Survey, <br>
+..5.2. Allocate Enumeration Areas, <br>
  5.3. Create ODK Access ID, <br>
  5.4. Provide Mobile Number to access via USSD channel <br>
  5.5. Finally, finish enrollment <br>
@@ -99,7 +99,7 @@ At any point on the uSurvey portal, use breadcrumbs on top of each page for easy
 
 
 + #####Offline Data Collection
-- [uSurvey App](./ODK_App.md)
+    + [uSurvey App](./ODK_App.md)
 
 + #####Online Data Collection
 - [USSD](ussd-integration.md)
