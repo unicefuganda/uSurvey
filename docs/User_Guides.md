@@ -524,7 +524,7 @@ A New Batch is created by providing above fields and click on ‘Save’ button 
 ######Enable Batch
 * **Open/Close**: To enable Batch for data collection <br>
 click on, Action Item ‘Open/Close’, takes to the page where all Enumeration Areas are listed, here one can change the “status of conducting survey in a particular Enumeration Area” to Open/Close<br>
-i.e. Open- means, enable Batch for data collection and Close – means, disable Batch for data collection.
+i.e. **Open** - means, enable Batch for data collection and **Close** – means, disable Batch for data collection.
 
 ![Batch](./Batch8.png)
 
@@ -888,7 +888,6 @@ This section allows to add additional administration users to uSurvey.<br>
 Portal Users’ enrollment is done here by Administrator, this system is developed in the model of ‘Role-based User access’, hence in the system we will find different ‘Roles’, based on application access privileges, these roles are defined. In this context, based on the ‘Roles’ of individual ‘Users’ access to perform a specific task, such as view, create or modify a form are given.
 
 ######Roles in the System
-
 **Administrator**: Granted full access to View, Add, Edit and Delete in entire application, including creating the users, uploading the location and also clear the data of any Survey/ Listing using ‘Power Mode’, etc.<br>
 **Please note**: This Role is very powerful and one should be very careful while allocation
 
@@ -902,8 +901,7 @@ Portal Users’ enrollment is done here by Administrator, this system is develop
 
 **Viewer**: Have permission to View Dashboard and Analysis.
 
- #####Create Users 
-
++ ######Create Users 
 Administrator enrolls portal Users and assign Roles.
 
 Enrolled Users are accessible from main menu under **Settings** >> **Users**

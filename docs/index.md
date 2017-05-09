@@ -63,9 +63,9 @@ Create [New Survey](./User_Guides.md#create-survey) or you can Clone existing Su
 4.1. [Create Batch](./User_Guides.md#batches) <br>
 4.3. then Create Questions in Batch <br>
      If necessary, <br>
-  4.4. Create Looping in questions and <br> 
-  4.5. Add Logic to questions. <br>
-  4.6. Finally, don’t forget to [enable batch for data collection](./User_Guides.md#enable-batch), via Action Item ‘Open/Close’ for Batch
+4.4. Create Looping in questions and <br> 
+4.5. Add Logic to questions. <br>
+4.6. Finally, don’t forget to [enable batch for data collection](./User_Guides.md#enable-batch), via Action Item ‘Open/Close’ for Batch
 
 ######Step -5: Enroll Interviewer
 
@@ -79,7 +79,6 @@ To conduct a Survey in the field, define an Interviewer as follows: <br>
 5.5. Finally, finish enrollment <br>
 
 ######Step -6: Conduct Survey
-
 Data collection and submission is done in two ways:
 
 1. Android channel - [Using uSurvey App](./ODK_App.md)
