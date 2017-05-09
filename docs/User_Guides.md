@@ -885,15 +885,12 @@ On the ‘Indicator’ page one can view all the Indicator created in the applic
  <span style="color:Gray;font-weight:bold;">•</span> – Not Displayed<br>
  <span style="color:Green;font-weight:bold;">•</span> – Displayed<br>
 
-**Indicator**: Is the title of Indicator, which is a unique identity to represent Indicator of a Survey.
+* **Indicator**: Is the title of Indicator, which is a unique identity to represent Indicator of a Survey.
+* **Description**: A short description about Indicator
+* **Survey**: Name of the Survey to which this Indicator belongs
+* **Batch**: Name of the Survey Batch to which this Indicator belongs
 
-**Description**: A short description about Indicator
-
-**Survey**: Name of the Survey to which this Indicator belongs
-
-**Batch**: Name of the Survey Batch to which this Indicator belongs
-
-**Actions**: 
+* **Actions**: 
 
 ![Indicators](./Ind4.png)
 
