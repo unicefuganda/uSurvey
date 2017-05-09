@@ -823,8 +823,6 @@ To create an Indicator, click on ‘Add Indicator’ button at top right of the 
 
 ![Indicators](./Ind2.png)
 
-![Indicators](./Ind3.png)
-
 **Elements in the Indicator form**
 
 ![Indicators](./Ind3.png)
@@ -838,7 +836,9 @@ To create an Indicator, click on ‘Add Indicator’ button at top right of the 
 Auto suggestion feature is available, which will prompt with the ‘Variables’ already defined above for composing. <br>
 i.e. just type, double curly brackets to automatically prompt with the ‘Variables’ already defined, <br>
 Ex: type {{ , system prompts with ‘Variables’ then select any one to insert Variable, <br>
-Like: {{hh_age}}   
+Like: {{hh_age}}
+
+![Indicators](./Ind12.png)
 
 **Display on dashboard**: This option allows the indicator to be displayed on the dashboard. A user can select a maximum of 5 indicators to be shown on the dashboard.
 
@@ -873,8 +873,6 @@ One can also ‘Edit’ and ‘Delete’ Variables using the respective icons ad
 ![Indicators](./Ind11.png)
 
 Once Variables are defined, now you can compose the formula in ‘Formulae’ Text box, the composed formula is validated automatically and a message is shown here as ‘Valid’ or ‘in valid’.
-
-![Indicators](./Ind12.png)
 
 ![Indicators](./Ind13.png)
 
