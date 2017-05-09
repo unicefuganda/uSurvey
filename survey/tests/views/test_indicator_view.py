@@ -4,6 +4,7 @@ from survey.forms.indicator import IndicatorForm
 from survey.forms.filters import IndicatorFilterForm
 from survey.models import QuestionModule, Batch, Indicator, Survey, Question
 from survey.tests.base_test import BaseTest
+from django.core.urlresolvers import reverse
 
 
 class IndicatorViewTest(BaseTest):
@@ -32,7 +33,7 @@ class IndicatorViewTest(BaseTest):
         self.client.login(username='Rajni', password='I_Rock')
 
     def test_get_new_indicator(self):
-        response = self.client.get('/indicators/new/')
+        response = self.client.get(reverse('new_indicator_page'))
         self.failUnlessEqual(response.status_code, 200)
         templates = [template.name for template in response.templates]
         self.assertIn('indicator/new.html', templates)
@@ -41,7 +42,7 @@ class IndicatorViewTest(BaseTest):
             response.context['indicator_form'], IndicatorForm)
         self.assertEqual(response.context['title'], "Add Indicator")
         self.assertEqual(response.context['button_label'], "Create")
-        self.assertEqual(response.context['action'], "/indicators/new/")
+        self.assertEqual(response.context['action'], reverse('new_indicator_page'))
 
     def test_post_indicator_creates_an_indicator_and_returns_success(self):
         data = self.form_data.copy()
@@ -50,7 +51,7 @@ class IndicatorViewTest(BaseTest):
 
         another_survey = Survey.objects.create(name="Education survey")
         data['survey'] = another_survey.id
-        response = self.client.post('/indicators/new/', data=data)
+        response = self.client.post(reverse('new_indicator_page'), data=data)
 
         error_message = "Indicator was not created."
         self.assertIn(error_message, response.content)
@@ -58,7 +59,7 @@ class IndicatorViewTest(BaseTest):
     def test_get_edit_indicator(self):
         indicator = Indicator.objects.create(
             name='ITN1', module=self.module, batch=self.batch)
-        response = self.client.get('/indicators/%s/edit/' % indicator.id)
+        response = self.client.get(reverse('edit_indicator_page',kwargs={"indicator_id":indicator.id}))
         self.failUnlessEqual(response.status_code, 200)
         templates = [template.name for template in response.templates]
         self.assertIn('indicator/new.html', templates)
@@ -83,12 +84,11 @@ class IndicatorViewTest(BaseTest):
         data = form_data.copy()
         del data['survey']
         self.failIf(Indicator.objects.filter(**data))
-        response = self.client.post(
-            '/indicators/%s/edit/' % indicator.id, data=form_data)
+        response = self.client.post(reverse('edit_indicator_page',kwargs={"indicator_id":indicator.id}), data=form_data)
 
         self.failUnless(Indicator.objects.filter(
             name=form_data['name'], description=form_data['description']))
-        self.assertRedirects(response, expected_url='/indicators/')
+        self.assertRedirects(response, expected_url=reverse('list_indicator_page'))
         success_message = "Indicator successfully edited."
         self.assertIn(success_message, response.cookies['messages'].value)
 
@@ -106,8 +106,7 @@ class IndicatorViewTest(BaseTest):
         data = form_data.copy()
         del data['survey']
         self.failIf(Indicator.objects.filter(**data))
-        response = self.client.post(
-            '/indicators/%s/edit/' % indicator.id, data=form_data)
+        response = self.client.post(reverse('edit_indicator_page',kwargs={"indicator_id":indicator.id}), data=form_data)
 
         self.failIf(Indicator.objects.filter(name=form_data[
                     'name'], description=form_data['description']))
@@ -119,15 +118,15 @@ class IndicatorViewTest(BaseTest):
         data = self.form_data.copy()
         del data['survey']
         self.failIf(Indicator.objects.filter(**data))
-        response = self.client.post('/indicators/new/', data=self.form_data)
+        response = self.client.post(reverse('new_indicator_page'), data=self.form_data)
         self.failUnless(Indicator.objects.filter(**data))
-        self.assertRedirects(response, "/indicators/", 302, 200)
+        self.assertRedirects(response, reverse('list_indicator_page'), 302, 200)
         success_message = "Indicator successfully created."
         self.assertIn(success_message, response.cookies['messages'].value)
 
     def test_permission_for_question_modules(self):
-        self.assert_restricted_permission_for('/indicators/')
-        self.assert_restricted_permission_for('/indicators/new/')
+        self.assert_restricted_permission_for(reverse('list_indicator_page'))
+        self.assert_restricted_permission_for(reverse('new_indicator_page'))
 
     def test_get_indicator_index(self):
         another_form_data = self.form_data.copy()
@@ -137,7 +136,7 @@ class IndicatorViewTest(BaseTest):
         del another_form_data['survey']
 
         education_indicator = Indicator.objects.create(**another_form_data)
-        response = self.client.get('/indicators/')
+        response = self.client.get(reverse('list_indicator_page'))
         self.failUnlessEqual(response.status_code, 200)
         templates = [template.name for template in response.templates]
         self.assertIn('indicator/index.html', templates)
@@ -156,7 +155,7 @@ class IndicatorViewTest(BaseTest):
             name='ITN1', module=module, batch=batch)
 
         response = self.client.get(
-            '/indicators/', data={'survey': survey.id, 'batch': 'All', 'module': 'All'})
+            reverse('list_indicator_page'), data={'survey': survey.id, 'batch': 'All', 'module': 'All'})
         self.failUnlessEqual(response.status_code, 200)
         self.assertIsInstance(
             response.context['indicator_filter_form'], IndicatorFilterForm)
@@ -178,7 +177,7 @@ class IndicatorViewTest(BaseTest):
             name='ITN1', module=module, batch=batch)
 
         response = self.client.get(
-            '/indicators/', data={'survey': survey.id, 'batch': batch_s.id, 'module': 'All'})
+            reverse('list_indicator_page'), data={'survey': survey.id, 'batch': batch_s.id, 'module': 'All'})
         self.failUnlessEqual(response.status_code, 200)
         self.assertIsInstance(
             response.context['indicator_filter_form'], IndicatorFilterForm)
@@ -201,7 +200,7 @@ class IndicatorViewTest(BaseTest):
                                                module=module_1, batch=batch_s)
 
         response = self.client.get(
-            '/indicators/', data={'survey': 'All', 'batch': 'All', 'module': module.id})
+            reverse('list_indicator_page'), data={'survey': 'All', 'batch': 'All', 'module': module.id})
         self.failUnlessEqual(response.status_code, 200)
         self.assertEqual(1, len(response.context['indicators']))
         self.assertIn(indicator_1, response.context['indicators'])
@@ -221,7 +220,7 @@ class IndicatorViewTest(BaseTest):
                                                module=module_1, batch=batch_s)
 
         response = self.client.get(
-            '/indicators/', data={'survey': 'All', 'batch': batch_s.id, 'module': module.id})
+            reverse('list_indicator_page'), data={'survey': 'All', 'batch': batch_s.id, 'module': module.id})
         self.failUnlessEqual(response.status_code, 200)
         self.assertEqual(1, len(response.context['indicators']))
         self.assertIn(indicator_1, response.context['indicators'])
@@ -240,7 +239,7 @@ class IndicatorViewTest(BaseTest):
                                                measure='Percentage',
                                                module=module_1, batch=batch_s)
 
-        response = self.client.get('/indicators/',
+        response = self.client.get(reverse('list_indicator_page'),
                                    data={'survey': survey.id, 'batch': batch_s.id, 'module': module.id})
         self.failUnlessEqual(response.status_code, 200)
         self.assertEqual(1, len(response.context['indicators']))
@@ -260,9 +259,9 @@ class IndicatorViewTest(BaseTest):
                                                measure='Percentage',
                                                module=module_1, batch=batch_s)
 
-        response = self.client.get('/indicators/%d/delete/' % indicator_1.id)
+        response = self.client.get(reverse('delete_indicator_page',kwargs={"indicator_id":indicator_1.id}),)
         recovered_indicator = Indicator.objects.filter(id=indicator_1.id)
-        self.assertRedirects(response, expected_url='/indicators/', status_code=302,
+        self.assertRedirects(response, expected_url=reverse('list_indicator_page'), status_code=302,
                              target_status_code=200, msg_prefix='')
         self.assertIn('Indicator successfully deleted.',
                       response.cookies['messages'].value)
@@ -277,11 +276,11 @@ class IndicatorViewTest(BaseTest):
                                                measure='Percentage',
                                                module=module, batch=batch_s)
 
-        response = self.client.get('/indicators/%s/delete/' % indicator_1.id)
+        response = self.client.get(reverse('delete_indicator_page',kwargs={"indicator_id":indicator_1.id}))
         self.failIf(Indicator.objects.filter(id=indicator_1.id))
         
         self.assertIn('Indicator successfully deleted.',
                       response.cookies['messages'].value)
 
     def test_restricted_perms_to_delete_indicator(self):
-        self.assert_restricted_permission_for('/indicators/1/delete/')
+        self.assert_restricted_permission_for(reverse('delete_indicator_page',kwargs={"indicator_id":999999}))
