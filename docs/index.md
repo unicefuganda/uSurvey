@@ -3,7 +3,7 @@ Welcome to uSurvey’s documentation!
 uSurvey is an innovative data collection tool designed to provide statistically representative real time estimates of a given indicator. It runs on USSD (Unstructured Supplementary Service Data) interactive secured channel and on ODK (Open Data Kit), for off-line data collection in locations with intermittent mobile network connections.
 
 The system has been designed to collect a wide range of data for the structured survey; to generate and produce descriptive statistics and graphical representation of the collected information whenever desired, as well as during the process of data collection.
-Source code for this project is available on github [here]()
+Source code for this project is available on github [here](https://github.com/unicefuganda/uSurvey/ "github repo").
 
 ###Features
 ------
@@ -50,9 +50,9 @@ Create [New Listing](./User_Guides.md#listing) or skip this step, if you want to
 
   3.0. Once Listing is created, next<br>
   3.1. Create Questions in Listing<br>
-  3.2. If necessary,<br>
-  3.3. Create Looping in questions and<br>
-  3.4. Add Logic to questions<br>
+       If necessary,<br>
+  3.2. Create Looping in questions and<br>
+  3.3. Add Logic to questions<br>
 
 ######Step -4: Create a Survey
 
@@ -62,10 +62,10 @@ Create [New Survey](./User_Guides.md#create-survey) or you can Clone existing Su
   4.0. Once a new Survey is created, next <br>
   4.1. [Create Batch](./User_Guides.md#batches) <br>
   4.3. then Create Questions in Batch <br>
-     If necessary, <br>
+       If necessary, <br>
   4.4. Create Looping in questions and <br> 
   4.5. Add Logic to questions. <br>
-  4.6. Finally, don’t forget to change the status to Open, via Action Item ‘Open/Close’ for Batch
+  4.6. Finally, don’t forget to [enable batch for data collection](./User_Guides.md#enable-batch), via Action Item ‘Open/Close’ for Batch
 
 ######Step -5: Enroll Interviewer
 
@@ -88,7 +88,7 @@ At any point on the uSurvey portal, use breadcrumbs on top of each page for easy
 
 ###User Guides
 ------
-+ #####Administration Guide
++ #####Admin User Guide
     - [Modules](./User_Guides.md#modules)
     - [Groups](./User_Guides.md#groups)
     - [Listing](./User_Guides.md#listing)
@@ -96,8 +96,7 @@ At any point on the uSurvey portal, use breadcrumbs on top of each page for easy
     - [Question Library](./User_Guides.md#library-questions)
     - [Interviewers](./User_Guides.md#interviewer)
     - [Indicators](./User_Guides.md#indicators)
-
-
+<br>
 + #####Offline Data Collection
     - [uSurvey App](./ODK_App.md)
 

@@ -6,30 +6,29 @@ To login, click on ‘Login’ at top right of the Home page
 
 ![Home](./Home.png)
 
-Now login using your Username and Password, after successful login you will be navigated to uSurvey Dashboard, which shows Uganda Map.
+Now Sign in to the portal using your Username and Password, after successful login you will be navigated to uSurvey Dashboard, which shows Uganda Map.
 
 ![Login](./Login.png)
 
 ###Dashboard
 ------
-The Dashboard, contains Survey Map, which is used to display survey report on a country map as per primary Administrative divisions. Eg for Uganda, that would be District, For South Africa, that might correspond to Provinces.
+The Dashboard, contains Survey Map, which is used to display survey report on a country map as per primary Administrative divisions.<br>
+E.g. In current map of Uganda, every District correspond to primary administrative division for Survey.
 
-This page is basically divided into two Tabs<br>
-1. **Locations**<br>
+Dashboard is basically divided into two Tabs <br>
+1. **Locations** <br>
 2. **Indicators**
 
-On this page, drop down at top left corner contains Surveys, whose District wise completion rates with respect to legend and respective Indicators to display on map.
+On Map Dashboard, a drop down at top left contains Surveys, District wise completion rates with respect to its legend and respective Survey Indicators are display adjacent to the map.
+Legend at bottom left, shows with color codes used to indicate completion status on map.
 
 In the ‘Locations’ tab, <br>
-Shows District wise survey report based on completion rates, select a Survey and point on relevant District on the map, then the report is loaded into the map.
+select a Survey and point on relevant District on the map you wish to examine, then the report is loaded into the map and shows District wise Survey report with completion rates and completion status.
 
 ![Map](./Map1.png)
-
-Hover over the relevant Administrative division on map to view completion report at the left side of the page.
-Legend at bottom left of page shows color codes used to indicate completion status on map.
  
 In the ‘Indicators’ tab,<br>
-Shows Indicators that defined for selected Survey. select a Survey and point on relevant District on the map, that show up with the Indicators.
+Shows maximum five Indicators that defined for each Survey. select a Survey and point on relevant District on the map you wish to examine respective Indicators.
 
 ![Map](./Map2.png)
 
@@ -487,7 +486,6 @@ Sampling Criteria is created by satisfying above fields, then click on ‘Save C
 In the same page, Sampling Criteria that is created can be seen in table the “Existing Criteria”.
 Which shows the defined Sampling Criteria and has option to ‘Delete’.
 
-
 ###Batches
 ------
 Batch is a categorization of Survey Questions, that means set of Questions categorized for a Survey convenience. We can create multiple Batches in a survey.
@@ -508,8 +506,8 @@ To create a New Batch, click on ‘Create New Batch’ button at top right of th
 
 **Elements of a Batch**:
 
-* **Name**: Is Batch Name, which is a unique identity to a Batch and is a mandatory field<br>
-* **Description**: write about the importance of this Batch in short<br>
+* **Name**: Is Batch Name, which is a unique identity to a Batch and is a mandatory field
+* **Description**: write about the importance of this Batch in short
 * **Access channels**: This will identify on which channel this survey has to be conducted and has two channel ODK and USSD
 
 A New Batch is created by providing above fields and click on ‘Save’ button to Create a New Batch in Survey. 
@@ -518,17 +516,19 @@ A New Batch is created by providing above fields and click on ‘Save’ button 
 
 ![Batch](./Batch3.png)
 
-* **Edit**: click on, Action Item ‘Edit’, User can Edit all fields in a Batch<br>
+* **Edit**: click on, Action Item ‘Edit’, User can Edit all fields in a Batch
 * **Delete**: click on, Action Item ‘Delete, the entire Batch along with questions are removed, before deleting you will be prompted with conformation to delete, click ‘Yes’ to Delete permanently. This option is not available for completed Surveys<br>
-* **View/Edit Questions**: click on, Action Item ‘View /Edit Questions’, takes to the Survey ‘Batch Questions’ page <br>
-* **Open/Close**: click on, Action Item ‘Open/Close’, takes to the page where all Enumeration Areas are listed, here one can change the “status of conducting survey in a particular Enumeration Area” to Open/Close<br>
-i.e. Open- means allow to conduct survey and Close - means it prevents to conduct survey.
+* **View/Edit Questions**: click on, Action Item ‘View /Edit Questions’, takes to the Survey ‘Batch Questions’ page
+* **View Data**: click on, Action Item ‘View Data’, shows Data collected in this Survey. This option is available only for completed Surveys.
+
+######Enable Batch
+* **Open/Close**: To enable Batch for data collection <br>
+click on, Action Item ‘Open/Close’, takes to the page where all Enumeration Areas are listed, here one can change the “status of conducting survey in a particular Enumeration Area” to Open/Close<br>
+i.e. Open- means, enable Batch for data collection and Close – means, disable Batch for data collection.
 
 ![Batch](./Batch8.png)
 
 ![Batch](./Batch7.png)
-
-* **View Data**: click on, Action Item ‘View Data’, shows Data collected in this Survey. This option is available only for completed Surveys.
 
 **How to create Batch Questions?**
 
