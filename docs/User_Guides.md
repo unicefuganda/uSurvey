@@ -34,8 +34,8 @@ Shows maximum five Indicators that defined for each Survey. select a Survey and 
 
 ###Modules
 ------
-Modules are Survey based classification based up on survey type and need.
-Modules are accessible from main menu under, **Design** >> **Modules**
+Modules are Survey based classification based up on survey type and need.   
+   Modules are accessible from main menu under, **Design** >> **Modules**
 
 ![Module](./Module1.png)
 
@@ -810,7 +810,8 @@ In this page, Interviewers are also managed, i.e. to Edit Details and block/unbl
 ###Indicators
 ------
 A Data Researcher can choose one or more fields from their survey and create an arithmetic expression to generate metrics as per their requirement. Each such expression is called an Indicator. Any number of indicators can be created for a Survey. A limited number of these indicators can be selected to be shown on the dashboard. <br>
-Our system facilitates creating customized Indicators for every survey and show an analysis report in tabular and bar chart form.
+Our system facilitates creating customized Indicators for every survey and show an analysis report in tabular and bar chart form.   
+   Indicators are accessible from main menu under **Analyse** >> **Indicators**
 
 **How to create an Indicator?**
 
@@ -879,15 +880,15 @@ On the ‘Indicator’ page one can view all the Indicator created in the applic
 * **Delete**: click on, Action Item ‘Delete’, the Indicator is removed, before deleting you will be prompted with conformation to delete, click ‘Yes’ to Delete permanently
 * **Formula**: click on, Action Item ‘Formula’, to edit the Indicator Formula directly
 * **Analysis**: click on, Action Item ‘Analysis’, navigates to ‘Indicator Analysis’ page, here one can view two forms of district wise reports based up on the Indicator Formula,
-  * A Bar chart report is generated and displayed
-  * A tabular report
+    + A Bar chart report is generated and displayed
+    + A tabular report
 
 ###Manage Users
 ------
 This section allows to add additional administration users to uSurvey.<br>
 Portal Users’ enrollment is done here by Administrator, this system is developed in the model of ‘Role-based User access’, hence in the system we will find different ‘Roles’, based on application access privileges, these roles are defined. In this context, based on the ‘Roles’ of individual ‘Users’ access to perform a specific task, such as view, create or modify a form are given.
 
-######Roles in the System
+#####Roles in the System
 **Administrator**: Granted full access to View, Add, Edit and Delete in entire application, including creating the users, uploading the location and also clear the data of any Survey/ Listing using ‘Power Mode’, etc.<br>
 **Please note**: This Role is very powerful and one should be very careful while allocation
 
@@ -901,7 +902,7 @@ Portal Users’ enrollment is done here by Administrator, this system is develop
 
 **Viewer**: Have permission to View Dashboard and Analysis.
 
-+ ######Create Users 
+#####Create Users 
 Administrator enrolls portal Users and assign Roles.
 
 Enrolled Users are accessible from main menu under **Settings** >> **Users**
