@@ -866,9 +866,8 @@ Once all the above fields are filled, then click on ‘Add’ button to add to b
 
 ![Indicators](./Ind9.png)
 
-![Indicators](./Ind10.png)
-
-One can also ‘Edit’ and ‘Delete’ Variables using the respective icons adjacent to ‘Variables’ Text box.
+![Indicators](./Ind10.png)   
+   One can also ‘Edit’ and ‘Delete’ Variables using the respective icons adjacent to ‘Variables’ Text box.
 
 ![Indicators](./Ind11.png)
 
