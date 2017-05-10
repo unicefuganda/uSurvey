@@ -7,6 +7,7 @@ Source code for this project is available on github [here](https://github.com/un
 
 ###Features
 ------
+
 * Admin management portal
 * Classification of surveys using Modules
 * Classification of population using Groups
@@ -54,16 +55,16 @@ Create [New Listing](./User_Guides.md#listing) or skip this step, if you want to
 
 ######Step -4: Create a Survey
 
-Create [New Survey](./User_Guides.md#create-survey) or you can Clone existing Survey and rename it,<br>
-**Clone existing Survey**: This option duplicates the survey along with the Listing data, and ready to use.
+Create [New Survey](./User_Guides.md#create-survey) or you can Clone existing Survey and rename it,   
+   **Clone existing Survey**: This option duplicates the survey along with the Listing data, and ready to use.
 
-4.0. Once a new Survey is created, next <br>
-4.1. [Create Batch](./User_Guides.md#batches) <br>
-4.3. then Create Questions in Batch <br>
-     If necessary, <br>
-4.4. Create Looping in questions and <br> 
-4.5. Add Logic to questions. <br>
-4.6. Finally, don’t forget to [enable batch for data collection](./User_Guides.md#enable-batch), via Action Item ‘Open/Close’ for Batch
+4.0. Once a new Survey is created, next   
+   4.1. [Create Batch](./User_Guides.md#batches)   
+   4.3. then Create Questions in Batch   
+   If necessary,   
+   4.4. Create Looping in questions and   
+   4.5. Add Logic to questions   
+   4.6. Finally, don’t forget to [enable batch for data collection](./User_Guides.md#enable-batch), via Action Item ‘Open/Close’ for Batch
 
 ######Step -5: Enroll Interviewer
 
