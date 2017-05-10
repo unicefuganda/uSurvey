@@ -6,6 +6,7 @@ from django.contrib.auth.forms import PasswordChangeForm
 from django.views.generic import TemplateView
 from survey.models import ListingTemplate, Batch,\
     ParameterTemplate, QuestionTemplate
+from survey.forms.password_mgt import uSurveyPasswordResetForm
 
 from django.views.static import serve as staticserve
 
@@ -186,7 +187,7 @@ urlpatterns = patterns(
     url(
         r'^user/password/reset/$',
         'django.contrib.auth.views.password_reset',
-        {'post_reset_redirect': '/user/password/reset/done/'},
+        {'post_reset_redirect': '/user/password/reset/done/', 'password_reset_form': uSurveyPasswordResetForm},
         name="password_reset"),
     url(
         r'^user/password/reset/done/$',
@@ -194,7 +195,8 @@ urlpatterns = patterns(
     url(
         r'^user/password/reset/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>.+)/$',
         'django.contrib.auth.views.password_reset_confirm',
-        {'post_reset_redirect': '/user/password/done/'}, name='password_reset_url'),
+        {'post_reset_redirect': '/user/password/done/', },
+        name='password_reset_url'),
     url(
         r'^user/password/done/$',
         'django.contrib.auth.views.password_reset_complete'),
