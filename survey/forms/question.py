@@ -39,7 +39,7 @@ def get_question_form(model_class):
             self.fields['answer_type'].choices = [
                 choice for choice in self.fields['answer_type'].choices if choice[0] in qset.answer_types]
             self.fields['answer_type'].choices.insert(
-                0, ('', 'Select Answer Type'))
+                0, ('', '----Select Answer Type----'))
             if instance:
                 self.help_text = ' and '.join(
                     AnswerAccessDefinition.access_channels(
