@@ -36,6 +36,13 @@ class InterviewerForm(ModelForm):
             }), required=True)
 
     def __init__(self, eas, data=None, *args, **kwargs):
+        """First parameter might be removed in the future since eas is just defined based on data value for performance
+        :param eas:
+        :param data:
+        :param args:
+        :param kwargs:
+        :return:
+        """
         super(InterviewerForm, self).__init__(data=data, *args, **kwargs)
         self.fields.keyOrder = [
             'name',
@@ -59,8 +66,9 @@ class InterviewerForm(ModelForm):
             except IndexError:
                 pass
         self.fields['ea'].queryset = eas
+        if self.data.get('ea'):
+            self.fields['ea'].queryset = EnumerationArea.objects.filter(id__in=data.getlist('ea'))
         self.fields['survey'].empty_label = 'Select Survey'
-        #self.fields['survey'].empty_label = 'Select Survey'
 
     class Meta:
         model = Interviewer
