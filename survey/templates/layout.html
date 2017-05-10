@@ -454,6 +454,8 @@
             });
             
         </script>
+        {% block javascripts %}
+        {% endblock %}
         <script type="text/javascript">
             // clear all input elements on cancel
             $('.modal').on('hidden.bs.modal', function (e) {
@@ -464,21 +466,11 @@
                     .find("input[type=checkbox], input[type=radio]")
                        .prop("checked", "")
                        .end();
-                })
-        </script>
-        {% block javascripts %}
-        {% endblock %}
-        <!-- <script type="text/javascript">
-            $(function(){
-                var $btn = $('#button');
-                $btn.click(function(){
-                    var $this = $(this);
-                    $this.html("Processing the form Please wait..");
-                    $(this).submit();
-                    
+                       $("#id_preferred_listing-control-group").show();
+                       $("#id_listing_form-control-group").show();
+
                 });
-            })
-        </script> -->
+        </script>
         
         <script type="text/javascript">
             if('ontouchstart' in document.documentElement) document.write("<script src='assets/js/jquery.mobile.custom.min.js'>"+"<"+"/script>");

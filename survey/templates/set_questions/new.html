@@ -1,4 +1,5 @@
 {% extends "form.html" %}
+{% load template_tags %}
 
 {% block title %}
   {% if parent_question or heading %}
@@ -23,6 +24,93 @@
 {% endblock%}
 
 {% block display_form_fields %}
+
+{% for field in questionform.visible_fields %}
+  
+
+        {% if field.name == 'mandatory' %}
+        {% if options %}
+          {% for option in options %}
+           {% if option %}
+            <div class="control-group options question-option">
+                <label style="margin-top:10px;" class="control-label col-md-4">Option <span class="number"> {{ option.order }}</span></label>
+                <div class="controls">
+                    <input type="text" maxlength="100" name="options" value="{{ option.text }}">
+                    <a style="padding: 0px !important;" href="javascript:;" class="btn btn-white btn-warning btn-bold add-option"><i class="ace-icon fa fa-plus bigger-120 orange"></i></i></a>
+                    <a style="padding: 0px !important;" href="javascript:;" class="btn btn-white btn-warning btn-bold remove-option"><i class="ace-icon fa fa-minus bigger-120 orange"></i></i></a>
+                </div>
+            </div>
+            {% endif %}
+          {% endfor %}
+
+        {% endif %}
+        <div id="{{field.auto_id}}-control-group" class="control-group int-part">
+    <div class="controls {{ field|is_radio }}">
+        <label class="control-label" for="{{field.auto_id}}" style="padding: 5px;">{{field.label}}</label>
+        
+
+        <span title="{{ field.help_text }}" class="{{field.auto_id}}_tip">{{field}}</span>
+        {% else %}
+
+        <div id="{{field.auto_id}}-control-group" class="control-group int-part">
+    <div class="controls {{ field|is_radio }}">
+        <label class="control-label" for="{{field.auto_id}}" style="padding: 5px;">{{field.label}}</label>
+        
+
+        <span title="{{ field.help_text }}" class="{{field.auto_id}}_tip">{{field}}</span>
+
+{% endif %}
+
+        
+        {% if field.errors %}
+        <label class="error" style="color:red; padding-bottom:10px; padding-top:10px;" >
+            {% for error in field.errors %}
+                {{ error}}
+            {% endfor %}
+         </label>
+        {% endif %}
+        <div id="{{field.auto_id}}_tip" class="help tip hide" style="color: #307ecc; margin-top: 5px; margin-left: 55px;">{{ field.help_text }}</div>
+    </div>
+  </div>
+
+{% endfor %}
+<script type="text/javascript">
+  $(document).ready(function(){
+    $('.controls textarea ').after($('<span id="text-counter"></span>'));
+  })
+</script>
+{% for hidden in questionform.hidden_fields %}
+  {{ hidden }}
+{% endfor %}
+
+
+
+
+{% include "_multiple_options.html" with option_label='Option' id="question-option-template" name='options'%}
+{% if parent_question %}
+<script type="text/template" id="question-group-template">
+    <select id="id_group" name="group">
+      <option value="{{parent_question.group.pk}}" selected="selected">{{parent_question.group.name}}</option>
+    </select>
+</script>
+{% endif %}
+
+{% endblock %}
+    {% block buttons %}
+  <div class="form-actions">
+    <button id="button" type="submit" class="btn btn-primary submit" name="save_button" data-disabled-text="{{ loading_text }}"><i class="fa fa-save"></i> Save Changes</button>
+    <button id="button" type="submit" class="btn btn-primary submit" name="add_more_button" data-disabled-text="{{ loading_text }}"><i class="fa fa-save"></i> Save and Add More</button>
+    <button id="button" type="submit" class="btn btn-primary submit" name="add_to_lib_button" data-disabled-text="{{ loading_text }}"><i class="fa fa-save"></i> Save and Update Library</button>
+
+    {% if cancel_url %}
+      <a href="{{ cancel_url }}" class="btn btn-primary" name="cancel_button" class="cancel" style=" padding-right: 5px; padding-left: 5px; padding-bottom: 1px;"><i class="fa fa-close"></i> Cancel</a>      
+    {% else %}
+      <a href="#" class="btn btn-primary" name="cancel_button" id="cancel_{{ id }}" class="cancel">Cancel</a>
+    {% endif %}
+  </div>
+    {% endblock %}
+
+{% block javascripts %}
 <style type="text/css">
   #id_identifier{
     width: 261px !important;
@@ -52,62 +140,33 @@
             <span id="text-counter"></span>
         </div>
   </div> -->
-{% include "naked_form.html" with a_form=questionform %}
-{% if options %}
-  {% for option in options %}
-   {% if option %}
-    <div class="control-group options question-option">
-        <label style="margin-top:10px;" class="control-label col-md-4">Option <span class="number"> {{ option.order }}</span></label>
-        <div class="controls">
-            <input type="text" maxlength="100" name="options" value="{{ option.text }}">
-            <a style="padding: 0px !important;" href="javascript:;" class="btn btn-white btn-warning btn-bold add-option"><i class="ace-icon fa fa-plus bigger-120 orange"></i></i></a>
-            <a style="padding: 0px !important;" href="javascript:;" class="btn btn-white btn-warning btn-bold remove-option"><i class="ace-icon fa fa-minus bigger-120 orange"></i></i></a>
-        </div>
-    </div>
-    {% endif %}
-  {% endfor %}
 
-{% endif %}
-{% include "_multiple_options.html" with option_label='Option' id="question-option-template" name='options'%}
-{% if parent_question %}
-<script type="text/template" id="question-group-template">
-    <select id="id_group" name="group">
-      <option value="{{parent_question.group.pk}}" selected="selected">{{parent_question.group.name}}</option>
-    </select>
-</script>
-{% endif %}
 
-{% endblock %}
-    {% block buttons %}
-  <div class="form-actions">
-    <button id="button" type="submit" class="btn btn-primary submit" name="save_button" data-disabled-text="{{ loading_text }}"><i class="fa fa-save"></i> Save Changes</button>
-    <button id="button" type="submit" class="btn btn-primary submit" name="add_more_button" data-disabled-text="{{ loading_text }}"><i class="fa fa-save"></i> Save and Add More</button>
-    <button id="button" type="submit" class="btn btn-primary submit" name="add_to_lib_button" data-disabled-text="{{ loading_text }}"><i class="fa fa-save"></i> Save and Update Library</button>
 
-    {% if cancel_url %}
-      <a href="{{ cancel_url }}" class="btn btn-primary" name="cancel_button" class="cancel" style=" padding-right: 5px; padding-left: 5px; padding-bottom: 1px;"><i class="fa fa-close"></i> Cancel</a>      
-    {% else %}
-      <a href="#" class="btn btn-primary" name="cancel_button" id="cancel_{{ id }}" class="cancel">Cancel</a>
-    {% endif %}
-  </div>
-    {% endblock %}
 
-{% block javascripts %}
-<style type="text/css">
-  #id_identifier{width: 261px !important;
-height: 25px !important;
-margin-left: 0px !important; }
-.dataTables_wrapper select {margin-left: 0px !important;}
-.btn-white{padding: 0px !important;font-size: 10px !important;}
-.dataTables_wrapper input[name=options] {
-  width: 261px !important;
-    height: 27px !important;
-margin-left: 1px !important;
-margin-top: 10px !important;
-}
-.dataTables_wrapper .btn.btn-white{margin-top: 10px !important;}
-.dataTables_wrapper .question-option label{margin-top: 15px !important;}
-</style>
+
+
+ <style type="text/css">
+     .controls {
+        margin-bottom: 20px;
+     }
+    
+    #id_access_channels{
+      display: inline-block;
+      vertical-align: middle;
+    }
+    #text-counter{
+    margin-left: 10px !important;
+  }
+  
+  .ms-list{
+        margin-top: -14px !important;
+  }
+  .inline pos-rel > open {
+    display: none !important;
+  }
+  </style>
+  
 
     <script src="{{STATIC_URL}}js/type-auto-suggest.js" type="text/javascript" charset="utf-8"></script>
     <script src="{{STATIC_URL}}js/questions.js" type="text/javascript" charset="utf-8"></script>
