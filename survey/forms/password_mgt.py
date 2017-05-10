@@ -10,5 +10,5 @@ class uSurveyPasswordResetForm(PasswordResetForm):
     def save(self, **kwargs):
         """Just over ridden to det default domain
         """
-        kwargs['domain_override'] = kwargs['request'].get_host()
+        kwargs['domain_override'] = kwargs['request'].build_absolute_uri('/')
         return super(uSurveyPasswordResetForm, self).save(**kwargs)
