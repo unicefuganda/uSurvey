@@ -345,7 +345,7 @@ def get_absolute_url(request, url_name, *args):
 
 
 @register.assignment_tag
-def get_home_url(request, url_name, *args):
+def get_home_url(request):
     return request.build_absolute_uri('/')
 
 

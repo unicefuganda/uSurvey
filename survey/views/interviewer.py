@@ -53,28 +53,18 @@ def _create_or_edit(
         if interviewer.ussd_access.exists():
             extra = 0
     locations_filter = LocationsFilterForm(data=data)
-    if data:
-        eas = locations_filter.get_enumerations()
-    else:
-        eas = EnumerationArea.objects.none()
-    USSDAccessFormSet = inlineformset_factory(
-        Interviewer, USSDAccess, form=USSDAccessForm, extra=extra)
-    ussd_access_form = USSDAccessFormSet(
-        prefix='ussd_access', instance=interviewer)
+    eas = EnumerationArea.objects.none()
+    USSDAccessFormSet = inlineformset_factory(Interviewer, USSDAccess, form=USSDAccessForm, extra=extra)
+    ussd_access_form = USSDAccessFormSet(prefix='ussd_access', instance=interviewer)
     response = None
     redirect_url = reverse('interviewers_page')
     odk_access_form = ODKAccessForm(instance=odk_instance)
     if request.method == 'POST':
-        interviewer_form = InterviewerForm(
-            eas, data=request.POST, instance=interviewer)
+        interviewer_form = InterviewerForm(eas, data=request.POST, instance=interviewer)
         ussd_access_form = USSDAccessFormSet(
             request.POST,
             prefix='ussd_access',
             instance=interviewer)
-        #odk_access_form = ODKAccessFormSet(
-            # request.POST,
-            # prefix='odk_access',
-            # instance=interviewer)
         odk_access_form = ODKAccessForm(request.POST, instance=odk_instance)
         if interviewer_form.is_valid() and odk_access_form.is_valid():
             interviewer = interviewer_form.save()
