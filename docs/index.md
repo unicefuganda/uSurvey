@@ -36,11 +36,9 @@ Source code for this project is available on github [here](https://github.com/un
 ######Step -1: Create a Module
 
 Create [New Module](./User_Guides.md#modules) or skip this step, if you want to use existing Modules
-
 ######Step -2: Create a Group
 
 Create [New Group](./User_Guides.md#groups) or skip this step, if you want to use existing Groups
-
 ######Step -3: Create a Listing 
 
 Create [New Listing](./User_Guides.md#listing) or skip this step, if you want to use existing Listing or you can Clone existing Listing and rename it. Here we have to observe two things;
