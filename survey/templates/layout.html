@@ -189,14 +189,14 @@
                         </ul>
                     </li>
                     <li>
-                        <a href='#' class="show_interviewer_completion_summary view_listing_data view_batch_data odk_submission_list submenu-button1"><i class="fa fa-desktop"></i> MONITOR</a>
+                        <a href='#' class="show_interviewer_completion_summary view_listing_data view_survey_data odk_submission_list submenu-button1"><i class="fa fa-desktop"></i> MONITOR</a>
                         <ul>
                             {% if perms.auth.view_completed_survey %}
                             <li>
                                 <a href="{% url 'view_listing_data' %}" class="view_listing_data">Listing Data</a>
                             </li>
                             <li>
-                                <a href="{% url 'view_batch_data' %}" class="view_batch_data">Batch Data</a>
+                                <a href="{% url 'view_survey_data' %}" class="view_survey_data">Survey Data</a>
                             </li>
                             <li>
                                 <a href="{% url 'show_interviewer_completion_summary' %}" class="show_interviewer_completion_summary"> Completion
@@ -300,8 +300,7 @@
         </header>
         <div class="fw-page-builder-content">
             <div class="container-fluid">
-                <div class="fw-row" style="margin-left: 10px;
-                    margin-right: 10px;">
+                <div class="fw-row col-md-12" >
                     <div class="fw-col-xs-12 fw-col-xs-12 col-sm-12  col-md-12  wow none animated" style="text-align: left ! important; padding-left: 0px; padding-right: 0px; visibility: visible;margin-top: 15px;">
                     </div>
                     <div class="row" id="xyz-breadcrumbs">
@@ -313,7 +312,7 @@
                         </h5>
                     </div>
                     <div>
-                        <div class="dataTables_filter" id="xyz-page-actions">
+                        <div class="dataTables_filter row" id="xyz-page-actions">
                             {% block page_actions %}
                             {% endblock %}
                         </div>
@@ -420,13 +419,18 @@
                 catch(err) {
                     //alert(err);
                 }
-               
+                var currentTime = new Date()
+                var year = currentTime.getFullYear();
                 try { 
                         $(".datepicker").datepicker({
                          changeMonth: true,
                          changeYear: true,
                          dateFormat: 'dd-mm-yy',
-                         yearRange: "-120:+nn"
+                         yearRange: "-120:+nn",
+                         {% if request.resolver_match.url_name == 'new_interviewer_page' or request.resolver_match.url_name == 'edit_interviewer_page'%}
+                           maxDate: new Date(year-18, 1 - 1, 28)
+                           {%endif%}
+
                        });
                      }
                 catch(err) {
@@ -450,7 +454,7 @@
             // clear all input elements on cancel
             $('.modal').on('hidden.bs.modal', function (e) {
                   $(this)
-                    .find("input[type=text],textarea,select")
+                    .find("input[type=text],input[type=number],input[type=email]textarea,select")
                        .val('')
                        .end()
                     .find("input[type=checkbox], input[type=radio]")
@@ -458,7 +462,9 @@
                        .end();
                 })
         </script>
-        <script type="text/javascript">
+        {% block javascripts %}
+        {% endblock %}
+        <!-- <script type="text/javascript">
             $(function(){
                 var $btn = $('#button');
                 $btn.click(function(){
@@ -468,9 +474,8 @@
                     
                 });
             })
-        </script>
-        {% block javascripts %}
-        {% endblock %}
+        </script> -->
+        
         <script type="text/javascript">
             if('ontouchstart' in document.documentElement) document.write("<script src='assets/js/jquery.mobile.custom.min.js'>"+"<"+"/script>");
         </script>

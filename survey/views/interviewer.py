@@ -176,6 +176,8 @@ def block_interviewer(request, interviewer_id):
         interviewer = Interviewer.objects.get(id=interviewer_id)
         interviewer.ussd_access.update(is_active=False)
         interviewer.odk_access.update(is_active=False)
+        interviewer.is_blocked = True
+        interviewer.save()
         messages.success(
             request, "Interviewer USSD Access successfully blocked.")
     except Interviewer.DoesNotExist:
@@ -189,6 +191,8 @@ def unblock_interviewer(request, interviewer_id):
         interviewer = Interviewer.objects.get(id=interviewer_id)
         interviewer.ussd_access.update(is_active=True)
         interviewer.odk_access.update(is_active=True)
+        interviewer.is_blocked = False
+        interviewer.save()
         messages.success(
             request, "Interviewer USSD Access successfully unblocked.")
     except Interviewer.DoesNotExist:

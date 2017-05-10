@@ -19,6 +19,7 @@ $("#id_groups").attr("disabled", "disabled");
 $("#button").html("<i class='fa fa-edit'></i> Edit");
 $("#button").attr({
     "type": "button",
+    "id":'view_button',
     "onclick": "window.location.href='{% url 'users_edit' user_id 'edit' %}'"
 });
 $(".add-row").attr("href", '');

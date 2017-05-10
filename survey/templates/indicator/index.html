@@ -56,7 +56,7 @@
 												<i class="ace-icon fa fa-plus bigger-120 orange"></i>
 												<a href="{% url 'new_indicator_page' %}" class="">Add Indicator</a>
 											</button> -->
-                      <div class="col-lg-16">
+                      <div class="">
   <a style="padding-left: 4px;padding-right: 3px;" class="btn btn-white btn-warning btn-bold" href="{% url 'new_indicator_page' %}" >
                         <i class="ace-icon fa fa-plus bigger-120"></i>
                          Add Indicator</a>
@@ -75,8 +75,8 @@
     <table id="datatables" class="table table-striped table-bordered table-hover dataTable">
         <thead>
           <tr>
-            <th class="sorting">
-                Sts.
+            <th class="sorting" id='fth'>
+                Sts
             </th>
             <th class="sorting">
               Indicator
@@ -160,4 +160,7 @@
 <script src="{{ STATIC_URL }}/js/dataTables.bootstrap.js" type="text/javascript" charset="utf-8"></script>
 <script src="{{ STATIC_URL }}js/indicator.js" type="text/javascript" charset="utf-8"></script>
 {% include 'max_display_per_page_form.html' %}
+<style type="text/css">
+    #fth{width: 38px !important;}
+</style>
 {% endblock %}
