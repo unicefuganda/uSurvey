@@ -25,7 +25,7 @@
                 <li>
                     <a href="{% url 'view_interviewer_page'  interviewer.id 'edit' %}" class="tooltip-info" data-rel="tooltip" title="" data-original-title="Edit"><span class="blue"><i class="usur-icon fa fa-edit bigger-120"></i>Edit</span></a>
                 </li>
-                {% if interviewer.has_access %}
+                {% if interviewer.is_blocked %}
                 <li><a href="#unblock_interviewer_{{interviewer.id}}" id="unblock_interviewer" data-toggle="modal" class="tooltip-success" data-rel="tooltip" title=""><span class="red"><i class="usur-icon fa fa-language bigger-120"></i>UnBlock</span></a></li>
                 {% else %}
                 <li><a href="#block_interviewer_{{interviewer.id}}" id="block_interviewer" data-toggle="modal" class="tooltip-error" data-rel="tooltip" title=""><span class="red"><i class="usur-icon fa fa-exclamation-triangle bigger-120"></i>Block</span></a></li>

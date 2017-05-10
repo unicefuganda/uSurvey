@@ -138,3 +138,13 @@ class ListingViewTest(BaseTest):
         response = self.client.get(reverse('qset_questions_page'))
         self.failUnlessEqual(response.status_code, 200)
 
+    def test_restricted_permission(self):
+        url = reverse('listing_template_home')
+        self.assert_restricted_permission_for(url)
+        url =reverse('new_listing_template_page')
+        self.assert_restricted_permission_for(url)
+        url =reverse('edit_listing_template_page', kwargs={'qset_id':listing.id})
+        self.assert_restricted_permission_for(url)
+        url = reverse('delete_listing_template',kwargs={"qset_id":500})
+        self.assert_restricted_permission_for(url)
+
