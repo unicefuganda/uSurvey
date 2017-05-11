@@ -64,11 +64,11 @@ In Survey, we have 2 choices as follows:
 
 <dl>
   <dd>4.0. Once a new Survey is created, next</dd>
-  <dd>4.1. [Create Batch](./User_Guides.md#batches)</dd>
+  <dd>4.1. Create Batch</dd>
   <dd>4.2. then Create Questions in Batch</dd>If necessary,
   <dd>4.3. Create Looping in questions and</dd>
   <dd>4.4. Add Logic to questions</dd>
-  <dd>4.5. Finally, don’t forget to [enable batch for data collection](./User_Guides.md#enable-batch), via Action Item ‘Open/Close’ for Batch</dd>
+  <dd>4.5. Finally, don’t forget to enable Batch for data collection, via Action Item ‘Open/Close’ for Batch</dd>
 </dl>
 
 ######Step -5: Enroll Interviewer
