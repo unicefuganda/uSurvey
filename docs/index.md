@@ -67,10 +67,9 @@ Create [New Survey](./User_Guides.md#create-survey) or you can Clone existing Su
    4.6. Finally, don’t forget to [enable batch for data collection](./User_Guides.md#enable-batch), via Action Item ‘Open/Close’ for Batch
 
 ######Step -5: Enroll Interviewer
- 
 
 <dl>
-  <dt>To conduct a Survey in the field, enroll an [Interviewer](./User_Guides.md#interviewer) as follows:</dt>
+  <dt>To conduct a Survey in the field, enroll an</dt> [Interviewer](./User_Guides.md#interviewer) as follows:
    <dd>5.0. Provide basic Interviewer details,</dd>
    <dd>5.1. Assign a Survey,</dd>
    <dd>5.2. Allocate Enumeration Areas,</dd>
