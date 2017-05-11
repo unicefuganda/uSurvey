@@ -24,6 +24,9 @@
   .controls{
     margin-bottom: 5px !important;
   }  
+  .dataTables_wrapper input[type="text"], .dataTables_wrapper textarea {
+    width: 308px !important;
+}
 </style>
 <form action="{{ action }}" method="post" accept-charset="utf-8" id="{{ id }}" class="form-horizontal {{ class }}">
   {% csrf_token %}
