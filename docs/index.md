@@ -49,7 +49,7 @@ Create [New Listing](./User_Guides.md#listing) or skip this step, if you want to
 <dl>
 <dd> 3.0. Once Listing is created, next</dd>
 <dd>3.1. Create Questions in Listing</dd>
-       If necessary,<br>
+If necessary,<br>
 <dd>3.2. Create Looping in questions and</dd>
 <dd>3.3. Add Logic to questions</dd>
 </dl>
@@ -57,15 +57,15 @@ Create [New Listing](./User_Guides.md#listing) or skip this step, if you want to
 
 Create [New Survey](./User_Guides.md#create-survey) or you can Clone existing Survey and rename it,   
    **Clone existing Survey**: This option duplicates the survey along with the Listing data, and ready to use.
-
-4.0. Once a new Survey is created, next   
-   4.1. [Create Batch](./User_Guides.md#batches)   
-   4.3. then Create Questions in Batch   
-   If necessary,   
-   4.4. Create Looping in questions and   
-   4.5. Add Logic to questions   
-   4.6. Finally, don’t forget to [enable batch for data collection](./User_Guides.md#enable-batch), via Action Item ‘Open/Close’ for Batch
-
+<dl>
+<dd>4.0. Once a new Survey is created, next</dd>
+<dd>4.1. [Create Batch](./User_Guides.md#batches)</dd>
+<dd>4.3. then Create Questions in Batch</dd>   
+If necessary,   
+<dd>4.4. Create Looping in questions and</dd>   
+<dd>4.5. Add Logic to questions</dd>   
+<dd>4.6. Finally, don’t forget to [enable batch for data collection](./User_Guides.md#enable-batch), via Action Item ‘Open/Close’ for Batch</dd>
+<dl>
 ######Step -5: Enroll Interviewer
 
 To conduct a Survey in the field, enroll an [Interviewer](./User_Guides.md#interviewer) as follows:
