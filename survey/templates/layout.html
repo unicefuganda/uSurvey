@@ -460,7 +460,7 @@
             // clear all input elements on cancel
             $('.modal').on('hidden.bs.modal', function (e) {
                   $(this)
-                    .find("input[type=text],input[type=number],input[type=email]textarea,select")
+                    .find("input[type=text],input[type=number],input[type=email],textarea,select")
                        .val('')
                        .end()
                     .find("input[type=checkbox], input[type=radio]")
@@ -468,6 +468,7 @@
                        .end();
                        $("#id_preferred_listing-control-group").show();
                        $("#id_listing_form-control-group").show();
+                       $(".chzn-select").val("").trigger('chosen:updated');
 
                 });
         </script>
