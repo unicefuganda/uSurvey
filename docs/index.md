@@ -41,6 +41,7 @@ Create [New Module](./User_Guides.md#modules) or skip this step, if you want to 
 
 Create [New Group](./User_Guides.md#groups) or skip this step, if you want to use existing Groups
 ######Step -3: Create a Listing 
+
 In Listing, we have 3 choices as follows:
    
 * Create [New Listing](./User_Guides.md#listing), or
@@ -53,7 +54,9 @@ In Listing, we have 3 choices as follows:
 <dd>3.2. Create Looping in questions and</dd>
 <dd>3.3. Add Logic to questions</dd>
 </dl>
+
 ######Step -4: Create a Survey
+
 In Survey, we have 2 choices as follows:
 
 * Create [New Survey](./User_Guides.md#create-survey), or
@@ -83,6 +86,7 @@ To conduct a Survey in the field, enroll an [Interviewer](./User_Guides.md#inter
 Note: At any point on the uSurvey portal, use breadcrumbs on top of each page for easy navigation.
 
 ######Step -6: Conduct Survey
+
 Data collection and submission is done in two ways:
 
 1. Offline Data Collection - [Using Smart Phone](./ODK_App.md)
@@ -91,6 +95,7 @@ Data collection and submission is done in two ways:
 ###User Guides
 ------
 + ######Administering uSurvey
+
     - [Modules](./User_Guides.md#modules)
     - [Groups](./User_Guides.md#groups)
     - [Listing](./User_Guides.md#listing)
@@ -100,15 +105,19 @@ Data collection and submission is done in two ways:
     - [Indicators](./User_Guides.md#indicators)
     - [Manage Users](./User_Guides.md#manage-users)
 
+
 + ######Data Collection
     - [Offline Data Collection](./ODK_App.md)
     - [Online Data Collection](ussd-integration.md)
 
+
 + ######Installation Guide
     - [Installation](installation.md)
+
 
 + ######Deployment Guide
     - [Application Architecture](deployment_guide.md)
 
+    
 + ######Testing & Coverage
     - [Tests](tests.md)
