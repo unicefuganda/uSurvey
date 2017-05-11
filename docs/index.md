@@ -75,18 +75,19 @@ To conduct a Survey in the field, define an Interviewer as follows: <br>
 5.2. Allocate Enumeration Areas, <br>
 5.3. Create ODK Access ID, <br>
 5.4. Provide Mobile Number to access via USSD channel <br>
-5.5. Finally, finish enrollment <br>
+5.5. Finally, finish enrollment
+
+Note: At any point on the uSurvey portal, use breadcrumbs on top of each page for easy navigation.
 
 ######Step -6: Conduct Survey
 Data collection and submission is done in two ways:
 
-1. Android channel - [Using uSurvey App](./ODK_App.md)
-2. USSD channel - [Using Featured Phone](./ussd-integration.md) <br>
-At any point on the uSurvey portal, use breadcrumbs on top of each page for easy navigation.
+1. Offline Data Collection - [Using Smart Phone](./ODK_App.md)
+2. Online Data Collection  - [Using Featured Phone](./ussd-integration.md)
 
 ###User Guides
 ------
-+ #####Admin User Guide
++ ######Administering uSurvey
     - [Modules](./User_Guides.md#modules)
     - [Groups](./User_Guides.md#groups)
     - [Listing](./User_Guides.md#listing)
@@ -94,22 +95,17 @@ At any point on the uSurvey portal, use breadcrumbs on top of each page for easy
     - [Question Library](./User_Guides.md#library-questions)
     - [Interviewers](./User_Guides.md#interviewer)
     - [Indicators](./User_Guides.md#indicators)
+    - [Manage Users](./User_Guides.md#manage-users)
 
++ ######Data Collection
+    - [Offline Data Collection](./ODK_App.md)
+    - [Online Data Collection](ussd-integration.md)
 
-+ #####Offline Data Collection
-    - [uSurvey App](./ODK_App.md)
-
-+ #####Online Data Collection
-    - [USSD](ussd-integration.md)
-
-
-+ #####Installation Guide
++ #######Installation Guide
     - [Installation](installation.md)
 
-
-+ #####Deployment Guide
++ ######Deployment Guide
     - [Application Architecture](deployment_guide.md)
 
-
-+ #####Testing & Coverage
++ ######Testing & Coverage
     - [Tests](tests.md)
