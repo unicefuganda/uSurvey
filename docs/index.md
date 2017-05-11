@@ -45,7 +45,6 @@ Create [New Group](./User_Guides.md#groups) or skip this step, if you want to us
 Create [New Listing](./User_Guides.md#listing) or skip this step, if you want to use existing Listing   
     or you can Clone existing Listing and rename it.   
         Here we have to observe two things;
-
 * Use existing Listing: This option benefits by providing data collected earlier
 * Clone existing Listing: Duplicates Listing questions only
 <dl>
@@ -88,9 +87,9 @@ Data collection and submission is done in two ways:
 
 ###User Guides
 ------
-- ######Administering uSurvey
-  - [Modules](./User_Guides.md#modules)
-   - [Groups](./User_Guides.md#groups)
++ ######Administering uSurvey
+    - [Modules](./User_Guides.md#modules)
+    - [Groups](./User_Guides.md#groups)
     - [Listing](./User_Guides.md#listing)
     - [Survey](./User_Guides.md#create-survey)
     - [Question Library](./User_Guides.md#library-questions)
@@ -102,7 +101,7 @@ Data collection and submission is done in two ways:
     - [Offline Data Collection](./ODK_App.md)
     - [Online Data Collection](ussd-integration.md)
 
-+ #######Installation Guide
++ ######Installation Guide
     - [Installation](installation.md)
 
 + ######Deployment Guide
