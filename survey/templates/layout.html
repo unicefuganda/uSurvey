@@ -368,6 +368,10 @@
                                                                     {% block content_search %}
                                                                     {% endblock %}
                                                                 </div>
+                                                                <div>
+                                                                    {% block content %}
+                                                                {% endblock %}
+                                                                </div>
                                                                 
                                                             </div>
                                                         </div>
@@ -375,11 +379,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="row">
-                                        {% block content %}
-                                                                {% endblock %} 
-                                            
-                                        </div>
+                                        
                                     </div>
                                 </div>
                                 <a href="#" id="btn-scroll-up" class="btn-scroll-up btn btn-sm btn-inverse">
@@ -486,6 +486,7 @@
             padding-bottom: 10px;
             }
             .dataTables_length {margin-top: 10px;}
+            .dataTables_wrapper input, select, textarea{color: #000 !important;}
         </style>
     </body>
 </html>
