@@ -68,15 +68,16 @@ Create [New Survey](./User_Guides.md#create-survey) or you can Clone existing Su
 
 ######Step -5: Enroll Interviewer
 
-Enroll [an Interviewer](./User_Guides.md#interviewer) <br>
-To conduct a Survey in the field, define an Interviewer as follows: <br>
-5.0. Provide basic Interviewer details, <br>
-5.1. Assign a Survey, <br>
-5.2. Allocate Enumeration Areas, <br>
-5.3. Create ODK Access ID, <br>
-5.4. Provide Mobile Number to access via USSD channel <br>
-5.5. Finally, finish enrollment
-
+Enroll [an Interviewer](./User_Guides.md#interviewer)
+<dl>
+<dt>To conduct a Survey in the field, define an Interviewer as follows:</dt>
+<dd>5.0. Provide basic Interviewer details,</dd>
+<dd>5.1. Assign a Survey,</dd>
+<dd>5.2. Allocate Enumeration Areas,</dd>
+<dd>5.3. Create ODK Access ID,</dd>
+<dd>5.4. Provide Mobile Number to access via USSD channel</dd>
+<dd>5.5. Finally, finish enrollment</dd>
+</dl>
 Note: At any point on the uSurvey portal, use breadcrumbs on top of each page for easy navigation.
 
 ######Step -6: Conduct Survey
@@ -87,9 +88,9 @@ Data collection and submission is done in two ways:
 
 ###User Guides
 ------
-+ ######Administering uSurvey
-    - [Modules](./User_Guides.md#modules)
-    - [Groups](./User_Guides.md#groups)
+- ######Administering uSurvey
+  - [Modules](./User_Guides.md#modules)
+   - [Groups](./User_Guides.md#groups)
     - [Listing](./User_Guides.md#listing)
     - [Survey](./User_Guides.md#create-survey)
     - [Question Library](./User_Guides.md#library-questions)
