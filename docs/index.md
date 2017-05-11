@@ -70,7 +70,6 @@ Create [New Survey](./User_Guides.md#create-survey) or you can Clone existing Su
 
 To conduct a Survey in the field, enroll an [Interviewer](./User_Guides.md#interviewer) as follows:
 <dl>
-  <dt></dt>
    <dd>5.0. Provide basic Interviewer details,</dd>
    <dd>5.1. Assign a Survey,</dd>
    <dd>5.2. Allocate Enumeration Areas,</dd>
