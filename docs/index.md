@@ -42,7 +42,7 @@ Create [New Module](./User_Guides.md#modules) or skip this step, if you want to 
 Create [New Group](./User_Guides.md#groups) or skip this step, if you want to use existing Groups
 ######Step -3: Create a Listing 
 In Listing, we have 3 choices as follows:
-
+   
 * Create [New Listing](./User_Guides.md#listing), or
 * Use existing Listing - Proceed to reuse Listing data collected already
 * Clone existing Listing – Proceed to reuse Listing questions only
@@ -53,7 +53,6 @@ In Listing, we have 3 choices as follows:
 <dd>3.2. Create Looping in questions and</dd>
 <dd>3.3. Add Logic to questions</dd>
 </dl>
-
 ######Step -4: Create a Survey
 In Survey, we have 2 choices as follows:
 
