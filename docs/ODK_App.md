@@ -1,6 +1,6 @@
 ###uSurvey App
 
-uSurvey portal is intended to design and define the Listings, Surveys and to collect real-time data to produce statistical reports. On other end in the field, data collection and submission is done using hand-held mobile devices in two ways.
+uSurvey portal is intended to design and define the Listings, Surveys and monitor statistical reports. On other end in the field, data collection and submission is done using hand-held mobile devices in two ways.
 
 1. Offline Data Collection - Using Smart Phone
 2. Online Data Collection  - Using Featured Phone
