@@ -13,8 +13,8 @@ Source code for this project is available on github [here](https://github.com/un
 * Classification of population using Groups
 * Highly customizable Listings and Surveys
 * Preview questionnaire before go-live
-* Offline data collection via USSD channel
-* Online data collection via uSurvey App
+* Offline data collection Using Smart Phone
+* Online data collection Using Featured Phone
 * Download, search and edit submitted forms in uSurvey App
 * Country Map is used to demonstrate district wise Completion rates and Indicators 
 * Customizable Indicators to measure survey results
@@ -53,9 +53,10 @@ In Listing, we have 3 choices as follows:
 <dd>3.3. Add Logic to questions</dd>
 </dl>
 ######Step -4: Create a Survey
+In Survey, we have 2 choices as follows:
 
-Create [New Survey](./User_Guides.md#create-survey) or you can Clone existing Survey and rename it,   
-   **Clone existing Survey**: This option duplicates the survey along with the Listing data, and ready to use.
+* Create [New Survey](./User_Guides.md#create-survey), or
+* Clone existing Survey and rename: Proceed to reuse the survey along with the Listing data and ready to use.
 <dl>
 <dd>4.0. Once a new Survey is created, next</dd>
 <dd>4.1. [Create Batch](./User_Guides.md#batches)</dd>

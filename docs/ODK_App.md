@@ -1,11 +1,11 @@
 ###uSurvey App
 
-uSurvey portal is intended to design, define the Listings, Surveys and to collect real-time data by survey to produce statistical reports, whereas in the field data collection is done using hand-held mobile devices in two ways.
+uSurvey portal is intended to design and define the Listings, Surveys and to collect real-time data to produce statistical reports. On other end in the field, data collection and submission is done using hand-held mobile devices in two ways.
 
-1. Using Internet services: Android channel
-2. Using GSM Cellular Telephones services: USSD channel
+1. Offline Data Collection - Using Smart Phone
+2. Online Data Collection  - Using Featured Phone
 
-**Data collection and submission using Android channel**
+**Data collection and submission using Smart Phone**
 
 uSurvey App is exclusively designed for survey data collection and submission using the hand-held mobile devices (Android Smart Phone/ Tablet). Hence uSurvey application is paperless and carry out survey in a digitalized process with increased ease and accuracy of data. 
 
