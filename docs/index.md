@@ -69,7 +69,7 @@ In Survey, we have 2 choices as follows:
 <dd>4.4. Create Looping in questions and</dd>   
 <dd>4.5. Add Logic to questions</dd>   
 <dd>4.6. Finally, don’t forget to [enable batch for data collection](./User_Guides.md#enable-batch), via Action Item ‘Open/Close’ for Batch</dd>
-<dl>
+</dl>
 
 ######Step -5: Enroll Interviewer
 
@@ -87,15 +87,14 @@ Note: At any point on the uSurvey portal, use breadcrumbs on top of each page fo
 
 ######Step -6: Conduct Survey
 
-Data collection and submission is done in two ways:
-
-1. Offline Data Collection - [Using Smart Phone](./ODK_App.md)
-2. Online Data Collection  - [Using Featured Phone](./ussd-integration.md)
-
+Data collection and submission is done in two ways:   
+   
+   1. Offline Data Collection - [Using Smart Phone](./ODK_App.md)
+2. Online Data Collection  - [Using Featured Phone](./ussd-integration.md)   
+   
 ###User Guides
 ------
 + ######Administering uSurvey
-
     - [Modules](./User_Guides.md#modules)
     - [Groups](./User_Guides.md#groups)
     - [Listing](./User_Guides.md#listing)
@@ -105,19 +104,15 @@ Data collection and submission is done in two ways:
     - [Indicators](./User_Guides.md#indicators)
     - [Manage Users](./User_Guides.md#manage-users)
 
-
 + ######Data Collection
     - [Offline Data Collection](./ODK_App.md)
     - [Online Data Collection](ussd-integration.md)
 
-
 + ######Installation Guide
     - [Installation](installation.md)
 
-
 + ######Deployment Guide
     - [Application Architecture](deployment_guide.md)
-
-    
+  
 + ######Testing & Coverage
     - [Tests](tests.md)
