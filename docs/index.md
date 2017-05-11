@@ -41,8 +41,9 @@ Create [New Module](./User_Guides.md#modules) or skip this step, if you want to 
 
 Create [New Group](./User_Guides.md#groups) or skip this step, if you want to use existing Groups
 ######Step -3: Create a Listing 
-In Listing, we have 3 choices as follows:   
-   * Create [New Listing](./User_Guides.md#listing), or
+In Listing, we have 3 choices as follows:
+
+* Create [New Listing](./User_Guides.md#listing), or
 * Use existing Listing - Proceed to reuse Listing data collected already
 * Clone existing Listing – Proceed to reuse Listing questions only
 
@@ -52,11 +53,13 @@ In Listing, we have 3 choices as follows:
 <dd>3.2. Create Looping in questions and</dd>
 <dd>3.3. Add Logic to questions</dd>
 </dl>
+
 ######Step -4: Create a Survey
 In Survey, we have 2 choices as follows:
 
 * Create [New Survey](./User_Guides.md#create-survey), or
 * Clone existing Survey and rename: Proceed to reuse the survey along with the Listing data and ready to use.
+
 <dl>
 <dd>4.0. Once a new Survey is created, next</dd>
 <dd>4.1. [Create Batch](./User_Guides.md#batches)</dd>
@@ -65,6 +68,7 @@ In Survey, we have 2 choices as follows:
 <dd>4.5. Add Logic to questions</dd>   
 <dd>4.6. Finally, don’t forget to [enable batch for data collection](./User_Guides.md#enable-batch), via Action Item ‘Open/Close’ for Batch</dd>
 <dl>
+
 ######Step -5: Enroll Interviewer
 
 To conduct a Survey in the field, enroll an [Interviewer](./User_Guides.md#interviewer) as follows:
