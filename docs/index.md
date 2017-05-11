@@ -42,14 +42,15 @@ Create [New Module](./User_Guides.md#modules) or skip this step, if you want to 
 Create [New Group](./User_Guides.md#groups) or skip this step, if you want to use existing Groups
 ######Step -3: Create a Listing 
 
-Create [New Listing](./User_Guides.md#listing) or skip this step, if you want to use existing Listing or you can Clone existing Listing and rename it. Here we have to observe two things;
+Create [New Listing](./User_Guides.md#listing) or skip this step, if you want to use existing Listing   
+    or you can Clone existing Listing and rename it.   
+        Here we have to observe two things;
 
 * Use existing Listing: This option benefits by providing data collected earlier
 * Clone existing Listing: Duplicates Listing questions only
 <dl>
-<dd> 3.0. Once Listing is created, next</dd>
-<dd>3.1. Create Questions in Listing</dd>
-If necessary,<br>
+<dd>3.0. Once Listing is created, next</dd>
+<dd>3.1. Create Questions in Listing</dd>If necessary,
 <dd>3.2. Create Looping in questions and</dd>
 <dd>3.3. Add Logic to questions</dd>
 </dl>
