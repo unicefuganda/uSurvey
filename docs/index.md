@@ -44,14 +44,15 @@ Create [New Module](./User_Guides.md#modules) or skip this step, if you want to 
 Create [New Group](./User_Guides.md#groups) or skip this step, if you want to use existing Groups
 ######Step -3: Create a Listing 
 
+In Listing, we have 3 choices as follows:
 
-<dl>
-<dd>3.0. In Listing, we have 3 choices as follows:</dd>
-
-* Create [New Listing](./User_Guides.md#listing), or
-* Use existing Listing - Proceed to reuse Listing data collected already
+* Create [New Listing](./User_Guides.md#listing)   
+   or
+* Use existing Listing - Proceed to reuse Listing data collected already    
+   or
 * Clone existing Listing – Proceed to reuse Listing questions only
-
+<dl>
+<dd>3.0. Once Listing is created, next</dd>
 <dd>3.1. Create Questions in Listing</dd>
 <dd>3.2. Create Looping in questions (If necessary)</dd>
 <dd>3.3. Add Logic to questions (If necessary)</dd>
@@ -70,7 +71,7 @@ In Survey, we have 2 choices as follows:
   <dd>4.2. then Create Questions in Batch</dd>If necessary,
   <dd>4.3. Create Looping in questions and</dd>
   <dd>4.4. Add Logic to questions</dd>
-  <dd>4.5. Finally, don’t forget to enable Batch for data collection, via Action Item ‘Open/Close’ for Batch</dd>
+     Please note that Survey can not be downloaded until this step is done
 </dl>
 
 ######Step -5: Enroll Interviewer
@@ -105,7 +106,8 @@ Data collection and submission is done in two ways:
     - [Interviewers](./User_Guides.md#interviewer)
     - [Indicators](./User_Guides.md#indicators)
     - [Manage Users](./User_Guides.md#manage-users)
-
+<----------
+>
 + ######Data Collection
     - [Offline Data Collection](./ODK_App.md)
     - [Online Data Collection](ussd-integration.md)
