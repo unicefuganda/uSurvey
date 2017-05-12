@@ -47,7 +47,7 @@ Create [New Group](./User_Guides.md#groups) or skip this step, if you want to us
 
 
 <dl>
-<dd>3.0. Create [New Listing](./User_Guides.md#listing)<br>
+<dd>3.0. Create <a href="./User_Guides/#listing">New Listing</a><br>
    &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp or <br>
          &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbspUse existing Listing - Proceed to reuse Listing data collected already  <br>  
    &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp or<br>
@@ -71,7 +71,10 @@ In Survey, we have 2 choices as follows:
   <dd>4.2. then Create Questions in Batch</dd>If necessary,
   <dd>4.3. Create Looping in questions and</dd>
   <dd>4.4. Add Logic to questions</dd>
-  <dd>4.5. Finally, enable batch for data collection, via Action Item ‘Open/Close’ for Batch</dd>
+  <dd>4.5. Finally, enable
+  
+   [Batch](./User_Guides.md#enable-batch) for data collection, via Action Item ‘Open/Close’ for Batch
+  </dd>
      Please note that Survey can not be downloaded until this step is done
 </dl>
 
