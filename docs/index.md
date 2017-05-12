@@ -46,13 +46,14 @@ Create [New Group](./User_Guides.md#groups) or skip this step, if you want to us
 
 In Listing, we have 3 choices as follows:
 
+<dl>
+<dd>3.0. Once Listing is created, next
 * Create [New Listing](./User_Guides.md#listing)   
    or
 * Use existing Listing - Proceed to reuse Listing data collected already    
    or
 * Clone existing Listing – Proceed to reuse Listing questions only
-<dl>
-<dd>3.0. Once Listing is created, next</dd>
+</dd>
 <dd>3.1. Create Questions in Listing</dd>
 <dd>3.2. Create Looping in questions (If necessary)</dd>
 <dd>3.3. Add Logic to questions (If necessary)</dd>
