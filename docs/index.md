@@ -44,7 +44,7 @@ Create [New Module](./User_Guides.md#modules) or skip this step, if you want to 
 Create [New Group](./User_Guides.md#groups) or skip this step, if you want to use existing Groups
 ######Step -3: Create a Listing
 <dl>
-<dd>3.0. Create <a href="./User_Guides.md/#listing">New Listing</a> <br>
+<dd>3.0. Create <a href="./User_Guides/#listing">New Listing</a> <br>
    &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp or <br>
          &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbspUse existing Listing - Proceed to reuse Listing data collected already  <br>  
    &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp or<br>
@@ -104,19 +104,17 @@ Data collection and submission is done in two ways:
     - [Interviewers](./User_Guides.md#interviewer)
     - [Indicators](./User_Guides.md#indicators)
     - [Manage Users](./User_Guides.md#manage-users) 
-
-<----------
->
+<hr>
 
 + ######Data Collection
     - [Offline Data Collection](./ODK_App.md)
     - [Online Data Collection](ussd-integration.md)
-
+<hr>
 + ######Installation Guide
     - [Installation](installation.md)
-
+<hr>
 + ######Deployment Guide
     - [Application Architecture](deployment_guide.md)
-  
+<hr>  
 + ######Testing & Coverage
     - [Tests](tests.md)
