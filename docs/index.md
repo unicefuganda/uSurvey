@@ -109,7 +109,7 @@ Data collection and submission is done in two ways:
     - [Interviewers](./User_Guides.md#interviewer)
     - [Indicators](./User_Guides.md#indicators)
     - [Manage Users](./User_Guides.md#manage-users)
-<pre>   </pre>
+<pre> </pre>
 + ######Data Collection
     - [Offline Data Collection](./ODK_App.md)
     - [Online Data Collection](ussd-integration.md)
