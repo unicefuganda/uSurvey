@@ -44,8 +44,11 @@ Create [New Module](./User_Guides.md#modules) or skip this step, if you want to 
 Create [New Group](./User_Guides.md#groups) or skip this step, if you want to use existing Groups
 ######Step -3: Create a Listing
 <dl>
-<dd>3.0. Create<br>
-   
+<dd>3.0. Create [New Listing](./User_Guides.md#listing)<br>
+   &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp or <br>
+         &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbspUse existing Listing - Proceed to reuse Listing data collected already  <br>  
+   &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp or<br>
+         &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbspClone existing Listing – Proceed to reuse Listing questions only<br>
 </dd>
 <dd>3.1. Create Questions in Listing</dd>
 <dd>3.2. Create Looping in questions (If necessary)</dd>
@@ -65,7 +68,7 @@ In Survey, we have 2 choices as follows:
   <dd>4.2. then Create Questions in Batch</dd>If necessary,
   <dd>4.3. Create Looping in questions and</dd>
   <dd>4.4. Add Logic to questions</dd>
-  <dd>4.5. Finally, <a href="./User_Guides/#listing">enable Batch</a>  for data collection, via Action Item ‘Open/Close’ for Batch</dd>
+  <dd>4.5. Finally, enable Batch for data collection, via Action Item ‘Open/Close’ for Batch</dd>
      Please note that Survey can not be downloaded until this step is done
 </dl>
 
@@ -100,18 +103,19 @@ Data collection and submission is done in two ways:
     - [Question Library](./User_Guides.md#library-questions)
     - [Interviewers](./User_Guides.md#interviewer)
     - [Indicators](./User_Guides.md#indicators)
-    - [Manage Users](./User_Guides.md#manage-users) 
-<hr>
+    - [Manage Users](./User_Guides.md#manage-users)
+
+&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
 
 + ######Data Collection
     - [Offline Data Collection](./ODK_App.md)
     - [Online Data Collection](ussd-integration.md)
-<hr>
+
 + ######Installation Guide
     - [Installation](installation.md)
-<hr>
+
 + ######Deployment Guide
     - [Application Architecture](deployment_guide.md)
-<hr>  
+  
 + ######Testing & Coverage
     - [Tests](tests.md)
