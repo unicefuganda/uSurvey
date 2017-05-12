@@ -64,21 +64,17 @@ In Survey, we have 2 choices as follows:
 
 
 <dl>
-  <dd>4.0. Create <a href="./User_Guides/#create-survey">New Survey</a>
+  <dd>4.0. Create <a href="./User_Guides/#create-survey">New Survey</a><br>
  &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp or <br>
-          &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp Clone existing Survey and rename: Proceed to reuse the survey along with the Listing data and ready to use.<br>
+          &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp Clone existing Survey and rename: Proceed to reuse the survey along with the Listing data and ready to use.<br>
 
 </dd>
   <dd>4.1. Create Batch</dd>
   <dd>4.2. then Create Questions in Batch (If necessary)</dd>
   <dd>4.3. Create Looping in questions and</dd>
   <dd>4.4. Add Logic to questions</dd>
-  <dd>4.5. Finally, enable
-
-[Batch](./User_Guides.md#enable-batch) for data collection, via Action Item ‘Open/Close’ for Batch
-
-  </dd>
-     Please note that Survey can not be downloaded until this step is done
+  <dd>4.5. Finally, enable <a href="./User_Guides/#enable-batch">Batch</a>for data collection, via Action Item ‘Open/Close’ for Batch</dd>
+     Please note that Survey can not be downloaded on Mobile until this step is done
 </dl>
 
 ######Step -5: Enroll Interviewer
