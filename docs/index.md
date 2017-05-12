@@ -66,8 +66,8 @@ In Survey, we have 2 choices as follows:
 <dl>
   <dd>4.0. Create <a href="./User_Guides/#create-survey">New Survey</a>
  
-<pre>      </pre> or
-<pre>      </pre> Clone existing Survey and rename: Proceed to reuse the survey along with the Listing data and ready to use.
+<pre>          </pre> or<br>
+<pre>          </pre> Clone existing Survey and rename: Proceed to reuse the survey along with the Listing data and ready to use.<br>
 
 </dd>
   <dd>4.1. Create Batch</dd>
