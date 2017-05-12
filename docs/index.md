@@ -66,7 +66,7 @@ In Survey, we have 2 choices as follows:
 <dl>
   <dd>4.0. Create <a href="./User_Guides/#create-survey">New Survey</a><br>
  &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp or <br>
-          &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp Clone existing Survey and rename: Proceed to reuse the survey along with the Listing data and ready to use.<br>
+          &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp Clone existing Survey and rename: Proceed to reuse the survey along with Listing data and ready to use.<br>
 
 </dd>
   <dd>4.1. Create Batch</dd>
@@ -109,16 +109,16 @@ Data collection and submission is done in two ways:
     - [Interviewers](./User_Guides.md#interviewer)
     - [Indicators](./User_Guides.md#indicators)
     - [Manage Users](./User_Guides.md#manage-users)
-<pre>      </pre>
+<pre>   </pre>
 + ######Data Collection
     - [Offline Data Collection](./ODK_App.md)
     - [Online Data Collection](ussd-integration.md)
-
+<pre>   </pre>
 + ######Installation Guide
     - [Installation](installation.md)
-
+<pre>   </pre>
 + ######Deployment Guide
     - [Application Architecture](deployment_guide.md)
-  
+<pre>   </pre>
 + ######Testing & Coverage
     - [Tests](tests.md)
