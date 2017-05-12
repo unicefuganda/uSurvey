@@ -44,7 +44,7 @@ Create [New Module](./User_Guides.md#modules) or skip this step, if you want to 
 Create [New Group](./User_Guides.md#groups) or skip this step, if you want to use existing Groups
 ######Step -3: Create a Listing
 <dl>
-<dd>3.0. Create <a href="./User_Guides/#listing">New Listing</a> <br>
+<dd>3.0. Create  <br>
    &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp or <br>
          &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp Use existing Listing - Proceed to reuse Listing data collected already  <br>  
    &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp or<br>
