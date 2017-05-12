@@ -44,14 +44,14 @@ Create [New Module](./User_Guides.md#modules) or skip this step, if you want to 
 Create [New Group](./User_Guides.md#groups) or skip this step, if you want to use existing Groups
 ######Step -3: Create a Listing 
 
-
+In Listing, we have 3 choices as follows:
 
 <dl>
 <dd>3.0. Create <a href="./User_Guides/#listing">New Listing</a><br>
    &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp or <br>
-         &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbspUse existing Listing - Proceed to reuse Listing data collected already  <br>  
+         &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp Use existing Listing - Proceed to reuse Listing data collected already <br>  
    &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp or<br>
-         &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbspClone existing Listing – Proceed to reuse Listing questions only<br>
+         &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp Clone existing Listing – Proceed to reuse Listing questions only<br>
 </dd>
 <dd>3.1. Create Questions in Listing</dd>
 <dd>3.2. Create Looping in questions (If necessary)</dd>
@@ -62,18 +62,22 @@ Create [New Group](./User_Guides.md#groups) or skip this step, if you want to us
 
 In Survey, we have 2 choices as follows:
 
-* Create [New Survey](./User_Guides.md#create-survey), or
-* Clone existing Survey and rename: Proceed to reuse the survey along with the Listing data and ready to use.
 
 <dl>
-  <dd>4.0. Once a new Survey is created, next</dd>
+  <dd>4.0. Create <a href="./User_Guides/#create-survey">New Survey</a>
+ 
+<pre>      </pre> or
+<pre>      </pre> Clone existing Survey and rename: Proceed to reuse the survey along with the Listing data and ready to use.
+
+</dd>
   <dd>4.1. Create Batch</dd>
   <dd>4.2. then Create Questions in Batch</dd>If necessary,
   <dd>4.3. Create Looping in questions and</dd>
   <dd>4.4. Add Logic to questions</dd>
   <dd>4.5. Finally, enable
-  
-   [Batch](./User_Guides.md#enable-batch) for data collection, via Action Item ‘Open/Close’ for Batch
+
+[Batch](./User_Guides.md#enable-batch) for data collection, via Action Item ‘Open/Close’ for Batch
+
   </dd>
      Please note that Survey can not be downloaded until this step is done
 </dl>
