@@ -234,14 +234,6 @@ urlpatterns = patterns(
         'survey.views.users.new',
         name='new_user_page'),
     url(
-        r'^users/(?P<user_id>\d+)/(?P<mode>\w+)/$',
-        'survey.views.users.edit',
-        name='users_edit'),
-    url(
-        r'^users/(?P<user_id>\d+)/$',
-        'survey.views.users.edit',
-        name='users_edit_profile'),
-    url(
         r'^users/(?P<user_id>\d+)/deactivate/$',
         'survey.views.users.deactivate',
         name='deactivate_user'),
@@ -257,6 +249,14 @@ urlpatterns = patterns(
         r'^users/download/$',
         'survey.views.users.download_users',
         name='download_users'),
+    url(
+        r'^users/(?P<user_id>\d+)/(?P<mode>\w+)/$',
+        'survey.views.users.edit',
+        name='users_edit'),
+    url(
+        r'^users/(?P<user_id>\d+)/$',
+        'survey.views.users.edit',
+        name='users_edit_profile'),
     # """
     # url(r'^batches/(?P<batch_id>\d+)/assign_questions/$',
     # 'survey.views.batch./completion/json/', name='assign_questions_page'),

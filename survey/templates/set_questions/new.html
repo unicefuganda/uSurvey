@@ -5,7 +5,7 @@
   {% if parent_question or heading %}
     {{ heading }}
   {% else %}
-     Question
+    {% if instance %}Edit{%else%} Add{%endif%} Question
   {% endif %}
 {% endblock %}
 {% block extra_head %}
