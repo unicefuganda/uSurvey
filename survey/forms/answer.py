@@ -250,7 +250,7 @@ class UserAccessForm(forms.Form):
         except InterviewerAccess.DoesNotExist:
             raise ValidationError('No such interviewer')
         if access:
-            if not access.interviewer.is_blocked:
+            if access.interviewer.is_blocked:
                 raise ValidationError('This interviewer have been blocked')
         return access
 
