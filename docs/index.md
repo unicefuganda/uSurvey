@@ -32,8 +32,10 @@ Source code for this project is available on github [here](https://github.com/un
 * Captured data is sent to uSurvey portal
 * Data collected by Interviewers is then viewed on the uSurvey portal for reporting and analysis
 
-###Glimpse of uSurvey 
+###Work Flow
 ------
+Following are the simple steps to be executed in the given sequence, to ensure a Survey is completed.
+
 ######Step -1: Create a Module
 
 Create [New Module](./User_Guides.md#modules) or skip this step, if you want to use existing Modules
@@ -43,16 +45,14 @@ Create [New Group](./User_Guides.md#groups) or skip this step, if you want to us
 ######Step -3: Create a Listing 
 
 In Listing, we have 3 choices as follows:
-   
+<dl>
+<dd>3.0. Once Listing is created, next</dd> 
 * Create [New Listing](./User_Guides.md#listing), or
 * Use existing Listing - Proceed to reuse Listing data collected already
 * Clone existing Listing – Proceed to reuse Listing questions only
-
-<dl>
-<dd>3.0. Once Listing is created, next</dd>
-<dd>3.1. Create Questions in Listing</dd>If necessary,
-<dd>3.2. Create Looping in questions and</dd>
-<dd>3.3. Add Logic to questions</dd>
+<dd>3.1. Create Questions in Listing</dd>
+<dd>3.2. Create Looping in questions (If necessary)</dd>
+<dd>3.3. Add Logic to questions (If necessary)</dd>
 </dl>
 
 ######Step -4: Create a Survey
@@ -92,9 +92,9 @@ Data collection and submission is done in two ways:
    1. Offline Data Collection - [Using Smart Phone](./ODK_App.md)
 2. Online Data Collection  - [Using Featured Phone](./ussd-integration.md)   
    
-###User Guides
+###Complete List of User Guides
 ------
-+ ######Administering uSurvey
++ ######User Manual
     - [Modules](./User_Guides.md#modules)
     - [Groups](./User_Guides.md#groups)
     - [Listing](./User_Guides.md#listing)
