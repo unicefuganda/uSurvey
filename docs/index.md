@@ -48,9 +48,9 @@ Create [New Group](./User_Guides.md#groups) or skip this step, if you want to us
 
 <dl>
 <dd>3.0. Create [New Listing](./User_Guides.md#listing)<br>
-   or <br>
+   &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp or <br>
 Use existing Listing - Proceed to reuse Listing data collected already  <br>  
-   or<br>
+   &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp or<br>
 Clone existing Listing – Proceed to reuse Listing questions only<br>
 </dd>
 <dd>3.1. Create Questions in Listing</dd>
