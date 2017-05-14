@@ -81,6 +81,12 @@
                                                                 </div>
                                                                 <br />
                                                                 <input name="submit" class="form_submit submit" id="submit" value="Go" type="submit">
+                                                                {% if is_preview or has_go_back  %}
+                                                                       <input name="has-go-back" class="form_submit submit" id="has-go-back" value="true" type="hidden">
+                                                                    {% if has_go_back  %}
+                                                                       <input name="go-back" class="form_submit submit" id="go-back" value="Back" type="submit">
+                                                                    {% endif %}
+                                                                {% endif %}
                                                              {% endblock %}
                                                          </form>
                                                      {% endblock %}

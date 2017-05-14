@@ -69,8 +69,7 @@ def get_answer_form(interview, access=None):
 
         def __init__(self, *args, **kwargs):
             super(AnswerForm, self).__init__(*args, **kwargs)
-            self.fields['uid'] = forms.CharField(
-                initial=access.user_identifier, widget=forms.HiddenInput)
+            #>self.fields['uid'] = forms.CharField(initial=access.user_identifier, widget=forms.HiddenInput)
             if question.answer_type == DateAnswer.choice_name():
                 self.fields['value'] = forms.DateField(
                     label='Answer',
@@ -161,7 +160,6 @@ def get_answer_form(interview, access=None):
                 if not valid:
                     raise ValidationError(
                         'Please enter in format: lat[space]long[space]altitude[space]precision')
-
             return self.cleaned_data['value']
 
         def save(self, *args, **kwargs):

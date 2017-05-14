@@ -30,9 +30,7 @@ def handle_request(request, qset_id):
         mock_access.id = str(request_data['uid'])
     handler = SimulatorView(
         mock_access,
-        action_url=reverse(
-            'test_qset_flow',
-            args=(qset_id, )))
+        action_url=reverse('test_qset_flow', args=(qset_id, )))
     return handler.handle_session(request)
 
 

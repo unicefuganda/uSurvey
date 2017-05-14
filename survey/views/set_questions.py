@@ -57,6 +57,7 @@ def index(request, qset_id):
                'question_filter_form': question_filter_form,
                'placeholder': 'identifier, text',
                'template_file': 'interviews/answer.html',
+               'is_preview': True
                # caution atleast on ODK access
                #  at least on access must exist
                }
