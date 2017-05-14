@@ -55,7 +55,6 @@ class Command(BaseCommand):
         group.permissions.add(can_view_households)
         group.permissions.add(can_view_interviewer)
         group.permissions.add(can_view_locations)
-        group.permissions.add(can_view_users)
         group.permissions.add(can_receive_email)
         group, _ = Group.objects.get_or_create(name='Supervisor')
         group.permissions.add(can_enter_data)
