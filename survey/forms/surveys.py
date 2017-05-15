@@ -45,8 +45,8 @@ class SurveyForm(ModelForm, FormOrderMixin):
         try:
             listing_forms = ListingTemplate.objects.values_list(
                 'pk', flat=True).order_by('id')
-            survey_listings = Interview.objects.filter(
-                question_set__pk__in=listing_forms).only('survey').distinct('survey')
+            survey_listings = Interview.objects.filter(question_set__pk__in=listing_forms
+                                                       ).only('survey').distinct('survey').order_by('survey__name')
             preferred_listings.extend(
                 set([(l.survey.pk, l.survey.name) for l in survey_listings]))
             self.fields['preferred_listing'].choices = preferred_listings
@@ -55,7 +55,10 @@ class SurveyForm(ModelForm, FormOrderMixin):
         except Exception as err:
             pass
         self.fields['email_group'].help_text = 'These users shall receive email notifications from this survey'
-        self.fields['listing_form'].required = False
+        if not self.data.get('preferred_listing'):
+            self.fields['listing_form'].required = True
+        else:
+            self.fields['listing_form'].required = False
         self.order_fields(['name',
                            'description',
                            'has_sampling',
@@ -78,7 +81,9 @@ class SurveyForm(ModelForm, FormOrderMixin):
                 raise ValidationError(
                     'You need to include one listing response identifier in double curly brackets'
                     ' e.g {{house_number}}')
-            listing_form = self.cleaned_data['listing_form']
+            listing_form = self.cleaned_data.get('listing_form')
+            if not listing_form:
+                raise ValidationError('You need to select listing form first')
             if listing_form.questions.filter(
                     identifier__in=requested_identifiers).count() == len(
                     set(requested_identifiers)):
