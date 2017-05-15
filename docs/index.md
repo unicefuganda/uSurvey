@@ -113,16 +113,16 @@ Data collection and submission is done in two ways:
 + ######Data Collection
     - [Offline Data Collection](./ODK_App.md)
     - [Online Data Collection](./ussd-integration.md)
-<pre>   </pre>
+<pre></pre>
 + ######Installation Guide
     - [Prerequisites](./installation.md#prerequisites)
     - [Installation](./installation.md#installation-instructions)
-<pre>   </pre>
+<pre></pre>
 + ######Deployment Guide
     - [uSurvey Deployment](./deployment_guide.md)
     - [Application Architecture](./deployment_guide.md#application-architecture)
     - [Components](./deployment_guide.md#components)
     - [Hosting](./deployment_guide.md#usurvey-hosting)
-<pre>   </pre>
+<pre></pre>
 + ######Testing & Coverage
     - [Tests](./tests.md)
