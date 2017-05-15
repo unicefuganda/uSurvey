@@ -47,8 +47,8 @@ Create [New Group](./User_Guides.md#groups) or skip this step, if you want to us
 In Listing, we have 3 choices as follows:
 
 <dl>
-<dd>3.0. Create <a href="./User_Guides/#listing">New Listing</a><br>
-   <pre>               or</pre>
+<dd>3.0. Create <a href="./User_Guides/#listing">New Listing</a>
+   <pre>      or</pre>
          &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp Use existing Listing - Proceed to reuse Listing data collected already <br>  
    &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp or<br>
          &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp Clone existing Listing – Proceed to reuse Listing questions only<br>
