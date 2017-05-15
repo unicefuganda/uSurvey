@@ -2,7 +2,6 @@ from django.test import TestCase
 from survey.forms.question import *
 from survey.models import Batch, Survey
 from survey.models.questions import Question
-from survey.models.householdgroups import HouseholdMemberGroup
 
 
 class QuestionFormTest(TestCase):
@@ -10,23 +9,7 @@ class QuestionFormTest(TestCase):
     def setUp(self):
         self.survey = Survey.objects.create(
             name="Test Survey", description="Desc", sample_size=10, has_sampling=True)
-        self.household_member_group = HouseholdMemberGroup.objects.create(
-            name='Age 4-5', order=1)
         self.question_module = QuestionModule.objects.create(name="Education")
-        self.batch = Batch.objects.create(
-            name='Batch A', description='description', survey=self.survey)
-        self.question = Question.objects.create(identifier='1.1', text="This is a question", answer_type='Numerical Answer',
-                                                group=self.household_member_group, batch=self.batch, module=self.question_module)
-        self.batch.start_question = self.question
-        self.form_data = {
-            'batch': self.batch,
-            'text': 'whaat?',
-            'answer_type': 'Numerical Answer',
-            'identifier': 'ID 1',
-            'options': "some option text",
-            'group': self.household_member_group.id,
-            'module': self.question_module.id
-        }
 
     def test_invalid(self):
         question_form = QuestionForm(self.batch)

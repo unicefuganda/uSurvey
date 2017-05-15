@@ -175,8 +175,10 @@ class InterviewerViewTest(BaseTest):
         self.assertIn('interviewers/index.html', templates)
         investigator = Interviewer.objects.get(name='int_6')
         self.assertEquals(investigator.is_blocked, True)
+        self.assertIn("Interviewer USSD Access successfully unblocked.", response.cookies['messages'].value)
+        self.assertRedirects(response, expected_url=reverse('interviewers_page'))
 
-    def test_block_interviwer_details(self):
+    def test_block_interviewer_details(self):
         investigator = Interviewer.objects.create(name='int_7',survey=self.survey,ea=self.ea,date_of_birth='1987-01-01')
         url = reverse('block_interviewer_page', kwargs={"interviewer_id":  investigator.id})
         response = self.client.get(url)
@@ -185,11 +187,32 @@ class InterviewerViewTest(BaseTest):
         self.assertIn('interviewers/index.html', templates)
         investigator = Interviewer.objects.get(name='int_7')
         self.assertEquals(investigator.is_blocked, False)
+        self.assertIn("Interviewer USSD Access successfully blocked.", response.cookies['messages'].value)
+        self.assertRedirects(response, expected_url=reverse('interviewers_page'))
 
-    def test_download_interviwers(self):
-        url = reverse('download_interviewers')
+    def test_block_interviwer_when_no_such_interviewer_exist(self):
+        url = reverse('block_interviewer_page', kwargs={"interviewer_id":  99999})
         response = self.client.get(url)
+        self.assertRedirects(response, expected_url=reverse('interviewers_page'))
+        self.assertIn("Interviewer does not exist.", response.cookies['messages'].value)
+
+
+    def test_block_interviwer_when_no_such_interviewer_exist(self):
+        url = reverse('unblock_interviewer_page', kwargs={"interviewer_id":  99999})
+        response = self.client.get(url)
+        self.assertRedirects(response, expected_url=reverse('interviewers_page'))
+        self.assertIn("Interviewer does not exist.", response.cookies['messages'].value)
+        
+
+
+    def test_download_interviewers(self):
+        response = self.client.get(reverse('download_interviewers'))
         self.failUnlessEqual(response.status_code, 200)
+        rtype = response.headers.get('content_type')
+        self.assertIn('text/csv', rtype)
+        res_csv = 'attachment; \
+        filename="%s.csv"' % filename
+        self.assertIn(response['Content-Disposition'], res_csv)
 
 
     def test_view_interviewer_details_when_no_such_interviewer_exists(self):
@@ -199,3 +222,14 @@ class InterviewerViewTest(BaseTest):
         response = self.client.get(url)
         self.assertRedirects(response, expected_url=reverse('interviewers_page'))
         self.assertIn("Interviewer not found.", response.cookies['messages'].value)
+
+    def test_restricted_permission(self):
+        self.assert_restricted_permission_for(reverse('interviewers_page'))
+        url = reverse('view_interviewer_page', kwargs={"interviewer_id":  investigator.id,"mode":'view'})
+        self.assert_restricted_permission_for(reverse(url))
+        url = reverse('block_interviewer_page', kwargs={"interviewer_id":  investigator.id})
+        self.assert_restricted_permission_for(reverse(url))
+        url = reverse('unblock_interviewer_page', kwargs={"interviewer_id":  investigator.id})
+        self.assert_restricted_permission_for(reverse(url))
+        url = reverse('download_interviewers')
+        self.assert_restricted_permission_for(reverse(url))

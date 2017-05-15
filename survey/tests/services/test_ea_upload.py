@@ -1,6 +1,6 @@
 import os
 from survey.models.locations import *
-from survey.models import Survey, UploadErrorLog, EnumerationArea, LocationTypeDetails
+from survey.models import Survey, UploadErrorLog, EnumerationArea
 from survey.services.ea_upload import UploadEA, UploadEACSVLayoutHelper
 from survey.tests.base_test import BaseTest
 
@@ -145,8 +145,6 @@ class EAUploadCSVLayoutHelperTest(BaseTest):
         self.country = LocationType.objects.create(
             name='Country', slug='country')
         self.uganda = Location.objects.create(name="Uganda", type=self.country)
-        LocationTypeDetails.objects.create(
-            country=self.uganda, location_type=self.country)
 
         self.region_type = LocationType.objects.create(
             name="Regiontype", slug="regiontype", parent=self.country)
@@ -198,7 +196,6 @@ class EAUploadCSVLayoutHelperTest(BaseTest):
 
     def test_table_layout_when_no_location_type_or_location_yet(self):
         LocationType.objects.all().delete()
-        LocationTypeDetails.objects.all().delete()
         Location.objects.all().delete()
         ea_csv_layout = UploadEACSVLayoutHelper()
         self.assertEqual([["No Location/LocationType added yet. Please add those first."]],

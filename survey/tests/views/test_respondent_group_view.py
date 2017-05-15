@@ -37,8 +37,9 @@ class RespondentViewTest(BaseTest):
         g = RespondentGroup.objects.create(name='g111',description='des')
         groups = RespondentGroup.objects.all()
         response = self.client.get(reverse('respondent_groups_page'))
-        self.assertIn(groups, response.context['groups'])
         self.failUnlessEqual(response.status_code, 200)
+        self.assertIn(groups, response.context['groups'])
+        
 
     def test_list_groups(self):
         g = RespondentGroup.objects.create(name='g1',description='des')
@@ -53,7 +54,7 @@ class RespondentViewTest(BaseTest):
         g = RespondentGroup.objects.create(name='g1',description='des')
         url = reverse(
             'respondent_groups_edit',
-            kwargs={"group_id":  str(g.pk), "mode":  "edit"})
+            kwargs={"group_id": g.pk})
         response = self.client.get(url)
         self.failUnlessEqual(response.status_code, 200)
         templates = [template.name for template in response.templates]
