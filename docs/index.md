@@ -48,10 +48,10 @@ In Listing, we have 3 choices as follows:
 
 <dl>
 <dd>3.0. Create <a href="./User_Guides/#listing">New Listing</a>
-   <pre>      or</pre>
-         &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp Use existing Listing - Proceed to reuse Listing data collected already <br>  
-   &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp or<br>
-         &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp Clone existing Listing – Proceed to reuse Listing questions only<br>
+<pre>      or</pre>
+<pre>  Use existing Listing - Proceed to reuse Listing data collected already</pre>
+<pre>      or</pre>
+<pre>  Clone existing Listing – Proceed to reuse Listing questions only</pre>
 </dd>
 <dd>3.1. Create Questions in Listing</dd>
 <dd>3.2. Create Looping in questions (If necessary)</dd>
