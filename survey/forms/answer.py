@@ -78,7 +78,7 @@ def get_answer_form(interview, access=None):
                     ],
                     widget=forms.DateInput(
                         attrs={
-                            'placeholder': 'Date Of Birth',
+                            'placeholder': 'Answer',
                             'class': 'datepicker'},
                         format=settings.DATE_FORMAT))
             if question.answer_type == GeopointAnswer.choice_name():

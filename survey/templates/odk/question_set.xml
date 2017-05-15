@@ -19,6 +19,7 @@ xmlns:jr="http://openrosa.org/javarosa">
      <meta>
        <instanceID />
        <instanceName />
+		<creationDate />
 		<locked />
      </meta>
 	 <submissions>
@@ -69,6 +70,7 @@ xmlns:jr="http://openrosa.org/javarosa">
   <!-- bindings -->
   <bind nodeset="/qset/meta/instanceID" type="string" 
            readonly="true()" calculate="concat('uuid:',uuid())" />
+  <bind nodeset="/qset/meta/creationDate" type="dateTime" readonly="true()" calculate="today()" />
   <bind nodeset="/qset/meta/instanceName" type="string" 
            readonly="true()" calculate="concat('{{ qset.name}}', /qset/surveyAllocation{% if ea_samples %}, '-', /qset/qset{{qset.pk}}/sampleData/selectedSample{% endif %})" />
   <bind nodeset="/qset/surveyAllocation" type="select1" required="true()" />

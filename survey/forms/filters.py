@@ -1,3 +1,5 @@
+from datetime import datetime
+from django.conf import settings
 from django import forms
 from survey.models import RespondentGroup, QuestionModule, Question, Batch, Survey, EnumerationArea, Location, \
     LocationType, Indicator, BatchQuestion, Interview, QuestionSet, ListingTemplate
@@ -266,6 +268,12 @@ class SurveyResultsFilterForm(forms.Form):
         queryset=Survey.objects.all(), required=False)
     question_set = forms.ModelChoiceField(
         queryset=QuestionSet.objects.all(), required=False)
+    from_date = forms.DateField(label='From', required=False, input_formats=[settings.DATE_FORMAT, ],
+                                widget=forms.DateInput(attrs={'placeholder': 'From Date',
+                                                              'class': 'datepicker'}, format=settings.DATE_FORMAT))
+    to_date = forms.DateField(label='To', required=False, input_formats=[settings.DATE_FORMAT, ],
+                              widget=forms.DateInput(attrs={'placeholder': 'To Date',
+                                                            'class': 'datepicker'}, format=settings.DATE_FORMAT))
 
     def __init__(self, model_class, disabled_fields=[], *args, **kwargs):
         super(SurveyResultsFilterForm, self).__init__(*args, **kwargs)
@@ -293,4 +301,8 @@ class SurveyResultsFilterForm(forms.Form):
             kwargs['survey__id'] = self.data['survey']
         if self.data.get('question_set', None):
             kwargs['question_set__id'] = self.data['question_set']
+        if self.data.get('from_date', None):
+            kwargs['created__gte'] = datetime.strptime(self.data['from_date'], settings.DATE_FORMAT)
+        if self.data.get('to_date', None):
+            kwargs['created__lt'] = datetime.strptime(self.data['to_date'], settings.DATE_FORMAT)
         return interviews.filter(**kwargs)

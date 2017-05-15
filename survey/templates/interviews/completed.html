@@ -4,13 +4,13 @@ Survey Completed.
 Enter any key to return to main.
 {% endblock %}
 {% block preview_title %}
-    <h2 class="page_title">Survey {{interview.question_set.name}} completed.</h2>
+    <h2 class="page_title" style="line-height:20px; margin: 0;">Survey {{interview.question_set.name}} completed.</h2>
 {% endblock %}
 {% block contactform %}
-    <div class="form_row">
+    <div class="form_row center">
         <br /><br />
-        <a style="padding-left: 4px;padding-right: 3px;" class="btn btn-white btn-warning btn-bold" href="." >
-                    <i class="ace-icon fa fa-plus bigger-120"></i>
+        <a class="btn btn-white btn-warning btn-bold block" href="." style="margin: auto;">
+                    <i class="ace-icon fa fa-check-circle bigger-120"></i>
                      Done</a>
     </div>
 {% endblock %}
