@@ -25,10 +25,10 @@ Source code for this project is available on github [here](https://github.com/un
 **General flow of the uSurvey**:
 
 * Admin creates uSurvey Users and assigns them Roles
-* User ‘Data Researcher’ defines Modules, Groups, Listing, Surveys, Batches and creates questionnaires for Listing & Batches in application
-* Data Researcher also defines ‘Interviewers’ and assigns them to an Enumeration area to conduct a Listing or Survey
-* In the field, Interviewer conducts the actual survey in the designated Enumeration area
-* Data collection is done using a hand-held mobile device like Android Smart Phone or Featured Phone via ODK and USSD channels respectively.
+* Data Researcher defines Modules, Groups, Listing, Surveys, Batches and creates questionnaires for Listing & Batch in the application
+* Data Researcher also defines ‘Interviewers’ and assigns them to an Enumeration area to conduct Listing or Survey
+* In the field, Interviewer does data collection in the designated Enumeration area
+* Data collection is done using hand-held mobile devices like Android Smart Phone or Featured Phone via uSurvey App and USSD channel respectively.
 * Captured data is sent to uSurvey portal
 * Data collected by Interviewers is then viewed on the uSurvey portal for reporting and analysis
 
@@ -70,7 +70,7 @@ In Survey, we have 2 choices as follows:
 
 </dd>
   <dd>4.1. Create Batch</dd>
-  <dd>4.2. then Create Questions in Batch (If necessary)</dd>
+  <dd>4.2. Create Questions in Batch (If necessary)</dd>
   <dd>4.3. Create Looping in questions and</dd>
   <dd>4.4. Add Logic to questions</dd>
   <dd>4.5. Finally, enable <a href="./User_Guides/#enable-batch">Batch </a> for data collection, via Action Item ‘Open/Close’ for Batch</dd>
@@ -109,16 +109,20 @@ Data collection and submission is done in two ways:
     - [Interviewers](./User_Guides.md#interviewer)
     - [Indicators](./User_Guides.md#indicators)
     - [Manage Users](./User_Guides.md#manage-users)
-<pre> </pre>
+<pre></pre>
 + ######Data Collection
     - [Offline Data Collection](./ODK_App.md)
-    - [Online Data Collection](ussd-integration.md)
+    - [Online Data Collection](./ussd-integration.md)
 <pre>   </pre>
 + ######Installation Guide
-    - [Installation](installation.md)
+    - [Prerequisites](./installation.md#prerequisites)
+    - [Installation](./installation.md#installation-instructions)
 <pre>   </pre>
 + ######Deployment Guide
-    - [Application Architecture](deployment_guide.md)
+    - [uSurvey Deployment](./deployment_guide.md)
+    - [Application Architecture](./deployment_guide.md#application-architecture)
+    - [Components](./deployment_guide.md#components)
+    - [Hosting](./deployment_guide.md#usurvey-hosting)
 <pre>   </pre>
 + ######Testing & Coverage
-    - [Tests](tests.md)
+    - [Tests](./tests.md)
