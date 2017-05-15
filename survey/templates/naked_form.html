@@ -109,7 +109,7 @@
   <div id="{{field.auto_id}}-control-group" class="control-group int-part">
     <div class="controls {{ field|is_radio }}">
         <label class="control-label" for="{{field.auto_id}}" style="padding: 5px;">{{field.label}}</label>
-        <span title="{{ field.help_text }}" class="{{field.auto_id}}_tip">{{field}}</span>
+        <span data-toggle="{{ field.help_text }}"data-placement="left">{{field}}</span>
         {% if field.field.icons %}
             <div class="input-prepend" style="display: inline-block; border: none;">
                 {% for icon, attrs in field.field.icons.items %}
@@ -147,7 +147,6 @@
             {% endfor %}
          </label>
         {% endif %}
-        <div id="{{field.auto_id}}_tip" class="help tip hide" style="color: #307ecc; margin-top: 5px; margin-left: 55px;">{{ field.help_text }}</div>
     </div>
   </div>
 

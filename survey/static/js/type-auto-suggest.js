@@ -15,15 +15,15 @@ function make_suggestions(elem_selector, fetch_qset_ids_url) {
         });
      }
 
-    get_autocomplete = function(list) {
+    get_autocomplete = function(suggestions) {
             return new Awesomplete(elem, {
-                                    list: [],
+                                    list: suggestions,
                                         filter: function(text, input) {
                                             return Awesomplete.FILTER_CONTAINS(text, input.match(/[^({{)]*$/)[0]);
                                         },
 
                                         replace: function(text) {
-                                            var before = this.input.value.match(/^.*{{\s*|/)[0].trim();
+                                            var before = this.input.value.match(/^.*{{[^(}})]*$/)[0].trim();    //demand a starting brace {{ at least
                                             this.input.value = before +text + "}} ";
                                         }
                                 });
