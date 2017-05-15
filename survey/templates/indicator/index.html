@@ -159,6 +159,14 @@
 <script src="{{ STATIC_URL }}/js/jquery.dataTables.js"></script>
 <script src="{{ STATIC_URL }}/js/dataTables.bootstrap.js" type="text/javascript" charset="utf-8"></script>
 <script src="{{ STATIC_URL }}js/indicator.js" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript">
+    
+    $(function() {
+    $('#id_filter_survey').change(function() {
+        this.form.submit();
+    });
+});
+</script>
 {% include 'max_display_per_page_form.html' %}
 <style type="text/css">
     #fth{width: 38px !important;}

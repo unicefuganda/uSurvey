@@ -35,6 +35,7 @@ def get_question_templates_form(model_class):
             self.fields['answer_type'].choices = [(name, name) for name in
                                                   AnswerAccessDefinition.answer_types(USSDAccess.choice_name())
                                                   if name != AutoResponse.choice_name()]
+            self.fields['answer_type'].choices.insert(0,('','----Select Answer Type -----'))
             # key,val pair of supported access channels for each answer type
             self.answer_map = {}
             # not much needed since we are only restricting to USSD access

@@ -275,6 +275,7 @@ def edit(request, question_id):
     batch = QuestionSet.get(pk=question.qset.pk)
     response, context = _render_question_view(
         request, batch, instance=question)
+    context['page_title '] = 'Edit Question'
     return response or render(request, 'set_questions/new.html', context)
 
 
@@ -282,6 +283,7 @@ def edit(request, question_id):
 def new(request, qset_id):
     batch = QuestionSet.get(pk=qset_id)
     response, context = _render_question_view(request, batch)
+    context['page_title '] = 'Add Question'
     return response or render(request, 'set_questions/new.html', context)
 
 
@@ -361,6 +363,7 @@ def _render_question_view(request, batch, instance=None, prev_question=None):
             batch, instance=instance, prev_question=prev_question)
     context = {'button_label': button_label,
                'id': 'add-question-form',
+               'instance':instance,
                'request': request,
                'class': 'question-form',
                'batch': batch,

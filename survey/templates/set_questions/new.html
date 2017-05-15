@@ -1,10 +1,11 @@
 {% extends "form.html" %}
+{% load template_tags %}
 
 {% block title %}
   {% if parent_question or heading %}
     {{ heading }}
   {% else %}
-    New Question
+    {% if instance %}Edit{%else%} Add{%endif%} Question
   {% endif %}
 {% endblock %}
 {% block extra_head %}
@@ -23,51 +24,68 @@
 {% endblock%}
 
 {% block display_form_fields %}
-<style type="text/css">
-  #id_identifier{
-    width: 261px !important;
-    height: 25px !important;
-    margin-left: 3px !important;
-  }
-  #id_text{
-    width: 261px !important;
-    margin-left: 0px;
-  }
-  .dataTables_wrapper select {    margin-bottom: 0 !important;    margin-left: 4px!important;    margin-right: 4px!important;    margin-top: 0px !important;    padding: 3px !important;    width: 261px!important;}
-  .form-actions {
-    background-color: #fff;
-    border-top: 1px solid #c3a0d9;
-    margin-bottom: 0px !important; 
-    margin-top: 0px !important; 
-    padding: 8px 20px 20px !important;
-    /* text-align: center; */
-} 
-.orange{
-    padding: 3px !important;
-} 
-</style>
-<!-- <div class="control-group">
-        <label class="control-label" for="text_counter"></label>
-        <div class="controls">
-            <span id="text-counter"></span>
-        </div>
-  </div> -->
-{% include "naked_form.html" with a_form=questionform %}
-{% if options %}
-  {% for option in options %}
-   {% if option %}
-    <div class="control-group options question-option">
-        <label style="margin-top:10px;" class="control-label col-md-4">Option <span class="number"> {{ option.order }}</span></label>
-        <div class="controls">
-            <input type="text" maxlength="100" name="options" value="{{ option.text }}">
-            <a style="padding: 0px !important;" href="javascript:;" class="btn btn-white btn-warning btn-bold add-option"><i class="ace-icon fa fa-plus bigger-120 orange"></i></i></a>
-            <a style="padding: 0px !important;" href="javascript:;" class="btn btn-white btn-warning btn-bold remove-option"><i class="ace-icon fa fa-minus bigger-120 orange"></i></i></a>
-        </div>
-    </div>
-    {% endif %}
-  {% endfor %}
+
+{% for field in questionform.visible_fields %}
+  
+
+        {% if field.name == 'mandatory' %}
+        {% if options %}
+          {% for option in options %}
+           {% if option %}
+            <div class="control-group options question-option">
+                <label style="margin-top:10px;" class="control-label col-md-4">Option <span class="number"> {{ option.order }}</span></label>
+                <div class="controls">
+                    <input type="text" maxlength="100" name="options" value="{{ option.text }}">
+                    <a style="padding: 0px !important;" href="javascript:;" class="btn btn-white btn-warning btn-bold add-option"><i class="ace-icon fa fa-plus bigger-120 orange"></i></i></a>
+                    <a style="padding: 0px !important;" href="javascript:;" class="btn btn-white btn-warning btn-bold remove-option"><i class="ace-icon fa fa-minus bigger-120 orange"></i></i></a>
+                </div>
+            </div>
+            {% endif %}
+          {% endfor %}
+
+        {% endif %}
+        <div id="{{field.auto_id}}-control-group" class="control-group int-part">
+    <div class="controls {{ field|is_radio }}">
+        <label class="control-label" for="{{field.auto_id}}" style="padding: 5px;">{{field.label}}</label>
+        
+
+        <span title="{{ field.help_text }}" class="{{field.auto_id}}_tip">{{field}}</span>
+        {% else %}
+
+        <div id="{{field.auto_id}}-control-group" class="control-group int-part">
+    <div class="controls {{ field|is_radio }}">
+        <label class="control-label" for="{{field.auto_id}}" style="padding: 5px;">{{field.label}}</label>
+        
+
+        <span title="{{ field.help_text }}" class="{{field.auto_id}}_tip">{{field}}</span>
 
 {% endif %}
+
+        
+        {% if field.errors %}
+        <label class="error" style="color:red; padding-bottom:10px; padding-top:10px;" >
+            {% for error in field.errors %}
+                {{ error}}
+            {% endfor %}
+         </label>
+        {% endif %}
+        <div id="{{field.auto_id}}_tip" class="help tip hide" style="color: #307ecc; margin-top: 5px; margin-left: 55px;">{{ field.help_text }}</div>
+    </div>
+  </div>
+
+{% endfor %}
+<script type="text/javascript">
+  $(document).ready(function(){
+    $('.controls textarea ').after($('<span id="text-counter"></span>'));
+  })
+</script>
+{% for hidden in questionform.hidden_fields %}
+  {{ hidden }}
+{% endfor %}
+
+
+
+
 {% include "_multiple_options.html" with option_label='Option' id="question-option-template" name='options'%}
 {% if parent_question %}
 <script type="text/template" id="question-group-template">
@@ -94,20 +112,65 @@
 
 {% block javascripts %}
 <style type="text/css">
-  #id_identifier{width: 261px !important;
-height: 25px !important;
-margin-left: 0px !important; }
-.dataTables_wrapper select {margin-left: 0px !important;}
-.btn-white{padding: 0px !important;font-size: 10px !important;}
-.dataTables_wrapper input[name=options] {
-  width: 261px !important;
-    height: 27px !important;
-margin-left: 1px !important;
-margin-top: 10px !important;
-}
-.dataTables_wrapper .btn.btn-white{margin-top: 10px !important;}
-.dataTables_wrapper .question-option label{margin-top: 15px !important;}
+  #id_identifier{
+    width: 261px !important;
+    height: 25px !important;
+    
+  }
+  #id_text{
+    width: 261px !important;
+    margin-left: 4px !important;
+  }
+  .dataTables_wrapper select {    margin-bottom: 0 !important;    margin-left: 4px!important;    margin-right: 4px!important;    margin-top: 0px !important;    padding: 3px !important;    width: 261px!important;}
+  .form-actions {
+    background-color: #fff;
+    border-top: 1px solid #c3a0d9;
+    margin-bottom: 0px !important; 
+    margin-top: 0px !important; 
+    padding: 8px 20px 20px !important;
+    /* text-align: center; */
+} 
+.orange{
+    padding: 3px !important;
+} 
+#id_answer_type,#id_module,#id_group{
+width: 261px !important; }
+.dataTables_wrapper input[name='options']{width: 261px !important;height: 25px !important;margin-left: 6px !important;}
+.controls .btn-warning{font-size: 12px !important;}
 </style>
+<!-- <div class="control-group">
+        <label class="control-label" for="text_counter"></label>
+        <div class="controls">
+            <span id="text-counter"></span>
+        </div>
+  </div> -->
+
+
+
+
+
+
+ <style type="text/css">
+     .controls {
+        margin-bottom: 20px !important;
+     }
+    
+    #id_access_channels{
+      display: inline-block;
+      vertical-align: middle;
+    }
+    #text-counter{
+    margin-left: 10px !important;
+  }
+  
+  .ms-list{
+        margin-top: -14px !important;
+  }
+  .inline pos-rel > open {
+    display: none !important;
+  }
+  </style>
+  
 
     <script src="{{STATIC_URL}}js/type-auto-suggest.js" type="text/javascript" charset="utf-8"></script>
     <script src="{{STATIC_URL}}js/questions.js" type="text/javascript" charset="utf-8"></script>

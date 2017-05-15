@@ -83,7 +83,6 @@
 $(document).ready(function(){
 
 $("#id_module option[value='']").text("--Select Module--");
-        $("select#id_module").val("");
 
 
   
@@ -109,5 +108,8 @@ margin-top: 10px !important;
 }
 .dataTables_wrapper .btn.btn-white{margin-top: 10px !important;}
 .dataTables_wrapper .question-option label{margin-top: 15px !important;}
+#id_answer_type,#id_module,#id_group{
+width: 261px !important; }
+input[name='options']{width: 261px !important;height: 25px !important;margin-left: 3px;}
 </style>
 {% endblock %}

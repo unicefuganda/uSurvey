@@ -29,9 +29,10 @@
   #id_email_group{
     width: 308px !important;
   }
-  .dataTables_wrapper input[type="text"] {
+  .dataTables_wrapper input[type="text"], .dataTables_wrapper textarea {
     width: 308px !important;
 }
+.dataTables_wrapper #id_sample_size{height: 25px;}
 #id_email_group_chosen {
     border-left: 3px solid #0577e0;
     display: inline-block;
@@ -62,21 +63,20 @@
 
           $(document).ready(function(){
         $("label[for='id_listing_form']").text("New Listing");
-          //var listing_selected_option = $("#id_listing_form :selected").val();
         $("#id_listing_form").change(function() {
-          if($(this).val())
+          if($(this).val()){
             $("#id_preferred_listing-control-group").hide();
-          else
+            $("#id_random_sample_label-control-group").show();
+          }
+          else{
             $("#id_preferred_listing-control-group").show();
+            $("#id_random_sample_label-control-group").hide();
+            }
         });
 
         $("#id_listing_form option[value='']").text("--Select New Listing Form--");
         $("select#id_listing_form").val("");
         $("#id_preferred_listing option[value='']").text("--Select Preferred Listing Form--");
-        
-        //$("#id_preferred_listing_tip").hide();
-        //$('#id_preferred_listing').mousedown(function() {
-        //$("#id_preferred_listing_tip").show();
 
         });
         </script>

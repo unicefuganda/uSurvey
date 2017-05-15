@@ -247,6 +247,9 @@ class UserAccessForm(forms.Form):
                 user_identifier=self.cleaned_data['uid'])
         except InterviewerAccess.DoesNotExist:
             raise ValidationError('No such interviewer')
+        if access:
+            if access.interviewer.is_blocked:
+                raise ValidationError('This interviewer have been blocked')
         return access
 
 

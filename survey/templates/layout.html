@@ -368,14 +368,18 @@
                                                                     {% block content_search %}
                                                                     {% endblock %}
                                                                 </div>
-                                                                {% block content %}
+                                                                <div>
+                                                                    {% block content %}
                                                                 {% endblock %}
+                                                                </div>
+                                                                
                                                             </div>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
+                                        
                                     </div>
                                 </div>
                                 <a href="#" id="btn-scroll-up" class="btn-scroll-up btn btn-sm btn-inverse">
@@ -450,31 +454,19 @@
             });
             
         </script>
+        {% block javascripts %}
+        {% endblock %}
         <script type="text/javascript">
             // clear all input elements on cancel
             $('.modal').on('hidden.bs.modal', function (e) {
                   $(this)
-                    .find("input[type=text],input[type=number],input[type=email]textarea,select")
+                    .find("input[type=text],input[type=number],input[type=email],textarea,select")
                        .val('')
-                       .end()
-                    .find("input[type=checkbox], input[type=radio]")
-                       .prop("checked", "")
                        .end();
-                })
-        </script>
-        {% block javascripts %}
-        {% endblock %}
-        <!-- <script type="text/javascript">
-            $(function(){
-                var $btn = $('#button');
-                $btn.click(function(){
-                    var $this = $(this);
-                    $this.html("Processing the form Please wait..");
-                    $(this).submit();
-                    
+                       $(".chzn-select").val("").trigger('chosen:updated');
+                       $("#id_random_sample_label-control-group").hide();
                 });
-            })
-        </script> -->
+        </script>
         
         <script type="text/javascript">
             if('ontouchstart' in document.documentElement) document.write("<script src='assets/js/jquery.mobile.custom.min.js'>"+"<"+"/script>");
@@ -490,6 +482,7 @@
             padding-bottom: 10px;
             }
             .dataTables_length {margin-top: 10px;}
+            .dataTables_wrapper input[type='text'],input[type='number'],input[type='password'], select, textarea{color: #000 !important;}
         </style>
     </body>
 </html>

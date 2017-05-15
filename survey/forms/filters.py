@@ -22,6 +22,7 @@ class QuestionFilterForm(forms.Form):
             map(lambda question_type: question_type_choices.append(
                 question_type), [(name, name) for name in qset.answer_types])
         self.fields['question_types'].choices = question_type_choices
+        self.fields['question_types'].choices.insert(0,('','---- Select ----'))
         for field in read_only:
             self.fields[field].widget.attrs['readonly'] = True
             self.fields[field].widget.attrs['disabled'] = True
@@ -104,8 +105,9 @@ class IndicatorFilterForm(forms.Form):
         all_surveys = [('All', 'All')]
         all_modules = [('All', 'All')]
         batches = Batch.objects.all()
-        if data and data.get('survey', None).isdigit():
-            batches = batches.filter(survey__id=int(data.get('survey', None)))
+        if data and data.get('survey'):
+            if data['survey'].isdigit():
+                batches = batches.filter(survey__id=int(data.get('survey', None)))
         map(lambda batch: all_batches.append((batch.id, batch.name)), batches)
         map(lambda survey: all_surveys.append(
             (survey.id, survey.name)), Survey.objects.all())
