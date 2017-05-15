@@ -58,16 +58,19 @@ For first time use and when app reset is done, one has to provide, App user cred
 
 ![ODK](./ODK-4.png)   
    Mobile Screen-4
+
 * In ‘Configure platform settings’ under ‘ODK Aggregate Settings’, make sure that, URL should be http://usurvey.unicefuganda.org/odk/collect/forms <br>
 
 ![ODK](./ODK-5.png)   
    Mobile Screen-5
+
 * Username: enter ‘ODK ID’ of the Interviewer
 * Password: enter ‘ODK Token’ of the Interviewer <br> (For above details, you need an interviewer defined on uSurvey portal and defined with an ODK ID)
 
 ![ODK](./ODK-6.png)   
    Mobile Screen-6
-* then come back to App home screen using Mobile back key
+
+* Now come back to App Home screen using Mobile back key
 
 **Using uSurvey App**
 
@@ -76,21 +79,26 @@ Get Blank Form, Fill Blank Form, Edit Save Form, Send Finalized Form, Download D
 
 ######Step -1: Get Blank Form
 
-Once App is opened, in the Home screen hit on ‘Get Blank Form’ to download blank form, then you will be prompted “Please enter User name and Password for server”, then Interviewer has to conform his/her User name and Password, to proceed by clicking on ‘OK’. As shown in below Mobile Screen-2
+Once App is opened, in the Home screen hit on ‘Get Blank Form’ to download blank form, then you will be prompted “Please enter User name and Password for server”, then Interviewer has to conform his/her User name and Password, to proceed by clicking on ‘OK’. As shown in below Mobile Screen-7
 
 ![ODK](./ODK-2_3.png)   
    Mobile Screen-7
+
 ![ODK](./ODK-7.png)   
    Mobile Screen-8
-Now you will be navigated to this below Mobile Screen-, Select ‘Blank Form’ from list, usually blank forms, show with ‘Survey –Listing’ names and hit on ‘Get Selected’ As shown in below Mobile Screen-, then Hit ‘OK’
 
-![ODK](./ODK-8.png)
+Now you will be navigated to this below Mobile Screen-9, Select ‘Blank Form’ from list, usually blank forms, show with ‘Survey –Listing’ names and hit on ‘Get Selected’ As shown in below Mobile Screen-, then Hit ‘OK’
 
-![ODK](./ODK-9.png)
+![ODK](./ODK-8.png)   
+   Mobile Screen-9
 
-![ODK](./ODK-10.png)
+![ODK](./ODK-9.png)   
+   Mobile Screen-10
 
-**Fill Blank Form**
+![ODK](./ODK-10.png)   
+   Mobile Screen-11
+
+######Step -2: Fill Blank Form
 
 In the Home Screen hit on ‘Fill Blank Form’ to fill questionnaire as part of data collection. Now select any of one the forms listed here. As shown in below Mobile Screen-
 
@@ -113,7 +121,7 @@ Once filling the questionnaire is completed, you will be prompt with message “
 
 ![ODK](./ODK-15.png)
 
-**Edit Saved form**
+######Step -3: Edit Saved form
 
 This feature provides, option to view or edit completed questionnaire, including Enumeration Area before submission.
 
@@ -133,7 +141,7 @@ You can select any form from list to view or edit, usually filled forms, show wi
 
 ![ODK](./ODK-31.png)
 
-**Send Finalized Form**
+######Step -4: Send Finalized Form
 
 The process of transmitting the completed forms to server, when there is an internet connectivity.
 
@@ -151,7 +159,7 @@ Now you will be navigated to this below shown, Mobile Screen-, Select forms indi
 
 ![ODK](./ODK-21.png)
 
-**Download Data Forms**
+######Step -5: Download Data Forms
 
 The feature to download completed Listing and Survey forms from server to make any changes.
 
@@ -169,7 +177,7 @@ Then download starts, which takes several minutes, depends up on your Internet s
 
 Note: Once Forms are downloaded then these forms are available from ‘Edit Saved Form’ and ‘Search Forms’ 
 
-**Search Forms**
+######Step -6: Search Forms
 
 The feature to find completed Listing and Survey forms, to view or edit filled questionnaire.
 
