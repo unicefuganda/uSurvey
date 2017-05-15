@@ -1,9 +1,19 @@
-###uSurvey App
+###Introduction
 
 uSurvey portal is intended to design and define the Listings, Surveys and monitor statistical reports. On other end in the field, data collection and submission is done using hand-held mobile devices in two ways.
 
 1. Offline Data Collection - Using Smart Phone
 2. Online Data Collection  - Using Featured Phone
+
+Hence to collect real time data, both offline and online methods are implemented.   
+   In the locations, where there is a mobile phone network connectivity is available, data is transmitted to server instantly via USSD channel, using Featured Phone.
+Whereas, in isolated mobile phone network connectivity locations, data collection is done offline via uSurvey App, using Smart Phones. This collected data is stored temporally in the hand-held device and transmits to server later time, once reaches to a location with internet connectivity.
+ 
+Ultimately uSurvey application make paperless work and carry out Survey in a digitalized process with increased ease and accuracy of data. Which results in the release of Survey reports timely.
+
+###Offline Data Collection
+------
+#####About uSurvey App
 
 **Data collection and submission using Smart Phone**
 
@@ -215,3 +225,26 @@ To delete, select forms individually or hit on ‘Toggle All’ to select all fo
  ![ODK](./ODK-33.png)
 
  ![ODK](./ODK-34.png)
+
+###Online Data Collection
+------
+#####USSD Integration
+uSurvey fully supports survey participation on USSD using the interactive menu capability of the USSD platform. To begin, from uSurvey portal, interviewers are sent SMS with details of the code to dial in order to commence data collection (e.g. *256#). The interviewer dials the code and then the survey starts.
+  
+![USSD Participation](./ussd-code-example.jpg)
+
+#####What do I need to conduct survey on USSD?
+
+1. Any mobile phone would do.
+2. You need a USSD Aggregator.
+3. You need to choose a mobile network which supports your chosen USSD Aggregator.
+4. You need your chosen USSD Aggregator to forward USSD messages to uSurvey as follows:
+    * Requests can be sent as a HTTP GET or a POST to uSurvey USSD end point.
+    * If you have hosted uSurvey with host IP `HOST_IP` and port `APP_PORT`, the USSD end point is `HTTP(s)://HOST_IP:APP_PORT/ussd`.
+    * At a minimum, following parameters need to be sent to uSurvey USSD API from the aggregator:
+        * `msisdn:` This parameter holds the mobile number of the responding interviewer.
+        * `ussdRequestString:` This parameter holds the input string sent by the interviewer.
+        * `transactionId:` This parameter holds the session ID of the USSD Interaction.
+5. You need to maintain connectivity to your mobile network (Since USSD participation requires an active USSD session).  
+6. Now assign the interviewer to the relevant Survey and Enumeration area (for more info on this see the relevant section in the [User manual](./user_manual.md#interviewer-page "Interviewer Page"))
+      
