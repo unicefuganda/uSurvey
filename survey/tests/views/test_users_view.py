@@ -151,7 +151,7 @@ class UsersViewTest(BaseTest):
         self.assertTrue(json_response)
 
         response = self.client.get(
-            "%?username=" % reverse('users_index') + user.username)
+            "%s?username=%s" %(reverse('users_index'),user.username))
         self.failUnlessEqual(response.status_code, 200)
         json_response = json.loads(response.content)
         self.assertFalse(json_response)
@@ -459,9 +459,15 @@ class UsersViewTest(BaseTest):
         self.assert_restricted_permission_for(url)
         url = reverse('deactivate_user', kwargs={"user_id":  1})
         self.assert_restricted_permission_for(url)
-        url = reverse('activate_user', kwargs={"user_id":  1})
+        url = reverse('activate_user', kwargs={"user_id":  999})
         self.assert_restricted_permission_for(reverse(url))
 
     def test_download(self):
+        filename = 'all_admin_users'
         response = self.client.get(reverse('download_users'))
         self.failUnlessEqual(response.status_code, 200)
+        rtype = response.headers.get('content_type')
+        self.assertIn('text/csv', rtype)
+        res_csv = 'attachment; \
+        filename="%s.csv"' % filename
+        self.assertIn(res_csv,response['Content-Disposition'])

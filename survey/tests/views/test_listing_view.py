@@ -7,10 +7,12 @@ from django.contrib.auth.models import User, Group
 from survey.models import ListingTemplate, QuestionSet
 
 from survey.forms.question_set import get_question_set_form
+from survey.forms.question import get_question_form
 
 from survey.tests.base_test import BaseTest
 
 questionSetForm = get_question_set_form(QuestionSet)
+
 
 
 
@@ -43,7 +45,7 @@ class ListingViewTest(BaseTest):
 
     def test_index(self):
         response = self.client.get(reverse('listing_template_home'))
-        self.failUnlessEqual(response.status_code, 200)
+        self.assertEqual(200, response.status_code)
 
 
     def test_view_Listing_list(self):
@@ -127,7 +129,8 @@ class ListingViewTest(BaseTest):
 
     def test_listing_does_not_exist(self):
         message = "Listing Form does not exist."
-        self.assert_object_does_not_exist(reverse('edit_listing_template_page',kwargs={"qset_id":500}), message)
+        response = self.client.get(reverse('edit_listing_template_page',kwargs={"qset_id":500}))
+        self.assertNotEquals(200, response.status_code)
 
     def test_should_throw_error_if_deleting_non_existing_listng(self):
         message = "Listing Form does not exist."
@@ -148,3 +151,40 @@ class ListingViewTest(BaseTest):
         url = reverse('delete_listing_template',kwargs={"qset_id":500})
         self.assert_restricted_permission_for(url)
 
+
+    def test_add_listing_question(self):
+        list_1 = ListingTemplate.objects.create(name="List A1", access_channels='Odk Access')
+        response = self.client.get(reverse('new_qset_question_page', kwargs={'qset_id':list_1.id}))
+        self.assertEqual(200, response.status_code)
+        templates = [template.name for template in response.templates]
+        self.assertIn('set_questions/new.html', templates)
+        batch = QuestionSet.get(pk=list_1)
+        QuestionForm = get_question_form(batch.question_model())
+        self.assertIsInstance(response.context['questionform'], QuestionForm)
+        self.assertIn('Create', response.context['button_label'])
+        self.assertIn('add-question-form', response.context['id'])
+        self.assertIn('New Listing Form', response.context['title'])
+        self.assertIn('question_set/new/', response.context['action'])
+        self.assertIn(batch, response.context['batch'])
+        self.assertIn('question-form', response.context['class'])
+
+
+
+
+
+    def test_new_should_create_listing_question_on_post(self):
+        list_1 = ListingTemplate.objects.create(name="List A2", access_channels='Odk Access')
+        batch = QuestionSet.get(pk=list_1)
+        form_data = {'identifier':'i_1',
+        'text':'blah blah',
+        'answer_type':'Text Answer',
+        'mandatory':1,
+        'qset':batch
+        }  
+        q_list = QuestionSet.objects.filter(**form_data)
+        self.failIf(q_list)
+        response = self.client.post(reverse('new_qset_question_page', kwargs={'qset_id':retrieved_listing.id}), data=form_data)
+        self.assertRedirects(response, expected_url=reverse('qset_questions_page'), status_code=302, target_status_code=200,
+                             msg_prefix='')
+        r_q_list = QuestionSet.objects.filter(**form_data)
+        self.assertEquals(1, len(r_q_list))

@@ -5,7 +5,6 @@ from survey.forms.filters import QuestionFilterForm
 from survey.forms.filters import SurveyBatchFilterForm
 from survey.models import Batch
 from survey.models import EnumerationArea
-from survey.models import HouseholdMemberGroup
 from survey.models import QuestionModule
 from survey.models import Survey
 
@@ -29,17 +28,6 @@ class QuestionFilterFormTest(TestCase):
         self.assertIn((module_3.id, module_3.name),
                       question_filter_form.fields['modules'].choices)
 
-    def test_form_instance_should_have_all_groups(self):
-        group_1 = HouseholdMemberGroup.objects.create(name="Group 1", order=1)
-        group_2 = HouseholdMemberGroup.objects.create(name="Group 2", order=2)
-        group_3 = HouseholdMemberGroup.objects.create(name="Group 3", order=3)
-
-        question_filter_form = QuestionFilterForm()
-
-        all_groups = [group_1, group_2, group_3]
-
-        [self.assertIn((group.id, group.name), question_filter_form.fields[
-                       'groups'].choices) for group in all_groups]
 
     def test_form_instance_should_have_all_question_types(self):
 

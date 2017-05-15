@@ -14,6 +14,7 @@ from survey.views.custom_decorators \
 from survey.utils.query_helper import get_filterset
 from survey.forms.filters import UsersFilterForm
 from survey.services.export_model import get_model_as_dump
+from django.shortcuts import get_list_or_404, get_object_or_404
 
 
 def _add_error_messages(userform, request, action_str='registered'):
@@ -93,7 +94,7 @@ def index(request):
 
 @permission_required_for_perm_or_current_user('auth.can_view_users')
 def edit(request, user_id, mode=None):
-    user = User.objects.get(pk=user_id)
+    user = get_object_or_404(User, pk=user_id)
     initial = {'mobile_number': UserProfile.objects.get(
         user=user).mobile_number}
     userform = EditUserForm(user=request.user, instance=user, initial=initial)

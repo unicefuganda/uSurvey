@@ -20,12 +20,6 @@ from survey.forms.enumeration_area import LocationsFilterForm
 CREATE_INTERVIEWER_DEFAULT_SELECT = ''
 LIST_INTERVIEWER_DEFAULT_SELECT = 'All'
 
-
-def _add_error_response_message(interviewer, request, action_text):
-    error_message = "Interviewer not %s. " % action_text
-    messages.error(request, error_message + "See errors below.")
-
-
 def _create_or_edit(
         request,
         action_text,

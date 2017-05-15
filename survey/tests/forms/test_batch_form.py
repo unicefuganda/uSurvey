@@ -4,7 +4,6 @@ from survey.forms.batch import BatchForm
 from survey.models.locations import *
 from survey.models import EnumerationArea
 from survey.models import Interviewer
-from survey.models import LocationTypeDetails
 from survey.models.access_channels import *
 from survey.models.batch import Batch
 from survey.models.surveys import Survey
@@ -16,8 +15,7 @@ class BatchFormTest(TestCase):
         self.country = LocationType.objects.create(
             name='Country', slug='country')
         self.africa = Location.objects.create(name='Africa', type=self.country)
-        LocationTypeDetails.objects.create(
-            country=self.africa, location_type=self.country)
+        
         self.city_ea = EnumerationArea.objects.create(name="CITY EA")
         self.city_ea.locations.add(self.africa)
 
