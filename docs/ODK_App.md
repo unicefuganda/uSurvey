@@ -36,13 +36,13 @@ Enrolled Interviewers, has to do data collection and submission using Android Ap
 * Once App installation is done, now uSurvey App is available in application list and ready to launch, as shown below in Mobile Screen-1
 * Now launch uSurvey App on mobile
 
-![ODK](./ODK-1.png)
-Mobile Screen-1
+![ODK](./ODK-1.png)   
+   Mobile Screen-1
 
 App Home/landing screen has following options, as shown below in Mobile Screen-2
 
-![ODK](./ODK-2.png)
-Mobile Screen-2
+![ODK](./ODK-2.png)   
+   Mobile Screen-2
 
 **Configure uSurvey App**
 
@@ -51,8 +51,8 @@ For first time use and when app reset is done, one has to provide, App user cred
 * To configure, press the Menu button on the phone while the app is opened, then Select ‘General Settings’, takes you to a new screen to change setting <br>
   as shown below in Mobile Screen-3
 
-![ODK](./ODK-3.png)
-Mobile Screen-3
+![ODK](./ODK-3.png)   
+   Mobile Screen-3
 
 * Now under ‘Server Settings’ select ‘Configure platform settings’, as shown below in Mobile Screen-4 <br>
 
