@@ -87,7 +87,7 @@ Once App is opened, in the Home screen hit on ‘Get Blank Form’ to download b
 ![ODK](./ODK-7.png)   
    Mobile Screen-8
 
-Now you will be navigated to this below Mobile Screen-9, Select ‘Blank Form’ from list, usually blank forms, show with ‘Survey –Listing’ names and hit on ‘Get Selected’ As shown in below Mobile Screen-, then Hit ‘OK’
+Now you will be navigated to this below Mobile Screen-9, Select ‘Blank Form’ from list, usually blank forms, show with ‘Survey –Listing’ names and hit on ‘Get Selected’ As shown in below Mobile Screen-9, then Hit ‘OK’
 
 ![ODK](./ODK-8.png)   
    Mobile Screen-9
@@ -97,6 +97,7 @@ Now you will be navigated to this below Mobile Screen-9, Select ‘Blank Form’
 
 ![ODK](./ODK-10.png)   
    Mobile Screen-11
+
 
 ######Step -2: Fill Blank Form
 
@@ -127,16 +128,18 @@ Once filling the questionnaire is completed, you will be prompt with message “
 ![ODK](./ODK-15.png)   
    Mobile Screen-17
 
+
 ######Step -3: Edit Saved form
 
 This feature provides, option to view or edit completed questionnaire, including Enumeration Area before submission.
 
-In the Home Screen hit on ‘Edit Saved form’ to edit filled questionnaire. As shown in below Mobile Screen-
+In the Home Screen hit on ‘Edit Saved form’ to edit filled questionnaire. As shown in below Mobile Screen-18
 
 ![ODK](./ODK-2_2.png)   
    Mobile Screen-18
 
-You can select any form from list to view or edit, usually filled forms, show with ‘Survey –Listing’ names, tap on the listed items to proceed view or edit filled questionnaire, once changes are done, don’t forget to hit on ‘Save Survey and Exit’. At any instance of the from, one can exit the current form from undo by hitting on Mobile back key, which prompt with message to ‘Save Changes’, ‘Ignore Changes’ and ‘Cancel’ to the Form.
+You can select any form from list to view or edit, usually filled forms, show with ‘Survey –Listing’ names, tap on the listed items to proceed view or edit filled questionnaire, once changes are done, don’t forget to hit on ‘Save Survey and Exit’.   
+   At any instance of the from, one can exit the current form from undo by hitting on Mobile back key, which prompt with message to ‘Save Changes’, ‘Ignore Changes’ and ‘Cancel’ to the Form.
 
 ![ODK](./ODK-16.png)   
    Mobile Screen-19
@@ -153,16 +156,18 @@ You can select any form from list to view or edit, usually filled forms, show wi
 ![ODK](./ODK-31.png)   
    Mobile Screen-23
 
+
 ######Step -4: Send Finalized Form
 
 The process of transmitting the completed forms to server, when there is an internet connectivity.
 
-Now in the Home Screen hit on ‘Send Finalized Form’ to submit the completed questionnaire forms, As shown in below Mobile Screen-
+Now in the Home Screen hit on ‘Send Finalized Form’ to submit the completed questionnaire forms, As shown in below Mobile Screen-24
 
 ![ODK](./ODK-17.png)   
    Mobile Screen-24
 
-Now you will be navigated to this below shown, Mobile Screen-, Select forms individually or hit on ‘Toggle All’ to select all forms in the list, then hit on ‘Send Selected’. As shown in below Mobile Screen-, if again you will be prompted “Please enter User name and Password for server”, then conform your credentials once again by clicking on ‘OK’. You will get success message if from is submitted or respective error message is shown.
+Now you will be navigated to this below shown, Mobile Screen-25, Select forms individually or hit on ‘Toggle All’ to select all forms in the list, then hit on ‘Send Selected’. As shown in below Mobile Screen-26,   
+   if again you will be prompted “Please enter User name and Password for server”, then conform your credentials once again by clicking on ‘OK’. You will get success message if from is submitted or respective error message is shown.
 
 ![ODK](./ODK-18.png)   
    Mobile Screen-25
@@ -176,11 +181,12 @@ Now you will be navigated to this below shown, Mobile Screen-, Select forms indi
 ![ODK](./ODK-21.png)   
    Mobile Screen-28
 
+
 ######Step -5: Download Data Forms
 
 The feature to download completed Listing and Survey forms from server to make any changes.
 
-In the Home Screen hit on ‘Download Data Form’ to get list of recent/current submitted forms. Now screen opens with the complete list of submitted forms, select forms individually or hit on ‘Toggle All’ to select all forms in the list, then hit on ‘Get Selected’. As shown in below Mobile Screen-, 
+In the Home Screen hit on ‘Download Data Form’ to get list of recent/current submitted forms. Now screen opens with the complete list of submitted forms, select forms individually or hit on ‘Toggle All’ to select all forms in the list, then hit on ‘Get Selected’. As shown in below Mobile Screen-29, 
 
 ![ODK](./ODK-2_6.png)   
    Mobile Screen-29
@@ -191,7 +197,7 @@ In the Home Screen hit on ‘Download Data Form’ to get list of recent/current
 ![ODK](./ODK-23.png)   
    Mobile Screen-31
 
-Then download starts, which takes several minutes, depends up on your Internet speed. As shown below Mobile Screen-
+Then download starts, which takes several minutes, depends up on your Internet speed. As shown below Mobile Screen-32
 
 ![ODK](./ODK-24.png)   
    Mobile Screen-32
@@ -202,7 +208,7 @@ Note: Once Forms are downloaded then these forms are available from ‘Edit Save
 
 The feature to find completed Listing and Survey forms, to view or edit filled questionnaire.
 
-In the Home Screen hit on ‘Search Forms’ to start searching for forms, which opens a search screen, where an Interviewer can search a beneficiary using data in the filled questionnaire and Hit on Search Icon in Key Pad, as shown in below Mobile Screen-
+In the Home Screen hit on ‘Search Forms’ to start searching for forms, which opens a search screen, where an Interviewer can search a beneficiary using data in the filled questionnaire and Hit on Search Icon in Key Pad, as shown in below Mobile Screen-33
 
 ![ODK](./ODK-2_5.png)   
    Mobile Screen-33
@@ -219,7 +225,7 @@ If the search criteria match the input data, then screen will show up with list 
 
 This feature provides, option to view or edit download questionnaire forms and resubmit.
 
-In the Home Screen hit on ‘Edit Saved form’ to edit filled questionnaire. As shown in below Mobile Screen-
+In the Home Screen hit on ‘Edit Saved form’ to edit filled questionnaire. As shown in below Mobile Screen-36
 
 ![ODK](./ODK-2_2.png)   
    Mobile Screen-36
@@ -239,7 +245,7 @@ You can select any form from list to view or edit, usually these forms, show wit
  ![ODK](./ODK-30.png)   
    Mobile Screen-40
 
-There is an option to Exit Form by pressing the default ‘BACK’ button of the Mobile at any time while filling or using this App, which prompt with message to ‘Save Changes’, ‘Ignore Changes’ and ‘Cancel’ to the Form. As shown in below Mobile Screen-
+There is an option to Exit Form by pressing the default ‘BACK’ button of the Mobile at any time while filling or using this App, which prompt with message to ‘Save Changes’, ‘Ignore Changes’ and ‘Cancel’ to the Form. As shown in below Mobile Screen-41
 
  ![ODK](./ODK-31.png)   
    Mobile Screen-41
@@ -249,7 +255,7 @@ There is an option to Exit Form by pressing the default ‘BACK’ button of the
 This feature allows user to remove the Forms from local device, to clear the local data.
 
 In the Home Screen hit on ‘Delete Saved form’ to remove Forms.
-As shown in below Mobile Screen-
+As shown in below Mobile Screen-42
 
  ![ODK](./ODK-2_4.png)   
    Mobile Screen-42
@@ -268,7 +274,7 @@ To delete, select forms individually or hit on ‘Toggle All’ to select all fo
 
  ![ODK](./ODK-34.png)   
    Mobile Screen-45
-   
+
 
 ###Online Data Collection
 ------
