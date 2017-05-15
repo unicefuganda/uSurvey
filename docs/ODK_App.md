@@ -56,34 +56,32 @@ For first time use and when app reset is done, one has to provide, App user cred
 
 * Now under ‘Server Settings’ select ‘Configure platform settings’, as shown below in Mobile Screen-4 <br>
 
-![ODK](./ODK-4.png)
-
+![ODK](./ODK-4.png)   
+   Mobile Screen-4
 * In ‘Configure platform settings’ under ‘ODK Aggregate Settings’, make sure that, URL should be http://usurvey.unicefuganda.org/odk/collect/forms <br>
 
-![ODK](./ODK-5.png)
+![ODK](./ODK-5.png)   
+   Mobile Screen-5
+* Username: enter ‘ODK ID’ of the Interviewer
+* Password: enter ‘ODK Token’ of the Interviewer <br> (For above details, you need an interviewer defined on uSurvey portal and defined with an ODK ID)
 
-* Username: enter ‘ODK ID’ of the Interviewer <br>
-* Password: enter ‘ODK Token’ of the Interviewer <br> (For above details, you need an interviewer defined on uSurvey portal and defined with an ODK ID) <br>
-
-![ODK](./ODK-6.png)
-
-* then come back to App home screen using Mobile back key <br>
+![ODK](./ODK-6.png)   
+   Mobile Screen-6
+* then come back to App home screen using Mobile back key
 
 **Using uSurvey App**
 
 Follow these simple steps for survey Data collection:<br>
 Get Blank Form, Fill Blank Form, Edit Save Form, Send Finalized Form, Download Data Forms, Search Forms and Edit Download Form
 
-**Step-1**
-
-**Get Blank Form**
+######Step -1: Get Blank Form
 
 Once App is opened, in the Home screen hit on ‘Get Blank Form’ to download blank form, then you will be prompted “Please enter User name and Password for server”, then Interviewer has to conform his/her User name and Password, to proceed by clicking on ‘OK’. As shown in below Mobile Screen-2
 
-![ODK](./ODK-2_3.png)
-
-![ODK](./ODK-7.png)
-
+![ODK](./ODK-2_3.png)   
+   Mobile Screen-7
+![ODK](./ODK-7.png)   
+   Mobile Screen-8
 Now you will be navigated to this below Mobile Screen-, Select ‘Blank Form’ from list, usually blank forms, show with ‘Survey –Listing’ names and hit on ‘Get Selected’ As shown in below Mobile Screen-, then Hit ‘OK’
 
 ![ODK](./ODK-8.png)

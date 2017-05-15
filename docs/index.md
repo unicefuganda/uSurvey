@@ -113,7 +113,7 @@ Data collection and submission is done in two ways:
 + ######Data Collection
     - [Introduction](./ODK_App.md#introduction)
     - [Offline Data Collection](./ODK_App.md#offline-data-collection)
-    - [Online Data Collection](./ussd-integration.md#online-data-collection)
+    - [Online Data Collection](./ODK_App.md#online-data-collection)
 <pre></pre>
 + ######Installation Guide
     - [Prerequisites](./installation.md#prerequisites)
