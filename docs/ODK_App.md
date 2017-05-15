@@ -6,8 +6,8 @@ uSurvey portal is intended to design and define the Listings, Surveys and monito
 2. Online Data Collection  - Using Featured Phone
 
 Hence to collect real time data, both offline and online methods are implemented.   
-   In the locations, where there is a mobile phone network connectivity is available, data is transmitted to server instantly via USSD channel, using Featured Phone.
-Whereas, in isolated mobile phone network connectivity locations, data collection is done offline via uSurvey App, using Smart Phones. This collected data is stored temporally in the hand-held device and transmits to server later time, once reaches to a location with internet connectivity.
+   In the locations, where there is a mobile phone network connectivity is available, data is transmitted to server instantly via USSD channel, using Featured Phone.   
+   Whereas, in isolated mobile phone network connectivity locations, data collection is done offline via uSurvey App, using Smart Phones. This collected data is stored temporally in the hand-held device and transmits to server later time, once reaches to a location with internet connectivity.
  
 Ultimately uSurvey application make paperless work and carry out Survey in a digitalized process with increased ease and accuracy of data. Which results in the release of Survey reports timely.
 
@@ -15,9 +15,9 @@ Ultimately uSurvey application make paperless work and carry out Survey in a dig
 ------
 #####About uSurvey App
 
-**Data collection and submission using Smart Phone**
+**Data collection and submission using Android Smart Phone**
 
-uSurvey App is exclusively designed for survey data collection and submission using the hand-held mobile devices (Android Smart Phone/ Tablet). Hence uSurvey application is paperless and carry out survey in a digitalized process with increased ease and accuracy of data. 
+uSurvey App is exclusively designed for survey data collection and submission using the hand-held mobile devices (Android Smart Phone/ Tablet). Thus using rich text forms, also supports media files, captures GPS location, stores data locally and works offline.
 
 **Implementing uSurvey App**
 
@@ -27,20 +27,22 @@ Enrolled Interviewers, has to do data collection and submission using Android Ap
 
 **uSurvey App Installation**
 
- Interviewers has to download uSurvey App form Google play store, then 
+ Interviewers has to download uSurvey App form Google play store, as follows 
 
-* On Android device, go to Google play store <br>
-* Search for “uSurvey” and choose uSurvey App from search results <br>
-* Select ‘uSurvey App’ in the result and click the Install button <br>
-* Click OK after viewing the security settings <br>
-* Once App installation is done, now uSurvey App is available in application list and ready to launch, as shown below in Mobile Screen-1 <br>
-* Now launch uSurvey App on mobile <br>
+* On Android device, go to Google play store
+* Search for “uSurvey” and choose uSurvey App from search results
+* Select ‘uSurvey App’ in the result and click the Install button
+* Click OK after viewing the security settings
+* Once App installation is done, now uSurvey App is available in application list and ready to launch, as shown below in Mobile Screen-1
+* Now launch uSurvey App on mobile
 
 ![ODK](./ODK-1.png)
+Mobile Screen-1
 
 App Home/landing screen has following options, as shown below in Mobile Screen-2
 
 ![ODK](./ODK-2.png)
+Mobile Screen-2
 
 **Configure uSurvey App**
 
@@ -50,6 +52,7 @@ For first time use and when app reset is done, one has to provide, App user cred
   as shown below in Mobile Screen-3
 
 ![ODK](./ODK-3.png)
+Mobile Screen-3
 
 * Now under ‘Server Settings’ select ‘Configure platform settings’, as shown below in Mobile Screen-4 <br>
 
@@ -225,6 +228,7 @@ To delete, select forms individually or hit on ‘Toggle All’ to select all fo
  ![ODK](./ODK-33.png)
 
  ![ODK](./ODK-34.png)
+
 
 ###Online Data Collection
 ------
