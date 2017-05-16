@@ -7,7 +7,7 @@ uSurvey portal is intended to design and define the Listings, Surveys and monito
 
 Hence to collect real time data, both offline and online methods are implemented.   
    In the locations, where there is a mobile phone network connectivity is available, data is transmitted to server instantly via USSD channel, using Featured Phone.   
-   Whereas, in isolated mobile phone network connectivity locations, data collection is done offline via uSurvey App, using Smart Phones. This collected data is stored temporally in the hand-held device and transmits to server later time, once reaches to a location with internet connectivity.
+   Whereas, in isolated mobile phone network connectivity locations, data collection is done offline via uSurvey App, using Smart Phones. Thus, data collected stores temporally in the hand-held device and transmits to the server later time, once reaches to a location with Internet connectivity.
  
 Ultimately uSurvey application make paperless work and carry out Survey in a digitalized process with increased ease and accuracy of data. Which results in the release of Survey reports timely.
 

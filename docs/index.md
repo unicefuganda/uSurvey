@@ -95,8 +95,8 @@ Note: At any point on the uSurvey portal, use breadcrumbs on top of each page fo
 
 Data collection and submission is done in two ways:   
    
-   1. Offline Data Collection - [Using Smart Phone](./ODK_App.md)
-2. Online Data Collection  - [Using Featured Phone](./ussd-integration.md)   
+   1. Offline Data Collection - [Using Smart Phone](./ODK_App.md#offline-data-collection)
+2. Online Data Collection  - [Using Featured Phone](./ODK_App.md#online-data-collection)   
    
 ###Complete List of User Guides
 ------
