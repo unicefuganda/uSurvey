@@ -55,20 +55,22 @@ class InterviewerForm(ModelForm):
         self.fields['ea'].label = 'Enumeration Area'
         if self.instance:
             try:
-                self.fields['survey'].initial = SurveyAllocation.objects.filter(
-                    interviewer=self.instance,
-                    status__in=[
-                        SurveyAllocation.PENDING,
-                        SurveyAllocation.COMPLETED]).order_by('status')[0].survey.pk
-                self.fields['ea'].initial = EnumerationArea.objects.filter(id__in=[
-                    assignment.allocation_ea.id for assignment in self.instance.unfinished_assignments
-                ])
+                assignments = SurveyAllocation.objects.filter(interviewer=self.instance,
+                                                              status__in=[SurveyAllocation.PENDING,
+                                                                          SurveyAllocation.COMPLETED])
+                if assignments.exists():
+                    self.fields['survey'].initial = assignments.order_by('status')[0].survey.pk
+                self.fields['ea'].initial = EnumerationArea.objects.filter(id__in=
+                                                                           [assignment.allocation_ea.id for assignment
+                                                                            in self.instance.unfinished_assignments]
+                                                                           or [self.instance.ea, ])
             except IndexError:
                 pass
-        self.fields['ea'].queryset = eas
+        self.fields['ea'].queryset = eas or self.fields['ea'].initial
         if self.data.get('ea'):
             self.fields['ea'].queryset = EnumerationArea.objects.filter(id__in=data.getlist('ea'))
         self.fields['survey'].empty_label = 'Select Survey'
+
 
     class Meta:
         model = Interviewer

@@ -7,7 +7,7 @@ from django.conf import settings
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.core.urlresolvers import reverse
-from survey.models import (InterviewerAccess, QuestionLoop, QuestionSet, Answer, Question,
+from survey.models import (InterviewerAccess, QuestionLoop, QuestionSet, Answer, Question, QuestionOption,
                            SurveyAllocation, AnswerAccessDefinition, ODKAccess, Interviewer, Interview)
 from survey.forms.answer import (get_answer_form, UserAccessForm, UssdTimeoutForm,
                                  SurveyAllocationForm, SelectBatchForm, AddMoreLoopForm)
@@ -259,13 +259,17 @@ class OnlineHandler(object):
         :return:
         """
         access = self.access
+        if isinstance(answer, QuestionOption):
+            reply = answer.order
+        else:
+            reply = answer
 
         def _get_group_next_question(question, proposed_next):
             next_question = proposed_next
             present_question_group = question.group if hasattr(question, 'group') else None
             if next_question and AnswerAccessDefinition.is_valid(access.choice_name(),
                                                                  next_question.answer_type) is False:
-                next_question = _get_group_next_question(question, next_question.next_question(answer))
+                next_question = _get_group_next_question(question, next_question.next_question(reply))
             # I hope the next line is not so confusing!
             # Basically it means treat only if the next question belongs to a different group from the present.
             # That's if present has a group
@@ -293,7 +297,7 @@ class OnlineHandler(object):
                             valid_group = False
                             break   # fail if any condition fails
                     if valid_group is False:
-                        next_question = _get_group_next_question(question, next_question.next_question(answer))
+                        next_question = _get_group_next_question(question, next_question.next_question(reply))
             return next_question
         return _get_group_next_question(interview.last_question,
-                                        interview.last_question.next_question(answer))
+                                        interview.last_question.next_question(reply))
