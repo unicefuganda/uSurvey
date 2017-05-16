@@ -13,11 +13,11 @@ class QuestionsViews(BaseTest):
 
     def setUp(self):
         self.client = Client()
-        user_without_permission = User.objects.create_user(username='useless', email='rajni@kant.com',
+        user_without_permission = User.objects.create_user(username='useless', email='demo10@kant.com',
                                                            password='I_Suck')
-        raj = self.assign_permission_to(User.objects.create_user('Rajni', 'rajni@kant.com', 'I_Rock'),
+        raj = self.assign_permission_to(User.objects.create_user('demo10', 'demo10@kant.com', 'demo10'),
                                         'can_view_batches')
-        self.client.login(username='Rajni', password='I_Rock')
+        self.client.login(username='demo10', password='demo10')
         
         self.module = QuestionModule.objects.create(name="Education")
         self.survey = Survey.objects.create(name="haha")

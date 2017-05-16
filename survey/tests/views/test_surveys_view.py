@@ -13,15 +13,15 @@ class SurveyViewTest(BaseTest):
 
     def setUp(self):
         self.client = Client()
-        user_without_permission = User.objects.create_user(username='useless', email='rajni@kant.com',
+        user_without_permission = User.objects.create_user(username='useless', email='demo12@kant.com',
                                                            password='I_Suck')
-        raj = self.assign_permission_to(User.objects.create_user('Rajni', 'rajni@kant.com', 'I_Rock'),
+        raj = self.assign_permission_to(User.objects.create_user('demo12', 'demo12@kant.com', 'demo12'),
                                         'can_view_batches')
 
-        self.client.login(username='Rajni', password='I_Rock')
+        self.client.login(username='demo12', password='demo12')
         self.form_data = {
-            'name': 'survey rajni',
-            'description': 'survey description rajni',
+            'name': 'survey demo12',
+            'description': 'survey description demo12',
             'has_sampling': True,
             'sample_size': 10,
         }
@@ -81,7 +81,7 @@ class SurveyViewTest(BaseTest):
         self.assertRedirects(response, expected_url='/surveys/', status_code=302, target_status_code=200,
                              msg_prefix='')
         retrieved_surveys = Survey.objects.filter(
-            name='survey rajni', has_sampling=False)
+            name='survey demo12', has_sampling=False)
 
         self.assertEquals(1, len(retrieved_surveys))
         self.assertIn('Survey successfully added.',

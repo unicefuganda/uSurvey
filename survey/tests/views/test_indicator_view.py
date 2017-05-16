@@ -26,11 +26,11 @@ class IndicatorViewTest(BaseTest):
                           'survey': self.survey.id}
 
         User.objects.create_user(
-            username='useless', email='rajni@kant.com', password='I_Suck')
-        raj = self.assign_permission_to(User.objects.create_user('Rajni', 'rajni@kant.com', 'I_Rock'),
+            username='useless', email='demo4@kant.com', password='I_Suck')
+        raj = self.assign_permission_to(User.objects.create_user('demo4', 'demo4@kant.com', 'demo4'),
                                         'can_view_batches')
         self.assign_permission_to(raj, 'can_view_investigators')
-        self.client.login(username='Rajni', password='I_Rock')
+        self.client.login(username='demo4', password='demo4')
 
     def test_get_new_indicator(self):
         response = self.client.get(reverse('new_indicator_page'))
@@ -192,10 +192,10 @@ class IndicatorViewTest(BaseTest):
         module = QuestionModule.objects.create(name="module")
         module_1 = QuestionModule.objects.create(name="module")
 
-        indicator_1 = Indicator.objects.create(name="indicator name 1", description="rajni indicator 1",
+        indicator_1 = Indicator.objects.create(name="indicator name 1", description="demo4 indicator 1",
                                                measure='Percentage',
                                                module=module, batch=batch_s)
-        indicator_2 = Indicator.objects.create(name="indicator name 1", description="rajni indicator 1",
+        indicator_2 = Indicator.objects.create(name="indicator name 1", description="demo4 indicator 1",
                                                measure='Percentage',
                                                module=module_1, batch=batch_s)
 
@@ -212,10 +212,10 @@ class IndicatorViewTest(BaseTest):
         module = QuestionModule.objects.create(name="module")
         module_1 = QuestionModule.objects.create(name="module")
 
-        indicator_1 = Indicator.objects.create(name="indicator name 1", description="rajni indicator 1",
+        indicator_1 = Indicator.objects.create(name="indicator name 1", description="demo4 indicator 1",
                                                measure='Percentage',
                                                module=module, batch=batch_s)
-        indicator_2 = Indicator.objects.create(name="indicator name 1", description="rajni indicator 1",
+        indicator_2 = Indicator.objects.create(name="indicator name 1", description="demo4 indicator 1",
                                                measure='Percentage',
                                                module=module_1, batch=batch_s)
 
@@ -232,10 +232,10 @@ class IndicatorViewTest(BaseTest):
         module = QuestionModule.objects.create(name="module")
         module_1 = QuestionModule.objects.create(name="module")
 
-        indicator_1 = Indicator.objects.create(name="indicator name 1", description="rajni indicator 1",
+        indicator_1 = Indicator.objects.create(name="indicator name 1", description="demo4 indicator 1",
                                                measure='Percentage',
                                                module=module, batch=batch_s)
-        indicator_2 = Indicator.objects.create(name="indicator name 1", description="rajni indicator 1",
+        indicator_2 = Indicator.objects.create(name="indicator name 1", description="demo4 indicator 1",
                                                measure='Percentage',
                                                module=module_1, batch=batch_s)
 
@@ -252,10 +252,10 @@ class IndicatorViewTest(BaseTest):
         module = QuestionModule.objects.create(name="module")
         module_1 = QuestionModule.objects.create(name="module")
 
-        indicator_1 = Indicator.objects.create(name="indicator name 1", description="rajni indicator 1",
+        indicator_1 = Indicator.objects.create(name="indicator name 1", description="demo4 indicator 1",
                                                measure='Percentage',
                                                module=module, batch=batch_s)
-        indicator_2 = Indicator.objects.create(name="indicator name 1", description="rajni indicator 1",
+        indicator_2 = Indicator.objects.create(name="indicator name 1", description="demo4 indicator 1",
                                                measure='Percentage',
                                                module=module_1, batch=batch_s)
 
@@ -272,7 +272,7 @@ class IndicatorViewTest(BaseTest):
         survey = Survey.objects.create(name='survey')
         batch_s = Batch.objects.create(name='batch survey', survey=survey)
         module = QuestionModule.objects.create(name="module")
-        indicator_1 = Indicator.objects.create(name="indicator name 1", description="rajni indicator 1",
+        indicator_1 = Indicator.objects.create(name="indicator name 1", description="demo4 indicator 1",
                                                measure='Percentage',
                                                module=module, batch=batch_s)
 

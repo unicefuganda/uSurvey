@@ -71,9 +71,6 @@
                             <li>
                             <a href="{% url 'users_edit' user.pk 'edit' %}" class="tooltip-info" data-rel="tooltip" title="" data-original-title="Edit"><span class="blue"><i class="usur-icon fa fa-edit bigger-120"></i> Edit</span></a>
                             </li>
-                            <!-- <li>
-                            <a href="{% url 'users_show_details' user.pk %}" class="tooltip-info" data-rel="tooltip" title="" data-original-title="Details"><span class="green"><i class="usur-icon fa fa-info-circle bigger-120"></i> Details</span></a>
-                            </li> -->
                             <li>
                             {% if user.is_active %}
                                 <a href="#deactivate_user_{{ user.pk }}" data-toggle="modal" class="tooltip-info" data-rel="tooltip" title="" data-original-title="DeActivate"><span class="red"><i class="usur-icon fa fa-low-vision bigger-120"></i> DeActivate</span></a>

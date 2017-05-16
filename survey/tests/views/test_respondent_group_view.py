@@ -16,15 +16,15 @@ class RespondentViewTest(BaseTest):
     def setUp(self):
         self.client = Client()
         self.user_without_permission = User.objects.create_user(
-            username='useless', email='rajni@kant.com', password='I_Suck')
+            username='useless', email='demo11@kant.com', password='I_Suck')
         self.raj = self.assign_permission_to(User.objects.create_user(
-            'Rajni', 'rajni@kant.com', 'I_Rock'), 'can_view_users')
-        self.client.login(username='Rajni', password='I_Rock')
+            'demo11', 'demo11@kant.com', 'demo11'), 'can_view_users')
+        self.client.login(username='demo11', password='demo11')
         self.form_data = {"name":'G-1',"description":"blah blah"}
 
     def test_new(self):
         response = self.client.get(reverse('new_respondent_groups_page'))
-        self.failUnlessEqual(response.status_code, 200)
+        self.assertEquals(response.status_code, 200)
         templates = [template.name for template in response.templates]
         self.assertIn('respondent_groups/new.html', templates)
         self.assertEquals(response.context['action'], reverse('new_respondent_groups_page'))
@@ -37,14 +37,14 @@ class RespondentViewTest(BaseTest):
         g = RespondentGroup.objects.create(name='g111',description='des')
         groups = RespondentGroup.objects.all()
         response = self.client.get(reverse('respondent_groups_page'))
-        self.failUnlessEqual(response.status_code, 200)
+        self.assertEquals(response.status_code, 200)
         self.assertIn(groups, response.context['groups'])
         
 
     def test_list_groups(self):
         g = RespondentGroup.objects.create(name='g1',description='des')
         response = self.client.get(reverse('respondent_groups_page'))
-        self.failUnlessEqual(response.status_code, 200)
+        self.assertEquals(response.status_code, 200)
         templates = [template.name for template in response.templates]
         self.assertIn('respondent_groups/index.html', templates)
         self.assertIn(g, response.context['groups'])
@@ -56,7 +56,7 @@ class RespondentViewTest(BaseTest):
             'respondent_groups_edit',
             kwargs={"group_id": g.pk})
         response = self.client.get(url)
-        self.failUnlessEqual(response.status_code, 200)
+        self.assertEquals(response.status_code, 200)
         templates = [template.name for template in response.templates]
         self.assertIn('respondent_groups/new.html', templates)
         self.assertEquals(response.context['action'], url)
@@ -80,7 +80,7 @@ class RespondentViewTest(BaseTest):
         g = RespondentGroup.objects.filter(name=form_data['name'])
         self.failIf(g)
         response = self.client.post(reverse('new_respondent_groups_page'), data=form_data)
-        self.failUnlessEqual(response.status_code, 302)
+        self.assertEquals(response.status_code, 302)
 
         g = RespondentGroup.objects.get(name=form_data['name'])
         self.failUnless(g.id)

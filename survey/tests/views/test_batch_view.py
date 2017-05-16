@@ -16,13 +16,13 @@ class BatchViewsTest(BaseTest):
 
     def setUp(self):
         self.client = Client()
-        User.objects.create_user(username='useless', email='rajni@kant.com',
-                                                           password='I_Suck')
-        raj = self.assign_permission_to(User.objects.create_user('Rajni', 'rajni@kant.com', 'I_Rock'),
+        User.objects.create_user(username='demo1', email='rajni@kant.com',
+                                                           password='demo1')
+        raj = self.assign_permission_to(User.objects.create_user('demo1', 'rajni@kant.com', 'demo1'),
                                         'can_view_batches')
         self.assign_permission_to(raj, 'can_view_investigators')
 
-        self.client.login(username='Rajni', password='I_Rock')
+        self.client.login(username='demo1', password='demo1')
         self.survey = Survey.objects.create(
             name='survey name', description='survey descrpition')
         self.batch = Batch.objects.create(
@@ -59,7 +59,7 @@ class BatchViewsTest(BaseTest):
         response = self.client.get('/surveys/%d/batches/' % self.survey.id)
         self.failUnlessEqual(response.status_code, 200)
         templates = [template.name for template in response.templates]
-        self.assertIn('batches/index.html', templates)
+        self.assertIn('questions_set/index.html', templates)
         self.assertIn(self.batch, response.context['batches'])
         self.assertEquals(self.survey, response.context['survey'])
         self.assertEquals('/surveys/%d/batches/new/' %
@@ -76,7 +76,7 @@ class BatchViewsTest(BaseTest):
         response = self.client.get('/surveys/%d/batches/' % self.survey.id)
         self.failUnlessEqual(response.status_code, 200)
         templates = [template.name for template in response.templates]
-        self.assertIn('batches/index.html', templates)
+        self.assertIn('question_set/index.html', templates)
         self.assertIn(self.batch, response.context['batches'])
         self.assertFalse(another_batch in response.context['batches'])
         self.assertEquals(self.survey, response.context['survey'])
@@ -156,7 +156,7 @@ class BatchViewsTest(BaseTest):
         response = self.client.get('/surveys/%d/batches/new/' % self.survey.id)
         self.assertEqual(response.status_code, 200)
         templates = [template.name for template in response.templates]
-        self.assertIn('batches/new.html', templates)
+        self.assertIn('question_set/new.html', templates)
 
     def test_batch_form_is_in_response_request_context(self):
         response = self.client.get('/surveys/%d/batches/new/' % self.survey.id)

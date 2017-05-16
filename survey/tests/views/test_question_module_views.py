@@ -11,11 +11,11 @@ class QuestionModuleViewTest(BaseTest):
     def setUp(self):
         self.client = Client()
         User.objects.create_user(
-            username='useless', email='rajni@kant.com', password='I_Suck')
-        raj = self.assign_permission_to(User.objects.create_user('Rajni', 'rajni@kant.com', 'I_Rock'),
+            username='useless', email='demo8@kant.com', password='I_Suck')
+        raj = self.assign_permission_to(User.objects.create_user('demo8', 'demo8@kant.com', 'demo8'),
                                         'can_view_batches')
         self.assign_permission_to(raj, 'can_view_investigators')
-        self.client.login(username='Rajni', password='I_Rock')
+        self.client.login(username='demo8', password='demo8')
 
     def test_get_new_question_module(self):
         response = self.client.get('/modules/new/')

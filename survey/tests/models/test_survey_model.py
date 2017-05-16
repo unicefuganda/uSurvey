@@ -10,8 +10,8 @@ class SurveyTest(TestCase):
     def test_fields(self):
         survey = Survey()
         fields = [str(item.attname) for item in survey._meta.fields]
-        self.assertEqual(8, len(fields))
-        for field in ['id', 'created', 'modified', 'name', 'description', 'sample_size', 'has_sampling', 'preferred_listing_id']:
+        self.assertEqual(10, len(fields))
+        for field in ['id','created','modified','name','description','has_sampling','sample_size','listing_form_id','preferred_listing_id','random_sample_label']:
             self.assertIn(field, fields)
 
     def test_store(self):

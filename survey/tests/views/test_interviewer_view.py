@@ -22,10 +22,10 @@ class InterviewerViewTest(BaseTest):
     def setUp(self):
         self.client = Client()
         self.user_without_permission = User.objects.create_user(
-            username='useless', email='rajni@kant.com', password='I_Suck')
+            username='useless', email='demo5@kant.com', password='I_Suck')
         self.raj = self.assign_permission_to(User.objects.create_user(
-            'Rajni', 'rajni@kant.com', 'I_Rock'), 'can_view_users')
-        self.client.login(username='Rajni', password='I_Rock')
+            'demo5', 'demo5@kant.com', 'demo5'), 'can_view_users')
+        self.client.login(username='demo5', password='demo5')
 
         self.ea = EnumerationArea.objects.create(name="EA2")
         self.country = LocationType.objects.create(name="country", slug="country")

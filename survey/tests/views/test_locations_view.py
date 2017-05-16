@@ -14,8 +14,8 @@ class LocationTest(BaseTest):
         self.client = Client()
         self.client = Client()
         user_without_permission = User.objects.create_user(
-            username='useless', email='rajni@kant.com', password='I_Suck')
-        self.client.login(username='useless', password='I_Suck')
+            username='demo7', email='rajni@kant.com', password='demo7')
+        self.client.login(username='demo7', password='demo7')
         self.country = LocationType.objects.create(
             name='Country', slug='country')
         self.district = LocationType.objects.create(
