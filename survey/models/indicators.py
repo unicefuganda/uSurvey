@@ -101,8 +101,6 @@ class Indicator(BaseModel):
                     include_self=True)
                 report[child_location.name] = [self.get_variable_value(
                     target_locations, name) for name in variable_names]
-            # for name in variable_names:
-            #     report[name] = self.get_variable_aggregates(base_location, name)
             df = pd.DataFrame(report).transpose()
             if df.columns.shape[0] == len(variable_names):
                 df.columns = variable_names
@@ -116,54 +114,9 @@ class Indicator(BaseModel):
             return df
         return _get_data()
 
-    def get_variable_aggregates(self, base_location, variable_name):
-        variable = self.variables.get(name__iexact=variable_name)
-        ikwargs = {
-            'question_set__pk': self.question_set.id,
-            'survey': self.survey}
-        parent_loc = 'ea__locations'
-        for i in base_location.type.get_descendants(
-                include_self=False):    # just to know how many levels down
-            parent_loc = '%s__parent' % parent_loc
-        ikwargs['%s__id' % parent_loc] = base_location.id
-        valid_interviews = Interview.objects.filter(
-            **ikwargs).values_list('id', flat=True)
-        for criterion in variable.criteria.all():
-            if criterion.test_question.answer_type == MultiChoiceAnswer.choice_name():
-                value_key = 'as_value'
-            else:
-                value_key = 'as_text'
-            kwargs = {
-                'question__id': criterion.test_question.id,
-                'interview__id__in': valid_interviews
-            }
-            valid_interviews = criterion.qs_passes_test(value_key, Answer.objects.filter(
-                **kwargs). only('interview__id').values_list('interview__id', flat=True))
-        parent_loc = 'interview__%s__name' % parent_loc
-        aggregate = valid_interviews.values(
-            parent_loc).annotate(total=Count(parent_loc))
-        return SortedDict([(d[parent_loc], d['total']) for d in aggregate])
-
     def get_variable_value(self, locations, variable_name):
         variable = self.variables.get(name__iexact=variable_name)
-        valid_interviews = Interview.objects.filter(
-            ea__locations__in=locations,
-            question_set__pk=self.question_set.id,
-            survey=self.survey,
-        ).values_list(
-            'id',
-            flat=True)
-        for criterion in variable.criteria.all():
-            if criterion.test_question.answer_type == MultiChoiceAnswer.choice_name():
-                value_key = 'as_value'
-            else:
-                value_key = 'as_text'
-            kwargs = {
-                'question__identifier__iexact': criterion.test_question.identifier,
-                'interview__id__in': valid_interviews}
-            valid_interviews = criterion.qs_passes_test(value_key, Answer.objects.filter(
-                **kwargs). only('interview__id').values_list('interview__id', flat=True))
-        return valid_interviews.count()
+        return variable.get_valid_qs(locations).count()
 
 
 class IndicatorVariable(BaseModel):
@@ -186,8 +139,30 @@ class IndicatorVariable(BaseModel):
         app_label = 'survey'
         unique_together = ['name', 'indicator']
 
+    def get_valid_qs(self, locations):
+        """Return the queryset valid according to this indicator variable
+        :param locations:
+        :return:
+        """
+        indicator = self.indicator
+        ikwargs = {'ea__locations__in': locations,
+                   'question_set__pk': indicator.question_set.pk,
+                   'survey__pk': indicator.survey.pk}
+        interviews = Interview.objects.filter(**ikwargs)
+        for criterion in self.criteria.all():
+            kwargs = dict()
+            kwargs['answer__question__identifier__iexact'] = criterion.test_question.identifier
+            # be careful here regarding multiple validation tests with same name (e.g a__gt=2, a__gt=10)
+            kwargs.update(Answer.get_validation_queries(criterion.validation_test, 'as_value',
+                                                        namespace='answer__', *criterion.prepped_args))
+            interviews = interviews.filter(**kwargs)
+        return interviews.distinct('id')
+
 
 class IndicatorVariableCriteria(BaseModel):
+    """A variable is essential a filtered set of answers. Hence they need the filter criteria to be defined.
+    This is the purpose of this class
+    """
     VALIDATION_TESTS = [(validator.__name__, validator.__name__)
                         for validator in Answer.validators()]
     variable = models.ForeignKey(IndicatorVariable, related_name='criteria')
@@ -222,9 +197,13 @@ class IndicatorVariableCriteria(BaseModel):
         return IndicatorCriteriaTestArgument.objects.filter(
             criteria=self).order_by('position')
 
-    def qs_passes_test(self, value_key, queryset):
+    @property
+    def prepped_args(self):
         answer_class = Answer.get_class(self.test_question.answer_type)
-        test_args = [answer_class.prep_value(val) for val in self.test_params]
+        return [answer_class.prep_value(val) for val in self.test_params]
+
+    def qs_passes_test(self, value_key, queryset):
+        test_args = self.prepped_args
         method = getattr(Answer, 'fetch_%s' % self.validation_test, None)
         return method(value_key, *test_args, qs=queryset)
 

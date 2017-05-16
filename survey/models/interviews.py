@@ -406,6 +406,40 @@ class Answer(BaseModel):
         return upperlmt > answer >= lowerlmt
 
     @classmethod
+    def get_validation_query_params(cls):
+        return {cls.greater_than.__name__: 'gt', cls.less_than.__name__: 'lt',
+                cls.starts_with.__name__: 'istartswith', cls.ends_with.__name__: 'iendswith',
+                cls.contains.__name__: 'icontains', cls.equals.__name__: 'iexact'}
+
+    @classmethod
+    def get_validation_queries(cls, method_name, answer_key, *test_args, **kwargs):
+        namespace = kwargs.pop('namespace', '')
+        validation_queries = cls.get_validation_query_params()
+        if method_name == cls.between.__name__:         # only between takes two arguments
+            query_args = []
+            return {'%s%s__%s' % (namespace, answer_key, validation_queries[cls.less_than.__name__]): test_args[1],
+                    '%s%s__%s' % (namespace, answer_key,
+                                  validation_queries[cls.greater_than.__name__]): test_args[0]
+                    }
+        else:
+            return {'%s%s__%s' % (namespace, answer_key, validation_queries[method_name]): test_args[0],}
+
+    @classmethod
+    def __getattr__(cls, name):
+        """Shall be used to implement all fetch_validation function methods.
+        This is required instead of implementing individual code for each. This function results in db call
+        :param name:
+        :return:
+        """
+        if name.startswith('fetch_'):
+            method_name = name[6:]
+
+            def wrapper(answer_key, qs=cls.objects, *test_args):
+                return qs.filter(**cls.get_validation_queries(method_name, answer_key, *test_args))
+            return wrapper
+        raise AttributeError
+
+    @classmethod
     def fetch_between(cls, answer_key, lowerlmt, upperlmt, qs=None):
         if qs is None:
             qs = cls.objects

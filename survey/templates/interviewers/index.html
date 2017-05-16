@@ -136,7 +136,7 @@
     	   var {{ location_type }}_selected = $('#id_{{ location_type }}').val();
     	{% endfor %}
     	url = "{% url 'enumeration_area_filter' %}";
-        params = {
+        var params = {
         		{% for location_type in location_filter_types %}
         			{{ location_type }} : {{ location_type }}_selected,
  	    		{% endfor %}
