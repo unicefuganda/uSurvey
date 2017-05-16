@@ -20,7 +20,7 @@ class RespondentViewTest(BaseTest):
         self.raj = self.assign_permission_to(User.objects.create_user(
             'Rajni', 'rajni@kant.com', 'I_Rock'), 'can_view_users')
         self.client.login(username='Rajni', password='I_Rock')
-        self.form_data = {"name":'G-1',"descripton":"blah blah"}
+        self.form_data = {"name":'G-1',"description":"blah blah"}
 
     def test_new(self):
         response = self.client.get(reverse('new_respondent_groups_page'))
