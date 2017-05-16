@@ -10,15 +10,15 @@ class HomepageViewTest(BaseTest):
 
     def setUp(self):
         self.client = Client()
-        User.objects.create_user(username='useless', email='rajni@kant.com',
+        User.objects.create_user(username='useless', email='demo3@kant.com',
                                                            password='I_Suck')
         raj = self.assign_permission_to(
             User.objects.create_user(
-                'Rajni',
-                'rajni@kant.com',
-                'I_Rock'),
+                'demo3',
+                'demo3@kant.com',
+                'demo3'),
             'can_view_users')
-        self.client.login(username='Rajni', password='I_Rock')
+        self.client.login(username='demo3', password='demo3')
 
     def test_home_page(self):
         response = self.client.get('/')

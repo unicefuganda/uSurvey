@@ -21,9 +21,9 @@
     {% csrf_token %}
     <div class="control-group">
       <label class="control-label left" for="text">Compose</label>
-      <label class="control-label right" id="sms-chars-left">0/480</label>
+      <label class="control-label col-md-offset-4" id="sms-chars-left">0/480</label>
       <div class="controls">
-            <textarea rows="3" name="text" maxlength="480"></textarea>
+            <textarea rows="4" cols=62 name="text" maxlength="480"></textarea>
       </div>
     </div>
     <div class="control-group">
@@ -50,6 +50,6 @@
 {% endblock %}
 <script type="text/javascript">
    $(document).ready(function(){
-     $('.controls textarea ').after($('<span id="text-counter"></span>'));
+     $('.controls textarea').after($('<span id="text-counter"></span>'));
      });
 </script>

@@ -12,3 +12,16 @@ class QuestionTest(TestCase):
         self.question_mod = QuestionModule.objects.create(
             name="Test question name", description="test desc")
         self.batch = Batch.objects.create(order=1)
+
+    def test_fields(self):
+        ss_content = Question()
+        fields = [str(item.attname) for item in ss_content._meta.fields]
+        self.assertEqual(6, len(fields))
+        for field in ['id','created','modified','identifier','text','answer_type','qset_id','mandatory']:
+            self.assertIn(field, fields)
+
+        s_content = QuestionOption()
+        fields = [str(item.attname) for item in ss_content._meta.fields]
+        self.assertEqual(6, len(fields))
+        for field in ['id', 'created', 'modified', 'question_id', 'text', 'order']:
+            self.assertIn(field, fields)

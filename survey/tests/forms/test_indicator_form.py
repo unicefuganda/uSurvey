@@ -6,16 +6,15 @@ from survey.models import QuestionModule, Batch, Survey
 class IndicatorFormTest(TestCase):
 
     def setUp(self):
-        module = QuestionModule.objects.create(name="Health")
         self.survey = Survey.objects.create(name="Health survey")
-        batch = Batch.objects.create(name="Health", survey=self.survey)
+        self.batch = Batch.objects.create(name="Health", survey=self.survey)
 
-        self.form_data = {'module': module.id,
+        self.form_data = {
                           'name': 'Health',
                           'description': 'some description',
-                          'measure': '%',
-                          'batch': batch.id,
-                          'survey': self.survey.id, }
+                          'question_set': self.batch.id,
+                          'survey': self.survey.id,
+                          'formulae':"{{gender}} /{{age}} *100" }
 
     def test_valid(self):
         indicator_form = IndicatorForm(self.form_data)
@@ -23,11 +22,11 @@ class IndicatorFormTest(TestCase):
 
     def test_invalid(self):
         form_data = self.form_data.copy()
-        form_data['module'] = ''
+        form_data['name'] = ''
         indicator_form = IndicatorForm(form_data)
         self.assertFalse(indicator_form.is_valid())
         self.assertEqual(['This field is required.'],
-                         indicator_form.errors['module'])
+                         indicator_form.errors['name'])
 
     def test_batch_should_belong_to_survey(self):
         form_data = self.form_data.copy()

@@ -245,14 +245,7 @@ urlpatterns = patterns(
         r'^users/(?P<user_id>\d+)/(?P<mode>\w+)/$',
         'survey.views.users.edit',
         name='users_edit'),
-    url(
-        r'^users/(?P<user_id>\d+)/$',
-        'survey.views.users.edit',
-        name='users_edit_profile'),
-    url(
-        r'^users/(?P<user_id>\d+)/$',
-        'survey.views.users.show',
-        name='users_show_details'),
+    
     url(
         r'^users/download/$',
         'survey.views.users.download_users',

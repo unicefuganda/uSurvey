@@ -16,10 +16,10 @@ class UsersViewTest(BaseTest):
     def setUp(self):
         self.client = Client()
         self.user_without_permission = User.objects.create_user(
-            username='useless', email='rajni@kant.com', password='I_Suck')
+            username='useless', email='demo13@kant.com', password='I_Suck')
         self.raj = self.assign_permission_to(User.objects.create_user(
-            'Rajni', 'rajni@kant.com', 'I_Rock'), 'can_view_users')
-        self.client.login(username='Rajni', password='I_Rock')
+            'demo13', 'demo13@kant.com', 'demo13'), 'can_view_users')
+        self.client.login(username='demo13', password='demo13')
 
     def test_new(self):
         response = self.client.get(reverse('new_user_page'))
@@ -144,7 +144,7 @@ class UsersViewTest(BaseTest):
 
     def test_check_username(self):
         user = User.objects.create(username='some_other_name')
-        url = '%s?username=rajni' % reverse('users_index')
+        url = '%s?username=demo13' % reverse('users_index')
         response = self.client.get(url)
         self.failUnlessEqual(response.status_code, 200)
         json_response = json.loads(response.content)
@@ -158,7 +158,7 @@ class UsersViewTest(BaseTest):
 
     def test_check_email(self):
         user = User.objects.create(email='haha@ha.ha')
-        self.client.login(username='Rajni', password='I_suck')
+        self.client.login(username='demo13', password='I_suck')
         url = '%s?email=bla@bla.bl' % reverse('users_index')
         response = self.client.get(url)
         self.failUnlessEqual(response.status_code, 200)
@@ -316,7 +316,7 @@ class UsersViewTest(BaseTest):
 
     def test_a_non_admin_user_cannot_POST_edit_other_users_profile(self):
         user_without_permission = User.objects.create_user(
-            username='notpermitted', email='rajni@kant.com', password='I_Suck')
+            username='notpermitted', email='demo13@kant.com', password='I_Suck')
         self.client.logout()
         self.client.login(
             username=user_without_permission.username, password='I_Suck')
@@ -328,66 +328,56 @@ class UsersViewTest(BaseTest):
             'email': 'mm@mm.mm',
         }
 
-        original_rajni_attributes = User.objects.filter(
+        original_demo13_attributes = User.objects.filter(
             username=self.raj).values()[0]
 
-        edit_rajni_url = reverse(
+        edit_demo13_url = reverse(
             'users_edit',
             kwargs={"user_id":  str(self.raj.pk), "mode":  "edit"})
-        response = self.client.post(edit_rajni_url, data=data)
+        response = self.client.post(edit_demo13_url, data=data)
         self.assertRedirects(
             response,
             expected_url="%s?next=%s" % (
                 reverse('login_page'),
-                edit_rajni_url))
-        message = "Current user, %s, is not \
-            allowed to perform this action.\
-            Please log in a user with enough \
-            privileges." % user_without_permission.get_full_name()
-        self.assertIn(message, response.cookies['messages'].value)
-        retrieved_rajni = User.objects.filter(**original_rajni_attributes)
-        self.assertEqual(1, retrieved_rajni.count())
+                edit_demo13_url))
+        retrieved_demo13 = User.objects.filter(**original_demo13_attributes)
+        self.assertEqual(1, retrieved_demo13.count())
 
     def test_a_non_admin_user_cannot_GET_edit_other_users_profile(self):
         user_without_permission = User.objects.create_user(
-            username='notpermitted', email='rajni@kant.com', password='I_Suck')
+            username='notpermitted', email='demo13@kant.com', password='I_Suck')
         self.client.logout()
         self.client.login(
             username=user_without_permission.username, password='I_Suck')
 
-        original_rajni_attributes = User.objects.filter(
+        original_demo13_attributes = User.objects.filter(
             username=self.raj).values()[0]
-        edit_rajni_url = reverse(
+        edit_demo13_url = reverse(
             'users_edit',
             kwargs={"user_id":  str(self.raj.pk), "mode":  "edit"})
 
-        response = self.client.get(edit_rajni_url)
+        response = self.client.get(edit_demo13_url)
         self.assertRedirects(
             response, expected_url="%s?next=%s" % (
                 reverse('login_page'),
-                edit_rajni_url))
-        message = "Current user, %s, is not allowed to perform this action. \
-            Please log in a user with enough \
-            privileges." % user_without_permission.get_full_name()
-        self.assertIn(message, response.cookies['messages'].value)
-        retrieved_rajni = User.objects.filter(**original_rajni_attributes)
-        self.assertEqual(1, retrieved_rajni.count())
+                edit_demo13_url))
+        retrieved_demo13 = User.objects.filter(**original_demo13_attributes)
+        self.assertEqual(1, retrieved_demo13.count())
 
     def test_view_user_details(self):
         user = User.objects.create_user(
-            username='rrrajni',
-            email='rrajni@kant.com',
-            password='I_Rock_0',
+            username='rrdemo13',
+            email='rdemo13@kant.com',
+            password='demo13_0',
             first_name='some name',
             last_name='last_name')
         UserProfile.objects.create(user=user, mobile_number='123456666')
 
-        url = reverse('users_show_details', kwargs={"user_id":  user.id,'mode':'edit'})
+        url = reverse('users_edit', kwargs={"user_id":  user.id,'mode':'view'})
         response = self.client.get(url)
-        self.failUnlessEqual(response.status_code, 200)
+        self.assertEquals(response.status_code, 200)
         templates = [template.name for template in response.templates]
-        self.assertIn('users/show.html', templates)
-        self.assertEquals(response.context['the_user'], user)
+        self.assertIn('users/new.html', templates)
         self.assertEquals(
             response.context['cancel_url'],
             reverse('users_index'))
@@ -395,17 +385,16 @@ class UsersViewTest(BaseTest):
     def test_view_user_details_when_no_such_user_exists(self):
         non_existing_user_id = 111
         url = reverse(
-            'users_show_details',
-            kwargs={"user_id":  non_existing_user_id})
+            'users_edit',
+            kwargs={"user_id":  non_existing_user_id,"mode":"view"})
         response = self.client.get(url)
-        self.assertRedirects(response, expected_url=reverse('users_index'))
-        self.assertIn("User not found.", response.cookies['messages'].value)
+        self.assertEquals(response.status_code, 404)
 
     def test_deactivate_user(self):
         user = User.objects.create_user(
-            username='rrrajni',
-            email='rrajni@kant.com',
-            password='I_Rock_0',
+            username='rrdemo13',
+            email='rdemo13@kant.com',
+            password='demo13_0',
             first_name='some name',
             last_name='last_name')
         UserProfile.objects.create(user=user, mobile_number='123456666')
@@ -427,9 +416,9 @@ class UsersViewTest(BaseTest):
 
     def test_reactivate_user(self):
         user = User.objects.create_user(
-            username='rrrajni',
-            email='rrajni@kant.com',
-            password='I_Rock_0',
+            username='rrdemo13',
+            email='rdemo13@kant.com',
+            password='demo13_0',
             first_name='some name',
             last_name='last_name')
         UserProfile.objects.create(user=user, mobile_number='123456666')
@@ -455,17 +444,15 @@ class UsersViewTest(BaseTest):
     def test_restricted_permission(self):
         self.assert_restricted_permission_for(reverse('new_user_page'))
         self.assert_restricted_permission_for(reverse('users_index'))
-        url = reverse('users_show_details', kwargs={"user_id":  1})
+        url = reverse('users_edit', kwargs={"user_id":  1,"mode":"view"})
         self.assert_restricted_permission_for(url)
         url = reverse('deactivate_user', kwargs={"user_id":  1})
         self.assert_restricted_permission_for(url)
-        url = reverse('activate_user', kwargs={"user_id":  999})
-        self.assert_restricted_permission_for(reverse(url))
 
     def test_download(self):
         filename = 'all_admin_users'
         response = self.client.get(reverse('download_users'))
-        self.failUnlessEqual(response.status_code, 200)
+        self.assertEquals(response.status_code, 200)
         rtype = response.headers.get('content_type')
         self.assertIn('text/csv', rtype)
         res_csv = 'attachment; \

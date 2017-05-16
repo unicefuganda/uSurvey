@@ -10,11 +10,11 @@
             {% include "naked_form.html" with a_form=sampling_form %}
          </div>
         <div class="col-md-6">
-            <ul class="list-group">
-                  <li class="list-group-item panel-heading">Use this form to define the criteria to use for listing</li>
-                  <li class="list-group-item">Select a Listing question</li>
-                  <li class="list-group-item">Configure the listing condition</li>
-                 <li class="list-group-item">Settings defined here would be applied when sampling listing during for data collection</li>
+            <ul class="list-data">
+                  <li class="list-group-item panel-heading"><i class="fa fa-check"></i> Use this form to define the criteria to use for listing</li>
+                  <li ><i class="fa fa-check"></i> Select a Listing question</li>
+                  <li ><i class="fa fa-check"></i> Configure the listing condition</li>
+                 <li ><i class="fa fa-check"></i> Settings defined here would be applied when sampling listing during for data collection</li>
              </ul>
          </div>
     </div>
@@ -127,6 +127,10 @@
             id_text_delim = '-';
             change_to_select2( $('#id_listing_question'));
         </script>
+        <style type="text/css">
+            .list-data{line-height: 22px;font-size: 14px;}
+            .list-data .fa{color: #02a066;}
+        </style>
 {% endblock %}
 
 {% block non_form_content %}

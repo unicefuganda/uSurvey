@@ -4,6 +4,19 @@ from survey.models.locations import LocationType, Location
 
 class LocationTest(TestCase):
 
+    def test_fields(self):
+        ss_content = Location()
+        fields = [str(item.attname) for item in ss_content._meta.fields]
+        self.assertEqual(11, len(fields))
+        for field in ['id','created','modified','name','type_id','code','parent_id','lft','rght','tree_id','level']:
+            self.assertIn(field, fields)
+
+        ss_content = Location()
+        fields = [str(item.attname) for item in ss_content._meta.fields]
+        self.assertEqual(11, len(fields))
+        for field in ['id','created','modified','name','parent_id','location_code','slug','lft','rght','tree_id','level']:
+            self.assertIn(field, fields)
+
     def test_store(self):
         country = LocationType.objects.create(name="Country", slug='country')
         district = LocationType.objects.create(

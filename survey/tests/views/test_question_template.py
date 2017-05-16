@@ -10,11 +10,11 @@ class QuestionsTemplateViews(BaseTest):
 
     def setUp(self):
         self.client = Client()
-        user_without_permission = User.objects.create_user(username='useless', email='rajni@kant.com',
+        user_without_permission = User.objects.create_user(username='useless', email='demo9@kant.com',
                                                            password='I_Suck')
-        raj = self.assign_permission_to(User.objects.create_user('Rajni', 'rajni@kant.com', 'I_Rock'),
+        raj = self.assign_permission_to(User.objects.create_user('demo9', 'demo9@kant.com', 'demo9'),
                                         'can_view_batches')
-        self.client.login(username='Rajni', password='I_Rock')
+        self.client.login(username='demo9', password='demo9')
         self.module = QuestionModule.objects.create(name="Education")
         self.question_1 = QuestionTemplate.objects.create(module=self.module,variable_name='a',text='ttt',answer_type='Numerical Answer')
 

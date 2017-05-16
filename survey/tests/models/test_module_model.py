@@ -21,3 +21,8 @@ class QuestionModuleTest(BaseTest):
     def test_unicode_text(self):
         module = QuestionModule.objects.create(name="module name")
         self.assertEqual(module.name, str(module))
+
+    def test_name(self):
+        content = QuestionModule.objects.get(content="test")
+        self.assertEqual(content.name,'test')
+        self.assertEqual(len(content.name),4)

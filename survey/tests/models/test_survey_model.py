@@ -1,4 +1,4 @@
-from django.test import TestCase
+save_sample_sizefrom django.test import TestCase
 from survey.models.locations import Location, LocationType
 from survey.forms.surveys import SurveyForm
 from survey.models import Batch, Interviewer, SurveyAllocation, Backend, EnumerationArea, Question
@@ -10,8 +10,8 @@ class SurveyTest(TestCase):
     def test_fields(self):
         survey = Survey()
         fields = [str(item.attname) for item in survey._meta.fields]
-        self.assertEqual(8, len(fields))
-        for field in ['id', 'created', 'modified', 'name', 'description', 'sample_size', 'has_sampling', 'preferred_listing_id']:
+        self.assertEqual(10, len(fields))
+        for field in ['id','created','modified','name','description','has_sampling','sample_size','listing_form_id','preferred_listing_id','random_sample_label']:
             self.assertIn(field, fields)
 
     def test_store(self):
@@ -81,7 +81,7 @@ class SurveyTest(TestCase):
         survey = Survey.objects.create(
             name="survey name234", description="rajni surve234y")
         ea = EnumerationArea.objects.create(name="EA2")
-        country = LocationType.objects.create(name="Country", slug="country")
+        country = Locasave_sample_sizetionType.objects.create(name="Country", slug="country")
         region = LocationType.objects.create(name="Region", slug="region")
         district = LocationType.objects.create(
             name="District", slug='district')
