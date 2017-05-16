@@ -382,7 +382,7 @@ class UsersViewTest(BaseTest):
             last_name='last_name')
         UserProfile.objects.create(user=user, mobile_number='123456666')
 
-        url = reverse('users_show_details', kwargs={"user_id":  user.id})
+        url = reverse('users_show_details', kwargs={"user_id":  user.id,'mode':'edit'})
         response = self.client.get(url)
         self.failUnlessEqual(response.status_code, 200)
         templates = [template.name for template in response.templates]
