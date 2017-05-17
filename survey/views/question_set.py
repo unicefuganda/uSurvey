@@ -190,11 +190,13 @@ def view_data(request, qset_id):
     if hasattr(qset, 'survey'):
         request.GET['survey'] = qset.survey.id
         disabled_fields.append('survey')
+    title = 'View Data'
     return _view_qset_data(
         request,
         qset.__class__,
         Interview.objects.filter(
             question_set__id=qset_id),
+        title,
         disabled_fields=disabled_fields)
 
 
@@ -204,7 +206,8 @@ def view_listing_data(request):
     interviews = Interview.objects.filter(
         question_set__id__in=ListingTemplate.objects.values_list(
             'id', flat=True))
-    return _view_qset_data(request, ListingTemplate, interviews)
+    title = 'View Listing Data'
+    return _view_qset_data(request, ListingTemplate, interviews,title)
 
 
 @login_required
@@ -213,10 +216,11 @@ def view_survey_data(request):
     interviews = Interview.objects.filter(
         question_set__id__in=Batch.objects.values_list(
             'id', flat=True))
-    return _view_qset_data(request, Batch, interviews)
+    title = 'View Survey Data'
+    return _view_qset_data(request, Batch, interviews,title)
 
 
-def _view_qset_data(request, model_class, interviews, disabled_fields=[]):
+def _view_qset_data(request, model_class, interviews,title, disabled_fields=[]):
     params = request.GET if request.method == 'GET' else request.POST
     survey_filter = SurveyResultsFilterForm(
         model_class, disabled_fields=disabled_fields, data=params)
@@ -251,7 +255,8 @@ def _view_qset_data(request, model_class, interviews, disabled_fields=[]):
         'selected_qset': selected_qset,
         'model_class': model_class,
         'items_per_page': items_per_page,
-        'max_display_per_page': items_per_page}
+        'max_display_per_page': items_per_page,
+        'title':title}
     if selected_qset and survey:
         # page_start = page_index * items_per_page
         # interviews = interviews[page_start: page_start + items_per_page]()
