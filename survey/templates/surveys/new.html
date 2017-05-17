@@ -10,6 +10,7 @@
 
 {% block display_form_fields %}
 	{% include "naked_form.html" with a_form=survey_form %}
+
 <style type="text/css">
   #id_sample_size{
     margin-left: 5px!important;
@@ -56,13 +57,20 @@
                    this.focus();
                 });
             });
-            $('.modal').on('hidden.bs.modal', function(){
+            /*$('.modal').on('hidden.bs.modal', function(){
                 $(this).find('form')[0].reset();
-            });
+            });*/
           
 
           $(document).ready(function(){
         $("label[for='id_listing_form']").text("New Listing");
+        {% if survey_form.preferred_listing.value %}
+        $("#id_random_sample_label-control-group").hide();
+        $("#id_listing_form-control-group").hide();
+        {%endif%}
+            
+
+        
         $("#id_listing_form").change(function() {
           if($(this).val()){
             $("#id_preferred_listing-control-group").hide();

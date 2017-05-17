@@ -51,6 +51,8 @@ class Batch(QuestionSet):
                 (survey.name, reverse(
                     'batch_index_page', args=(
                         survey.pk, ))))
+        if 'qset' in kwargs:
+            breadcrumbs.append((kwargs.get('qset').name,'#'))
         return breadcrumbs
 
     def non_response_enabled(self, ea):

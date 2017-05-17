@@ -33,7 +33,7 @@
     </style>
 {% endblock %}
 {% block title %}
-    {{ batch.name.capitalize }} Questions
+    Questions
 {% endblock %}
 {% block search %}
 {% include "search_form.html" %}
@@ -219,7 +219,7 @@
                             </li>
                             {% if 'auto' not in question.answer_type.lower %}
                             <li>
-                                <a href="{% url 'add_qset_question_logic_page' batch.pk question.pk %}" class="tooltip-info" data-rel="tooltip" title="" data-original-title="Insert"><span class="black"><i class="usur-icon fa fa-code bigger-120"></i>Add Logic</span></a>
+                                <a href="{% url 'add_qset_question_logic_page' batch.pk question.pk %}" class="tooltip-info" data-rel="tooltip" title="" data-original-title="Insert"><span class="black"><i class="usur-icon fa fa-code bigger-120"></i>Add/Edit Logic</span></a>
                             </li>
                             {% endif %}
                             <li><a href="#delete_question_{{question.id}}" class="tooltip-info" data-toggle="modal" data-rel="tooltip" title="" data-original-title="Delete"><span class="red"><i class="usur-icon fa fa-trash bigger-120"></i>Delete</span></a>                            
