@@ -521,10 +521,11 @@ class QuestionSet(
         breadcrumbs = cls.index_breadcrumbs(**kwargs)
         if 'qset' in kwargs:
             cls = kwargs['qset'].__class__
-        breadcrumbs.append(
+            breadcrumbs.append(
             (cls.verbose_name(), reverse(
                 '%s_home' %
                 cls.resolve_tag())))
+            breadcrumbs.append((kwargs['qset'],reverse('qset_questions_page',kwargs={'qset_id':kwargs.get('qset').id})))
         return breadcrumbs
 
     @classmethod

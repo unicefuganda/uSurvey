@@ -74,10 +74,11 @@
 <!-- End LEGENDS -->
 
 <div>
-        <button class="btn btn-white btn-warning btn-bold" data-toggle="modal" data-target="#new_survey"  id="add_survey">
+        <!-- <button class="btn btn-white btn-warning btn-bold" data-toggle="modal" data-target="#new_survey"  id="add_survey"> -->
+        <a class="btn btn-white btn-warning btn-bold" href="{% url 'new_survey_page' %}">
           <i class="ace-icon fa fa-plus bigger-120"></i>
 												Create New Survey 
-											</button>
+											</a>
                       </div>
 
     {% endblock %}

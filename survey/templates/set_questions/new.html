@@ -1,196 +1,174 @@
 {% extends "form.html" %}
 {% load template_tags %}
-
 {% block title %}
-  {% if parent_question or heading %}
-    {{ heading }}
-  {% else %}
-    {% if instance %}Edit{%else%} Add{%endif%} Question
-  {% endif %}
+{% if parent_question or heading %}
+{{ heading }}
+{% else %}
+{% if instance %}Edit{%else%} Add{%endif%} Question
+{% endif %}
 {% endblock %}
 {% block extra_head %}
 <link rel="stylesheet" href="{{ STATIC_URL }}css/awesomplete.css" />
 <script src="{{ STATIC_URL }}js/awesomplete.min.js" async></script>
 {% endblock %}
-
 {% block pre_form_content %}
-  {% if parent_question %}
-     <h4> to question: {{parent_question.text}} </h4>
-  {% endif %}
-  {% if prev_question %}
-     <h4> <span>Preceding question:</span> {{prev_question.text}} </h4>
-  {% endif %}
-    <p>Please note that the following special characters will be removed on USSD [* ! # ' ; &]</p>
-{% endblock%}
-
-{% block display_form_fields %}
-
-{% for field in questionform.visible_fields %}
-  
-
-        {% if field.name == 'mandatory' %}
-        {% if options %}
-          {% for option in options %}
-           {% if option %}
-            <div class="control-group options question-option">
-                <label style="margin-top:10px;" class="control-label col-md-4">Option <span class="number"> {{ option.order }}</span></label>
-                <div class="controls">
-                    <input type="text" maxlength="100" name="options" value="{{ option.text }}">
-                    <a style="padding: 0px !important;" href="javascript:;" class="btn btn-white btn-warning btn-bold add-option"><i class="ace-icon fa fa-plus bigger-120 orange"></i></i></a>
-                    <a style="padding: 0px !important;" href="javascript:;" class="btn btn-white btn-warning btn-bold remove-option"><i class="ace-icon fa fa-minus bigger-120 orange"></i></i></a>
-                </div>
-            </div>
-            {% endif %}
-          {% endfor %}
-
-        {% endif %}
-        <div id="{{field.auto_id}}-control-group" class="control-group int-part">
-    <div class="controls {{ field|is_radio }}">
-        <label class="control-label" for="{{field.auto_id}}" style="padding: 5px;">{{field.label}}</label>
-        
-
-        <span title="{{ field.help_text }}" class="{{field.auto_id}}_tip">{{field}}</span>
-        {% else %}
-
-        <div id="{{field.auto_id}}-control-group" class="control-group int-part">
-    <div class="controls {{ field|is_radio }}">
-        <label class="control-label" for="{{field.auto_id}}" style="padding: 5px;">{{field.label}}</label>
-        
-
-        <span title="{{ field.help_text }}" class="{{field.auto_id}}_tip">{{field}}</span>
-
-{% endif %}
-
-        
-        {% if field.errors %}
-        <label class="error" style="color:red; padding-bottom:10px; padding-top:10px;" >
-            {% for error in field.errors %}
-                {{ error}}
-            {% endfor %}
-         </label>
-        {% endif %}
-        <div id="{{field.auto_id}}_tip" class="help tip hide" style="color: #307ecc; margin-top: 5px; margin-left: 55px;">{{ field.help_text }}</div>
-    </div>
-  </div>
-
-{% endfor %}
-<script type="text/javascript">
-  $(document).ready(function(){
-    $('.controls textarea ').after($('<span id="text-counter"></span>'));
-  })
-</script>
-{% for hidden in questionform.hidden_fields %}
-  {{ hidden }}
-{% endfor %}
-
-
-
-
-{% include "_multiple_options.html" with option_label='Option' id="question-option-template" name='options'%}
 {% if parent_question %}
-<script type="text/template" id="question-group-template">
-    <select id="id_group" name="group">
-      <option value="{{parent_question.group.pk}}" selected="selected">{{parent_question.group.name}}</option>
-    </select>
-</script>
+<h4> to question: {{parent_question.text}} </h4>
 {% endif %}
-
+{% if prev_question %}
+<h4> <span>Preceding question:</span> {{prev_question.text}} </h4>
+{% endif %}
+<p>Please note that the following special characters will be removed on USSD [* ! # ' ; &]</p>
+{% endblock%}
+{% block display_form_fields %}
+<table width="100%">
+    <tr>
+        <td>
+            <div class="col-md-7">
+                {% for field in questionform.visible_fields %}
+                {% if field.name == 'mandatory' %}
+                {% if options %}
+                {% for option in options %}
+                {% if option %}
+                <div class="control-group options question-option">
+                    <label style="margin-top:10px;" class="control-label col-md-4">Option <span class="number"> {{ option.order }}</span></label>
+                    <div class="controls">
+                        <input type="text" maxlength="100" name="options" value="{{ option.text }}">
+                        <a style="padding: 0px !important;" href="javascript:;" class="btn btn-white btn-warning btn-bold add-option"><i class="ace-icon fa fa-plus bigger-120 orange"></i></a>
+                        <a style="padding: 0px !important;" href="javascript:;" class="btn btn-white btn-warning btn-bold remove-option"><i class="ace-icon fa fa-minus bigger-120 orange"></i></a>
+                    </div>
+                </div>
+                {% endif %}
+                {% endfor %}
+                {% endif %}
+                <div id="{{field.auto_id}}-control-group" class="control-group int-part">
+                    <div class="controls {{ field|is_radio }}">
+                        <label class="control-label" for="{{field.auto_id}}" style="padding: 5px;">{{field.label}}</label>
+                        <span title="{{ field.help_text }}" class="{{field.auto_id}}_tip">{{field}}</span>
+                    </div>
+                </div>
+                {% else %}
+                <div id="{{field.auto_id}}-control-group" class="control-group int-part">
+                    <div class="controls {{ field|is_radio }}">
+                        <label class="control-label" for="{{field.auto_id}}" style="padding: 5px;">{{field.label}}</label>
+                        <span title="{{ field.help_text }}" class="{{field.auto_id}}_tip">{{field}}</span>
+                    </div>
+                </div>
+                {% endif %}
+                {% if field.errors %}
+                <label class="error" style="color:red; padding-bottom:10px; padding-top:10px;" >
+                {% for error in field.errors %}
+                {{ error}}
+                {% endfor %}
+                </label>
+                {% endif %}
+                <div id="{{field.auto_id}}_tip" class="help tip hide" style="color: #307ecc; margin-top: 5px; margin-left: 55px;">{{ field.help_text }}</div>
+                {% endfor %}
+                <script type="text/javascript">
+                    $(document).ready(function(){
+                      $('.controls textarea ').after($('<span id="text-counter"></span>'));
+                    })
+                </script>
+                {% for hidden in questionform.hidden_fields %}
+                {{ hidden }}
+                {% endfor %}
+                {% include "_multiple_options.html" with option_label='Option' id="question-option-template" name='options'%}
+                {% if parent_question %}
+                <script type="text/template" id="question-group-template">
+                    <select id="id_group" name="group">
+                      <option value="{{parent_question.group.pk}}" selected="selected">{{parent_question.group.name}}</option>
+                    </select>
+                </script>
+                {% endif %}
+            </div>
+            <div class="col-md-5" style="margin-top: -40px;">
+                {% include 'set_questions/help_text.html' %}
+            </div>
+        </td>
+    </tr>
+</table>
 {% endblock %}
-    {% block buttons %}
-  <div class="form-actions">
-    <button id="button" type="submit" class="btn btn-primary submit" name="save_button" data-disabled-text="{{ loading_text }}"><i class="fa fa-save"></i> Save Changes</button>
+{% block buttons %}
+<div class="form-actions">
+    <button id="button" type="submit" class="btn btn-primary submit" name="save_button" data-disabled-text="{{ loading_text }}"><i class="fa fa-save"></i> Save</button>
     <button id="button" type="submit" class="btn btn-primary submit" name="add_more_button" data-disabled-text="{{ loading_text }}"><i class="fa fa-save"></i> Save and Add More</button>
     <button id="button" type="submit" class="btn btn-primary submit" name="add_to_lib_button" data-disabled-text="{{ loading_text }}"><i class="fa fa-save"></i> Save and Update Library</button>
-
     {% if cancel_url %}
-      <a href="{{ cancel_url }}" class="btn btn-primary" name="cancel_button" class="cancel" style=" padding-right: 5px; padding-left: 5px; padding-bottom: 1px;"><i class="fa fa-close"></i> Cancel</a>      
+    <a href="{{ cancel_url }}" class="btn btn-primary" name="cancel_button" class="cancel" style=" padding-right: 5px; padding-left: 5px; padding-bottom: 1px;"><i class="fa fa-close"></i> Cancel</a>      
     {% else %}
-      <a href="#" class="btn btn-primary" name="cancel_button" id="cancel_{{ id }}" class="cancel">Cancel</a>
+    <a href="#" class="btn btn-primary" name="cancel_button" id="cancel_{{ id }}" class="cancel">Cancel</a>
     {% endif %}
-  </div>
-    {% endblock %}
-
+</div>
+{% endblock %}
 {% block javascripts %}
 <style type="text/css">
-  #id_identifier{
+    #id_identifier{
     width: 261px !important;
     height: 25px !important;
-    
-  }
-  #id_text{
+    }
+    #id_text{
     width: 261px !important;
     margin-left: 4px !important;
-  }
-  .dataTables_wrapper select {    margin-bottom: 0 !important;    margin-left: 4px!important;    margin-right: 4px!important;    margin-top: 0px !important;    padding: 3px !important;    width: 261px!important;}
-  .form-actions {
+    }
+    .dataTables_wrapper select {    margin-bottom: 0 !important;    margin-left: 4px!important;    margin-right: 4px!important;    margin-top: 0px !important;    padding: 3px !important;    width: 261px!important;}
+    .form-actions {
     background-color: #fff;
     border-top: 1px solid #c3a0d9;
     margin-bottom: 0px !important; 
     margin-top: 0px !important; 
     padding: 8px 20px 20px !important;
     /* text-align: center; */
-} 
-.orange{
+    } 
+    .orange{
     padding: 3px !important;
-} 
-#id_answer_type,#id_module,#id_group{
-width: 261px !important; }
-.dataTables_wrapper input[name='options']{width: 261px !important;height: 25px !important;margin-left: 6px !important;}
-.controls .btn-warning{font-size: 12px !important;}
+    } 
+    #id_answer_type,#id_module,#id_group{
+    width: 261px !important; }
+    .dataTables_wrapper input[name='options']{width: 220px !important;height: 25px !important;margin-left: 6px !important;}
+    .controls .btn-warning{font-size: 12px !important;}
 </style>
 <!-- <div class="control-group">
-        <label class="control-label" for="text_counter"></label>
-        <div class="controls">
-            <span id="text-counter"></span>
-        </div>
-  </div> -->
-
-
-
-
-
-
- <style type="text/css">
-     .controls {
-        margin-bottom: 20px !important;
-     }
-    
+    <label class="control-label" for="text_counter"></label>
+    <div class="controls">
+        <span id="text-counter"></span>
+    </div>
+    </div> -->
+<style type="text/css">
+    .controls {
+    margin-bottom: 20px !important;
+    }
     #id_access_channels{
-      display: inline-block;
-      vertical-align: middle;
+    display: inline-block;
+    vertical-align: middle;
     }
     #text-counter{
     margin-left: 10px !important;
-  }
-  
-  .ms-list{
-        margin-top: -14px !important;
-  }
-  .inline pos-rel > open {
+    }
+    .ms-list{
+    margin-top: -14px !important;
+    }
+    .inline pos-rel > open {
     display: none !important;
-  }
-  </style>
-  
-
-    <script src="{{STATIC_URL}}js/type-auto-suggest.js" type="text/javascript" charset="utf-8"></script>
-    <script src="{{STATIC_URL}}js/questions.js" type="text/javascript" charset="utf-8"></script>
-
-        <script type="text/javascript">
-            channel_map = {
-                {% for answer_type, channels in questionform.answer_map.items %}
-                    '{{answer_type}}' : [{% for channel in channels %}'{{channel}}',{% endfor %}],
-                {% endfor %}
-            };
-         $(function(){
-                $('#id_text').on('keyup', function(){
-                   make_suggestions('#id_text', "{% url 'qset_identifiers' %}?id={{batch.pk}}{% if questionform.instance.id %}&q_id={{questionform.instance.id}}{% endif %}");
-                   this.focus();
-                });
-                $('#id_answer_type').change(function(){
-                    help_text = channel_map[$('#id_answer_type').val()].join(' and ');
-                    $('#id_answer_type_tip').text(help_text);
-                    //$( '.id_answer_type_tip[title]' ).qtip();
-                });
-            });
-        </script>
+    }
+</style>
+<script src="{{STATIC_URL}}js/type-auto-suggest.js" type="text/javascript" charset="utf-8"></script>
+<script src="{{STATIC_URL}}js/questions.js" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript">
+    channel_map = {
+        {% for answer_type, channels in questionform.answer_map.items %}
+            '{{answer_type}}' : [{% for channel in channels %}'{{channel}}',{% endfor %}],
+        {% endfor %}
+    };
+    $(function(){
+        $('#id_text').on('keyup', function(){
+           make_suggestions('#id_text', "{% url 'qset_identifiers' %}?id={{batch.pk}}{% if questionform.instance.id %}&q_id={{questionform.instance.id}}{% endif %}");
+           this.focus();
+        });
+        $('#id_answer_type').change(function(){
+            help_text = channel_map[$('#id_answer_type').val()].join(' and ');
+            $('#id_answer_type_tip').text(help_text);
+            //$( '.id_answer_type_tip[title]' ).qtip();
+        });
+    });
+</script>
 {% endblock %}

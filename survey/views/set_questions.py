@@ -332,6 +332,7 @@ def _process_question_form(request, batch, response, question_form):
 
 
 def _render_question_view(request, batch, instance=None, prev_question=None):
+    print "*"*33
     if instance is None and prev_question is None:
         prev_question = batch.last_question_inline()
     elif prev_question is None:
@@ -370,7 +371,9 @@ def _render_question_view(request, batch, instance=None, prev_question=None):
                'prev_question': prev_question,
                # 'prev_question': prev_question,
                'cancel_url': reverse('qset_questions_page', args=(batch.pk, )),
-               'questionform': question_form}
+               'questionform': question_form,
+               'model_name' : batch.__class__.__name__
+               }
 
     if options:
         #options = filter(lambda text: text.strip(),
