@@ -47,8 +47,7 @@ class Command(BaseCommand):
                     for index, col in enumerate(row):
                         loc_name = string.capwords(col.strip())
                         loc_type = location_types[index]
-                        parent, _ = Location.objects.get_or_create(
-                            name=loc_name, type=loc_type, parent=parent)
+                        parent, _ = Location.objects.get_or_create(name=loc_name, type=loc_type, parent=parent)
                     if has_ea:
                         if parent:
                             ea, created = EnumerationArea.objects.get_or_create(

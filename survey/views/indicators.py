@@ -328,7 +328,7 @@ def _retrieve_data_frame(request, indicator_id):
                'selected_location': selected_location,
                'report_locations': report_locations
                }
-    return context, indicator.get_data(report_locations)
+    return context, indicator.get_data(selected_location, report_level=selected_location.level+1)
 
 
 @permission_required('auth.can_view_batches')

@@ -11,7 +11,7 @@ from survey.models.interviews import MultiChoiceAnswer, Answer
 from survey.models.surveys import Survey
 from survey.models.questions import Question, QuestionSet
 from survey.models.interviews import Interview
-from survey.models.locations import Location
+from survey.models.locations import Location, LocationType
 
 
 class Indicator(BaseModel):
@@ -79,40 +79,50 @@ class Indicator(BaseModel):
         return self.country_wide_report()[self.REPORT_FIELD_NAME]
 
     def country_wide_report(self):
-        return self.get_data(Location.objects.filter(parent__isnull=True)
-                             ).transpose().to_dict()[Location.country().name]
+        country = Location.country()
+        return self.get_data(country).transpose().to_dict()[country.name]
 
-    def get_data(self, locations, *args, **kxargs):
+    def get_data(self, base_location, report_level=None):
         """Used to get the compute indicator values.
         :param locations: The locations of interest
         :param args:
         :param kxargs:
         :return:
         """
-        @cached_as(self, locations)
+        if report_level is None:
+            report_level = base_location.level
+
+        @cached_as(self, base_location, extra=(report_level, ))
         def _get_data():
             SortedDict()
             variable_names = self.active_variables()
             # options = self.parameter.options.order_by('order')
             # answer_class = Answer.get_class(self.parameter.answer_type)
             report = {}
-            for child_location in locations:
-                target_locations = child_location.get_leafnodes(
-                    include_self=True)
-                report[child_location.name] = [self.get_variable_value(
-                    target_locations, name) for name in variable_names]
-            df = pd.DataFrame(report).transpose()
+            if report_level <= base_location.level:
+                location_names = [base_location.name, ]
+            else:
+                location_names = base_location.get_descendants().filter(level=report_level).values_list('name',
+                                                                                                        flat=True)
+            df = pd.DataFrame(columns=list(location_names))
+            for variable_name in variable_names:
+                # better to make variable_name the index
+                df = df.append(pd.DataFrame([self.get_variable_aggregates(base_location, variable_name,
+                                                                          report_level=report_level), ],
+                                            index=[variable_name, ],
+                                            columns=list(location_names)))
+            df = df.transpose().fillna(0)
             if df.columns.shape[0] == len(variable_names):
                 df.columns = variable_names
                 # now include the formula results per location
                 aeval = Interpreter()       # to avoid the recreating each time
-                df[self.REPORT_FIELD_NAME] = df.apply(
-                    self.get_indicator_value, axis=1, args=(aeval, ))
-            else:
-                df = pd.DataFrame(columns=list(
-                    variable_names) + [self.REPORT_FIELD_NAME, ])
+                df[self.REPORT_FIELD_NAME] = df.apply(self.get_indicator_value, axis=1, args=(aeval, ))
             return df
         return _get_data()
+
+    def get_variable_aggregates(self, base_location, variable_name, report_level=1):
+        variable = self.variables.get(name__iexact=variable_name)
+        return variable.get_variable_aggregates(base_location, report_level=report_level)
 
     def get_variable_value(self, locations, variable_name):
         variable = self.variables.get(name__iexact=variable_name)
@@ -157,6 +167,35 @@ class IndicatorVariable(BaseModel):
                                                         namespace='answer__', *criterion.prepped_args))
             interviews = interviews.filter(**kwargs)
         return interviews.distinct('id')
+
+    def get_variable_aggregates(self, base_location, report_level=1):
+        indicator = self.indicator
+        ikwargs = {'question_set__pk': indicator.question_set.pk,
+                   'survey__pk': indicator.survey.pk}
+        parent_loc = 'ea__locations'
+        hierachy_count = Location.country().type.get_descendant_count()
+        for i in range(hierachy_count - report_level):    # fetches direct descendants from ea__locs
+            parent_loc = '%s__parent' % parent_loc
+        # exploiting mptt artributes to speed up this query
+        lowest_level = base_location.type.get_descendants(include_self=False).last().level
+        left = base_location.lft
+        right = base_location.rght
+        if report_level <= base_location.level:
+            left += 1
+            right -= 1
+        ikwargs.update({'ea__locations__lft__gte': left, 'ea__locations__lft__lte': right,
+                        'ea__locations__level': lowest_level})
+        interviews = Interview.objects.filter(**ikwargs)
+        for criterion in self.criteria.all():
+            kwargs = dict()
+            kwargs['answer__question__identifier__iexact'] = criterion.test_question.identifier
+            # be careful here regarding multiple validation tests with same name (e.g a__gt=2, a__gt=10)
+            kwargs.update(Answer.get_validation_queries(criterion.validation_test, 'as_value',
+                                                        namespace='answer__', *criterion.prepped_args))
+            interviews = interviews.filter(**kwargs)
+        parent_loc = '%s__name' % parent_loc
+        aggregate = interviews.values(parent_loc).annotate(total=Count('id', distinct=True))
+        return dict([(d[parent_loc], d['total']) for d in aggregate if d[parent_loc]])
 
 
 class IndicatorVariableCriteria(BaseModel):

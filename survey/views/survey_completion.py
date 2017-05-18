@@ -50,16 +50,13 @@ def indicators_json(request):
         :return:
         """
         indicator_details = {}
-        country = LocationType.objects.get(parent__isnull=True)
+        country = Location.country()
         if hasattr(settings, 'MAP_ADMIN_LEVEL'):
-            location_type = country.get_descendants()[
-                settings.MAP_ADMIN_LEVEL - 1]
+            location_type = country.get_descendants()[settings.MAP_ADMIN_LEVEL - 1]
         else:
             location_type = LocationType.largest_unit()
         for indicator in indicators:
-            indicator_df = indicator.get_data(
-                location_type.locations.all()).fillna(
-                value='null')
+            indicator_df = indicator.get_data(country, report_level=location_type.level).fillna(value='null')
             indicator_df.index = indicator_df.index.str.upper()
             indicator_details[indicator.name] = indicator_df.transpose(
             ).to_dict()
