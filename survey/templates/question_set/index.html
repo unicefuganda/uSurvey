@@ -63,10 +63,11 @@
 <span style="padding-left:8px; font-family:Open Sans; font-size:12px; color:#ff6600;"><i class="fa fa-circle" aria-hidden="true"> Completed</i></span>
 </div> -->
 <!-- End LEGENDS -->  
-    <button class="btn btn-white btn-warning btn-bold" data-toggle="modal" data-target="#new_question_set"  id="add_question_set">
+    <!-- <button class="btn btn-white btn-warning btn-bold" data-toggle="modal" data-target="#new_question_set"  id="add_question_set"> -->
+    <a class="btn btn-white btn-warning btn-bold" href="{% url 'new_listing_template_page' %}">
           <i class="ace-icon fa fa-plus bigger-120"></i>
                         Create New {{ model.verbose_name }}
-                      </button>
+                      </a>
                       
 
 {% endblock %}
