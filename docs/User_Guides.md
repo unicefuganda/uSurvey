@@ -235,11 +235,12 @@ Click on, ‘Add Question’ button at top right of the particular Listing page,
 
 **Variables Name**: This is an identifier for Question, type a code for Question
 
-**Text**: Is the actual Question, Write a Question. While typing a question, auto suggestion feature is available, which will prompt with the ‘Variable Name’ of preceding questions, that helps to include “answered text of preceding question” in framing this question. 
-i.e. just type, double curly brackets to automatically prompt with the ‘Variable Name’ from preceding questions,<br>
-Ex: type {{ , system prompts with ‘Variable Name’ then select any one to insert Variable Name,<br>
-Like: {{structure_address}}
- 
+**Text**: Is the actual Question, Write a Question.   
+   While writing a question, auto suggestion feature is available, which will prompt with the "Variable Names" of the preceding questions, that helps to include “answer of the preceding question” in composing succeeding questions.   
+   i.e. just type, double curly brackets ( {{ ), to get list of Variable Names of the preceding questions.   
+   Ex: type {{ , to get Variable Names, then select any 'Variable Name' to insert; *{{NAME}}, {{HH_head}}*   
+   **Example Question**: *Gender of the {{HH_head}}*
+
 **Answer Type**: Select an Answer Type from dropdown list, such that Question has to be answered in any one of these formats only, that is ‘Answer type’ should be: “Audio, Auto Generate, Date, Geo Point, Image, Multi choice, Multi Select, Numeric, Text and Video”
 
 **Mandatory**: To mark the Question, that has to answered compulsory. 
@@ -548,10 +549,12 @@ Now click on, ‘Add Question’ button at top right side of this page, this wil
 * **Module**: All Modules in the application are listed here in this dropdown, one has to select, respective Module that is related to survey<br>
 * **Group**: All available Groups are listed in this dropdown, select relevant group name for the question<br>
 * **Variables Name**: This is an identifier for Question, type a code for Question<br>
-* **Text**: Is the actual Question, Write a Question. While typing a question, auto suggestion feature is available, which will prompt with the ‘Variable Name’ of preceding questions, that helps to include “Answered text of preceding question” in framing this question. 
-i.e. just type, double curly brackets to automatically prompt with the ‘Variable Name’ from preceding questions, <br>
-Ex: type {{ , system prompts with ‘Variable Name’ then select any one to insert Variable Name,<br>
-Like: {{structure_address}} <br>
+* **Text**: Is the actual Question, Write a Question.   
+   While writing a question, auto suggestion feature is available, which will prompt with the “Variable Names” of the preceding questions, that helps to include “answer of the preceding question” in composing succeeding questions.   
+   i.e. just type, double curly brackets ( {{ ), to get list of Variable Names of the preceding questions.   
+   Ex: type {{ , to get Variable Names, then select any ‘Variable Name’ to insert; *{{FIRST_NAME}}, {{name_student}}*   
+   Example Question: *What is {{FIRST_NAME}}'s Ethnicity?*
+
 * **Answer Type**: Select an Answer Type from dropdown list, such that Question has to be answered in any one of these formats only, that is ‘Answer type’ should be: “Audio, Auto Generate, Date, Geo Point, Image, Multi choice, Multi Select, Numeric, Text and Video”<br>
 * **Mandatory**: To mark the Question, that has to answered compulsory
 
@@ -832,11 +835,12 @@ To create an Indicator, click on ‘Add Indicator’ button at top right of the 
    **Indicator**: Give a name to the Indicator   
    **Description**: A short description about Indicator   
    **Variables**: To create an Indicator, certain metrics are needed for calculation, which are derived from survey/ listing questions   
-   **Formulae**: compose a formula based up on available Variables, <br>
-Auto suggestion feature is available, which will prompt with the ‘Variables’ already defined above for composing. <br>
-i.e. just type, double curly brackets to automatically prompt with the ‘Variables’ already defined, <br>
-Ex: type {{ , system prompts with ‘Variables’ then select any one to insert Variable, <br>
-Like: {{hh_age}}
+   **Formulae**: Compose a formula using/based up on available Variables,   
+   While composing formula, auto suggestion feature is available, which will prompt with the "Variables" already defined.   
+   i.e. just type, double curly brackets ( {{ ), to get list of ‘Variables’ defined for an Indicator.   
+   Ex: type {{ , to get “Variables”, then select any Variable to insert.   
+   Like: {{hh_age}}, {{all_men}}, {{men_aged_50_years}}   
+   **Sample formula** for *Percentage of Men aged 50 Years*: {{men_aged_50_years}}/{{all_men}}*100
 
 ![Indicators](./Ind12.png)
 
