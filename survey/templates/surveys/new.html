@@ -8,9 +8,24 @@
 <script src="{{ STATIC_URL }}js/awesomplete.min.js" async></script>
 {% endblock %}
 
-{% block display_form_fields %}
-	{% include "naked_form.html" with a_form=survey_form %}
 
+{% block display_form_fields %}
+<div class="row">
+<div class="col-md-6">
+	{% include "naked_form.html" with a_form=survey_form %}
+  </div>
+  <div class="col-md-6">
+  <div class="text-warning">
+    <p class="text-justify"><strong>Randomly selected data label:</strong><br/>You need to include at least one Listing response identifier <strong>(Variable Name)</strong> in double curly brackets.</p>
+ <p class="text-justify">i.e. just type, double curly brackets <code>( &#123;&#123; )</code>, to get list of <strong>“Variable Names”</strong> from the above selected Listing,</p><br/>
+<p class="text-justify"><strong>Example:</strong><br>type <code>{{ ,</code> to get Variable Names, then select any <strong>‘Variable Name’</strong> to insert <br>Like: <code>&#123;&#123;Srn_structure&#125;&#125;, &#123;&#123;Srn_HH&#125;&#125;</code></p><br/>
+
+<p class="text-justify"><strong>Note:</strong><br/> To insert multiple identifiers, do not use any space or special characters between each of the identifier, just continue by using <code>‘&#123;&#123;’</code> to insert.</p>
+  </div>
+    
+
+  </div>
+</div>
 <style type="text/css">
   #id_sample_size{
     margin-left: 5px!important;
@@ -43,6 +58,7 @@
     /*width: 261px!important;*/
     margin-left: 4px!important;
 }
+.error{padding-left: 170px;}
 </style>
 {% endblock %}
 
@@ -83,10 +99,12 @@
         });
 
         $("#id_listing_form option[value='']").text("--Select New Listing Form--");
-        $("select#id_listing_form").val("");
+        //$("select#id_listing_form").val("");
         $("#id_preferred_listing option[value='']").text("--Select Preferred Listing Form--");
 
         });
+
+
         </script>
 
 {% endblock %}
