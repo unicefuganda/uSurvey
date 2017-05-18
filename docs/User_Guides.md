@@ -417,19 +417,21 @@ Screen-2
 
 ![Survey2](./Survey3.png)
 
-* **Name**: Is Survey Name, which is a unique identity to a survey and is a mandatory field<br>
-* **Description**: write about the importance of this survey in short<br>
-* **Survey Type**: This identifies how survey is going to take place either using Listing or not<br>
-    If Survey Type is “Sampled”, Survey uses Sample size and Listing <br>
-    If Survey Type is “Census”, Survey doesn’t need Sample size and Listing
+* **Name**: Is Survey Name, which is a unique identity to a survey and is a mandatory field
+* **Description**: write about the importance of this survey in short
+* **Survey Type**: This identifies how survey is going to take place either using Listing or not   
+   If Survey Type is “Sampled”, Survey uses Sample size and Listing   
+   If Survey Type is “Census”, Survey doesn’t need Sample size and Listing
 
-* **Sample size**: Provide survey sample size<br>
-* **Preferred Listing**: select an existing Listing Or<br>
-* **New Listing**: select Newly created Listing<br>
-* **Randomly selected data label**: You need to include one listing response identifier in double curly brackets.<br>
- i.e. just type, double curly brackets to automatically insert ‘Variable Name’ in above selected Listing<br>
- Ex: type {{ , system prompts with ‘Variable Name’ then select any one to insert Variable Name<br>
- Like: {{house_number}} <br>
+* **Sample size**: Provide survey sample size
+* **Preferred Listing**: select an existing Listing Or
+* **New Listing**: select Newly created Listing
+* **Randomly selected data label**: You need to include at least one Listing response identifier (Variable Name) in double curly brackets.   
+   i.e. just type, double curly brackets ( {{ ), to get list of “Variable Names” from the above selected Listing.   
+   Ex: type {{ , to get Variable Names, then select any ‘Variable Name’ to insert.   
+   Like: {{Srn_structure}}, {{Srn_HH}}   
+   **Note**: To insert multiple identifiers, do not use any space or special characters between each of the identifier, just continue by using ‘{{’ to insert.
+
 * **Email group**: select, User Emails Id to send report  
 
 A New Survey is created by providing above fields and click on ‘Save’ button to Create a Survey. 
