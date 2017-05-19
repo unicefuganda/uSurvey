@@ -253,21 +253,21 @@ A Question in Listing is created by filling above all fields, finally click on �
 
 To Add Question from Library to Listing, just Click on “Code” or “Text” to move Question between (Library Questions << / >> Listing Questions) tables, then click on ‘Save’ button at bottom of this page, to finish adding Questions to Listing.
 
-**Search**: One can find Questions in Library by two ways:
-**Sort** questions using ‘Answer Type’ dropdown at top left side of this page. Or
-**Search** using the search bar at top right side of this page, by providing text or code.
+**Search**: One can find Questions in Library by two ways:   
+   **Sort** questions using ‘Answer Type’ dropdown at top left side of this page. Or   
+   **Search** using the search bar at top right side of this page, by providing text or code.
 
 **Export Questions**: On click, ‘Export Questions’ button, user can download the Listing Questions in “.csv” file format.
 
 **Update Question Order**: 
-Questions in the table can be rearranged.<br>
-To change the order of the Question in table, just select the Question then drag (move up or down) and drop at new position/order you want to in the table, then click on ‘Update Question Order’ button at bottom of the Questions table.
+Questions in the table can be rearranged.   
+   To change the order of the Question in table, just select the Question then drag (move up or down) and drop at new position/order you want to in the table, then click on ‘Update Question Order’ button at bottom of the Questions table.
 
 On the ‘Listing Questions’ page one can view all the Questions created in that particular Listing.
 
-**Search**: One can find Questions in Listing by two ways:<br>
-**Sort** questions using ‘Answer Type’ dropdown at top left side of this page. Or<br>
-**Search** using the search bar at top right side of this page, by providing text or code.
+**Search**: One can find Questions in Listing by two ways:   
+   **Sort** questions using ‘Answer Type’ dropdown at top left side of this page. Or   
+   **Search** using the search bar at top right side of this page, by providing text or code.
 
 **Actions for Listing Questions**:
 
@@ -363,13 +363,13 @@ one has to define the Logic here for respective question by satisfying the condi
   
 * ‘Reconfirm’ – Prompts with conformation Question to validate the Answer 
 
-* ‘End Interview’ – Skips the intermediate Question and moves to end of the questioner.
+* ‘End Interview’ – Skips the intermediate Question and moves to end of the questioner
  
-* ‘Ask Sub-Question’ – Provides an option to Create a Sub-Question based upon the ‘Attribute’ value.<br>
+* ‘Ask Sub-Question’ – Provides an option to Create a Sub-Question based upon the ‘Attribute’ value
 
-To do this, select option “Ask Sub-Question” than you will find a button with name ‘Add Sub-Question’ beside this, <br>
-click on it to create a Sub-Question, same like create question, once you click on ‘Save’ button, you will find this Sub-Question in the dropdown ‘Choose Question’ 
-beside it, now select the “Sub-Question” and click on ‘Save’ button.
+To do this, select option “Ask Sub-Question” than you will find a button with name ‘Add Sub-Question’ beside this,   
+   click on it to create a Sub-Question, same like create question, once you click on ‘Save’ button, you will find this Sub-Question in the dropdown ‘Choose Question’   
+   beside it, now select the “Sub-Question” and click on ‘Save’ button.
  
 * ‘Skip To’ - Provides the option to jump to any particular/ consecutive question in the list, by skipping / avoiding the intermediate Question. 
 
@@ -398,17 +398,17 @@ Screen-1
 
 A New Survey can be created and defined here, so before creating a survey first of all one has to know about the terminology used here.
 
-* **Preferred Listing**: List of existing Listing, which are already in the system.<br>
-Is an option to choose, existing Listing for this New Survey, where already survey was conducted on these Listings, which will include total Listing questions along with the data/results.
+* **Preferred Listing**: List of existing Listing, which are already in the system.   
+   Is an option to choose, existing Listing for this New Survey, where already survey was conducted on these Listings, which will include total Listing questions along with the data/results.
 
-* **New Listing**: List of Newly created Listings, not previously used in any survey.<br>
-This field will enable only if option “None, Create New” is selected, in the dropdown ‘Preferred Listing’. which contains list of Newly created Listings, which are not yet used in any survey.
+* **New Listing**: List of Newly created Listings, not previously used in any survey.   
+   This field will enable only if option “None, Create New” is selected, in the dropdown ‘Preferred Listing’. which contains list of Newly created Listings, which are not yet used in any survey.
 
-* **Randomly selected data label**: Is the identifier for respondents while conducting a Listing survey.
-  This field will enable only when listing in dropdown ‘New Listing’ is selected.
+* **Randomly selected data label**: Is the identifier for respondents while conducting a Listing survey.   
+   This field will enable only when listing in dropdown ‘New Listing’ is selected.
 
-**How to create a Survey?**
-To create a New Survey, click on ‘Create New Survey’ button at top right of the Survey page, that opens a form to create a new Survey, which has following elements;
+**How to create a Survey?**   
+   To create a New Survey, click on ‘Create New Survey’ button at top right of the Survey page, that opens a form to create a new Survey, which has following elements;
 
 ![Survey1](./Survey2.png)
 Screen-2
@@ -841,8 +841,8 @@ To create an Indicator, click on ‘Add Indicator’ button at top right of the 
    While composing formula, auto suggestion feature is available, which will prompt with the "Variables" already defined.   
    i.e. just type, double curly brackets ( {{ ), to get list of ‘Variables’ defined for an Indicator.   
    Ex: type {{ , to get “Variables”, then select any Variable to insert.   
-   Like: {{hh_age}}, {{all_men}}, {{men_aged_50_years}}   
-   **Sample formula** for *Percentage of Men aged 50 Years*: {{men_aged_50_years}}/{{all_men}}*100
+   Like: {{hh_age}}, {{total_men}}, {{men_above_50_years}}   
+   **Sample formula** for *Percentage of Male Age above 50 Years*: {{men_above_50_years}}/{{total_men}}*100
 
 ![Indicators](./Ind12.png)
 
