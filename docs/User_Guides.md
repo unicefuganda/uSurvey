@@ -186,8 +186,8 @@ On the ‘Listing Form’ page one can view all the Listings created in the appl
 **Sts**: Represents Status of the Listing by color indicator, that means each of the Color code indicates as:
 
  <span style="color:Gray;font-weight:bold;">•</span>– Not Started<br>
- <span style="color:Orange;font-weight:bold;">•</span>– Ongoing<br>
- <span style="color:Green;font-weight:bold;">•</span>– Completed<br>
+ <span style="color:Green;font-weight:bold;">•</span>– Ongoing<br>
+ <span style="color:Orange;font-weight:bold;">•</span>– Completed<br>
 
 **Name**: Is Name of the Listing, which is a unique identity to represent Listing and is a mandatory field.   
 
@@ -444,8 +444,8 @@ On the ‘Survey’ page one can view all the Survey created in the application,
 
 **Sts**: Represents Status of the Survey by color indicator, that means each of the Color code indicates as:
  <span style="color:Gray;font-weight:bold;">•</span> – Not Started<br>
- <span style="color:Orange;font-weight:bold;">•</span> – Ongoing<br>
- <span style="color:Green;font-weight:bold;">•</span> – Completed<br>
+ <span style="color:Green;font-weight:bold;">•</span> – Ongoing<br>
+ <span style="color:Orange;font-weight:bold;">•</span> – Completed<br>
 
 * **Name**: Is Name of a Survey, which is a unique identity to represent Survey and is a mandatory field
 * **Description**: A short description about Listing
