@@ -67,8 +67,6 @@ On the ‘Modules’ page you can view all the Modules created in the applicatio
 Groups are Survey dependent classification of people/respondents based on their Age, Gender and combination of both into one or more survey- respondents categories called Groups.
 Population has to be segment into Groups / multiple groups and our system allows us to create as many as needed.
 
-From this above Groups page, Groups are managed, i.e. to Create a New Group, Edit existing Group, Delete Groups and Manage Parameters
-
 **Create a New Group**
 
 Groups are accessible from main menu under **Design** >> **Groups**
@@ -79,15 +77,17 @@ To create a new Group, click on ‘Add Group’ button at top right of the Group
 
 ![Group](./Group2_1.png)
 
+From this above Groups page, Groups are managed, i.e. to Create a New Group, Edit existing Group, Delete Groups and Manage Parameters.
+
 **Elements of Group**
 
-**Name**: Is Group Name, which is a unique identity to a Group and is a mandatory field.   
+**Name**: Is Group Name, which is a unique identity to a Group.   
 
 **Description**: A short description about Group
 
-**Parameter**: Need to select a parameter, based on which Group is created. Like Age, Gender  
+**Parameter**: Need to select a parameter, based on which Group is created. Like: Age, Gender.  
 
-**Operator**: Also need to select an Operator based on the Parameter value, like value starts with, equals to and between, etc.
+**Operator**: Also need to select an Operator based on the Parameter value. Like: between, equals, grater_than, and less_than.
 
 ![Group](./Group3.png)
 
@@ -427,7 +427,7 @@ Screen-2
 * **Preferred Listing**: select an existing Listing Or
 * **New Listing**: select Newly created Listing
 * **Randomly selected data label**: You need to include at least one Listing response identifier (Variable Name) in double curly brackets.   
-   i.e. just type, double curly brackets ( {{ ), to get list of “Variable Names” from the above selected Listing.   
+   i.e. just type, double curly brackets ( {{ ), to get list of “Variable Names” defined in the above selected Listing.   
    Ex: type {{ , to get Variable Names, then select any ‘Variable Name’ to insert.   
    Like: {{Srn_structure}}, {{Srn_HH}}   
    **Note**: To insert multiple identifiers, do not use any space or special characters between each of the identifier, just continue by using ‘{{’ to insert.
@@ -447,21 +447,21 @@ On the ‘Survey’ page one can view all the Survey created in the application,
  <span style="color:Orange;font-weight:bold;">•</span> – Ongoing<br>
  <span style="color:Green;font-weight:bold;">•</span> – Completed<br>
 
-* **Name**: Is Name of a Survey, which is a unique identity to represent Survey and is a mandatory field.<br>
-* **Description**: A short description about Listing<br>
-* **Type**: Survey type Sampled or Census<br>
-* **Sample size**: Provide survey sample size<br>
-* **Total Respondents**: once the Survey is completed, this column will be updated with the count of participants/ respondents.<br>
-* **Eas Covered**: Count of Enumeration areas covered in this particular survey.
+* **Name**: Is Name of a Survey, which is a unique identity to represent Survey and is a mandatory field
+* **Description**: A short description about Listing
+* **Type**: Survey type Sampled or Census
+* **Sample size**: Provide survey sample size
+* **Total Respondents**: once the Survey is completed, this column will be updated with the count of participants/ respondents
+* **Eas Covered**: Count of Enumeration areas covered in this particular survey
 
 **Actions in Survey**:
 
-* **Edit Survey**: click on, Action Item ‘Edit’, User can Edit all fields in the Survey<br>
+* **Edit Survey**: click on, Action Item ‘Edit’, User can Edit all fields in the Survey
 * **Delete Survey**: click on, Action Item ‘Delete, the entire Survey is removed, before deleting you will be prompted with conformation to delete, click ‘Yes’ to Delete permanently. <br> This option is not available for completed Survey<br>
-* **View Batches in Survey**: click on, Action Item ‘View Batches’, navigates to ‘Survey Batches’ page<br>
-* **Clone a Survey**: click on, Action Item ‘Clone’, an another copy of same Survey is created along with Survey Batches and Batch Questions, except existing Looping and Logic in Batch Questions<br>
+* **View Batches in Survey**: click on, Action Item ‘View Batches’, navigates to ‘Survey Batches’ page
+* **Clone a Survey**: click on, Action Item ‘Clone’, an another copy of same Survey is created along with Survey Batches and Batch Questions, except existing Looping and Logic in Batch Questions
 * **Sampling Criteria**:
-  This feature helps Data researcher to sort collected data for sampling according to listing data, in some cases, the Data researcher might be interested in restricting sampling, so that only listing data which meets specific criteria are sampled.
+  This feature helps Data researcher to sort collected data for sampling according to listing data, in some cases, the Data researcher might be interested in restricting sampling, so that only listing data which meets specific criteria are sampled
 
 For example: if interviewer had collected data for houses in a particular Enumeration area, the Data researcher might be interested in sampling only those houses with at least one child. Or
 Data researcher might be interested in sampling only residential houses.
@@ -539,8 +539,8 @@ Once Survey and Batches are created, next step is to ‘Add Questions’ to Batc
 
 ![Batch](./Batch4.png)
 
-On the ‘Batch’ page you can view all the Batch created in a Survey
-Now click on Batch Name, or click on, Action Item ‘View /Edit Question’ to go to ‘Batch Questions’ Page
+On the ‘Batch’ page you can view all the Batch created in a Survey   
+   Now click on Batch Name, or click on, Action Item ‘View /Edit Question’ to go to ‘Batch Questions’ Page
 
 ![Batch](./Batch5.png)
 
@@ -548,16 +548,16 @@ Now click on, ‘Add Question’ button at top right side of this page, this wil
 
 **Elements in Batch Question form**:
 
-* **Module**: All Modules in the application are listed here in this dropdown, one has to select, respective Module that is related to survey<br>
-* **Group**: All available Groups are listed in this dropdown, select relevant group name for the question<br>
-* **Variables Name**: This is an identifier for Question, type a code for Question<br>
+* **Module**: All Modules in the application are listed here in this dropdown, one has to select, respective Module that is related to survey
+* **Group**: All available Groups are listed in this dropdown, select relevant group name for the question
+* **Variables Name**: This is an identifier for Question, type a code for Question
 * **Text**: Is the actual Question, Write a Question.   
    While writing a question, auto suggestion feature is available, which will prompt with the “Variable Names” of the preceding questions, that helps to include “answer of the preceding question” in composing succeeding questions.   
    i.e. just type, double curly brackets ( {{ ), to get list of Variable Names of the preceding questions.   
    Ex: type {{ , to get Variable Names, then select any ‘Variable Name’ to insert; *{{FIRST_NAME}}, {{name_student}}*   
    Example Question: *What is {{FIRST_NAME}}'s Ethnicity?*
 
-* **Answer Type**: Select an Answer Type from dropdown list, such that Question has to be answered in any one of these formats only, that is ‘Answer type’ should be: “Audio, Auto Generate, Date, Geo Point, Image, Multi choice, Multi Select, Numeric, Text and Video”<br>
+* **Answer Type**: Select an Answer Type from dropdown list, such that Question has to be answered in any one of these formats only, that is ‘Answer type’ should be: “Audio, Auto Generate, Date, Geo Point, Image, Multi choice, Multi Select, Numeric, Text and Video”
 * **Mandatory**: To mark the Question, that has to answered compulsory
 
 A Question in Batch is created by filling above all fields, finally click on ‘Save’ button to Add Question in Batch or click on ‘Save and Add More’ button to continue adding another Question to the same Batch or click on ‘Save and Update Library’ to add same to the ‘Questions Library’.
@@ -574,9 +574,9 @@ To Add Question from Library to Batch, just Click on “Code” or “Text” to
 
 **Export Questions**: On click, ‘Export Questions’ button, user can download the Batch Questions in “.csv” file format.
 
-**Update Question Order**:<br>
-Questions in the table can be rearranged.<br>
-To change the order of the Question in table, just select the Question then drag (move up or down) and drop at new position/order you want to in the table, then click on ‘Update Question Order’ button at bottom of the Questions table.
+**Update Question Order**:   
+   Questions in the table can be rearranged.   
+   To change the order of the Question in table, just select the Question then drag (move up or down) and drop at new position/order you want to in the table, then click on ‘Update Question Order’ button at bottom of the Questions table.
 
 On the ‘Batch Questions’ page one can view all the Questions created in that particular Batch, 
 
@@ -598,8 +598,8 @@ Caution, while deleting a Question: when a user attempts to delete a question, i
 
 ![Batch](./Batch9.png)
 
-**Start/Edit Loop**:
-‘Start/Edit Loop’ is an Action item available only for the Questions that has Answer Type “Auto Generated”. 
+**Start/Edit Loop**:   
+   ‘Start/Edit Loop’ is an Action item available only for the Questions that has Answer Type “Auto Generated”. 
 
 Looping means repeatedly asking set of questions based up the need and purpose of the base question.  
 
@@ -858,6 +858,8 @@ To Add a Variable, click on respective ‘+’ icon adjacent to ‘Variables’ 
 
 ![Indicators](./Ind7.png)
 
+**Parameters in Variable**:
+
 **Name**: Define a name to the Variable
 
 **Description**: A short description about Variable
@@ -873,6 +875,7 @@ Once all the above fields are filled, then click on ‘Add’ button to add to b
 ![Indicators](./Ind9.png)
 
 ![Indicators](./Ind10.png)   
+   
    One can also ‘Edit’ and ‘Delete’ Variables using the respective icons adjacent to ‘Variables’ Text box.
 
 ![Indicators](./Ind11.png)
