@@ -211,7 +211,10 @@ class Interview(BaseModel):
 
     @classmethod
     def interviews_in(cls, location, survey=None):
-        kwargs = {'ea__locations__in': location.get_leafnodes(True)}
+        left = location.lft + 1
+        right = location.rght - 1
+        kwargs = {'ea__locations__lft__gte': left, 'ea__locations__lft__lte': right,
+                  'ea__locations__level__gt': location.level}
         if survey:
             kwargs['survey'] = survey
         return Interview.objects.filter(**kwargs)

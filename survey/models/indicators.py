@@ -180,7 +180,7 @@ class IndicatorVariable(BaseModel):
         lowest_level = base_location.type.get_descendants(include_self=False).last().level
         left = base_location.lft
         right = base_location.rght
-        if report_level <= base_location.level:
+        if report_level <= base_location.level:     # if you want to include base_location (anything above becomes self
             left += 1
             right -= 1
         ikwargs.update({'ea__locations__lft__gte': left, 'ea__locations__lft__lte': right,
@@ -194,8 +194,7 @@ class IndicatorVariable(BaseModel):
                                                         namespace='answer__', *criterion.prepped_args))
             interviews = interviews.filter(**kwargs)
         parent_loc = '%s__name' % parent_loc
-        aggregate = interviews.values(parent_loc).annotate(total=Count('id', distinct=True))
-        return dict([(d[parent_loc], d['total']) for d in aggregate if d[parent_loc]])
+        return dict(interviews.values_list(parent_loc).annotate(total=Count('id', distinct=True)))
 
 
 class IndicatorVariableCriteria(BaseModel):

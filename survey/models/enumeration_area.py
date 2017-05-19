@@ -57,8 +57,11 @@ class EnumerationArea(BaseModel):
 
     @classmethod
     def under_(cls, selected_location):
-        return cls.objects.filter(
-            locations__in=selected_location.get_leafnodes()).distinct('name')
+        left = selected_location.lft + 1
+        right = selected_location.rght - 1
+        kwargs = {'locations__lft__gte': left, 'locations__lft__lte': right,
+                  'locations__level__gt': selected_location.level}
+        return cls.objects.filter(**kwargs).distinct('name')
 
 #     def validate_unique(self, *args, **kwargs):
 #         super(EnumerationArea, self).validate_unique(*args, **kwargs)
