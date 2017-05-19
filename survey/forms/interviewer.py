@@ -63,7 +63,7 @@ class InterviewerForm(ModelForm):
                 self.fields['ea'].initial = EnumerationArea.objects.filter(id__in=
                                                                            [assignment.allocation_ea.id for assignment
                                                                             in self.instance.unfinished_assignments]
-                                                                           or [self.instance.ea, ])
+                                                                           or [self.instance.ea.id, ] if self.instance.ea else [])
             except IndexError:
                 pass
         self.fields['ea'].queryset = eas or self.fields['ea'].initial

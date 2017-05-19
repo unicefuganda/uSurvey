@@ -95,8 +95,12 @@ def index(request):
 @permission_required_for_perm_or_current_user('auth.can_view_users')
 def edit(request, user_id, mode=None):
     user = get_object_or_404(User, pk=user_id)
-    initial = {'mobile_number': UserProfile.objects.get(
-        user=user).mobile_number}
+    initial = {'mobile_number': ''}
+    try:
+        mobile_number = UserProfile.objects.get(user=user).mobile_number
+        initial = {'mobile_number': mobile_number}
+    except UserProfile.DoesNotExist:
+        pass
     userform = EditUserForm(user=request.user, instance=user, initial=initial)
     response = None
     if request.method == 'POST':

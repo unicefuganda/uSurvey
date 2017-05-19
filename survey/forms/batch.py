@@ -22,7 +22,7 @@ class BatchForm(ModelForm):
         fields = ['name', 'description', 'survey', ]
 
         widgets = {
-            'description': forms.Textarea(attrs={"rows": 3, "cols": 60}),
+            'description': forms.Textarea(attrs={"rows": 3, "cols": 30}),
             'survey': forms.HiddenInput(),
         }
 

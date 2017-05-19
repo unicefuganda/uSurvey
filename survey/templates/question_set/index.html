@@ -64,7 +64,12 @@
 </div> -->
 <!-- End LEGENDS -->  
     <!-- <button class="btn btn-white btn-warning btn-bold" data-toggle="modal" data-target="#new_question_set"  id="add_question_set"> -->
-    <a class="btn btn-white btn-warning btn-bold" href="{% url 'new_listing_template_page' %}">
+    <a class="btn btn-white btn-warning btn-bold" 
+    href="{% if model_name == 'Batch' %}{% url 'new_batch_page' survey.id %}
+    {%elif model_name == 'ListingTemplate' %}
+    {% url 'new_listing_template_page' %}
+    {%endif%}"
+    >
           <i class="ace-icon fa fa-plus bigger-120"></i>
                         Create New {{ model.verbose_name }}
                       </a>
@@ -102,7 +107,7 @@
       {% for question_set in question_sets %}
         <tr>
           <td>
-              {% if question_set.is_open %}<div id="green_circle" title="Started"><span class="hide">S</span></div>{% elif question_set.interviews.count %}<div id="amber_circle" title="Closed"><span class="hide">C</span></div>{% else %}<div id="red_circle" title="Not Started"><span class="hide">N</span></div>{% endif %}
+              {% if question_set.is_open %}<div id="green_circle" title="Ongoing"><span class="hide">S</span></div>{% elif question_set.interviews.count %}<div id="amber_circle" title="Completed"><span class="hide">C</span></div>{% else %}<div id="red_circle" title="Not Started"><span class="hide">N</span></div>{% endif %}
           </td>
           <td>
              <a href="{% url 'qset_questions_page' question_set.id %}">{{ question_set.name }}</a>

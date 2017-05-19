@@ -98,7 +98,7 @@
           Name
         </th>
         <th class="sorting">
-          Description
+          Listing
         </th>
         <th class="sorting">
           Type
@@ -123,13 +123,18 @@
     {% for survey in surveys %}
         <tr>
          <td>
-              {% if survey.is_open %}<div id="green_circle" title="Started"><span class="hide">S</span></div>{% elif survey.interviews.count %}<div id="amber_circle" title="Closed"><span class="hide">C</span></div>{% else %}<div id="red_circle" title="Not Started"><span class="hide">N</span></div>{% endif %}
+              {% if survey.is_open %}<div id="green_circle" title="Ongoing"><span class="hide">S</span></div>{% elif survey.interviews.count %}<div id="amber_circle" title="Completed"><span class="hide">C</span></div>{% else %}<div id="red_circle" title="Not Started"><span class="hide">N</span></div>{% endif %}
           </td>
           <td>
             <a href="{% url 'batch_index_page' survey.id %}">{{ survey.name }}</a>
           </td>
-          <td>
-            {{ survey.description }}
+          <td>{% if survey.listing_form %}
+            {{ survey.listing_form.name }}
+            {%elif survey.preferred_listing %}
+            {{ survey.preferred_listing.name }}
+            {%else%}
+            Not Assigned
+            {%endif%}
           </td>
           <td>
               {% if survey.has_sampling %}Sampled{% else %}Census{% endif %}
