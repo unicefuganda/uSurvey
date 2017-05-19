@@ -100,9 +100,9 @@ def completion_json(request, survey_id):
                                                                      ).annotate(total=Count('ea', distinct=True)))
         # basically get interviews count
         for location in location_type.locations.all():
-            type_total_eas = total_eas[location.name]
-            type_total_interviews = total_interviews[location.name]
-            type_active_eas = active_eas[location.name]
+            type_total_eas = total_eas.get(location.name, 0)
+            type_total_interviews = total_interviews.get(location.name, 0)
+            type_active_eas = active_eas.get(location.name, 0)
             indicator_value = float(type_total_interviews) / type_total_eas
             completion_rates[location.name.upper()] = {
                 'value': '{0:.2f}'.format(indicator_value),
