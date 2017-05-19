@@ -22,6 +22,7 @@ from survey.forms.filters import QuestionSetResultsFilterForm
 from survey.forms.filters import SurveyResultsFilterForm
 from survey.odk.utils.odk_helper import get_zipped_dir
 from survey.services.results_download_service import ResultsDownloadService
+from django.db.models import ProtectedError
 
 model = QuestionSet
 QuestionsForm = get_question_form(Question)
@@ -56,9 +57,11 @@ class QuestionSetView(object):
             'request': request,
             'model': self.model,
             'placeholder': 'name, description',
+            'model_name' : self.model.__name__,
             'question_set_form': self.questionSetForm(
                 **form_extra)}
         context.update(extra_context)
+
         return render(request, template_name,
                       context)
 
@@ -173,8 +176,13 @@ def delete_qset_listingform(request, question_id):
             "%s cannot be deleted because it already has interviews." %
             qset.verbose_name())
     else:
-        qset.delete()
-    messages.success(request, "Listing form successfully deleted.")
+        try:
+            qset.delete()
+            messages.success(request, "Listing form successfully deleted.")
+        except ProtectedError as e:
+            print e
+            messages.success(request, "You can't delete this because it's being used by another")
+            pass
     return HttpResponseRedirect(reverse('%s_home' % qset.resolve_tag()))
 
 

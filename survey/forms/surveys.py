@@ -151,7 +151,9 @@ class SamplingCriterionForm(forms.ModelForm, FormOrderMixin):
         super(SamplingCriterionForm, self).__init__(*args, **kwargs)
         self.fields['survey'].initial = survey.pk
         self.fields['survey'].widget = forms.HiddenInput()
-        self.fields['listing_question'].queryset = survey.listing_form.questions.filter(
+        print survey.listing_form
+        if survey.listing_form:
+            self.fields['listing_question'].queryset = survey.listing_form.questions.filter(
             answer_type__in=[
                 defin.answer_type for defin in AnswerAccessDefinition.objects.filter(
                     channel=USSDAccess.choice_name())])

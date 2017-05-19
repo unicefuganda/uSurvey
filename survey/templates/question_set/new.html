@@ -7,7 +7,7 @@
 {% endblock %}
 
 {% block title %}
-  {% if question_set_form.instance.pk %}  {{ question_set_form.instance.name }} {% else %} {{ model.verbose_name }} {% endif %}
+  {% if question_set_form.instance.pk %}  {{ question_set_form.instance.name }} {% else %} New {{ model.verbose_name }} {% endif %}
 {% endblock %}
 
 {% block page_title %}

@@ -3,7 +3,7 @@ from django.core.urlresolvers import reverse
 from django.shortcuts import render, get_object_or_404
 from django.contrib import messages
 from django.core.exceptions import ValidationError
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponseRedirect, HttpResponse, Http404
 from django.contrib.auth.decorators import permission_required
 from survey.forms.filters import QuestionFilterForm
 from survey.models import Question, QuestionSet
@@ -34,7 +34,10 @@ def index(request, qset_id):
     # now I'm gonna call question set a batch of questions.\
         #If there's time, I'll rename them properly
     # So don't get confused :)
-    batch = QuestionSet.get(pk=qset_id)
+    try:
+        batch = QuestionSet.get(pk=qset_id)
+    except QuestionSet.DoesNotExist:
+        raise Http404("No  QuestionSet Model matches the given query.")
     questions = batch.questions_inline()
     request_data = request.GET if request.method == 'GET' else request.POST
     question_filter_form = QuestionFilterForm(data=request_data, qset=batch)
@@ -332,7 +335,6 @@ def _process_question_form(request, batch, response, question_form):
 
 
 def _render_question_view(request, batch, instance=None, prev_question=None):
-    print "*"*33
     if instance is None and prev_question is None:
         prev_question = batch.last_question_inline()
     elif prev_question is None:
