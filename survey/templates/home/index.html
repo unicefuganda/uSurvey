@@ -489,7 +489,7 @@
     indicatorCountryData = {},      // used to keep the country indicator
     indicatorSurveys = { {% for indicator in display_indicators %} '{{indicator.name}}': '{{indicator.survey.id}}', {% endfor %} },
     indicatorTable = document.getElementById('indicator-table'),
-    countryIndicator,
+    countryIndicator = '',
     geojson;
     map.dragging.disable();
     map.touchZoom.disable();
