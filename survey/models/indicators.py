@@ -111,7 +111,7 @@ class Indicator(BaseModel):
                                                                           report_level=report_level), ],
                                             index=[variable_name, ],
                                             columns=list(location_names)))
-            df = df.transpose().fillna(0)
+            df = df.transpose()
             if df.columns.shape[0] == len(variable_names):
                 df.columns = variable_names
                 # now include the formula results per location

@@ -64,7 +64,7 @@ def indicators_json(request):
         else:
             lreport_level = report_level
         for indicator in indicators:
-            indicator_df = indicator.get_data(country, report_level=lreport_level).fillna(value=0)
+            indicator_df = indicator.get_data(country, report_level=lreport_level).fillna(0)
             indicator_df.index = indicator_df.index.str.upper()
             indicator_details[indicator.name] = indicator_df.transpose(
             ).to_dict()
