@@ -489,6 +489,7 @@
     indicatorCountryData = {},      // used to keep the country indicator
     indicatorSurveys = { {% for indicator in display_indicators %} '{{indicator.name}}': '{{indicator.survey.id}}', {% endfor %} },
     indicatorTable = document.getElementById('indicator-table'),
+    statsInfo = document.getElementById('info-update'),
     countryIndicator = '',
     geojson;
     map.dragging.disable();
@@ -565,9 +566,11 @@ function updateLegend(max) {
 function getCompletionFor(){
     if(!$("#id_survey").val())
         return resetMap();
+    setCompletionRatesLoader();
     var survey_url = "{% url 'survey_json_summary' %}?survey=" + $("#id_survey").val();
     max_rate = 0;
     $.getJSON(survey_url, function (rate_data) {
+        statsInfo.innerHTML = '';
         mapData.features.map(function(feature){
           var property = feature.properties['{{loc_field}}'];
           if(!property)
@@ -587,7 +590,16 @@ function getCompletionFor(){
 
 }
 
+function setIndicatorLoader() {
+    indicatorTable.innerHTML = '<div class="row r-row"  style="position: relative;"><div id="loader"></div></div>';
+}
+
+function setCompletionRatesLoader() {
+    statsInfo.innerHTML = '<div class="row r-row" style="position: relative;"><div id="loader"></div></div>';
+}
+
 function load_indicators(){
+    setIndicatorLoader();
     var indicator_url = "{% url 'survey_indicators' %}";
     //load country level indicator then load location level indicator values
     var request_data = {'report_level': 0};
@@ -722,8 +734,7 @@ info.onAdd = function (map) {
 };
 
 info.update = function (props) {
-  var div = document.getElementById('info-update');
-  div.innerHTML = '';
+  statsInfo.innerHTML = '';
   if(typeof props != 'undefined'){
     var property = props['{{loc_field}}'];
     if(!property)
@@ -733,7 +744,7 @@ info.update = function (props) {
        updateIndicators(property);
         if('total_eas' in props.rate){
             rate = props.rate.value >-1 ? props.rate.value: 'No Data.';
-             div.innerHTML = '<table class="rathna_table">\
+             statsInfo.innerHTML = '<table class="rathna_table">\
                                 <thead>\
                                     <tr>\
                                         <th colspan="2" class="text-left">\
@@ -771,15 +782,15 @@ info.update = function (props) {
 
         }
         else{
-             div.innerHTML = '<table class="rathna_table">\
-                                <thead>\
-                                    <tr>\
-                                        <th colspan="2" class="text-left">\
-                                            <h3 class="rat_h3_1">'+property+'</h3>\
-                                        </th>\
-                                    </tr>\
-                                </thead>\
-                              </table>';
+             statsInfo.innerHTML = '<table class="rathna_table">\
+                                        <thead>\
+                                            <tr>\
+                                                <th colspan="2" class="text-left">\
+                                                    <h3 class="rat_h3_1">'+property+'</h3>\
+                                                </th>\
+                                            </tr>\
+                                        </thead>\
+                                  </table>';
         }
     }
   }
