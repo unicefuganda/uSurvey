@@ -489,7 +489,7 @@
     indicatorCountryData = {},      // used to keep the country indicator
     indicatorSurveys = { {% for indicator in display_indicators %} '{{indicator.name}}': '{{indicator.survey.id}}', {% endfor %} },
     indicatorTable = document.getElementById('indicator-table'),
-    countryIndicator = indicatorTable.innerHTML,
+    countryIndicator,
     geojson;
     map.dragging.disable();
     map.touchZoom.disable();
@@ -598,6 +598,7 @@ function load_indicators(){
         function (data) {
             indicatorCountryData = data;
             updateIndicators();
+            countryIndicator = indicatorTable.innerHTML;
         }
       );
     delete request_data['report_level'];            // let backend figure out indicator level
