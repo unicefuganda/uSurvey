@@ -115,8 +115,9 @@ def completion_json(request, survey_id):
                 'value': '{0:.2f}'.format(indicator_value),
                 'total_eas': type_total_eas,
                 'active_eas': type_active_eas,
-                'per_active_ea': '{0:.2f}'.format(float(type_total_interviews)/(type_total_eas or 1.0)),
-                'total_interviews': type_total_interviews
+                'is_open': survey.is_open_for(location),
+                'per_active_ea': '{0:.2f}'.format(float(type_total_interviews)/(type_active_eas or 1.0)),
+                'total_interviews': type_total_interviews,
             }
         return json.dumps(completion_rates, cls=DjangoJSONEncoder)
     json_dump = get_result_json()

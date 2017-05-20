@@ -33,7 +33,29 @@
 
         }
 
-
+    #red_circle  {
+        /*background: #d12a09 none repeat scroll 0 0;
+        border-radius: 70px;
+        height: 10px;
+        margin-top: 5px;
+        width: 10px;*/
+        background: #a3a3a3 none repeat scroll 0 0;
+        border: 1px solid #000;
+        margin-top: 5px;
+        border-radius: 70px;
+        height: 10px;
+        width: 10px;
+        margin-left: 15px;
+    }
+    #green_circle {
+        background: #009948 none repeat scroll 0 0;
+        border-radius: 70px;
+        height: 10px;
+        margin-top: 5px;
+        text-align: center;
+        width: 10px;
+        margin-left: 15px;
+    }
 
         .leaflet-container {
             margin-bottom: 10px;
@@ -674,8 +696,8 @@ function onEachFeature(feature, layer) {
 
 }
 
-getIndicatorHtml = function(name, property, styleIndex, indicatorData) {
-    var propertySummary = indicatorData[name][property];
+getIndicatorHtml = function(name, featureProps, locationName, styleIndex, indicatorData) {
+    var propertySummary = indicatorData[name][locationName];
     if(propertySummary == undefined)
         return '';
     var indicatorValue = propertySummary['{{indicator_reports_field}}'];
@@ -698,17 +720,17 @@ getIndicatorHtml = function(name, property, styleIndex, indicatorData) {
 }
 
 
-updateIndicators = function(property) {
+updateIndicators = function(featureProps, locationName) {
      var indicatorData;
-     if(property)
+     if(locationName)
         indicatorData = indicatorLocationData;
      else {
         indicatorData = indicatorCountryData;
-        property = '{{country.name.upper}}';
+        locationName = '{{country.name.upper}}';
      }
      indicatorTable.innerHTML = '<div class="row r-row">\
                                         <div style="margin-left:-8px !important;" class="col-sm-12">\
-                                            <p style="font-size:17px; color:#ff8200; font-weight:bold;">' + property + '</p>\
+                                            <p style="font-size:17px; color:#ff8200; font-weight:bold;">' + getLocationHeader(featureProps, locationName) + '</p>\
                                          </div>\
                                     </div>\
                                     <div class="row r-row"  style="font-family: Open Sans; ">\
@@ -716,7 +738,7 @@ updateIndicators = function(property) {
      var styleIndex = 0;
      for (var name in indicatorData){
         styleIndex = styleIndex%3+2;
-        indicatorTable.innerHTML += getIndicatorHtml(name, property, styleIndex, indicatorData);
+        indicatorTable.innerHTML += getIndicatorHtml(name, featureProps, locationName, styleIndex, indicatorData);
         styleIndex++;
      }
      indicatorTable.innerHTML += '</div>\
@@ -728,22 +750,31 @@ info.onAdd = function (map) {
 
 };
 
+function getLocationHeader(featureProps, locationName) {
+   var openStatusHTML = '<h3 class="rat_h3_1 red">'+locationName+' (Not Open)</h3>';
+   if(featureProps.rate.is_open) {
+        openStatusHTML = '<h3 class="rat_h3_1 green">'+locationName+' (Open)</h3>';
+   }
+   return openStatusHTML;
+}
+
 info.update = function (props) {
   statsInfo.innerHTML = '';
   if(typeof props != 'undefined'){
-    var property = props['{{loc_field}}'];
-    if(!property)
-        property = props['{{alt_loc_field}}'];
-    if(property) {
-       property = property.toUpperCase();
-       updateIndicators(property);
+    var locationName = props['{{loc_field}}'];
+    if(!locationName)
+        locationName = props['{{alt_loc_field}}'];
+    if(locationName) {
+
+       locationName = locationName.toUpperCase();
+       updateIndicators(props, locationName);
         if('total_eas' in props.rate){
             rate = props.rate.value >-1 ? props.rate.value: 'No Data.';
              statsInfo.innerHTML = '<table class="rathna_table">\
                                 <thead>\
                                     <tr>\
                                         <th colspan="2" class="text-left">\
-                                            <h3 class="rat_h3_1">'+property+'</h3>\
+                                             <h3 class="rat_h3_1">'+getLocationHeader(props, locationName)+'</h3>\
                                         </th>\
                                     </tr>\
                                 </thead>\
@@ -781,7 +812,7 @@ info.update = function (props) {
                                         <thead>\
                                             <tr>\
                                                 <th colspan="2" class="text-left">\
-                                                    <h3 class="rat_h3_1">'+property+'</h3>\
+                                                    <h3 class="rat_h3_1">'+locationName+'</h3>\
                                                 </th>\
                                             </tr>\
                                         </thead>\
