@@ -88,33 +88,26 @@ class BatchQuestionFilterForm(QuestionFilterForm):
 class IndicatorFilterForm(forms.Form):
     survey = forms.ChoiceField(label='Survey', widget=forms.Select(
         attrs={'id': 'id_filter_survey'}), choices=[], required=False)
-    batch = forms.ChoiceField(
-        label='Batch', widget=forms.Select(), choices=[], required=False)
-    module = forms.ChoiceField(
-        label='Module', widget=forms.Select(), choices=[], required=False)
+    question_set = forms.ChoiceField(label='Batch', widget=forms.Select(), choices=[], required=False)
 
     def __init__(self, data=None, initial=None):
         super(IndicatorFilterForm, self).__init__(data=data, initial=initial)
-        all_surveys, all_batches, all_modules = self.set_all_choices(data)
+        all_surveys, question_sets = self.get_all_choices(data)
         self.fields['survey'].choices = all_surveys
-        self.fields['batch'].choices = all_batches
-        self.fields['module'].choices = all_modules
+        self.fields['question_set'].choices = question_sets
 
-    def set_all_choices(self, data=None):
+    def get_all_choices(self, data=None):
         all_batches = [('All', 'All')]
         all_surveys = [('All', 'All')]
         all_modules = [('All', 'All')]
-        batches = Batch.objects.all()
+        question_sets = [('All', 'All')]
+        qsets = QuestionSet.objects.none()
         if data and data.get('survey'):
             if data['survey'].isdigit():
-                batches = batches.filter(survey__id=int(data.get('survey', None)))
-        map(lambda batch: all_batches.append((batch.id, batch.name)), batches)
-        map(lambda survey: all_surveys.append(
-            (survey.id, survey.name)), Survey.objects.all())
-        map(lambda module: all_modules.append(
-            (module.id, module.name)), QuestionModule.objects.all())
-
-        return all_surveys, all_batches, all_modules
+                qsets = Survey.objects.get(pk=data['survey']).qsets
+        map(lambda qset: question_sets.append((qset.id, qset.name)), qsets)
+        map(lambda survey: all_surveys.append((survey.id, survey.name)), Survey.objects.all())
+        return all_surveys, question_sets
 
 
 class LocationFilterForm(forms.Form):
