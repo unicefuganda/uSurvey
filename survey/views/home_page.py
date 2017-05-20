@@ -8,6 +8,7 @@ from survey.models import Survey, AboutUs, Indicator, SuccessStories
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
 from django.core.urlresolvers import reverse
+from survey.models import Location
 from survey.utils import views_helper
 from survey.forms.filters import MapFilterForm
 
@@ -32,7 +33,8 @@ def home(request):
                    'map_center': settings.MAP_CENTER,
                    'zoom_level': settings.MAP_ZOOM_LEVEL,
                    'display_indicators': display_indicators,
-                   'indicator_reports_field': Indicator.REPORT_FIELD_NAME})
+                   'indicator_reports_field': Indicator.REPORT_FIELD_NAME,
+                   'country': Location.country()})
 
 
 def index(request):

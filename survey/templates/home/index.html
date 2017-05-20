@@ -485,7 +485,8 @@
 
     info = L.control(),
     //legend = L.control({position: 'bottomright'}),
-    indicatorData = {},
+    indicatorLocationData = {},
+    indicatorCountryData = {},      // used to keep the country indicator
     indicatorSurveys = { {% for indicator in display_indicators %} '{{indicator.name}}': '{{indicator.survey.id}}', {% endfor %} },
     indicatorTable = document.getElementById('indicator-table'),
     countryIndicator = indicatorTable.innerHTML,
@@ -588,10 +589,22 @@ function getCompletionFor(){
 
 function load_indicators(){
     var indicator_url = "{% url 'survey_indicators' %}";
+    //load country level indicator then load location level indicator values
+    var request_data = {'report_level': 0};
     if($("#id_survey").val())
-        indicator_url = indicator_url + "?survey=" + $("#id_survey").val();
-    $.getJSON(indicator_url, function (data) {
-         indicatorData = data;
+        request_data['survey'] = $("#id_survey").val();
+    $.getJSON(indicator_url,
+        request_data,
+        function (data) {
+            indicatorCountryData = data;
+            updateIndicators();
+        }
+      );
+    delete request_data['report_level'];            // let backend figure out indicator level
+    $.getJSON(indicator_url,
+        request_data,
+        function (data) {
+         indicatorLocationData = data;
       });
 }
 
@@ -653,7 +666,7 @@ function onEachFeature(feature, layer) {
 
 }
 
-getIndicatorHtml = function(name, property, styleIndex) {
+getIndicatorHtml = function(name, property, styleIndex, indicatorData) {
     var propertySummary = indicatorData[name][property];
     if(propertySummary == undefined)
         return '';
@@ -678,6 +691,13 @@ getIndicatorHtml = function(name, property, styleIndex) {
 
 
 updateIndicators = function(property) {
+     var indicatorData;
+     if(property)
+        indicatorData = indicatorLocationData;
+     else {
+        indicatorData = indicatorCountryData;
+        property = '{{country.name.upper}}';
+     }
      indicatorTable.innerHTML = '<div class="row r-row">\
                                         <div style="margin-left:-8px !important;" class="col-sm-12">\
                                             <p style="font-size:17px; color:#ff8200; font-weight:bold;">' + property + '</p>\
@@ -688,7 +708,7 @@ updateIndicators = function(property) {
      var styleIndex = 0;
      for (var name in indicatorData){
         styleIndex = styleIndex%3+2;
-        indicatorTable.innerHTML += getIndicatorHtml(name, property, styleIndex);
+        indicatorTable.innerHTML += getIndicatorHtml(name, property, styleIndex, indicatorData);
         styleIndex++;
      }
      indicatorTable.innerHTML += '</div>\
