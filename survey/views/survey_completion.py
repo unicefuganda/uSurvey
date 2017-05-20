@@ -47,7 +47,7 @@ def indicators_json(request):
     if request.GET.get('report_level'):
         report_level = int(request.GET['report_level'])
     indicators = Indicator.objects.filter(**in_kwargs).order_by('name')
-    
+
     @cached_as(indicators, extra=(report_level, ))
     def get_result_json():
         """Basically fetch all indicators as per the map level info

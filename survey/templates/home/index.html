@@ -566,10 +566,11 @@ function updateLegend(max) {
 function getCompletionFor(){
     if(!$("#id_survey").val())
         return resetMap();
-    setCompletionRatesLoader();
+    $(".loader").show();
     var survey_url = "{% url 'survey_json_summary' %}?survey=" + $("#id_survey").val();
     max_rate = 0;
     $.getJSON(survey_url, function (rate_data) {
+        $(".loader").fadeOut("slow");
         statsInfo.innerHTML = '';
         mapData.features.map(function(feature){
           var property = feature.properties['{{loc_field}}'];
@@ -590,17 +591,9 @@ function getCompletionFor(){
 
 }
 
-function setIndicatorLoader() {
-    indicatorTable.innerHTML = '<div class="row r-row"  style="position: relative;"><div id="loader"></div></div>';
-    countryIndicator = indicatorTable.innerHTML;
-}
-
-function setCompletionRatesLoader() {
-    statsInfo.innerHTML = '<div class="row r-row" style="position: relative;"><div id="loader"></div></div>';
-}
 
 function load_indicators(){
-    setIndicatorLoader();
+    $(".loader").show();
     var indicator_url = "{% url 'survey_indicators' %}";
     //load country level indicator then load location level indicator values
     var request_data = {'report_level': 0};
@@ -609,6 +602,7 @@ function load_indicators(){
     $.getJSON(indicator_url,
         request_data,
         function (data) {
+            $(".loader").fadeOut("slow");
             indicatorCountryData = data;
             updateIndicators();
             countryIndicator = indicatorTable.innerHTML;
