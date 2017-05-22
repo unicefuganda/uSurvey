@@ -279,11 +279,11 @@
                         </span>
                         </a>
                         <ul>
-                            <li>
+                            <!-- <li>
                                 <a href="{% url 'users_edit' request.user.id 'view' %}">Profile</a>
-                            </li>
+                            </li> -->
                             <li>
-                                <a href="#" >{% if user.first_name %}{{ user.first_name }} {% else %} Settings {% endif %}</a>
+                                <a href="{% url 'users_edit' request.user.id 'view' %}" >{% if user.first_name %}{{ user.first_name }} {% else %} Settings {% endif %}</a>
                             </li>
 
                             {% if perms.auth.can_have_super_powers %}
