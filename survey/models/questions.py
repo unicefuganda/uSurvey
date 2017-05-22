@@ -540,10 +540,11 @@ class QuestionSet(
             return Question.get(pk=questions[0].id)
 
     def deep_clone(self, **attrs):
+        import random
         batch = QuestionSet.get(pk=self.pk)
         old_batch = batch
         start_question = batch.start_question
-        attrs.update({'start_question': None, 'name': '%s-copy' % batch.name})
+        attrs.update({'start_question': None, 'name': '%s-copy-%s' % (batch.name, random.randrange(1000))})
         batch = batch.clone(attrs=attrs)
         flows = QuestionFlow.objects.filter(question__qset=old_batch)
         if start_question:

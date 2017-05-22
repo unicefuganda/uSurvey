@@ -129,11 +129,11 @@
             <a href="{% url 'batch_index_page' survey.id %}">{{ survey.name }}</a>
           </td>
           <td>{% if survey.listing_form %}
-            {{ survey.listing_form.name }}
+                {{ survey.listing_form.name }}
             {%elif survey.preferred_listing %}
-            {{ survey.preferred_listing.name }}
+                {{ survey.preferred_listing.name }}
             {%else%}
-            Not Assigned
+                N/A
             {%endif%}
           </td>
           <td>
