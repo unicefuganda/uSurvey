@@ -116,8 +116,9 @@ class Survey(CloneableMixin, BaseModel):
 
     def deep_clone(self):
         from survey.models import Batch
+        import random
         # first clone this survey
-        survey = self.clone(attrs={'name': '%s-copy' % self.name})
+        survey = self.clone(attrs={'name': '%s-copy-%s' % (self.name, random.randrange(1000))})
         # not create survey batches for this one
         for batch in Batch.objects.filter(survey__id=self.id):
             batch.deep_clone(survey=survey)

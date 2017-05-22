@@ -69,19 +69,12 @@ def edit(request, indicator_id):
 def _process_form(indicator_filter_form, indicators):
     if indicator_filter_form.is_valid():
         survey_id = indicator_filter_form.cleaned_data['survey']
-        batch_id = indicator_filter_form.cleaned_data['batch']
-        module_id = indicator_filter_form.cleaned_data['module']
-        if batch_id.isdigit() and module_id.isdigit():
-            indicators = indicators.filter(batch=batch_id, module=module_id)
-        elif not batch_id.isdigit() and module_id.isdigit():
-            indicators = indicators.filter(module=module_id)
-        elif batch_id.isdigit() and not module_id.isdigit():
-            indicators = indicators.filter(batch__id=batch_id)
+        question_set_id = indicator_filter_form.cleaned_data['question_set']          # could
+        if question_set_id.isdigit():
+            indicators = indicators.filter(question_set__id=question_set_id)
         elif survey_id.isdigit():
-            batches = Survey.objects.get(
-                id=survey_id).batches.values_list(
-                'id', flat=True)
-            indicators = indicators.filter(batch__id__in=batches)
+            qsets = Survey.objects.get(id=survey_id).qsets.values_list('id', flat=True)
+            indicators = indicators.filter(question_set__id__in=qsets)
     return indicators
 
 
@@ -350,7 +343,7 @@ def simple_indicator(request, indicator_id):
 
     def make_hover_text(row):
         return '<br />'.join(['%s: %d' % (name, row[name])
-                              for name in variable_names])
+                              for name in variable_names if str(row[name]).isdigit()])
     reports_df['hover-text'] = reports_df.apply(make_hover_text, axis=1)
     if report_locations:
         trace1 = go.Bar(x=reports_df.index,

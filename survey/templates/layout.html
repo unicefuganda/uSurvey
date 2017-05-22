@@ -98,6 +98,7 @@
         <link href="{{ STATIC_URL }}css/formset-extra.css" rel="stylesheet" type="text/css">
         <link rel="stylesheet" href="{{ STATIC_URL }}bootstrap-switch/bootstrap-switch.css">
         <link rel="stylesheet" href="{{ STATIC_URL }}multi-select/multi-select.css">
+        <link rel="stylesheet" href="{{ STATIC_URL }}css/loader.css">
         <link href="{{STATIC_URL}}css/select2.css" rel="stylesheet">
         <link href="http://cdn.jsdelivr.net/qtip2/3.0.3/jquery.qtip.min.css" rel="stylesheet" type="text/css"/>
         <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
@@ -139,6 +140,12 @@
         </style>
     </head>
     <body class="home page page-id-146 page-template page-template-page_templates page-template-home bgOne ">
+        <div class="loader"></div>
+        <script type="text/javascript">
+            $(window).load(function() {
+                $(".loader").fadeOut("slow");
+            })
+            </script>
         <div class="loaderWrap" style="display: none;">
             <div class="loader-inner sk-folding-cube">
                 <div class="sk-cube1 sk-cube"></div>

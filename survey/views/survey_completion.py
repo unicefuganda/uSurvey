@@ -6,6 +6,7 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.core.serializers.json import DjangoJSONEncoder
 from django.http import HttpResponse
 from django.shortcuts import render, get_object_or_404
+from django.db.models import Count
 from survey.models import Location, LocationType, Indicator,\
     Answer, QuestionOption
 from survey.forms.enumeration_area import LocationsFilterForm as LocFilterForm
@@ -40,11 +41,14 @@ def __get_parent_level_locations():
 @permission_required('auth.can_view_aggregates')
 def indicators_json(request):
     in_kwargs = {'display_on_dashboard': True}
+    report_level = None
     if request.GET.get('survey'):
         in_kwargs['survey__id'] = request.GET['survey']
+    if request.GET.get('report_level'):
+        report_level = int(request.GET['report_level'])
     indicators = Indicator.objects.filter(**in_kwargs).order_by('name')
 
-    @cached_as(indicators)
+    @cached_as(indicators, extra=(report_level, ))
     def get_result_json():
         """Basically fetch all indicators as per the map level info
         :return:
@@ -55,8 +59,12 @@ def indicators_json(request):
             location_type = country.get_descendants()[settings.MAP_ADMIN_LEVEL - 1]
         else:
             location_type = LocationType.largest_unit()
+        if report_level is None:
+            lreport_level = location_type.level
+        else:
+            lreport_level = report_level
         for indicator in indicators:
-            indicator_df = indicator.get_data(country, report_level=location_type.level).fillna(value='null')
+            indicator_df = indicator.get_data(country, report_level=lreport_level).fillna(0)
             indicator_df.index = indicator_df.index.str.upper()
             indicator_details[indicator.name] = indicator_df.transpose(
             ).to_dict()
@@ -76,32 +84,41 @@ def completion_json(request, survey_id):
         :return:
         """
         survey = Survey.objects.get(id=survey_id)
-        country = LocationType.objects.get(parent__isnull=True)
+        country_type = LocationType.objects.get(parent__isnull=True)
+        hierachy_count = country_type.get_descendant_count()
         if hasattr(settings, 'MAP_ADMIN_LEVEL'):
-            location_type = country.get_descendants()[settings.MAP_ADMIN_LEVEL - 1]
+            location_type = country_type.get_descendants()[settings.MAP_ADMIN_LEVEL - 1]
         else:
             location_type = LocationType.largest_unit()
         divider = 1.0
         completion_rates = {}
         has_sampling = survey.has_sampling
         is_open = survey.is_open()
+        parent_loc = 'locations'
+        for i in range(hierachy_count - location_type.level):    # fetches direct descendants from ea__locations
+            parent_loc = '%s__parent' % parent_loc
+        total_interviews = dict(Interview.objects.filter(**{'survey': survey
+                                                            }).values_list('ea__%s__name' % parent_loc
+                                                                           ).annotate(total=Count('id', distinct=True)))
+        total_eas = dict(EnumerationArea.objects.all().values_list('%s__name' % parent_loc
+                                                                   ).annotate(total=Count('id', distinct=True)))
+        active_eas = dict(Interview.objects.filter(**{'survey': survey,
+                                                      }).values_list('ea__%s__name' % parent_loc
+                                                                     ).annotate(total=Count('ea', distinct=True)))
         # basically get interviews count
         for location in location_type.locations.all():
-            description = 'Percentage Responses'
-            total_eas = EnumerationArea.under_(location).count()
-            total_interviews = Interview.interviews_in(
-                location, survey).distinct('id').count()
-            active_eas = Interview.interviews_in(
-                location, survey).distinct('ea').count()
-            indicator_value = float(total_interviews) / total_eas
+            type_total_eas = total_eas.get(location.name, 0)
+            type_total_interviews = total_interviews.get(location.name, 0)
+            type_active_eas = active_eas.get(location.name, 0)
+            indicator_value = float(type_total_interviews) / type_total_eas
             completion_rates[location.name.upper()] = {
                 'value': '{0:.2f}'.format(indicator_value),
-                'total_eas': total_eas,
-                'active_eas': active_eas,
-                'per_active_ea': '{0:.2f}'.format(
-                    float(
-                        total_interviews)/(active_eas or 1.0)),
-                'total_interviews': total_interviews}
+                'total_eas': type_total_eas,
+                'active_eas': type_active_eas,
+                'is_open': survey.is_open_for(location),
+                'per_active_ea': '{0:.2f}'.format(float(type_total_interviews)/(type_active_eas or 1.0)),
+                'total_interviews': type_total_interviews,
+            }
         return json.dumps(completion_rates, cls=DjangoJSONEncoder)
     json_dump = get_result_json()
     return HttpResponse(json_dump, content_type='application/json')

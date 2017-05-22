@@ -1,42 +1,24 @@
-    <div  id="indicator-table" class="container-fluid" style="padding: 0;margin: 0; width: 100%;">
+    <div  id="indicator-table" class="container-fluid" style="padding: 0;margin: 0; width: 100%; ">
     <style>
    .hero-description {
-    color: #000;    
-    font-family: Open Sans;
-    font-size: 13px;
-    line-height: 140%;
-    margin-left: -9px;
+        color: #000;
+        font-family: Open Sans;
+        font-size: 13px;
+        line-height: 140%;
+        margin-left: -9px;
 
-}
-.poll-hero .poll-hero-questions {
-    border-left: 2px solid #896de8);
-    font-family: "Open Sans";
-    font-size: 8px;
-    margin-left: 5px;
-    margin-top: 10px;
-    min-height: 50px;
-    padding-left: 15px;
-    position: relative;
- 
-}
+    }
+    .poll-hero .poll-hero-questions {
+        border-left: 2px solid #896de8);
+        font-family: "Open Sans";
+        font-size: 8px;
+        margin-left: 5px;
+        margin-top: 10px;
+        min-height: 50px;
+        padding-left: 15px;
+        position: relative;
+
+    }
 </style>
-        <div class="row r-row">
-            <div class="col-sm-12">
-                <p style="font-size:17px; color:#ff8200; font-weight:bold;">&nbsp;</p>
-             </div>
-        </div>
-        <div class="row r-row"  style="font-family: Open Sans; ">
-            <div class="col-sm-12"  style="width: 100% !important;">
-                {% for indicator in display_indicators %}
-                    <div class="hero-description poll-hero-title indicators indicator-{{indicator.survey.id}} indic-{% cycle 2 3 4 %}">
-                           <span class="tite{% cycle 2 3 4 %}">{{ indicator.country_wide_value }}</span> <i>{{ indicator.name }}</i>
-                            {% for key, value in indicator.country_wide_report.items %}
-                                {% if key != indicator_reports_field %}
-                                    <p><span>{{value}}</span><i>{{key}}</i></p>
-                                {% endif %}
-                            {% endfor %}
-                      </div>
-                {% endfor %}
-            </div>
-        </div>
-    </div>
+
+</div>
