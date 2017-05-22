@@ -280,8 +280,12 @@
                         </a>
                         <ul>
                             <li>
+                                <a href="{% url 'users_edit' request.user.id 'view' %}">Profile</a>
+                            </li>
+                            <li>
                                 <a href="#" >{% if user.first_name %}{{ user.first_name }} {% else %} Settings {% endif %}</a>
                             </li>
+
                             {% if perms.auth.can_have_super_powers %}
                             {% if has_powers %}
                             <li>
@@ -292,7 +296,7 @@
                                 <a href="{% url 'activate_super_powers_page' %}" class="activate_super_powers_page">Active Power Mode</a>
                             </li>
                             {% endif %}
-                            {% endif %}
+                            {% endif %}                            
                             <li>
                                 <a href="{% url 'password_change' %}" class="password_reset_done password_change">Change Password</a>
                             </li>
