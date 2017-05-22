@@ -321,7 +321,7 @@ def _retrieve_data_frame(request, indicator_id):
                'selected_location': selected_location,
                'report_locations': report_locations
                }
-    return context, indicator.get_data(selected_location, report_level=selected_location.level+1).fillna(0)
+    return context, indicator.get_data(selected_location, report_level=selected_location.level+1)
 
 
 @permission_required('auth.can_view_batches')
@@ -343,7 +343,7 @@ def simple_indicator(request, indicator_id):
 
     def make_hover_text(row):
         return '<br />'.join(['%s: %d' % (name, row[name])
-                              for name in variable_names])
+                              for name in variable_names if str(row[name]).isdigit()])
     reports_df['hover-text'] = reports_df.apply(make_hover_text, axis=1)
     if report_locations:
         trace1 = go.Bar(x=reports_df.index,
