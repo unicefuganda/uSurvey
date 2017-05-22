@@ -53,15 +53,16 @@
 }
 
 .sp-slideshow input + label {
-    position: absolute;
+    border: 3px solid rgba(255, 255, 255, 0.9);
+    border-radius: 50%;
     bottom: 15px;
-	left: 50%;
-    width: 6px;
-	height: 6px;
-	display: block;
-	z-index: 1000;
-	border: 3px solid #fff;
-	border: 3px solid rgba(255,255,255,0.9);
+    display: block;
+    height: 10px;
+    left: 50%;
+    position: absolute;
+    transition: background-color 0.1s linear 0s;
+    width: 10px;
+    z-index: 1000;
     -webkit-border-radius: 50%;
     -moz-border-radius: 50%;
     border-radius: 50%;
@@ -72,8 +73,8 @@
     transition: background-color linear 0.1s;
 }
 .sp-slideshow input:checked + label {
-	background-color: #fff;
-    background-color: rgba(255,255,255,0.9);
+    background-color: yellow;
+    border: 3px solid yellow;
 }
 
 .sp-selector-1, .button-label-1 {

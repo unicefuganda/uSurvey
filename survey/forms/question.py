@@ -51,13 +51,20 @@ def get_question_form(model_class):
                 self.answer_map[defi.answer_type] = self.answer_map.get(
                     defi.answer_type, [])
                 self.answer_map[defi.answer_type].append(defi.channel)
-            if 'module' in self.fields:
-                self.fields['module'].empty_label = 'Select Module'
-            if 'group' in self.fields:
-                self.fields['group'].empty_label = 'Select Group'
+            
+            
+            group_choices = sorted([ each for each in self.fields['group'].choices if each[0]!=''] , key=lambda tup: (tup[0]))
+            group_choices.insert(0,('','-----Select Group----'))
+            self.fields['group'].choices = group_choices
+
+            module_choices = sorted([ each for each in self.fields['module'].choices if each[0]!=''] , key=lambda tup: (tup[1]))
+            module_choices.insert(0,('','-----Select Module----'))
+            self.fields['module'].choices = module_choices
+
             self.fields[
                 'text'].help_text = "To get previous identifier suggestions, type {{ any time"
             self.parent_question = parent_question
+
             self.order_fields(['module', 'group', 'identifier',
                                'text', 'answer_type', 'mandatory'])
 
