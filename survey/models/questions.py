@@ -14,6 +14,7 @@ from survey.models.base import BaseModel
 from survey.models.generics import GenericQuestion
 from survey.models.interviews import AnswerAccessDefinition
 from survey.models.access_channels import ODKAccess
+from survey.models.surveys import Survey
 
 ALL_ANSWERS = Answer.answer_types()
 
@@ -538,6 +539,11 @@ class QuestionSet(
         questions = self.all_questions
         if questions:
             return Question.get(pk=questions[0].id)
+    def survey_list(self):
+        survey_names = []
+        survey_names.extend(Survey.objects.filter(listing_form_id=self.id))
+        survey_names.extend(Survey.objects.filter(preferred_listing_id=self.id))
+        return survey_names
 
     def deep_clone(self, **attrs):
         import random
