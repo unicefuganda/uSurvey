@@ -92,6 +92,9 @@
         <th class="sorting">
           Name
         </th>
+        {% if model_name == 'ListingTemplate' %}
+        <th>Surveys</th>
+        {%endif%}
         <th class="sorting">
           Description
         </th>
@@ -112,6 +115,36 @@
           <td>
              <a href="{% url 'qset_questions_page' question_set.id %}">{{ question_set.name }}</a>
           </td>
+          {%if model_name == 'ListingTemplate'%}
+          <td>
+            {% if question_set.survey_list %}
+            <a style="color: #369 !important;
+    font-style: normal !important;
+    text-decoration: none !important;" href="#survey_{{question_set.pk}}" data-toggle="modal">View ({{question_set.survey_list|length}})</a>
+                    <div class="modal" id="survey_{{question_set.pk}}" tabindex="-1" role="dialog"  aria-hidden="true">
+              <div class="modal-dialog">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                      <h4 class="modal-title" style = "color:#fff;" >Assigned Surveys for {{question_set.name}}</h4>
+                    </div>
+                    <div class="modal-body">
+                      <table class="table">
+                          {% for each in  question_set.survey_list %}
+                            <tr>
+                              <td>{{each|title}}<td>
+                            </tr>
+                          {% endfor %}
+                        </table>
+                    </div>
+                  </div><!-- /.modal-content -->
+              </div><!-- /.modal-dialog -->
+          </div><!-- /.modal -->
+            {%else%}
+            N/A
+            {%endif%}
+          </td>
+          {%endif%}
           <td>
             {{ question_set.description }}
           </td>
