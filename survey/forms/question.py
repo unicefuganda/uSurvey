@@ -41,25 +41,21 @@ def get_question_form(model_class):
             self.fields['answer_type'].choices.insert(
                 0, ('', '----Select Answer Type----'))
             if instance:
-                self.help_text = ' and '.join(
-                    AnswerAccessDefinition.access_channels(
-                        instance.answer_type))
+                self.help_text = ' and '.join(AnswerAccessDefinition.access_channels(instance.answer_type))
                 self.fields['answer_type'].help_text = self.help_text
             self.answer_map = {}
             definitions = AnswerAccessDefinition.objects.all()
             for defi in definitions:
-                self.answer_map[defi.answer_type] = self.answer_map.get(
-                    defi.answer_type, [])
+                self.answer_map[defi.answer_type] = self.answer_map.get(defi.answer_type, [])
                 self.answer_map[defi.answer_type].append(defi.channel)
-            
-            
-            group_choices = sorted([ each for each in self.fields['group'].choices if each[0]!=''] , key=lambda tup: (tup[0]))
-            group_choices.insert(0,('','-----Select Group----'))
-            self.fields['group'].choices = group_choices
-
-            module_choices = sorted([ each for each in self.fields['module'].choices if each[0]!=''] , key=lambda tup: (tup[1]))
-            module_choices.insert(0,('','-----Select Module----'))
-            self.fields['module'].choices = module_choices
+            # group_choices = sorted([each for each in self.fields['group'].choices if each[0]!= ''],
+            #                        key=lambda tup: (tup[0]))
+            # group_choices.insert(0,('', '-----Select Group----'))
+            # self.fields['group'].choices = group_choices
+            #
+            # module_choices = sorted([each for each in self.fields['module'].choices if each[0]!=''], key=lambda tup: (tup[1]))
+            # module_choices.insert(0,('','-----Select Module----'))
+            # self.fields['module'].choices = module_choices
 
             self.fields[
                 'text'].help_text = "To get previous identifier suggestions, type {{ any time"
