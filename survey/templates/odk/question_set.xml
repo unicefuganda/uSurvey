@@ -103,6 +103,11 @@ xmlns:jr="http://openrosa.org/javarosa">
 				required="true()"
 				relevant="true() and {{ relevance_context }}" readonly="true()" calculate="position(..)"/>
 	       {% else %}
+
+
+
+
+	
 				<bind nodeset="/qset/qset{{qset.pk}}/questions/surveyQuestions{{ path }}/q{{question.pk}}"
 					type="{% if question.answer_type == answer_types.numericalanswer or question.answer_type == answer_types.autoresponse %}int{% elif question.answer_type == answer_types.multichoiceanswer %}select1{% elif question.answer_type == answer_types.multiselectanswer %}select{% elif question.answer_type == answer_types.dateanswer %}date{% elif question.answer_type == answer_types.audioanswer or answer_type == answer_types.imageanswer or answer_type == answer_types.videoanswer %}binary{% elif question.answer_type == answer_types.geopointanswer %}geopoint{% else %}string{% endif %}"
 					required="{% if question.mandatory %}true(){% else %}false(){% endif %}"
