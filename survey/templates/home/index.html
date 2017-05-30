@@ -753,9 +753,9 @@ info.onAdd = function (map) {
 function getLocationHeader(featureProps, locationName) {
    var openStatusHTML = '<h3 class="rat_h3_1 red">'+locationName+'</h3>';
    if(featureProps) {
-       openStatusHTML = '<h3 class="rat_h3_1 red">'+locationName+' (Not Open)</h3>';
+       openStatusHTML = '<h3 class="rat_h3_1 red">'+locationName+': Closed</h3>';
        if(featureProps.rate.is_open)
-            openStatusHTML = '<h3 class="rat_h3_1 green">'+locationName+' (Open)</h3>';
+            openStatusHTML = '<h3 class="rat_h3_1 green">'+locationName+': Open</h3>';
    }
    return openStatusHTML;
 }
