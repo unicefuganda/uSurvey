@@ -102,7 +102,7 @@ class Interview(BaseModel):
         def _save_record(record):
             interview = Interview.objects.create(survey=survey, question_set=qset,
                                                  ea=ea, interviewer=interviewer, interview_channel=access_channel,
-                                                 closure_date=timezone.now(),
+                                                 closure_date=record.get('completion_date', timezone.now()),
                                                  interview_reference_id=reference_interview)
             interviews.append(interview)
             map(lambda (q_id, answer): _save_answer(interview, q_id, answer), record.items())

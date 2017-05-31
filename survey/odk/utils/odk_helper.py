@@ -30,6 +30,7 @@ OPEN_ROSA_VERSION = '1.0'
 DEFAULT_CONTENT_TYPE = 'text/xml; charset=utf-8'
 INSTANCE_ID_PATH = '//qset/meta/instanceID'
 INSTANCE_NAME_PATH = '//qset/meta/instanceName'
+DEFAULT_DATE_CREATED_PATH = '//qset/meta/creationDate'
 FORM_ID_PATH = '//qset/@id'
 SUBMISSIONS_ID_PATH = '//qset/submissions/id'
 FORM_TYPE_PATH = '//qset/type'
@@ -90,12 +91,13 @@ def process_answers(xml, qset, access_channel, question_map, survey_allocation, 
         # map(lambda node: answers.extend(get_answers(node, qset, question_map)), question_answers_node.getchildren())
         # map(lambda node: survey_parameters.extend(get_answers(node, qset, question_map)),
         #     survey_parameters_node.getchildren())
-        answers = get_answers(question_answers_node, qset, question_map)
+        answers = get_answers(question_answers_node, qset, question_map, _get_default_date_created(survey_tree))
         survey_parameters = None
         if hasattr(qset, 'parameter_list'):
             survey_parameters_node = _get_nodes('./questions/groupQuestions', answers_node)[0]
             # survey paramaters does not have any single repeat
-            survey_parameters = get_answers(survey_parameters_node, qset, question_map)[0]
+            survey_parameters = get_answers(survey_parameters_node, qset, question_map,
+                                            _get_default_date_created(survey_tree))[0]
         if survey_allocation.stage in [None, SurveyAllocation.LISTING] and \
                 survey.has_sampling and survey.sample_size > len(answers):
             raise NotEnoughData()
@@ -125,6 +127,7 @@ def get_answers(node, qset, question_map, completion_date):
             _update_loop_answers(inline_record, loop_answers)
             answers.extend(loop_answers)
         else:
+            inline_record['completion_date'] = completion_date
             inline_record[e.tag.strip('q')] = e.text
             question = question_map.get(e.tag.strip('q'), '')
             if question:
@@ -157,6 +160,14 @@ def _get_instance_id(survey_tree):
 
 def _get_instance_name(survey_tree):
     return _get_nodes(INSTANCE_NAME_PATH, tree=survey_tree)[0].text
+
+
+def _get_default_date_created(survey_tree):
+    date_string = _get_nodes(INSTANCE_NAME_PATH, tree=survey_tree)[0].text
+    if date_string:
+        return extract_date(date_string)
+    else:
+        return datetime.now()
 
 
 def _get_form_id(survey_tree):
