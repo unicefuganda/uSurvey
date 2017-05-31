@@ -2,6 +2,7 @@ from datetime import date, datetime
 import os
 import pytz
 from lxml import etree
+from dateutil.parser import parse as extract_date
 from django.forms import ValidationError
 from django.http import HttpResponse, HttpResponseNotFound, StreamingHttpResponse
 from django.core.servers.basehttp import FileWrapper
@@ -111,14 +112,16 @@ def process_answers(xml, qset, access_channel, question_map, survey_allocation, 
     submission.save_attachments(media_files)
 
 
-def get_answers(node, qset, question_map):
+def get_answers(node, qset, question_map, completion_date):
     """get answers for the node set. Would work for nested loops but for loops sitting in same inline question thread
     """
     answers = []
     inline_record = {}
     for e in node.getchildren():
         if e.getchildren():
-            loop_answers = get_answers(e, qset, question_map)
+            if e.xpath('creationDate'):
+                completion_date = extract_date(e.xpath('creationDate')[0])
+            loop_answers = get_answers(e, qset, question_map, completion_date)
             _update_loop_answers(inline_record, loop_answers)
             answers.extend(loop_answers)
         else:

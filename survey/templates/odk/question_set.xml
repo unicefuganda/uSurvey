@@ -52,6 +52,7 @@ xmlns:jr="http://openrosa.org/javarosa">
 					   {% if question.loop_started %}
 						   <q{{question.pk}}q{{question.loop_started.loop_ender.pk}}>
 							<id{{ question.loop_started.pk }} />
+							<creationDate />
 					   {% endif %}
 								<q{{question.pk}} />
 								{% for sub_question in question.direct_sub_questions %}
@@ -97,6 +98,9 @@ xmlns:jr="http://openrosa.org/javarosa">
 	           <bind nodeset="/qset/qset{{qset.pk}}/questions/surveyQuestions{{ path }}"
 				required="true()"
 				relevant="true() and {{ relevance_context }}"/>
+	            <bind nodeset="/qset/qset{{qset.pk}}/questions/surveyQuestions{{ path }}/creationDate"
+				required="true()"
+				relevant="true() and {{ relevance_context }}" readonly="true()" calculate="today()"/>
 			{% endif %}
 			{% if question.autoresponse %}
 				<bind nodeset="/qset/qset{{qset.pk}}/questions/surveyQuestions{{ path }}/q{{question.pk}}"
