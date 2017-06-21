@@ -215,6 +215,9 @@
                                     <a href="{% url 'qset_edit_question_page' question.pk %}" class="tooltip-info" data-rel="tooltip" title="" data-original-title="Edit"><span class="blue"><i class="usur-icon fa fa-pencil-square-o bigger-120"></i>Edit</span></a>
                                 </li>
                                 <li>
+                                    <a href="{% url 'loop_qset_question_page' question.pk %}" class="tooltip-info" data-rel="tooltip" title="" data-original-title="Insert"><span class="green"><i class="usur-icon fa fa-plus-square bigger-120"></i>Start/Edit Loop</span></a>
+                                </li>
+                                <li>
                                     <a href="{% url 'insert_qset_question_page' question.pk %}" class="tooltip-info" data-rel="tooltip" title="" data-original-title="Insert"><span class="green"><i class="usur-icon fa fa-pencil-square-o bigger-120"></i>Insert Question</span></a>
                                 </li>
                                 {% if 'auto' not in question.answer_type.lower %}
@@ -225,10 +228,7 @@
                                 <li><a href="#delete_question_{{question.id}}" class="tooltip-info" data-toggle="modal" data-rel="tooltip" title="" data-original-title="Delete"><span class="red"><i class="usur-icon fa fa-trash bigger-120"></i>Delete</span></a>
                                 </li>
                             {% endif %}
-                            {% if question.loop_started  and batch.interviews.count == 0 %}
-                                <li>
-                                    <a href="{% url 'loop_qset_question_page' question.pk %}" class="tooltip-info" data-rel="tooltip" title="" data-original-title="Insert"><span class="green"><i class="usur-icon fa fa-plus-square bigger-120"></i>Start/Edit Loop</span></a>
-                                </li>
+                            {% if question.loop_started %}
                                 <li><a href="{% url 'remove_question_loop_page' question.loop_started.id %}" data-toggle="modal" {% comment %} data-target="#remove_loop_{{ question.loop_started.id }}"{% endcomment %}><span class="green"><i class="usur-icon fa fa-trash bigger-120"></i>Remove Loop</span></a>
                                 {% include "base/remove_modal.html" with object_name=question.text id=question.loop_started.id name="Loop" url=question.loop_started.id|get_url_with_ids:"remove_question_loop_page" %}
                                 </li>
