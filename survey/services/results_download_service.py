@@ -102,6 +102,7 @@ class ResultsDownloadService(object):
         def _get_interview_answers():
             interview_list_args = [
                 'created',
+                'closure_date',
                 'ea__locations__name',
                 'ea__name',
                 'interviewer__name',
@@ -112,17 +113,16 @@ class ResultsDownloadService(object):
             parent_loc = 'ea__locations'
             for i in range(LocationType.objects.count() - 2):
                 parent_loc = '%s__parent' % parent_loc
-                interview_list_args.insert(1, '%s__name' % parent_loc)
+                interview_list_args.insert(2, '%s__name' % parent_loc)      # insert after closure date
             interview_query_args = list(interview_list_args)
-            interview_queryset = self.interviews.values_list(
-                *interview_query_args)
+            interview_queryset = self.interviews.values_list(*interview_query_args)
             if self.items_per_page:
                 interview_queryset = interview_queryset[
                     self.page_start:
                     self.page_start + self.items_per_page]
             try:
                 interviews_df = to_df(
-                    interview_queryset, date_cols=['created'])
+                    interview_queryset, date_cols=['created', 'closure_date'])
             except EmptyResultSet:
                 interviews_df = pd.DataFrame(columns=interview_query_args)
             if self.follow_ref:
@@ -133,7 +133,7 @@ class ResultsDownloadService(object):
             answers_report_df = self._get_answer_df(interviews_df['id'])
             reports_df = interviews_df.join(
                 answers_report_df, on='id', how='outer')
-            header_names = ['Created', ]
+            header_names = ['Uploaded', 'Completion Date']
             location_names = list(
                 LocationType.objects.
                 get(parent__isnull=True).get_descendants(
@@ -144,7 +144,7 @@ class ResultsDownloadService(object):
                 header_names.extend(list(ref_answers_report_df.columns)[1:])
             report_columns = header_names[1:] + [
                 q.identifier for q in self.batch.all_questions
-                if q.identifier in reports_df.columns] + ['Created', ]
+                if q.identifier in reports_df.columns] + ['Uploaded', 'Completion Date']
             header_names.extend(list(reports_df.columns)[len(header_names):])
             reports_df.columns = header_names
             other_sort_fields = [
@@ -153,7 +153,7 @@ class ResultsDownloadService(object):
                     'identifier',
                     flat=True) if identifier in header_names]
             reports_df = reports_df.sort_values(
-                ['Created', ] + location_names + other_sort_fields)
+                ['Uploaded', 'Completion Date' ] + location_names + other_sort_fields)
             reports_df = reports_df[report_columns]
             try:
                 reports_df.Created = reports_df.Created.dt.tz_convert(settings.TIME_ZONE)

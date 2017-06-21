@@ -49,7 +49,7 @@ class Interview(BaseModel):
         blank=True)
     interview_channel = models.ForeignKey(
         InterviewerAccess, related_name='interviews', null=True)
-    closure_date = models.DateTimeField(null=True, blank=True, editable=False)
+    closure_date = models.DateTimeField(null=True, blank=True, editable=False, verbose_name='Completion Date')
     # just used to capture preview/data entry tester
     uploaded_by = models.ForeignKey(User, null=True, blank=True)
     test_data = models.BooleanField(default=False)
