@@ -142,10 +142,10 @@ class Interviewer(BaseModel):
             allocation_ea=self.ea)
 
     def survey_name(self):
-        ea_obj = SurveyAllocation.objects.filter(interviewer_id=self.id)
+        assignment = self.unfinished_assignments.first()
         survey_name = ''
-        if ea_obj:
-            survey_name = ea_obj[0].survey.name
+        if assignment:
+            survey_name = assignment.survey.name
         return survey_name
 
 

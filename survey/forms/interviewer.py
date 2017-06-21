@@ -125,9 +125,9 @@ class InterviewerForm(ModelForm):
         interviewer.ea = eas[0]
         if commit:
             survey = self.cleaned_data['survey']
+            # I want to track every change in allocation
+            interviewer.unfinished_assignments.update(status=SurveyAllocation.DEALLOCATED)
             if survey:
-                interviewer.assignments.update(      # I want to track every change in allocation
-                    status=SurveyAllocation.DEALLOCATED, survey=survey)
                 for ea in eas:
                     SurveyAllocation.objects.create(survey=survey,
                                                     interviewer=interviewer,
