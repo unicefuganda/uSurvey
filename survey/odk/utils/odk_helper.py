@@ -122,7 +122,7 @@ def get_answers(node, qset, question_map, completion_date):
     for e in node.getchildren():
         if e.getchildren():
             if _get_nodes('./creationDate', tree=e):
-                completion_date = extract_date(_get_nodes('./creationDate', tree=e)[0].text)
+                completion_date = extract_date(_get_nodes('./creationDate', tree=e)[0].text, dayfirst=False)
             loop_answers = get_answers(e, qset, question_map, completion_date)
             _update_loop_answers(inline_record, loop_answers)
             answers.extend(loop_answers)
@@ -163,9 +163,9 @@ def _get_instance_name(survey_tree):
 
 
 def _get_default_date_created(survey_tree):
-    date_string = _get_nodes(INSTANCE_NAME_PATH, tree=survey_tree)[0].text
+    date_string = _get_nodes(DEFAULT_DATE_CREATED_PATH, tree=survey_tree)[0].text
     if date_string:
-        return extract_date(date_string)
+        return extract_date(date_string, dayfirst=False)
     else:
         return datetime.now()
 

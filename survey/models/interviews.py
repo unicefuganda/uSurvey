@@ -753,7 +753,7 @@ class DateAnswer(Answer):
     def create(cls, interview, question, answer):
         raw_answer = answer
         if isinstance(answer, basestring):
-            answer = extract_date(answer)
+            answer = extract_date(answer, dayfirst=False)
         return super(
             DateAnswer,
             cls).create(
