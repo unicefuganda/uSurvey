@@ -175,7 +175,8 @@ xmlns:jr="http://openrosa.org/javarosa">
 													jr:count="{{question.loop_started.fixedloopcount.value}}"
 												{% endif %}>
 
-	       {% else %}
+	       {% endif %}
+		   {% if not question.autoresponse %}
 					{% concat_strings '/qset/qset' qset.pk '/questions/surveyQuestions' path '/q' question.pk as ref %}
 					{% include "odk/_question_body.xml" with question=question answer_types=answer_types qref=ref %}
 					 {% for sub_question in question.direct_sub_questions %}
