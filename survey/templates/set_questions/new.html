@@ -16,7 +16,7 @@
 <h4> to question: {{parent_question.text}} </h4>
 {% endif %}
 {% if prev_question %}
-<h4> <span>Preceding question:</span> {{prev_question.text}} </h4>
+<h4 style="margin-bottom:10px!important;"> <span>Preceding question:</span> {{prev_question.text}} </h4>
 {% endif %}
 <p>Please note that the following special characters will be removed on USSD [* ! # ' ; &]</p>
 {% endblock%}
@@ -81,7 +81,7 @@
                 </script>
                 {% endif %}
             </div>
-            <div class="col-md-5" style="margin-top: -40px;">
+            <div class="col-md-5" style="margin-top: 10px;">
                 {% include 'set_questions/help_text.html' %}
             </div>
         </td>
@@ -108,6 +108,7 @@
     }
     #id_text{
     width: 261px !important;
+    height: 125px !important;
     margin-left: 4px !important;
     }
     .dataTables_wrapper select {    margin-bottom: 0 !important;    margin-left: 4px!important;    margin-right: 4px!important;    margin-top: 0px !important;    padding: 3px !important;    width: 261px!important;}
@@ -136,6 +137,9 @@
 <style type="text/css">
     .controls {
     margin-bottom: 20px !important;
+    }
+    .control-group{
+        margin-top: 15px !important;
     }
     #id_access_channels{
     display: inline-block;
