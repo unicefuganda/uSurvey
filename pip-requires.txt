@@ -43,3 +43,5 @@ asteval
 plotly
 line_profiler
 django-responsive2
+model-mommy
+names

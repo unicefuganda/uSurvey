@@ -15,6 +15,7 @@ from survey.models.generics import GenericQuestion
 from survey.models.interviews import AnswerAccessDefinition
 from survey.models.access_channels import ODKAccess
 from survey.models.surveys import Survey
+from survey.models.response_validation import ResponseValidation
 
 ALL_ANSWERS = Answer.answer_types()
 
@@ -120,14 +121,14 @@ class Question(CloneableMixin, GenericQuestion):
     def direct_sub_questions(self):
         from survey.forms.logic import LogicForm
         sub_flows = self.flows.filter(
-            desc=LogicForm.SUBQUESTION_ACTION, validation_test__isnull=False)
+            desc=LogicForm.SUBQUESTION_ACTION, validation__isnull=False)
         return OrderedSet([flow.next_question for flow in sub_flows])
 
     def conditional_flows(self):
-        return self.flows.filter(validation_test__isnull=False)
+        return self.flows.filter(validation__isnull=False)
 
     def preceeding_conditional_flows(self):
-        return self.connecting_flows.filter(validation_test__isnull=False)
+        return self.connecting_flows.filter(validation__isnull=False)
 
     def __unicode__(self):
         return " - ".join([self.identifier, self.text])
@@ -183,8 +184,7 @@ class QuestionFlow(CloneableMixin, BaseModel):
                         for validator in Answer.validators()]
     question = models.ForeignKey(Question, related_name='flows')
     question_type = models.CharField(max_length=100)
-    validation_test = models.CharField(
-        max_length=200, null=True, blank=True, choices=VALIDATION_TESTS)
+    validation = models.ForeignKey(ResponseValidation, null=True, blank=True)
     # if validation passes, classify this flow response as having this value
     name = models.CharField(max_length=200, null=True, blank=True)
     # this would provide a brief description of this flow
@@ -197,14 +197,6 @@ class QuestionFlow(CloneableMixin, BaseModel):
         on_delete=models.SET_NULL)
     next_question_type = models.CharField(max_length=100)
 
-    class Meta:
-        app_label = 'survey'
-        # unique_together = [('question', 'next_question', 'desc', ),]
-
-    @property
-    def test_params(self):
-        return [t.param for t in self.text_arguments]
-
     def params_display(self):
         params = []
         for arg in self.text_arguments:
@@ -216,72 +208,42 @@ class QuestionFlow(CloneableMixin, BaseModel):
         return params
 
     @property
+    def validation_test(self):
+        if self.validation:
+            return self.validation.validation_test
+
+    @validation_test.setter
+    def validation_test(self, test):
+        if self.validation:
+            self.validation.validation_test = test
+        else:
+            self.validation = ResponseValidation.objects.create(validation_test=test)
+
+    class Meta:
+        app_label = 'survey'
+        # unique_together = [('question', 'next_question', 'desc', ),]
+
+    @property
+    def test_params(self):
+        if self.validation:
+            return self.validation.test_params
+
+    @property
     def text_arguments(self):
-        return TextArgument.objects.filter(flow=self).order_by('position')
+        if self.validation:
+            return self.validation.text_arguments
 
     @property
     def test_arguments(self):
-        return TextArgument.objects.filter(flow=self).order_by('position')
+        if self.validation:
+            return self.validation.test_arguments
 
     def save(self, *args, **kwargs):
-        self.question_type = self.question.type_name()
-        if self.next_question:
-            self.next_question_type = self.next_question.type_name()
         invalidate_obj(self.question)
         invalidate_obj(QuestionSet.get(pk=self.question.qset.pk))
         if self.next_question:
             invalidate_obj(self.next_question)
         return super(QuestionFlow, self).save(*args, **kwargs)
-
-#     def delete(self, *args, **kwargs):
-#         qset = self.question.qset
-#         outcome = super(QuestionFlow, self).delete(*args, **kwargs)
-#         _kill_zombies(qset.zombie_questions())          # this is basically for home cleaning to remove any dangling
-#                                                         # to remove any dangling question
-#         return outcome
-#
-#
-# def _kill_zombies(zombies):
-#     for z in zombies:
-#         z.delete()
-
-
-class TestArgument(CloneableMixin, BaseModel):
-    object = InheritanceManager()
-    flow = models.ForeignKey(QuestionFlow, related_name='%(class)s')
-    position = models.PositiveIntegerField()
-
-    @classmethod
-    def argument_types(cls):
-        return [cl.__name__ for cl in cls.__subclasses__()]
-
-    def __unicode__(self):
-        return self.param
-
-    class Meta:
-        app_label = 'survey'
-        get_latest_by = 'position'
-
-
-class TextArgument(TestArgument):
-    param = models.TextField()
-
-    class Meta:
-        app_label = 'survey'
-
-
-class NumberArgument(TestArgument):
-    param = models.IntegerField()
-
-    class Meta:
-        app_label = 'survey'
-
-
-class DateArgument(TestArgument):
-    param = models.DateField()
-
-    class Meta:
-        app_label = 'survey'
 
 
 class QuestionOption(CloneableMixin, BaseModel):
@@ -395,7 +357,7 @@ class QuestionSet(
     def inline_flows(self):
         return QuestionFlow.objects.filter(
             question__qset=self,
-            validation_test__isnull=True,
+            validation__isnull=True,
             next_question__isnull=False)
 
     @property
@@ -624,7 +586,7 @@ def next_inline_question(question, flows, answer_types=ALL_ANSWERS):
     if answer_types is None:
         answer_types = ALL_ANSWERS
     try:
-        qflow = flows.get(question=question, validation_test__isnull=True)
+        qflow = flows.get(question=question, validation__isnull=True)
         next_question = qflow.next_question
         if next_question and next_question.answer_type in answer_types:
             return next_question
@@ -639,7 +601,7 @@ def last_inline(question, flows):
     try:
         qflow = flows.get(
             question=question,
-            validation_test__isnull=True,
+            validation__isnull=True,
             next_question__isnull=False)
         return last_inline(qflow.next_question, flows)
     except QuestionFlow.DoesNotExist:
@@ -653,7 +615,7 @@ def first_inline_flow_with_desc(question, desc):
         if question.connecting_flows.filter(desc=desc).exists():
             return None
         iflow = question.flows.get(
-            validation_test__isnull=True,
+            validation__isnull=True,
             next_question__isnull=False)
         return first_inline_flow_with_desc(iflow.next_question, desc)
     except QuestionFlow.DoesNotExist:
@@ -665,17 +627,17 @@ def inline_questions(question, flows):
     # questions = [Question.get(pk=question.pk), ]
     questions = [question, ]
     try:
-        qflow = flows.get(question=question, validation_test__isnull=True)
+        qflow = flows.get(question=question, validation__isnull=True)
         questions.extend(inline_questions(qflow.next_question, flows))
     except QuestionFlow.DoesNotExist:
         pass
     return questions
 
 
-def inline_flows(question, flows):
+def inline_flows(question, qflows):
     flows = []
     try:
-        qflow = flows.get(question=question, validation_test__isnull=True)
+        qflow = qflows.get(question=question, validation__isnull=True)
         flows.append(qflow)
         flows.extend(inline_questions(qflow.next_question, flows))
     except QuestionFlow.DoesNotExist:

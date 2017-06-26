@@ -157,6 +157,11 @@
 </style>
 <script src="{{STATIC_URL}}js/type-auto-suggest.js" type="text/javascript" charset="utf-8"></script>
 <script src="{{STATIC_URL}}js/questions.js" type="text/javascript" charset="utf-8"></script>
+<script src="{{STATIC_URL}}js/logic.js" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript">
+    id_text_delim = ': ';
+    change_to_select2( $('#id_response_validation'));
+</script>
 <script type="text/javascript">
     channel_map = {
         {% for answer_type, channels in questionform.answer_map.items %}

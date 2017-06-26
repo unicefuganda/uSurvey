@@ -772,6 +772,23 @@ class DateAnswer(Answer):
         return [cls.greater_than, cls.equals, cls.less_than, cls.between]
 
     @classmethod
+    def to_odk_date(cls, date_val):
+        return "date('%s')" % date_val.strftime('%Y-%m-%d')
+
+    @classmethod
+    def odk_greater_than(cls, node_path, value):
+        return "%s &gt; %s" % (node_path, cls.to_odk_date(value))
+
+    @classmethod
+    def odk_less_than(cls, node_path, value):
+        return "%s &lt; %s" % (node_path, cls.to_odk_date(value))
+
+    @classmethod
+    def odk_between(cls, node_path, lowerlmt, upperlmt):
+        return "(%s &gt; %s) and (%s &lt; %s)" % (
+            node_path, cls.to_odk_date(lowerlmt), node_path, cls.to_odk_date(upperlmt))
+
+    @classmethod
     def validate_test_value(cls, value):
         '''Shall be used to validate that a given value is appropriate for this answer
         :return:

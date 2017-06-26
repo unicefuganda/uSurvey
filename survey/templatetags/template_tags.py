@@ -403,8 +403,7 @@ def is_relevant_odk(context, question, interviewer):
                         next_question.pk, ['false()', ])
                     next_q_context.append(flow_condition)
                     context[next_question.pk] = next_q_context
-        null_flows = flows.filter(
-            validation_test__isnull=True, next_question__isnull=False)
+        null_flows = flows.filter(validation__isnull=True, next_question__isnull=False)
         if null_flows:
             null_flow = null_flows[0]
             # check if next question if we are moving to a less looped question

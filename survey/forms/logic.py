@@ -1,9 +1,9 @@
 from django.core.exceptions import ValidationError
 from django import forms
 from form_helper import FormOrderMixin
-from survey.models import Answer, MultiChoiceAnswer, MultiSelectAnswer, DateAnswer, QuestionFlow, \
-    Question, TextArgument, NumericalAnswer, TextAnswer, TemplateOption
-from survey.models import QuestionLoop, FixedLoopCount, PreviousAnswerCount
+from survey.models import (Answer, MultiChoiceAnswer, MultiSelectAnswer, DateAnswer, QuestionFlow,
+                           Question, TextArgument, NumericalAnswer, TextAnswer, TemplateOption)
+from survey.models import ResponseValidation, QuestionLoop, FixedLoopCount, PreviousAnswerCount
 
 
 class LogicForm(forms.Form):
@@ -136,19 +136,18 @@ class LogicForm(forms.Form):
     def clean(self):
         self._make_desc()
         flows = QuestionFlow.objects.filter(question=self.question)
-
         if len(flows) > 0:
             for flow in flows:
                 if self.cleaned_data['condition'] == 'between':
                     min_val = self.cleaned_data.get('min_value')
                     max_val = self.cleaned_data.get('max_value')
-                    min_arg = flow.text_arguments.filter(
-                        position=0, param=min_val).exists()
-                    max_arg = flow.text_arguments.filter(
-                        position=0, param=max_val).exists()
+                    min_arg = flow.text_arguments and flow.text_arguments.filter(position=0, param=min_val).exists()
+                    max_arg = flow.text_arguments and flow.text_arguments.filter(position=0, param=max_val).exists()
                     if max_arg and min_arg:
                         raise ValidationError("This rule already exists.")
-                elif flow.text_arguments.filter(position=0, param=self.cleaned_data.get('value', '').strip()).exists():
+                elif flow.text_arguments and flow.text_arguments.filter(position=0,
+                                                                        param=self.cleaned_data.get('value', '').strip()
+                                                                        ).exists():
                     raise ValidationError("This rule already exists.")
                 if flow.next_question and flow.next_question.pk == self.cleaned_data.get(
                         'next_question', ''):
@@ -165,9 +164,9 @@ class LogicForm(forms.Form):
             next_question = Question.get(pk=self.cleaned_data['next_question'])
         if self.cleaned_data['action'] == self.REANSWER:
             next_question = self.question
+        validation = ResponseValidation.objects.create(validation_test=self.cleaned_data['condition'])
         flow = QuestionFlow.objects.create(question=self.question,
-                                           validation_test=self.cleaned_data[
-                                               'condition'],
+                                           validation=validation,
                                            next_question=next_question,
                                            desc=desc)
         if self.cleaned_data['action'] == self.ASK_SUBQUESTION:
@@ -178,17 +177,15 @@ class LogicForm(forms.Form):
                 next_question=self.batch.next_inline(
                     self.question))
         if self.cleaned_data['condition'] == 'between':
-            TextArgument.objects.create(
-                flow=flow, position=0, param=self.cleaned_data['min_value'])
-            TextArgument.objects.create(
-                flow=flow, position=1, param=self.cleaned_data['max_value'])
+            TextArgument.objects.create(validation=validation, position=0, param=self.cleaned_data['min_value'])
+            TextArgument.objects.create(validation=validation, position=1, param=self.cleaned_data['max_value'])
         else:
             value = self.cleaned_data.get('value', '')
             if self.question.answer_type in [
                     MultiChoiceAnswer.choice_name(),
                     MultiSelectAnswer.choice_name()]:
                 value = self.cleaned_data['option']
-            TextArgument.objects.create(flow=flow, position=0, param=value)
+            TextArgument.objects.create(validation=validation, position=0, param=value)
         # clean up now, remove all zombie questions
         self.question.qset.zombie_questions().delete()
 

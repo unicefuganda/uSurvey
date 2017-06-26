@@ -4,8 +4,8 @@ import re
 from django.core.exceptions import ValidationError
 from django.conf import settings
 from survey.models import Question, BatchQuestion, QuestionSet
-from survey.models import QuestionOption, Batch, Answer, QuestionModule, \
-    MultiChoiceAnswer, MultiSelectAnswer, QuestionFlow, AnswerAccessDefinition
+from survey.models import (QuestionOption, Batch, Answer, QuestionModule, MultiChoiceAnswer, MultiSelectAnswer,
+                           QuestionFlow, AnswerAccessDefinition, ResponseValidation)
 from survey.forms.form_helper import FormOrderMixin
 
 
@@ -43,6 +43,10 @@ def get_question_form(model_class):
             if instance:
                 self.help_text = ' and '.join(AnswerAccessDefinition.access_channels(instance.answer_type))
                 self.fields['answer_type'].help_text = self.help_text
+                answer_class = Answer.get_class(instance.answer_type)
+                validator_names = [validator.__name__ for validator in answer_class.validators()]
+                self.fields['response_validation'].queryset = ResponseValidation.objects.filter(validation_test__in=
+                                                                                                validator_names)
             self.answer_map = {}
             definitions = AnswerAccessDefinition.objects.all()
             for defi in definitions:
@@ -213,7 +217,7 @@ def get_question_form(model_class):
                             # incase, inline flow with no next quest already
                             # exists
                             flow, _ = QuestionFlow.objects.get_or_create(
-                                question=last_question, validation_test__isnull=True)
+                                question=last_question, validation__isnull=True)
                             prev_next_question = flow.next_question
                             flow.next_question = question
                             flow.save()

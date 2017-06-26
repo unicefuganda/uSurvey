@@ -79,7 +79,7 @@ def get_question_as_dump(questions):
 
 def get_logic_print(question):
     content = []
-    for flow in question.flows.exclude(validation_test__isnull=True):
+    for flow in question.flows.exclude(validation__isnull=True):
         # desc = flow.desc
         # if desc.startswith(flow.validation_test):
         #     desc = desc[len(flow.validation_test)+1:]

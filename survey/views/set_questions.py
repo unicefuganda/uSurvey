@@ -557,7 +557,7 @@ def _remove(request, question_id):
             messages.success(request, success_message)
         next_question = batch.next_inline(question)
         previous_inline = question.connecting_flows.filter(
-            validation_test__isnull=True)
+            validation__isnull=True)
         if previous_inline.exists() and next_question:
             QuestionFlow.objects.create(
                 question=previous_inline[0].question,
