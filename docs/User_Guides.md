@@ -236,7 +236,7 @@ Click on, ‘Add Question’ button at top right of the particular Listing page,
 **Variables Name**: This is an identifier for Question, type a code for Question
 
 **Text**: Is the actual Question, Write a Question.   
-   While writing a question, auto suggestion feature is available, which will prompt with the "Variable Names" of the preceding questions, that helps to include “answer of the preceding question” in composing succeeding questions.   
+   While writing a question, system prompts with the “Variable Names” of the preceding questions, that helps to include “answer of the preceding question” in composing succeeding questions.   
    i.e. just type, double curly brackets ( {{ ), to get list of Variable Names of the preceding questions.   
    Ex: type {{ , to get Variable Names, then select any 'Variable Name' to insert; *{{NAME}}, {{HH_head}}*   
    **Example Question**: *Gender of the {{HH_head}}*
@@ -552,7 +552,7 @@ Now click on, ‘Add Question’ button at top right side of this page, this wil
 * **Group**: All available Groups are listed in this dropdown, select relevant group name for the question
 * **Variables Name**: This is an identifier for Question, type a code for Question
 * **Text**: Is the actual Question, Write a Question.   
-   While writing a question, auto suggestion feature is available, which will prompt with the “Variable Names” of the preceding questions, that helps to include “answer of the preceding question” in composing succeeding questions.   
+   While writing a question, system prompts with the “Variable Names” of the preceding questions, that helps to include “answer of the preceding question” in composing succeeding questions.   
    i.e. just type, double curly brackets ( {{ ), to get list of Variable Names of the preceding questions.   
    Ex: type {{ , to get Variable Names, then select any ‘Variable Name’ to insert; *{{FIRST_NAME}}, {{name_student}}*   
    Example Question: *What is {{FIRST_NAME}}'s Ethnicity?*
