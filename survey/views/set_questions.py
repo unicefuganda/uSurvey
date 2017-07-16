@@ -3,7 +3,7 @@ from django.core.urlresolvers import reverse
 from django.shortcuts import render, get_object_or_404
 from django.contrib import messages
 from django.core.exceptions import ValidationError
-from django.http import HttpResponseRedirect, HttpResponse, Http404
+from django.http import HttpResponseRedirect, HttpResponse, Http404, JsonResponse
 from django.contrib.auth.decorators import permission_required
 from survey.forms.filters import QuestionFilterForm
 from survey.models import Question, QuestionSet
@@ -19,6 +19,7 @@ from survey.services.export_questions import get_question_as_dump
 from survey.utils.query_helper import get_filterset
 from survey.views.custom_decorators import not_allowed_when_batch_is_open
 from survey.forms.logic import LogicForm, LoopingForm
+from survey.forms.response_validation import ResponseValidationForm
 
 
 ADD_LOGIC_ON_OPEN_BATCH_ERROR_MESSAGE = "Logics cannot be added\
@@ -300,6 +301,23 @@ def insert(request, prev_quest_id):
     return response or render(request, 'set_questions/new.html', context)
 
 
+@permission_required('auth.can_view_batches')
+def json_create_response_validation(request):
+    """This function is meant to create json posted response validation
+    :param request:
+    :return:
+    """
+    if request.method == 'POST':
+        response_validation_form = ResponseValidationForm(data=request.POST)
+        if response_validation_form.is_valid():
+            response_validation = response_validation_form.save()
+            return JsonResponse({'success': True, 'created': {'id': response_validation.id,
+                                                              'text': str(response_validation)}})
+        elif response_validation_form.errors:
+            return JsonResponse({'success': False, 'error': response_validation_form.errors[0]})
+    return JsonResponse({})
+
+
 def _process_question_form(request, batch, response, question_form):
     instance = question_form.instance
     action_str = 'edit' if instance else 'add'
@@ -319,9 +337,7 @@ def _process_question_form(request, batch, response, question_form):
                     topts.append(TemplateOption(
                         question=qt, text=option.text, order=option.order))
                 TemplateOption.objects.bulk_create(topts)
-            messages.success(
-                request, 'Question successfully %sed. to library' % action_str)
-        #messages.success(request, 'Question successfully Saved.' % action_str)
+            messages.success(request, 'Question successfully %sed. to library' % action_str)
         messages.success(request, 'Question successfully Saved.')
         if 'add_more_button' in request.POST:
             redirect_age = ''
@@ -329,7 +345,7 @@ def _process_question_form(request, batch, response, question_form):
             redirect_age = reverse('qset_questions_page', args=(batch.pk, ))
         response = HttpResponseRedirect(redirect_age)
     else:
-        messages.error(request, 'Question was not %sed.' % action_str)
+        messages.error(request, 'Question was not %sed: %s' % (action_str, question_form.errors.values()[0][0]))
 #         options = dict(request.POST).get('options', None)
     return response, question_form
 
@@ -359,8 +375,7 @@ def _render_question_view(request, batch, instance=None, prev_question=None):
             data=request.POST,
             instance=instance,
             prev_question=prev_question)
-        response, question_form = _process_question_form(
-            request, batch, response, question_form)
+        response, question_form = _process_question_form(request, batch, response, question_form)
     else:
         question_form = QuestionForm(
             batch, instance=instance, prev_question=prev_question)
@@ -374,6 +389,7 @@ def _render_question_view(request, batch, instance=None, prev_question=None):
                # 'prev_question': prev_question,
                'cancel_url': reverse('qset_questions_page', args=(batch.pk, )),
                'questionform': question_form,
+               'response_validation_form': ResponseValidationForm(),
                'model_name' : batch.__class__.__name__
                }
 
@@ -556,8 +572,7 @@ def _remove(request, question_id):
             # % ("Sub question" if question.subquestion else "Question"))
             messages.success(request, success_message)
         next_question = batch.next_inline(question)
-        previous_inline = question.connecting_flows.filter(
-            validation__isnull=True)
+        previous_inline = question.connecting_flows.filter(validation__isnull=True)
         if previous_inline.exists() and next_question:
             QuestionFlow.objects.create(
                 question=previous_inline[0].question,

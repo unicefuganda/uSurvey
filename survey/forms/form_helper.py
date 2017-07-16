@@ -36,6 +36,7 @@ def get_form_field_no_validation(fieldname):
     return FieldNoValidation
 
 
-class IconName(object):
+class Icons(object):
 
-    icon_name = {}
+    icons = {}
+

@@ -6,7 +6,7 @@
 						{% for option in question.options.all %}
 						<item>
 							<label>{{ option.text }}</label>
-							<value>{{ option.order }}</value>
+							<value>{{ option.text }}</value>
 						</item>
 						{% endfor %}
 					</select1>
@@ -16,7 +16,7 @@
 							{% for option in question.options.all %}
 							<item>
 								<label>{{ option.text }}</label>
-								<value>{{ option.order }}</value>
+								<value>{{ option.text }}</value>
 							</item>
 							{% endfor %}
 						</select>

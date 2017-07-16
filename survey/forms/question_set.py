@@ -20,9 +20,8 @@ def get_question_set_form(model_class):
                 initial = kwargs.setdefault('initial', {})
                 initial['access_channels'] = [
                     c.channel for c in kwargs['instance'].access_channels.all()]
-                self.fields['validation'] = kwargs['instance']
+                #self.fields['validation'] = kwargs['instance']
             super(QuestionSetForm, self).__init__(*args, **kwargs)
-            # import pdb; pdb.set_trace()
 
         class Meta:
             model = model_class

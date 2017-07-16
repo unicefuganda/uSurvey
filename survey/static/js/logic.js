@@ -78,35 +78,42 @@ function append_to_next_question_dropdown(data) {
 //    });
 }
 
-function change_to_select2(obj) {
+function change_to_select2(obj, delimiter, show_entire_selected) {
+     if(!delimiter)
+         delimiter = id_text_delim;
+     show_entire_selected =  show_entire_selected === true ? true : false;
      obj.select2({
-        templateResult: next_question_format,
-        templateSelection: next_question_select_format,
+        templateResult: function(state) { return item_list_format(state, delimiter) },
+        templateSelection: function(state) { return item_select_format(state, delimiter, show_entire_selected) },
         theme: "classic",
     });
 }
 
-function next_question_format(state) {
-    var identifier_terminus = state.text.indexOf(id_text_delim);
+function item_list_format(state, delimiter) {
+    var key_terminus = state.text.indexOf(delimiter);
     if(state.id){    // to do: handle this more elegantly
-        var question_code = state.text.substring(0, identifier_terminus);
-        var question_text = state.text.substring(identifier_terminus + 1);
+        var key = state.text.substring(0, key_terminus);
+        var val = state.text.substring(key_terminus + 1);
     }
     else{
-        var question_code = '<strong class="opt-header">'+state.text.substring(0, identifier_terminus)+'</strong>';
-        var question_text = '<strong class="opt-header">'+state.text.substring(identifier_terminus + 1)+'</strong>';
+        var key = '<strong class="opt-header">'+state.text.substring(0, key_terminus)+'</strong>';
+        var val = '<strong class="opt-header">'+state.text.substring(key_terminus + 1)+'</strong>';
     }
-    return $('<div class="opt-item"><span class="opt-id" style="display: inline-block; padding-right: 2%; width: 40%; word-wrap:break-word;">' + question_code +
-    '</span><span class="opt-text" style="display: inline-block; word-wrap:break-word;">'+ question_text + '</span></div>');
+    return $('<div class="opt-item"><span class="opt-id" style="display: inline-block; padding-right: 2%; width: 40%; word-wrap:break-word;">' + key +
+    '</span><span class="opt-text" style="display: inline-block; word-wrap:break-word;">'+ val + '</span></div>');
 }
 
-function next_question_select_format(state) {
+function item_select_format(state, delimiter, show_entire_selected) {
     if(state.id){
-        var identifier_terminus = state.text.indexOf(id_text_delim);
-         var text = '<span style="color: #3875d7">' + state.text.substring(identifier_terminus + 1)+ '</span>';
+        var key_terminus = state.text.indexOf(delimiter);
+        if(show_entire_selected)
+            var content_to_show = state.text;
+        else
+            var content_to_show = state.text.substring(key_terminus + 1);
+        var text = '<span style="color: #3875d7">' + content_to_show + '</span>';
     }
     else{
-        var text =  '<strong>Choose Question</strong>';
+        var text =  '<strong>Choose Item</strong>';
      }
 
     return $('<div align="center">' + text + '</div>');

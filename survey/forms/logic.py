@@ -46,7 +46,7 @@ class LogicForm(forms.Form):
             self.fields['option'] = forms.ChoiceField(
                 label='', choices=[], widget=forms.Select, required=True)
             self.fields['option'].choices = [
-                (option.order, option.text) for option in question.options.all()]
+                (option.text, option.text) for option in question.options.all()]
         else:
             self.fields['value'] = forms.CharField(label='', required=False)
             self.fields['min_value'] = forms.CharField(

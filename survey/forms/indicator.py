@@ -11,11 +11,7 @@ from survey.models import MultiSelectAnswer
 from survey.models import Question
 from django.core.exceptions import ValidationError
 from survey.forms.form_helper import FormOrderMixin
-from survey.forms.form_helper import IconName
-
-
-class IndicatorVariablesField(forms.ModelMultipleChoiceField, IconName):
-    pass
+from survey.forms.form_helper import Icons
 
 
 class IndicatorForm(ModelForm, FormOrderMixin):
@@ -25,8 +21,7 @@ class IndicatorForm(ModelForm, FormOrderMixin):
     question_set = forms.ModelChoiceField(
         queryset=QuestionSet.objects.none(),
         empty_label='Select Question set')
-    variables = IndicatorVariablesField(
-        queryset=IndicatorVariable.objects.none())
+    variables = forms.ModelMultipleChoiceField(queryset=IndicatorVariable.objects.none())
 
     def __init__(self, *args, **kwargs):
         super(IndicatorForm, self).__init__(*args, **kwargs)
@@ -41,20 +36,20 @@ class IndicatorForm(ModelForm, FormOrderMixin):
             self.fields['variables'].initial = kwargs['instance'].variables.all()
         self.fields['variables'].queryset = self.available_variables()
         self.fields['variables'].icons = {
-            'add': {
-                'data-toggle': "modal",
-                'data-target': "#add_variable",
-                'id': 'add_new_variable',
-                'title': 'Add Variable'},
-            'edit': {
-                'data-toggle': "modal",
-                'title': 'Edit Variable',
-                'id': 'edit_variable'},
-            'delete': {
-                'data-toggle': "modal",
-                'data-target': "#remove-selected-variable",
-                'id': 'delete_variable',
-                'title': 'Delete Variable'}}
+                'add': {
+                    'data-toggle': "modal",
+                    'data-target': "#add_variable",
+                    'id': 'add_new_variable',
+                    'title': 'Add Variable'},
+                'edit': {
+                    'data-toggle': "modal",
+                    'title': 'Edit Variable',
+                    'id': 'edit_variable'},
+                'delete': {
+                    'data-toggle': "modal",
+                    'data-target': "#remove-selected-variable",
+                    'id': 'delete_variable',
+                    'title': 'Delete Variable'}}
         self.fields['formulae'].icons = {
             'check': {'id': 'validate', 'title': 'Validate'}, }
         if self.data.get('survey'):

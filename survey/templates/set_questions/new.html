@@ -10,6 +10,18 @@
 {% block extra_head %}
 <link rel="stylesheet" href="{{ STATIC_URL }}css/awesomplete.css" />
 <script src="{{ STATIC_URL }}js/awesomplete.min.js" async></script>
+<link href="{{STATIC_URL}}css/select2.css" rel="stylesheet"/>
+<script src="{{STATIC_URL}}js/select2.full.js"></script>
+<style type="text/css">
+    .form-horizontal {
+        margin-top: 5px;
+    }
+    .form-horizontal .control-label-2 {
+    padding-top: 7px !important;
+    margin-bottom: 0;
+    text-align: right;
+}
+</style>
 {% endblock %}
 {% block pre_form_content %}
 {% if parent_question %}
@@ -19,74 +31,48 @@
 <h4 style="margin-bottom:10px!important;"> <span>Preceding question:</span> {{prev_question.text}} </h4>
 {% endif %}
 <p>Please note that the following special characters will be removed on USSD [* ! # ' ; &]</p>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-12" id="modal-info" />
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+
+            <form action="{% url 'json_create_response_validation' %}" method="post" accept-charset="utf-8" class="form-horizontal" id="validation_form">
+                {% csrf_token %}
+                <div class="modal fade" tabindex="-1" role="dialog" id="add_validation"  aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                          <div class="modal-header" style="background-color: #3498DB;border-top: 1px solid #70B6E5;border-bottom: 5px solid #2372A7;" >
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                            <h4 class="modal-title" style="color: #fff">Add/Edit Validation</h4>
+                          </div>
+                          <div class="modal-body">
+                            {% include "naked_form.html" with a_form=response_validation_form %}
+                            <div class="form-actions">
+                                <button id="button" type="submit" class="btn btn-primary submit" name="save_button" data-disabled-text="{{ loading_text }}"><i class="fa fa-save"></i> Save</button>
+                                <a href="#" class="btn btn-primary" name="cancel_button" class="cancel" style=" padding-right: 5px; padding-left: 5px; padding-bottom: 1px;" data-dismiss="modal"><i class="fa fa-close"></i> Dismiss</a>
+                            </div>
+                          </div>
+                        </div><!-- /.modal-content -->
+                    </div><!-- /.modal-dialog -->
+                  </div><!-- /.modal -->
+            </form>
+        </div>
+    </div>
+</div>
 {% endblock%}
 {% block display_form_fields %}
-<table width="100%">
-    <tr>
-        <td>
-            <div class="col-md-7">
-                {% for field in questionform.visible_fields %}
-                {% if field.name == 'mandatory' %}
-                {% if options %}
-                {% for option in options %}
-                {% if option %}
-                <div class="control-group options question-option">
-                    <label style="margin-top:10px;" class="control-label col-md-4">Option <span class="number"> {{ option.order }}</span></label>
-                    <div class="controls">
-                        <input type="text" maxlength="100" name="options" value="{{ option.text }}">
-                        <a style="padding: 0px !important;" href="javascript:;" class="btn btn-white btn-warning btn-bold add-option"><i class="ace-icon fa fa-plus bigger-120 orange"></i></a>
-                        <a style="padding: 0px !important;" href="javascript:;" class="btn btn-white btn-warning btn-bold remove-option"><i class="ace-icon fa fa-minus bigger-120 orange"></i></a>
-                    </div>
-                </div>
-                {% endif %}
-                {% endfor %}
-                {% endif %}
-                <div id="{{field.auto_id}}-control-group" class="control-group int-part">
-                    <div class="controls {{ field|is_radio }}">
-                        <label class="control-label" for="{{field.auto_id}}" style="padding: 5px;">{{field.label}}</label>
-                        <span title="{{ field.help_text }}" class="{{field.auto_id}}_tip">{{field}}</span>
-                    </div>
-                </div>
-                {% else %}
-                <div id="{{field.auto_id}}-control-group" class="control-group int-part">
-                    <div class="controls {{ field|is_radio }}">
-                        <label class="control-label" for="{{field.auto_id}}" style="padding: 5px;">{{field.label}}</label>
-                        <span title="{{ field.help_text }}" class="{{field.auto_id}}_tip">{{field}}</span>
-                    </div>
-                </div>
-                {% endif %}
-                {% if field.errors %}
-                <label class="error" style="color:red; padding-bottom:10px; padding-top:10px;" >
-                {% for error in field.errors %}
-                {{ error}}
-                {% endfor %}
-                </label>
-                {% endif %}
-                <div id="{{field.auto_id}}_tip" class="help tip hide" style="color: #307ecc; margin-top: 5px; margin-left: 55px;">{{ field.help_text }}</div>
-                {% endfor %}
-                <script type="text/javascript">
-                    $(document).ready(function(){
-                      $('.controls textarea ').after($('<span id="text-counter"></span>'));
-                    })
-                </script>
-                {% for hidden in questionform.hidden_fields %}
-                {{ hidden }}
-                {% endfor %}
-                {% include "_multiple_options.html" with option_label='Option' id="question-option-template" name='options'%}
-                {% if parent_question %}
-                <script type="text/template" id="question-group-template">
-                    <select id="id_group" name="group">
-                      <option value="{{parent_question.group.pk}}" selected="selected">{{parent_question.group.name}}</option>
-                    </select>
-                </script>
-                {% endif %}
+    <div class="questions container-fluid">
+        <div class="row">
+            <div class="col-md-6 question-form">
+                {% include "naked_form.html" with a_form=questionform %}
             </div>
-            <div class="col-md-5" style="margin-top: 10px;">
-                {% include 'set_questions/help_text.html' %}
+            <div class="col-md-6">
+                {% include "set_questions/help_text.html" with a_form=questionform %}
             </div>
-        </td>
-    </tr>
-</table>
+        </div>
+    </div>
 {% endblock %}
 {% block buttons %}
 <div class="form-actions">
@@ -100,8 +86,69 @@
     {% endif %}
 </div>
 {% endblock %}
+
 {% block javascripts %}
+<script type="text/javascript">
+
+     jQuery(function($){
+        $('#id_validation_test').change(function(){
+            resetParams();
+        });
+        function resetParams() {
+            $('#id_value-control-group').show();
+            $('#id_min-control-group').hide();
+            $('#id_max-control-group').hide();
+            if($('#id_validation_test').val().toUpperCase() == 'BETWEEN') {
+                $('#id_value-control-group').hide();
+                $('#id_min-control-group').show();
+                $('#id_max-control-group').show();
+           }
+        }
+        //post($('#validation_form').
+        resetParams();
+
+        $('#validation_form').submit(function(e) {
+               $.ajax({
+                    url : "{% url 'json_create_response_validation' %}", // the endpoint
+                    type : "POST", // http method
+                    data : $('#validation_form').serializeArray(), // data sent with the post request
+
+                    // handle a successful response
+                    success : function(json) {
+                        if(json.success) {
+                            $('#validation_form')[0].reset();
+                            $('#id_response_validation').append($('<option>', {value: json.created.id, text: json.created.text}));
+                            $('#id_response_validation').val(json.created.id);
+                            $('#add_validation').modal('hide');
+                        }
+                        else{
+                            $('#modal_info').html('<div class="alert alert-danger" role="alert">\
+                                                      <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>\
+                                                      <span class="sr-only">Error:</span>' +
+                                                        json.error +
+                                                    '</div>');
+                        }
+                    },
+
+                    // handle a non-successful response
+                    error : function(xhr,errmsg,err) {
+                        $('#modal_info').html('<div class="alert alert-danger" role="alert">\
+                                                      <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>\
+                                                      <span class="sr-only">Error:</span> \
+                                                      Error occurred while treating the request</div>'); // add the error to the dom
+                        console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
+                    }
+              });
+              e.preventDefault();
+        });
+
+
+    });
+
+    </script>
+
 <style type="text/css">
+
     #id_identifier{
     width: 261px !important;
     height: 25px !important;
@@ -159,8 +206,7 @@
 <script src="{{STATIC_URL}}js/questions.js" type="text/javascript" charset="utf-8"></script>
 <script src="{{STATIC_URL}}js/logic.js" type="text/javascript" charset="utf-8"></script>
 <script type="text/javascript">
-    id_text_delim = ': ';
-    change_to_select2( $('#id_response_validation'));
+    change_to_select2( $('#id_response_validation'), ': ', true);
 </script>
 <script type="text/javascript">
     channel_map = {

@@ -6,16 +6,18 @@ from django.conf import settings
 from survey.models import Question, BatchQuestion, QuestionSet
 from survey.models import (QuestionOption, Batch, Answer, QuestionModule, MultiChoiceAnswer, MultiSelectAnswer,
                            QuestionFlow, AnswerAccessDefinition, ResponseValidation)
-from survey.forms.form_helper import FormOrderMixin
+from survey.forms.form_helper import FormOrderMixin, Icons
+
+
+class ValidationField(forms.ModelChoiceField, Icons):
+    pass
 
 
 def get_question_form(model_class):
 
     class QuestionForm(ModelForm, FormOrderMixin):
-        # prev_question = forms.CharField(
-        #     max_length=50, widget=forms.HiddenInput(), required=False)
-        options = forms.CharField(
-            max_length=50, widget=forms.HiddenInput(), required=False)
+        options = forms.CharField(max_length=50, widget=forms.HiddenInput(), required=False)
+        response_validation = ValidationField(queryset=ResponseValidation.objects.all())
 
         def __init__(
                 self,
@@ -31,8 +33,6 @@ def get_question_form(model_class):
             self.fields['qset'].widget = forms.HiddenInput()
             self.fields['qset'].initial = qset.pk
             self.qset = qset
-            # if prev_question:
-            #     self.fields['prev_question'].initial = prev_question.pk
             self.prev_question = prev_question
             # depending on type of ussd/odk access of qset restrict the answer
             # type
@@ -43,28 +43,17 @@ def get_question_form(model_class):
             if instance:
                 self.help_text = ' and '.join(AnswerAccessDefinition.access_channels(instance.answer_type))
                 self.fields['answer_type'].help_text = self.help_text
-                answer_class = Answer.get_class(instance.answer_type)
-                validator_names = [validator.__name__ for validator in answer_class.validators()]
-                self.fields['response_validation'].queryset = ResponseValidation.objects.filter(validation_test__in=
-                                                                                                validator_names)
             self.answer_map = {}
             definitions = AnswerAccessDefinition.objects.all()
             for defi in definitions:
                 self.answer_map[defi.answer_type] = self.answer_map.get(defi.answer_type, [])
                 self.answer_map[defi.answer_type].append(defi.channel)
-            # group_choices = sorted([each for each in self.fields['group'].choices if each[0]!= ''],
-            #                        key=lambda tup: (tup[0]))
-            # group_choices.insert(0,('', '-----Select Group----'))
-            # self.fields['group'].choices = group_choices
-            #
-            # module_choices = sorted([each for each in self.fields['module'].choices if each[0]!=''], key=lambda tup: (tup[1]))
-            # module_choices.insert(0,('','-----Select Module----'))
-            # self.fields['module'].choices = module_choices
-
-            self.fields[
-                'text'].help_text = "To get previous identifier suggestions, type {{ any time"
+            self.fields['response_validation'].icons = {'add': {'data-toggle': "modal",
+                                                                 'data-target': "#add_validation",
+                                                                 'id': 'add_validation_button',
+                                                                 'title': 'Add Validation'},
+                                                        }
             self.parent_question = parent_question
-
             self.order_fields(['module', 'group', 'identifier',
                                'text', 'answer_type', 'mandatory'])
 
@@ -142,11 +131,16 @@ def get_question_form(model_class):
         def clean(self):
             answer_type = self.cleaned_data.get('answer_type', None)
             options = self.cleaned_data.get('options', None)
+            response_validation = self.cleaned_data.get('response_validation', None)
             text = self.cleaned_data.get('text', None)
             self._check__multichoice_and_options_compatibility(
                 answer_type, options)
             self._strip_special_characters_for_ussd(text)
             self._prevent_duplicate_subquestions(text)
+            answer_class = Answer.get_class(answer_type)
+            validator_names = [validator.__name__ for validator in answer_class.validators()]
+            if response_validation.validation_test not in validator_names:
+                raise ValidationError('Selected Validation is not compatible with chosen answer type')
             return self.cleaned_data
 
         def _check__multichoice_and_options_compatibility(

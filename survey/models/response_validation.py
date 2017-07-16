@@ -16,7 +16,7 @@ class ResponseValidation(CloneableMixin, BaseModel):
                         for validator in Answer.validators()]
     validation_test = models.CharField(max_length=200, choices=VALIDATION_TESTS)
     # if validation passes, classify this flow response as having this value
-    constraint_message = models.TextField(default='')
+    constraint_message = models.TextField(default='', blank=True, null=True)
 
     @property
     def dconstraint_message(self):
@@ -47,10 +47,14 @@ class ResponseValidation(CloneableMixin, BaseModel):
         answer_class = Answer.get_class(test_question.answer_type)
         return answer_class.print_odk_validation('.', self.validation_test,  *self.test_params)
 
+    def validate(self, value):
+        method = getattr(Answer, self.validation_test, None)
+        return method(value, *self.test_params)
+
 
 class TestArgument(CloneableMixin, BaseModel):
     object = InheritanceManager()
-    validation = models.ForeignKey(ResponseValidation, related_name='%(class)s', null=True)
+    validation = models.ForeignKey(ResponseValidation, related_name='%(class)ss', null=True)
     position = models.PositiveIntegerField()
 
     @classmethod

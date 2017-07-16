@@ -1,4 +1,5 @@
 import os
+from django.conf import settings
 from django.conf.urls import patterns
 from django.conf.urls import url
 from django.contrib.auth.decorators import permission_required, login_required
@@ -334,6 +335,10 @@ urlpatterns = patterns(
         r'^batches/(?P<batch_id>\d+)/questions/(?P<question_id>\d+)/questions_json/$',
         'survey.views.questions.get_questions_for_batch',
         name='batch_questions_json_page'),
+    url(
+        r'^response_validation/create/$',
+        'survey.views.set_questions.json_create_response_validation',
+        name='json_create_response_validation'),
     url(
         r'^batches/(?P<batch_id>\d+)/questions/sub_questions/new/$',
         'survey.views.questions.new_subquestion',

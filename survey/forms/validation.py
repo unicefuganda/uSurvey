@@ -11,34 +11,30 @@ from survey.models import MultiSelectAnswer
 from survey.models import ParameterTemplate
 
 
-def get_response_validation_form(test_question_model):
+def get_response_validation_form(question=None):
+
+    if question:
+        validators = Answer.get_class(question.answer_type).validators()
+    else:
+        validators = Answer.validators()
+    validation_tests = [(validator.__name__, validator.__name__) for validator in validators]
+
     class ValidationForm(forms.ModelForm, FormOrderMixin):
         min = forms.IntegerField(required=False)
         max = forms.IntegerField(required=False)
         value = forms.CharField(required=False)
         options = forms.ChoiceField(choices=[], required=False)
         CHOICES = [('', '----------Create Operator----------')]
-        CHOICES.extend(RespondentGroupCondition.VALIDATION_TESTS)
-        validation_test = forms.ChoiceField(choices=CHOICES, required=False,
-                                            label='Operator')
-        test_question = forms.ModelChoiceField(queryset=test_question_model.objects.all(), required=False,
-                                               label='Parameter')
+        CHOICES.extend(validation_tests)
+        validation_test = forms.ChoiceField(choices=CHOICES, required=False, label='Operator')
 
         def __init__(self, *args, **kwargs):
             super(ValidationForm, self).__init__(*args, **kwargs)
-            self.order_fields(['name',
-                               'description',
-                               'test_question',
-                               'validation_test',
-                               'options',
-                               'value',
-                               'min',
-                               'max'])
-            if self.data.get('test_question', []):
-                options = TemplateOption.objects.filter(
-                    question__pk=self.data['test_question'])
-                self.fields['options'].choices = [
-                    (opt.order, opt.text) for opt in options]
+            field_order = []
+            if question is None:
+                field_order.append('test_question')
+            field_order.extend(['validation_test', 'options', 'value', 'min', 'max'])
+            self.order_fields(field_order)
 
         def clean(self):
             validation_test = self.cleaned_data.get('validation_test', None)

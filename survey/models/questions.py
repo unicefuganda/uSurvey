@@ -24,8 +24,6 @@ class Question(CloneableMixin, GenericQuestion):
     objects = InheritanceManager()
     qset = models.ForeignKey('QuestionSet', related_name='questions')
     mandatory = models.BooleanField(default=True)
-    # contraint_msg = models.CharField(max_length=80, null=True, blank=True,
-    # help_text='This is error message shown to interviewer')
 
     class Meta:
         abstract = False
