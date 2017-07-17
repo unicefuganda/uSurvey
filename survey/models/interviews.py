@@ -290,8 +290,10 @@ class Answer(BaseModel):
 
     @classmethod
     def answer_types(cls):
-        return sorted([cl.choice_name()
-                       for cl in Answer.__subclasses__() if cl is not NonResponseAnswer])
+        answer_types = [cl.choice_name() for cl in Answer.__subclasses__() if cl not in [NonResponseAnswer,
+                                                                                         NumericalTypeAnswer]]
+        answer_types.extend([cl.choice_name() for cl in NumericalTypeAnswer.__subclasses__()])
+        return sorted(answer_types)
 
     @classmethod
     def get_class(cls, verbose_name):
@@ -581,7 +583,7 @@ class AutoResponse(NumericalTypeAnswer):
     """Shall be used to capture responses auto generated
     """
     value = models.CharField(null=True, max_length=100)
-    
+
     @classmethod
     def choice_name(cls):
         return 'Auto Generated'
