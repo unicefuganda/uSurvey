@@ -495,6 +495,10 @@ class AutoResponse(Answer):
     """
     value = models.CharField(null=True, max_length=100)
 
+    @classmethod
+    def validators(cls):
+        return [cls.greater_than, cls.equals, cls.less_than, cls.between]
+
     class Meta:
         app_label = 'survey'
         abstract = False
