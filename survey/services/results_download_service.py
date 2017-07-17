@@ -142,7 +142,7 @@ class ResultsDownloadService(object):
             header_names.extend(['EA', 'interviewer__name', ])
             if self.follow_ref:
                 header_names.extend(list(ref_answers_report_df.columns)[1:])
-            report_columns = header_names[1:] + [
+            report_columns = header_names[2:] + [           # adding uploaded and completion date after other columns
                 q.identifier for q in self.batch.all_questions
                 if q.identifier in reports_df.columns] + ['Uploaded', 'Completion Date']
             header_names.extend(list(reports_df.columns)[len(header_names):])
