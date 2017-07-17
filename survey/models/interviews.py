@@ -301,6 +301,10 @@ class Answer(BaseModel):
         for cl in Answer.__subclasses__():
             if cl.choice_name() == verbose_name:
                 return cl
+        # check in numerical answer type
+        for cl in NumericalTypeAnswer.__subclasses__():
+            if cl.choice_name() == verbose_name:
+                return cl
         raise ValueError('unknown class')
 
     def to_text(self):
