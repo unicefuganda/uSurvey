@@ -3,7 +3,7 @@ __author__ = 'anthony <antsmc2@gmail.com>'
 """This module is designed to provide validation feature in general.
 Presently implemented for QuestionFlows but have to expand in general for response validation feature in other models
 """
-
+from django.utils.safestring import mark_safe
 from django.db import models
 from django_cloneable import CloneableMixin
 from survey.models.base import BaseModel
@@ -45,7 +45,7 @@ class ResponseValidation(CloneableMixin, BaseModel):
 
     def get_odk_constraint(self, test_question):
         answer_class = Answer.get_class(test_question.answer_type)
-        return answer_class.print_odk_validation('.', self.validation_test,  *self.test_params)
+        return mark_safe(answer_class.print_odk_validation('.', self.validation_test,  *self.test_params))
 
     def validate(self, value):
         method = getattr(Answer, self.validation_test, None)
