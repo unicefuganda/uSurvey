@@ -490,7 +490,20 @@ class Answer(BaseModel):
         get_latest_by = 'created'
 
 
-class NumericalFeatures(object):
+class NumericalTypeAnswer(Answer):
+
+    @classmethod
+    def validators(cls):
+        return [
+            cls.equals,
+            cls.between,
+            cls.less_than,
+            cls.greater_than,
+        ]
+
+    @classmethod
+    def prep_value(cls, val):
+        return str(val).zfill(9)
 
     @classmethod
     def prep_value(cls, val):
@@ -535,27 +548,47 @@ class NumericalFeatures(object):
         except ValueError as ex:
             raise ValidationError([unicode(ex), ])
 
+    class Meta:
+        app_label = 'survey'
+        abstract = True
 
-class AutoResponse(Answer, NumericalFeatures):
-    """Shall be used to capture responses auto generated
-    """
-    value = models.CharField(null=True, max_length=100)
+
+class NumericalAnswer(NumericalTypeAnswer):
+    value = models.PositiveIntegerField(null=True)
 
     @classmethod
-    def validators(cls):
-        return [cls.greater_than, cls.equals, cls.less_than, cls.between]
+    def create(cls, interview, question, answer):
+        try:
+            value = int(answer)
+            text_value = cls.prep_value(value)    # zero fill to 1billion
+        except Exception:
+            raise
+        return super(
+            NumericalAnswer,
+            cls).create(
+            interview,
+            question,
+            answer,
+            as_text=value,
+            as_value=text_value)
 
     class Meta:
         app_label = 'survey'
         abstract = False
 
-    @classmethod
-    def prep_value(cls, val):
-        return str(val).zfill(9)
 
+class AutoResponse(NumericalTypeAnswer):
+    """Shall be used to capture responses auto generated
+    """
+    value = models.CharField(null=True, max_length=100)
+    
     @classmethod
     def choice_name(cls):
         return 'Auto Generated'
+
+    class Meta:
+        app_label = 'survey'
+        abstract = False
 
     @classmethod
     def create(cls, interview, question, answer):
@@ -582,34 +615,6 @@ class AutoResponse(Answer, NumericalFeatures):
             answer,
             as_text=value,
             as_value=text_value)
-
-
-class NumericalAnswer(Answer, NumericalFeatures):
-    value = models.PositiveIntegerField(null=True)
-
-    @classmethod
-    def validators(cls):
-        return [cls.greater_than, cls.equals, cls.less_than, cls.between]
-
-    @classmethod
-    def create(cls, interview, question, answer):
-        try:
-            value = int(answer)
-            text_value = cls.prep_value(value)    # zero fill to 1billion
-        except Exception:
-            raise
-        return super(
-            NumericalAnswer,
-            cls).create(
-            interview,
-            question,
-            answer,
-            as_text=value,
-            as_value=text_value)
-
-    class Meta:
-        app_label = 'survey'
-        abstract = False
 
 
 class ODKGeoPoint(Point):
