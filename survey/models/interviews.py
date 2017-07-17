@@ -478,9 +478,9 @@ class Answer(BaseModel):
 
     @classmethod
     def validate_test_value(cls, value):
-        '''Shall be used to validate that a given value is appropriate for this answer
+        """Shall be used to validate that a given value is appropriate for this answer
         :return:
-        '''
+        """
         for validator in cls._meta.get_field_by_name('value')[0].validators:
             validator(value)
 
@@ -490,7 +490,53 @@ class Answer(BaseModel):
         get_latest_by = 'created'
 
 
-class AutoResponse(Answer):
+class NumericalFeatures(object):
+
+    @classmethod
+    def prep_value(cls, val):
+        return str(val).zfill(9)
+
+    @classmethod
+    def greater_than(cls, answer, value):
+        answer = int(answer)
+        value = int(value)
+        return answer > value
+
+    @classmethod
+    def odk_greater_than(cls, node_path, value):
+        return "%s &gt; %s" % (node_path, value)
+
+    @classmethod
+    def less_than(cls, answer, value):
+        answer = int(answer)
+        value = int(value)
+        return answer < value
+
+    @classmethod
+    def odk_less_than(cls, node_path, value):
+        return "%s &lt; %s" % (node_path, value)
+
+    @classmethod
+    def between(cls, answer, lowerlmt, upperlmt):
+        answer = int(answer)
+        upperlmt = int(upperlmt)
+        lowerlmt = int(lowerlmt)
+        return upperlmt > answer >= lowerlmt
+
+    @classmethod
+    def odk_between(cls, node_path, lowerlmt, upperlmt):
+        return "(%s &gt; %s) and (%s &lt; %s)" % (
+            node_path, lowerlmt, node_path, upperlmt)
+
+    @classmethod
+    def validate_test_value(cls, value):
+        try:
+            int(value)
+        except ValueError as ex:
+            raise ValidationError([unicode(ex), ])
+
+
+class AutoResponse(Answer, NumericalFeatures):
     """Shall be used to capture responses auto generated
     """
     value = models.CharField(null=True, max_length=100)
@@ -538,7 +584,7 @@ class AutoResponse(Answer):
             as_value=text_value)
 
 
-class NumericalAnswer(Answer):
+class NumericalAnswer(Answer, NumericalFeatures):
     value = models.PositiveIntegerField(null=True)
 
     @classmethod
@@ -560,49 +606,6 @@ class NumericalAnswer(Answer):
             answer,
             as_text=value,
             as_value=text_value)
-
-    @classmethod
-    def prep_value(cls, val):
-        return str(val).zfill(9)
-
-    @classmethod
-    def greater_than(cls, answer, value):
-        answer = int(answer)
-        value = int(value)
-        return answer > value
-
-    @classmethod
-    def odk_greater_than(cls, node_path, value):
-        return "%s &gt; %s" % (node_path, value)
-
-    @classmethod
-    def less_than(cls, answer, value):
-        answer = int(answer)
-        value = int(value)
-        return answer < value
-
-    @classmethod
-    def odk_less_than(cls, node_path, value):
-        return "%s &lt; %s" % (node_path, value)
-
-    @classmethod
-    def between(cls, answer, lowerlmt, upperlmt):
-        answer = int(answer)
-        upperlmt = int(upperlmt)
-        lowerlmt = int(lowerlmt)
-        return upperlmt > answer >= lowerlmt
-
-    @classmethod
-    def odk_between(cls, node_path, lowerlmt, upperlmt):
-        return "(%s &gt; %s) and (%s &lt; %s)" % (
-            node_path, lowerlmt, node_path, upperlmt)
-
-    @classmethod
-    def validate_test_value(cls, value):
-        try:
-            int(value)
-        except ValueError as ex:
-            raise ValidationError([unicode(ex), ])
 
     class Meta:
         app_label = 'survey'
