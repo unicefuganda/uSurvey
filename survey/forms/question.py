@@ -5,7 +5,8 @@ from django.core.exceptions import ValidationError
 from django.conf import settings
 from survey.models import Question, BatchQuestion, QuestionSet
 from survey.models import (QuestionOption, Batch, Answer, QuestionModule, MultiChoiceAnswer, MultiSelectAnswer,
-                           QuestionFlow, AnswerAccessDefinition, ResponseValidation)
+                           QuestionFlow, AnswerAccessDefinition, ResponseValidation, DateAnswer, TextAnswer,
+                           NumericalAnswer, AutoResponse)
 from survey.forms.form_helper import FormOrderMixin, Icons
 
 
@@ -16,8 +17,10 @@ class ValidationField(forms.ModelChoiceField, Icons):
 def get_question_form(model_class):
 
     class QuestionForm(ModelForm, FormOrderMixin):
+        VALIDATION_ANSWER_TYPES = [DateAnswer.choice_name(), TextAnswer.choice_name(),
+                                   NumericalAnswer.choice_name(), AutoResponse.choice_name()]
         options = forms.CharField(max_length=50, widget=forms.HiddenInput(), required=False)
-        response_validation = ValidationField(queryset=ResponseValidation.objects.all())
+        response_validation = ValidationField(queryset=ResponseValidation.objects.all(), required=False)
 
         def __init__(
                 self,
@@ -139,7 +142,7 @@ def get_question_form(model_class):
             self._prevent_duplicate_subquestions(text)
             answer_class = Answer.get_class(answer_type)
             validator_names = [validator.__name__ for validator in answer_class.validators()]
-            if response_validation.validation_test not in validator_names:
+            if response_validation and response_validation.validation_test not in validator_names:
                 raise ValidationError('Selected Validation is not compatible with chosen answer type')
             return self.cleaned_data
 

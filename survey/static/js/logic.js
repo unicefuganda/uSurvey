@@ -91,6 +91,9 @@ function change_to_select2(obj, delimiter, show_entire_selected) {
 
 function item_list_format(state, delimiter) {
     var key_terminus = state.text.indexOf(delimiter);
+    //alert(JSON.stringify(state))
+//    if(state.disabled === true)
+//        return '';
     if(state.id){    // to do: handle this more elegantly
         var key = state.text.substring(0, key_terminus);
         var val = state.text.substring(key_terminus + 1);

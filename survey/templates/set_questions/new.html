@@ -52,6 +52,7 @@
                           </div>
                           <div class="modal-body">
                             {% include "naked_form.html" with a_form=response_validation_form %}
+
                             <div class="form-actions">
                                 <button id="button" type="submit" class="btn btn-primary submit" name="save_button" data-disabled-text="{{ loading_text }}"><i class="fa fa-save"></i> Save</button>
                                 <a href="#" class="btn btn-primary" name="cancel_button" class="cancel" style=" padding-right: 5px; padding-left: 5px; padding-bottom: 1px;" data-dismiss="modal"><i class="fa fa-close"></i> Dismiss</a>
@@ -70,6 +71,24 @@
         <div class="row">
             <div class="col-md-6 question-form">
                 {% include "naked_form.html" with a_form=questionform %}
+                {% if options %}
+                <script type="text/template" id="question-option-template-instance">
+                  {% for option in options %}
+                   {% if option %}
+                   <div class="control-group options question-option">
+                        <label class="control-label col-md-4">Option <span class="number"> {{ option.order }}</span></label>
+                        <div class="controls">
+                            <input type="text" maxlength="100" name="options" value="{{ option.text }}">
+                            <a style="padding: 0px !important;" href="javascript:;" class="btn btn-white btn-warning btn-bold add-option"><i class="ace-icon fa fa-plus bigger-120 orange"></i></i></a>
+                            <a style="padding: 0px !important;" href="javascript:;" class="btn btn-white btn-warning btn-bold remove-option"><i class="ace-icon fa fa-minus bigger-120 orange"></i></i></a>
+
+                        </div>
+                    </div>
+                    {% endif %}
+                  {% endfor %}
+                  </script>
+                {% endif %}
+                {% include "_multiple_options.html" with option_label='Option' id="question-option-template" name='options'%}
             </div>
             <div class="col-md-6">
                 {% include "set_questions/help_text.html" with a_form=questionform %}
@@ -145,7 +164,37 @@
               e.preventDefault();
         });
 
+        $('#id_answer_type').change(toggleResponseValidationField);
+        {% if options %}
+            $('#id_answer_type-control-group').after($('#question-option-template-instance').html());
+        {% endif %}
+        toggleResponseValidationField();
+        function toggleResponseValidationField() {
+            var validation_answer_types = [{% for answer_type in questionform.VALIDATION_ANSWER_TYPES %}'{{answer_type}}',{% endfor %}];
+            if(validation_answer_types.indexOf($('#id_answer_type').val()) > -1) {
+                $('#id_response_validation-control-group').show();
+            }
+            else
+                $('#id_response_validation-control-group').hide();
 
+            //Show only relevant validations as per answer_type
+            $.ajax({
+                url: "{% url 'get_response_validations' %}",
+                data: {'answer_type': $('#id_answer_type').val()},
+                success: function(response_validation_ids) {
+                    $('#id_response_validation option').hide();
+                    $('#id_response_validation option').prop('disabled', true);
+                    $('#id_response_validation option[value=""]').show();
+                    $('#id_response_validation option[value=""]').prop('disabled', false);
+                    jQuery.each(response_validation_ids, function(i, id) {
+                       $('#id_response_validation option[value='+id+']').show();
+                       $('#id_response_validation option[value='+id+']').prop('disabled', false);
+                    });
+                    $('#id_response_validation').select2('destroy');        // have to recreate the select2
+                    change_to_select2( $('#id_response_validation'), ': ', true);
+                }
+            })
+        }
     });
 
     </script>
@@ -207,9 +256,10 @@
 </style>
 <script src="{{STATIC_URL}}js/type-auto-suggest.js" type="text/javascript" charset="utf-8"></script>
 <script src="{{STATIC_URL}}js/questions.js" type="text/javascript" charset="utf-8"></script>
+<script src="{{STATIC_URL}}js/question_options.js" type="text/javascript" charset="utf-8"></script>
 <script src="{{STATIC_URL}}js/logic.js" type="text/javascript" charset="utf-8"></script>
 <script type="text/javascript">
-    change_to_select2( $('#id_response_validation'), ': ', true);
+   change_to_select2( $('#id_response_validation'), ': ', true);
 </script>
 <script type="text/javascript">
     channel_map = {

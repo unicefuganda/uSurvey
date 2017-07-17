@@ -13,6 +13,8 @@ from survey.models import QuestionTemplate
 from survey.models import TemplateOption
 from survey.models import QuestionLoop
 from survey.models import QuestionOption
+from survey.models import Answer
+from survey.models import ResponseValidation
 from survey.forms.question import get_question_form  # , QuestionFlowForm
 from survey.forms.batch import BatchQuestionsForm
 from survey.services.export_questions import get_question_as_dump
@@ -316,6 +318,19 @@ def json_create_response_validation(request):
         elif response_validation_form.errors:
             return JsonResponse({'success': False, 'error': response_validation_form.errors[0]})
     return JsonResponse({})
+
+
+@permission_required('auth.can_view_batches')
+def get_response_validations(request):
+    """This function is meant to create json posted response validation
+    :param request:
+    :return:
+    """
+    answer_type = request.GET.get('answer_type') if request.method == 'GET' else request.POST.get('answer_type')
+    answer_class = Answer.get_class(answer_type)
+    validator_names = [validator.__name__ for validator in answer_class.validators()]
+    validations = ResponseValidation.objects.filter(validation_test__in=validator_names).values_list('id', flat=True)
+    return JsonResponse(list(validations), safe=False)
 
 
 def _process_question_form(request, batch, response, question_form):
