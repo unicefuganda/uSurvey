@@ -47,8 +47,9 @@ class ResponseValidation(CloneableMixin, BaseModel):
         answer_class = Answer.get_class(test_question.answer_type)
         return mark_safe(answer_class.print_odk_validation('.', self.validation_test,  *self.test_params))
 
-    def validate(self, value):
-        method = getattr(Answer, self.validation_test, None)
+    def validate(self, value, test_question):
+        answer_class = Answer.get_class(test_question.answer_type)
+        method = getattr(answer_class, self.validation_test, None)
         return method(value, *self.test_params)
 
 

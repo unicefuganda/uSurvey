@@ -344,6 +344,10 @@ urlpatterns = patterns(
         'survey.views.set_questions.get_response_validations',
         name='get_response_validations'),
     url(
+        r'^get_answer_validations/$',
+        'survey.views.set_questions.get_answer_validations',
+        name='get_answer_validations'),
+    url(
         r'^batches/(?P<batch_id>\d+)/questions/sub_questions/new/$',
         'survey.views.questions.new_subquestion',
         name='add_batch_subquestion_page'),

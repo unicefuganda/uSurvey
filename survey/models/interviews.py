@@ -790,6 +790,32 @@ class DateAnswer(Answer):
         return [cls.greater_than, cls.equals, cls.less_than, cls.between]
 
     @classmethod
+    def greater_than(cls, answer, value):
+        if isinstance(value, basestring):
+            value = extract_date(value, dayfirst=True).date()
+        if isinstance(answer, basestring):
+            answer = extract_date(answer, dayfirst=True).date()
+        return answer > value
+
+    @classmethod
+    def less_than(cls, answer, value):
+        if isinstance(value, basestring):
+            value = extract_date(value, dayfirst=True).date()
+        if isinstance(answer, basestring):
+            answer = extract_date(answer, dayfirst=True).date()
+        return answer < value
+
+    @classmethod
+    def between(cls, answer, lowerlmt, upperlmt):
+        if isinstance(answer, basestring):
+            answer = extract_date(answer, dayfirst=True).date()
+        if isinstance(lowerlmt, basestring):
+            lowerlmt = extract_date(lowerlmt, dayfirst=True).date()
+        if isinstance(upperlmt, basestring):
+            upperlmt = extract_date(upperlmt, dayfirst=True).date()
+        return upperlmt > answer >= lowerlmt
+
+    @classmethod
     def to_odk_date(cls, date_val):
         return "date('%s')" % date_val.strftime('%Y-%m-%d')
 

@@ -164,7 +164,10 @@
               e.preventDefault();
         });
 
-        $('#id_answer_type').change(toggleResponseValidationField);
+        $('#id_answer_type').change(function(){
+            $('#id_response_validation').val('');
+            toggleResponseValidationField();
+        });
         {% if options %}
             $('#id_answer_type-control-group').after($('#question-option-template-instance').html());
         {% endif %}
@@ -177,7 +180,7 @@
             else
                 $('#id_response_validation-control-group').hide();
 
-            //Show only relevant validations as per answer_type
+            //Show only relevant response validations as per answer_type
             $.ajax({
                 url: "{% url 'get_response_validations' %}",
                 data: {'answer_type': $('#id_answer_type').val()},
@@ -193,7 +196,28 @@
                     $('#id_response_validation').select2('destroy');        // have to recreate the select2
                     change_to_select2( $('#id_response_validation'), ': ', true);
                 }
-            })
+            });
+            // show only valid validations in validation_test
+            $.ajax({
+                url: "{% url 'get_answer_validations' %}",
+                data: {'answer_type': $('#id_answer_type').val()},
+                success: function(validation_names) {
+                    $('#id_validation_test option').hide();
+                    $('#id_validation_test option').prop('disabled', true);
+                    $('#id_validation_test option[value=""]').show();
+                    $('#id_validation_test option[value=""]').prop('disabled', false);
+                    jQuery.each(validation_names, function(i, name) {
+                       $('#id_validation_test option[value='+name+']').show();
+                       $('#id_validation_test option[value='+name+']').prop('disabled', false);
+                    });
+                    $('#id_response_validation').select2('destroy');        // have to recreate the select2
+                    change_to_select2( $('#id_response_validation'), ': ', true);
+                }
+            });
+            if($('#id_answer_type').val().toLowerCase().indexOf('date') > -1)
+                $('.expected-response').datepicker(datePickerSettings);
+            else
+                $('.expected-response').datepicker('destroy');
         }
     });
 

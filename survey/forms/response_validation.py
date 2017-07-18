@@ -5,15 +5,18 @@ from survey.models import ResponseValidation, TextArgument
 
 
 class ResponseValidationForm(forms.ModelForm, FormOrderMixin):
-    min = forms.IntegerField(required=False)
-    max = forms.IntegerField(required=False)
-    value = forms.CharField(required=False)
+    min = forms.CharField(required=False, max_length=50)
+    max = forms.CharField(required=False, max_length=50)
+    value = forms.CharField(required=False, max_length=50)
     CHOICES = [('', '----------Select Operator----------')]
     CHOICES.extend(ResponseValidation.VALIDATION_TESTS)
     validation_test = forms.ChoiceField(choices=CHOICES, label='Operator', required=True)
 
     def __init__(self, *args, **kwargs):
         super(ResponseValidationForm, self).__init__(*args, **kwargs)
+        self.fields['value'].widget.attrs['class'] = 'expected-response'
+        self.fields['min'].widget.attrs['class'] = 'expected-response'
+        self.fields['max'].widget.attrs['class'] = 'expected-response'
         self.order_fields(['validation_test',
                            'value',
                            'min',

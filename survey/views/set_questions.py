@@ -333,6 +333,17 @@ def get_response_validations(request):
     return JsonResponse(list(validations), safe=False)
 
 
+def get_answer_validations(request):
+    """This function is meant to create json posted response validation
+    :param request:
+    :return:
+    """
+    answer_type = request.GET.get('answer_type') if request.method == 'GET' else request.POST.get('answer_type')
+    answer_class = Answer.get_class(answer_type)
+    validator_names = [validator.__name__ for validator in answer_class.validators()]
+    return JsonResponse(validator_names, safe=False)
+
+
 def _process_question_form(request, batch, response, question_form):
     instance = question_form.instance
     action_str = 'edit' if instance else 'add'

@@ -439,17 +439,18 @@
                 }
                 var currentTime = new Date()
                 var year = currentTime.getFullYear();
-                try { 
-                        $(".datepicker").datepicker({
-                         changeMonth: true,
-                         changeYear: true,
-                         dateFormat: 'dd-mm-yy',
-                         yearRange: "-120:+nn",
-                         {% if request.resolver_match.url_name == 'new_interviewer_page' or request.resolver_match.url_name == 'edit_interviewer_page'%}
-                           maxDate: new Date(year-18, 1 - 1, 28)
-                           {%endif%}
+                try {
+                        datePickerSettings = {
+                                             changeMonth: true,
+                                             changeYear: true,
+                                             dateFormat: 'dd-mm-yy',
+                                             yearRange: "-120:+nn",
+                                             {% if request.resolver_match.url_name == 'new_interviewer_page' or request.resolver_match.url_name == 'edit_interviewer_page'%}
+                                               maxDate: new Date(year-18, 1 - 1, 28)
+                                               {%endif%}
 
-                       });
+                                           }
+                        $(".datepicker").datepicker(datePickerSettings);
                      }
                 catch(err) {
                     //alert(err);

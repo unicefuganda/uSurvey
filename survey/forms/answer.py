@@ -163,7 +163,7 @@ def get_answer_form(interview, access=None):
             # validate the response if the last question has validation
             if interview.last_question and interview.last_question.response_validation:
                 response_validation = interview.last_question.response_validation
-                if response_validation.validate(self.cleaned_data['value']) is False:
+                if response_validation.validate(self.cleaned_data['value'], interview.last_question) is False:
                     raise ValidationError(response_validation.dconstraint_message)
             return self.cleaned_data['value']
 
