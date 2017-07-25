@@ -817,6 +817,8 @@ class DateAnswer(Answer):
 
     @classmethod
     def to_odk_date(cls, date_val):
+        if isinstance(date_val, basestring):
+            date_val = extract_date(date_val, dayfirst=True)
         return "date('%s')" % date_val.strftime('%Y-%m-%d')
 
     @classmethod
