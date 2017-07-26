@@ -1,5 +1,5 @@
 from django.test import TestCase
-from survey.models import Indicator, QuestionModule, Survey, QuestionSet
+from survey.models import Indicator, QuestionModule, Survey, QuestionSet, IndicatorVariable, IndicatorCriteriaTestArgument
 
 
 class IndicatorTest(TestCase):
@@ -22,6 +22,9 @@ class IndicatorTest(TestCase):
         self.failUnless(indicator.survey)        
         self.failUnless(indicator.formulae)
         self.failUnless(indicator.question_set)
+    def test_unicode_text(self):
+        a = Indicator.objects.create(name="module name")
+        self.assertEqual(a.name, str(a))
     def setUp(self):
         Indicator.objects.create(name='Indicator',description='description')
 
@@ -32,16 +35,26 @@ class IndicatorTest(TestCase):
         self.assertEqual(len(name.name),9)
         self.assertEqual(description.description,'description')
         self.assertEqual(len(name.name),11)
-    # def test_knows_is_a_percentage_indicator(self):                
-    #     survey = Survey.objects.create(name="Survey")
-    #     question_set = QuestionSet.objects.create(name="QuestionSet")
-    #     indicator = Indicator.objects.create(name="indicator name", description="rajni indicator", survey=survey,
-    #                                          formulae="indicator formula", question_set=question_set)
-    #     self.assertTrue(indicator.is_open())
+    def test_knows_is_a_percentage_indicator(self):
+        health_module = QuestionModule.objects.create(name="Health")
+        batch = Batch.objects.create(name="Batch")
+        indicator = Indicator.objects.create(name="indicator name", description="rajni indicator", measure='Percentage',
+                                             module=health_module, batch=batch)
+        self.assertTrue(indicator.is_percentage_indicator())
 
-    # def test_knows_is_not_a_percentage_indicator(self):        
-    #     survey = Survey.objects.create(name="Survey")        
-    #     question_set = QuestionSet.objects.create(name="QuestionSet")
-    #     indicator = Indicator.objects.create(name="indicator name", description="rajni indicator", survey=survey,
-    #                                          formulae="indicator formula", question_set=question_set)
-    #     self.assertFalse(indicator.is_open())
+    def test_knows_is_not_a_percentage_indicator(self):
+        health_module = QuestionModule.objects.create(name="Health")
+        batch = Batch.objects.create(name="Batch")
+        indicator = Indicator.objects.create(name="indicator name", description="rajni indicator", measure='Count',
+                                             module=health_module, batch=batch)
+        self.assertFalse(indicator.is_percentage_indicator())
+
+class IndicatorVariableTest(TestCase):
+    def test_unicode_text(self):
+        iv = IndicatorVariable.objects.create(name="abcd name")
+        self.assertEqual(iv.name, str(iv))
+
+class IndicatorCriteriaTestArgumentTest(TestCase):
+    def test_unicode_text(self):
+        pm = IndicatorVariable.objects.create(param="abcd name")
+        self.assertEqual(pm.param, str(pm))        
