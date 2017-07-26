@@ -313,7 +313,7 @@
     $(function(){
         $('#id_text').on('keyup', function(){
            if($('#id_text').val().length > {{USSD_MAX_CHARS}}) {
-                $('#ussd-max-chars').html('<p class="ussd-alert fa fa-warning"><span>Text is more than {{USSD_MAX_CHARS}} characters.\
+                $('#ussd-max-chars').html('<p class="ussd-alert fa fa-warning"><span>Text is exceeded USSD character limit.\
                      This may not show properly on USSD</span>\
                        </p>');
            }
