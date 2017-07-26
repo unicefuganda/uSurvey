@@ -100,6 +100,7 @@ def get_qset_xform(interviewer, allocations, qset, ea_samples={}):
                              'qset': qset,
                              'stage': allocations[0].stage,
                                 'assignments': allocations,
+                                'non_response_reasons': settings.NON_RESPONSE_REASONS,
                                 'answer_types': dict([(
                                     cls.__name__.lower(),
                                     cls.choice_name())

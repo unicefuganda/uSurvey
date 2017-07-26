@@ -34,6 +34,9 @@ DEFAULT_DATE_CREATED_PATH = '//qset/meta/creationDate'
 FORM_ID_PATH = '//qset/@id'
 SUBMISSIONS_ID_PATH = '//qset/submissions/id'
 FORM_TYPE_PATH = '//qset/type'
+NON_RESPONSE_CONFIRMATION_PATH = '//qset/nqrc'
+NON_RESPONSE_PATH = '//qset/nqr'
+NON_RESPONSE_OTHERS_PATH = '//qset/nqr_other'
 FORM_ASSIGNMENT_PATH = '//qset/surveyAllocation'
 ANSWER_NODE_PATH = '//qset/qset{{ qset_id }}'
 # default content length for submission requests
@@ -76,6 +79,7 @@ def process_answers(xml, qset, access_channel, question_map, survey_allocation, 
     """
     survey_tree = _get_tree_from_blob(xml)
     answers_nodes = _get_answer_nodes(survey_tree, qset)
+    created_interviews = []
     for answers_node in answers_nodes:
         # answers = []
         survey_parameters = []
@@ -91,19 +95,30 @@ def process_answers(xml, qset, access_channel, question_map, survey_allocation, 
         # map(lambda node: answers.extend(get_answers(node, qset, question_map)), question_answers_node.getchildren())
         # map(lambda node: survey_parameters.extend(get_answers(node, qset, question_map)),
         #     survey_parameters_node.getchildren())
-        answers = get_answers(question_answers_node, qset, question_map, _get_default_date_created(survey_tree))
-        survey_parameters = None
-        if hasattr(qset, 'parameter_list'):
-            survey_parameters_node = _get_nodes('./questions/groupQuestions', answers_node)[0]
-            # survey paramaters does not have any single repeat
-            survey_parameters = get_answers(survey_parameters_node, qset, question_map,
-                                            _get_default_date_created(survey_tree))[0]
-        if survey_allocation.stage in [None, SurveyAllocation.LISTING] and \
-                survey.has_sampling and survey.sample_size > len(answers):
-            raise NotEnoughData()
-        created_interviews = Interview.save_answers(qset, survey, survey_allocation.allocation_ea, access_channel,
-                                                    question_map, answers, survey_parameters=survey_parameters,
-                                                    reference_interview=reference_interview, media_files=media_files)
+        # now check if non response exists and is selected
+        if _get_nodes(NON_RESPONSE_CONFIRMATION_PATH) and int(_get_nodes(NON_RESPONSE_CONFIRMATION_PATH)[0].text) > 0:
+            answer = _get_nodes(NON_RESPONSE_PATH)[0].text
+            if answer.upper() == 'OTHER':        # user selected non respons
+                answer = _get_nodes(NON_RESPONSE_OTHERS_PATH)[0].text
+            non_response = save_non_response(survey_tree, qset, survey, survey_allocation,
+                                             access_channel, answer, reference_interview)
+            created_interviews.append(non_response.interview)
+        else:
+            answers = get_answers(question_answers_node, qset, question_map, _get_default_date_created(survey_tree))
+            survey_parameters = None
+            if hasattr(qset, 'parameter_list'):
+                survey_parameters_node = _get_nodes('./questions/groupQuestions', answers_node)[0]
+                # survey paramaters does not have any single repeat
+                survey_parameters = get_answers(survey_parameters_node, qset, question_map,
+                                                _get_default_date_created(survey_tree))[0]
+            if survey_allocation.stage in [None, SurveyAllocation.LISTING] and \
+                    survey.has_sampling and survey.sample_size > len(answers):
+                raise NotEnoughData()
+            created_interviews.extend(Interview.save_answers(qset, survey, survey_allocation.allocation_ea,
+                                                             access_channel, question_map, answers,
+                                                             survey_parameters=survey_parameters,
+                                                             reference_interview=reference_interview,
+                                                             media_files=media_files))
         if survey.has_sampling:
             survey_allocation.stage = SurveyAllocation.SURVEY
             survey_allocation.save()
@@ -112,6 +127,18 @@ def process_answers(xml, qset, access_channel, question_map, survey_allocation, 
     map(lambda interview: submission.interviews.add(interview), created_interviews)    # update with present interviews
     submission.save()
     submission.save_attachments(media_files)
+
+
+def save_non_response(survey_tree, qset, survey, survey_allocation, access_channel, answer, reference_interview):
+    interviewer = survey_allocation.interviewer
+    interview = Interview.objects.create(survey=survey, question_set=qset, ea=survey_allocation.allocation_ea,
+                                         interviewer=interviewer, interview_channel=access_channel,
+                                         closure_date=extract_date(_get_nodes('./creationDate',
+                                                                              tree=survey_tree)[0].text,
+                                                                   dayfirst=False),
+                                         interview_reference_id=reference_interview)
+    return NonResponseAnswer.objects.create(interview=interview, value=answer, interviewer=interviewer)
+
 
 
 def get_answers(node, qset, question_map, completion_date):

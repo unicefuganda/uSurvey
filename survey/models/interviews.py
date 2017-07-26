@@ -941,6 +941,14 @@ class NonResponseAnswer(BaseModel):
     def validators(cls):
         return []
 
+    @property
+    def as_text(self):
+        return self.value
+
+    @property
+    def as_value(self):
+        return self.value
+
 
 class AnswerAccessDefinition(BaseModel):
     ACCESS_CHANNELS = [(name, name)

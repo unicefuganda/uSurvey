@@ -469,6 +469,17 @@ RESPONSIVE_MEDIA_QUERIES = {
     }
 }
 
+NON_RESPONSE_REASONS = {
+    'No competent respondent': 'No competent respondent',
+    'No respondent available': 'No respondent available',
+    'Refused': 'Refused',
+    'Dwelling vacent / Address not a dwelling': 'Dwelling vacent / Address not a dwelling',
+    'Dwelling destroyed': 'Dwelling destroyed',
+    'Dwelling not found': 'Dwelling not found',
+    'Other': 'Other'
+}
+
+
 
 ##end USSD config ##
 # Importing server specific settings

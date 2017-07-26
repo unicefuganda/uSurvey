@@ -30,7 +30,15 @@ xmlns:jr="http://openrosa.org/javarosa">
 	 </submissions>
 	   {% comment %}<type>{{ stage }}</type>  basically tells if it's listing or survey data. status may change {% endcomment %}
 	   <surveyAllocation locked="true()" />
+
+		{% if qset.non_response_eas %}
+			<qnrc>0</qnrc>		{% comment %}Non response confirmation. Just used to  {% endcomment %}
+			<qnr />			{% comment %}Non response confirmation {% endcomment %}
+			<nqr_other />
+	   {%  endif %}
+
 	   <qset{{ qset.pk }}>
+
 	   {% if ea_samples %}
 	     <sampleData>
 			 <selectedSample />
@@ -39,6 +47,7 @@ xmlns:jr="http://openrosa.org/javarosa">
 			{% endfor %}
 		</sampleData>
 	   {% endif %}
+
 			<questions>
 				{% if qset.parameter_list %}
 				   <groupQuestions>
@@ -83,6 +92,12 @@ xmlns:jr="http://openrosa.org/javarosa">
 			<bind nodeset="/qset/qset{{qset.pk}}/sampleData/iq{{ ea_id }}" type="select1" required="true()"  relevant="{{ relevant_sample_context }}"/>
 		{% endfor %}
 	{% endif %}
+	{% if qset.non_response_eas %}
+		<bind nodeset="/qset/nqrc" type="select1" relevant="selected({% for ea in qset.non_response_eas %}'{{ea.name}}' {% endfor %}, string(/qset/surveyAllocation))" />
+		<bind nodeset="/qset/nqr" type="select1" relevant="int(/qset/nqrc) &gt; 0" />
+		<bind nodeset="/qset/nqr_other" type="string" relevant="string(/qset/nqr) = 'OTHER'" />
+		<bind nodeset="/qset/qset{{qset.pk}}/questions" relevant="{% if qset.non_response_eas %}int(/qset/nqrc) = 0{% endif %}" />
+	{% endif %}
 	{% if qset.parameter_list %}
 		{% for question in qset.parameter_list.questions.all %}
 			<bind nodeset="/qset/qset{{qset.pk}}/questions/groupQuestions/q{{question.pk}}"
@@ -91,6 +106,7 @@ xmlns:jr="http://openrosa.org/javarosa">
 				relevant="true()" {% if question.odk_constraint %}constraint="{{question.odk_constraint}}" jr:constraintMsg="{{question.odk_constraint_msg}}" {% endif %}/>
 		{% endfor %}
 	{% endif %}
+
 	{% for question in qset.flow_questions  %}
 		{% is_relevant_odk question interviewer as relevance_context %}
 	    {% get_loop_aware_path question  as path %}
@@ -142,6 +158,31 @@ xmlns:jr="http://openrosa.org/javarosa">
 				{% endif %}
 			{% endfor %}
 		</group>
+	{% endif %}
+	{% if qset.non_response_eas %}
+		<select1 ref="/qset/nqrc">
+			<label>Record Non-Response?</label>
+			<item>
+				<label>Yes</label>
+				<value>1</value>
+			</item>
+			<item>
+				<label>No</label>
+				<value>0</value>
+			</item>
+		</select1>
+		<select1 ref="/qset/nqr">
+			<label>Select Reason</label>
+			{% for key, value in non_response_reasons.items %}
+				<item>
+					<label>​{{value}}</label>
+					<value>{{key.upper}}</value>
+				</item>
+			{% endfor %}
+		</select1>
+		<input ref="/qset/nqr_other">
+			<label>Please specify</label>
+		</input>
 	{% endif %}
 	{% if qset.parameter_list %}
 		<group>

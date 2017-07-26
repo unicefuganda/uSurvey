@@ -55,10 +55,6 @@ class SurveyForm(ModelForm, FormOrderMixin):
         except Exception as err:
             pass
         self.fields['email_group'].help_text = 'These users shall receive email notifications from this survey'
-        if not self.data.get('preferred_listing'):
-            self.fields['listing_form'].required = True
-        else:
-            self.fields['listing_form'].required = False
         self.order_fields(['name',
                            'description',
                            'has_sampling',
