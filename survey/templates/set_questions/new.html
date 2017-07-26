@@ -12,6 +12,7 @@
 <script src="{{ STATIC_URL }}js/awesomplete.min.js" async></script>
 <link href="{{STATIC_URL}}css/select2.css" rel="stylesheet"/>
 <script src="{{STATIC_URL}}js/select2.full.js"></script>
+
 <style type="text/css">
     .form-horizontal {
         margin-top: 5px;
@@ -110,12 +111,25 @@
 {% endblock %}
 
 {% block javascripts %}
+<script src="{{STATIC_URL}}js/textcounter.js"></script>
 <script type="text/javascript">
 
      jQuery(function($){
         $('#id_validation_test').change(function(){
             resetParams();
         });
+        $('#id_text').focus(function(){
+            $('.help-text').show();
+        });
+        $('#id_text').focusout(function(){
+            $('.help-text').hide();
+        });
+
+        $('#id_text').textcounter({
+            countContainerElement: 'span',
+            counterText: " %d/"+ $('#id_text').attr('maxlength'),
+        });
+        $('.help-text').hide();
         function resetParams() {
             $('#id_value-control-group').show();
             $('#id_min-control-group').hide();
@@ -224,7 +238,12 @@
     </script>
 
 <style type="text/css">
-
+    .ussd-alert {
+        padding: 3px;
+    }
+    .ussd-alert span{
+        text-align: center;
+    }
     #id_identifier{
     width: 261px !important;
     height: 25px !important;
@@ -293,6 +312,14 @@
     };
     $(function(){
         $('#id_text').on('keyup', function(){
+           if($('#id_text').val().length > {{USSD_MAX_CHARS}}) {
+                $('#ussd-max-chars').html('<p class="ussd-alert fa fa-warning"><span>Text is more than {{USSD_MAX_CHARS}} characters.\
+                     This may not show properly on USSD</span>\
+                       </p>');
+           }
+           else {
+                $('#ussd-max-chars').html('');
+           }
            make_suggestions('#id_text', "{% url 'qset_identifiers' %}?id={{batch.pk}}{% if questionform.instance.id %}&q_id={{questionform.instance.id}}{% endif %}");
            this.focus();
         });

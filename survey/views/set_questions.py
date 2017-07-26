@@ -1,6 +1,7 @@
 import json
 from django.core.urlresolvers import reverse
 from django.shortcuts import render, get_object_or_404
+from django.conf import settings
 from django.contrib import messages
 from django.core.exceptions import ValidationError
 from django.http import HttpResponseRedirect, HttpResponse, Http404, JsonResponse
@@ -106,6 +107,7 @@ def _save_subquestion(request, batch_id, instance=None):
         'questionform': questionform,
         'button_label': 'Create',
         'id': 'add-sub_question-form',
+        'USSD_MAX_CHARS': settings.USSD_MAX_CHARS,
         'save_url': reverse(
             '%s_home' %
             batch.resolve_tag()),
@@ -198,6 +200,7 @@ def add_logic(request, qset_id, question_id):
         'logic_form': logic_form,
         'button_label': 'Save',
         'question': question,
+        'USSD_MAX_CHARS': settings.USSD_MAX_CHARS,
         'rules_for_batch': question_rules_for_batch,
         'questionform': QuestionForm(
             batch,
@@ -410,6 +413,7 @@ def _render_question_view(request, batch, instance=None, prev_question=None):
                'instance':instance,
                'request': request,
                'class': 'question-form',
+                'USSD_MAX_CHARS': settings.USSD_MAX_CHARS,
                'batch': batch,
                'prev_question': prev_question,
                # 'prev_question': prev_question,
