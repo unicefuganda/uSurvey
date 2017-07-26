@@ -14,7 +14,7 @@ class LocationTest(TestCase):
         ss_content = Location()
         fields = [str(item.attname) for item in ss_content._meta.fields]
         self.assertEqual(11, len(fields))
-        for field in ['id','created','modified','name','parent_id','location_code','slug','lft','rght','tree_id','level']:
+        for field in ['id','created','modified','name','code','lft','rght','tree_id','level','parent_id','type_id']:
             self.assertIn(field, fields)
 
     def test_store(self):

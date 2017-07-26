@@ -3,10 +3,10 @@ from survey.models import Backend
 
 class BackendTest(TestCase):
 
-	def test_fields(self):
+    def test_fields(self):
         b = Backend()
         fields = [str(item.attname) for item in b._meta.fields]
-        self.assertEqual(6, len(fields))
+        self.assertEqual(2, len(fields))
         for field in ['id', 'name']:
             self.assertIn(field, fields)
 

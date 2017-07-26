@@ -8,17 +8,14 @@ from survey.models.questions import Question, QuestionOption
 from survey.models.question_module import QuestionModule
 
 
-class Interviewer(TestCase):
+class InterviewerTest(TestCase):
 
     def test_fields(self):
         ss_content = Interviewer()
         fields = [str(item.attname) for item in ss_content._meta.fields]
-        self.assertEqual(6, len(fields))
+        self.assertEqual(11, len(fields))
         for field in ['id','created','modified','name','gender','date_of_birth','level_of_education','is_blocked','ea_id','language','weights']:
             self.assertIn(field, fields)
-
-    def setUp(self):
-        Interviewer.objects.create(name="Dummy")
 
     def test_store(self):
         ea = EnumerationArea.objects.create(name="Kampala EA A")
@@ -33,8 +30,11 @@ class Interviewer(TestCase):
         self.failUnless(ea.id)
         self.failUnless(survey.id)
 
+    def setUp(self):
+        Interviewer.objects.create(name="Dummy")
+
     def test_name(self):
-        content = Interviewer.objects.get(content="test")
-        self.assertEqual(content.name,'test')
-        self.assertEqual(len(content.name),4)
+        name = Interviewer.objects.get(name="Dummy")
+        self.assertEqual(name.name,'Dummy')
+        self.assertEqual(len(name.name),5)
 

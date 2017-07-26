@@ -43,11 +43,11 @@ class SuccessStoriesTest(TestCase):
         SuccessStories.objects.create(name="India", content="Hyderabad")
 
     def test_name(self):
-        content = SuccessStories.objects.get(content="India")
-        self.assertEqual(content.name,'India')
-        self.assertEqual(len(content.name),5)
+        name = SuccessStories.objects.get(name="India")
+        self.assertEqual(name.name,'India')
+        self.assertEqual(len(name.name),5)
 
     def test_content(self):
         content = SuccessStories.objects.get(content="Hyderabad")
         self.assertEqual(content.content,'Hyderabad')
-        self.assertEqual(len(content.content),7)
+        self.assertEqual(len(content.content),9)

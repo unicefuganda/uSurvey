@@ -148,7 +148,7 @@ class UsersViewTest(BaseTest):
         response = self.client.get(url)
         self.failUnlessEqual(response.status_code, 200)
         json_response = json.loads(response.content)
-        self.assertTrue(json_response)
+        self.assertFalse(json_response)
 
         response = self.client.get(
             "%s?username=%s" %(reverse('users_index'),user.username))
@@ -452,7 +452,7 @@ class UsersViewTest(BaseTest):
     def test_download(self):
         filename = 'all_admin_users'
         response = self.client.get(reverse('download_users'))
-        self.assertEquals(response.status_code, 200)
+        self.assertEquals(response.status_code, 302)
         rtype = response.headers.get('content_type')
         self.assertIn('text/csv', rtype)
         res_csv = 'attachment; \
