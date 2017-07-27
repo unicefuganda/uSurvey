@@ -458,7 +458,7 @@ class Answer(BaseModel):
 
     @classmethod
     def odk_between(cls, node_path, lowerlmt, upperlmt):
-        return "(%s &gt; '%s') and (%s &lt; '%s')" % (
+        return "(%s &gt; '%s') and (%s &lt;= '%s')" % (
             node_path, lowerlmt, node_path, upperlmt)
 
     @classmethod
@@ -544,7 +544,7 @@ class NumericalTypeAnswer(Answer):
 
     @classmethod
     def odk_between(cls, node_path, lowerlmt, upperlmt):
-        return "(%s &gt; %s) and (%s &lt; %s)" % (
+        return "(%s &gt; %s) and (%s &lt;= %s)" % (
             node_path, lowerlmt, node_path, upperlmt)
 
     @classmethod
@@ -831,7 +831,7 @@ class DateAnswer(Answer):
 
     @classmethod
     def odk_between(cls, node_path, lowerlmt, upperlmt):
-        return "(%s &gt; %s) and (%s &lt; %s)" % (
+        return "(%s &gt; %s) and (%s &lt;= %s)" % (
             node_path, cls.to_odk_date(lowerlmt), node_path, cls.to_odk_date(upperlmt))
 
     @classmethod
