@@ -30,6 +30,7 @@ OPEN_ROSA_VERSION = '1.0'
 DEFAULT_CONTENT_TYPE = 'text/xml; charset=utf-8'
 INSTANCE_ID_PATH = '//qset/meta/instanceID'
 INSTANCE_NAME_PATH = '//qset/meta/instanceName'
+CREATION_DATE_PATH = '//qset/meta/creationDate'
 DEFAULT_DATE_CREATED_PATH = '//qset/meta/creationDate'
 FORM_ID_PATH = '//qset/@id'
 SUBMISSIONS_ID_PATH = '//qset/submissions/id'
@@ -133,7 +134,7 @@ def save_non_response(survey_tree, qset, survey, survey_allocation, access_chann
     interviewer = survey_allocation.interviewer
     interview = Interview.objects.create(survey=survey, question_set=qset, ea=survey_allocation.allocation_ea,
                                          interviewer=interviewer, interview_channel=access_channel,
-                                         closure_date=extract_date(_get_nodes('./creationDate',
+                                         closure_date=extract_date(_get_nodes(CREATION_DATE_PATH,
                                                                               tree=survey_tree)[0].text,
                                                                    dayfirst=False),
                                          interview_reference_id=reference_interview)
