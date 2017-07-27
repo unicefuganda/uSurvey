@@ -74,6 +74,17 @@ class Interviewer(BaseModel):
         return self.assignments.filter(status=SurveyAllocation.PENDING)
 
     @property
+    def non_response_eas(self):
+        eas = set()
+        for assignment in self.unfinished_assignments:
+            survey = assignment.survey
+            ea = assignment.allocation_ea
+            for batch in survey.batches.all():
+                if ea in batch.non_response_eas:
+                    eas.add(ea)
+        return eas
+
+    @property
     def present_interviews(self):
         return self.interviews.filter(
             ea__in=[a.allocation_ea for a in self.unfinished_assignments]).count()
