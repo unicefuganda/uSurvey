@@ -32,8 +32,8 @@ xmlns:jr="http://openrosa.org/javarosa">
 	   <surveyAllocation locked="true()" />
 
 		{% if interviewer.non_response_eas %}
-			<qnrc>0</qnrc>		{% comment %}Non response confirmation. Just used to  {% endcomment %}
-			<qnr />			{% comment %}Non response confirmation {% endcomment %}
+			<nqrc>0</nqrc>		{% comment %}Non response confirmation. Just used to  {% endcomment %}
+			<nqr />			{% comment %}Non response confirmation {% endcomment %}
 			<nqr_other />
 	   {%  endif %}
 
@@ -96,7 +96,7 @@ xmlns:jr="http://openrosa.org/javarosa">
 		<bind nodeset="/qset/nqrc" type="select1" relevant="selected({% for ea in interviewer.non_response_eas %}'{{ea.name}}' {% endfor %}, string(/qset/surveyAllocation))" />
 		<bind nodeset="/qset/nqr" type="select1" relevant="int(/qset/nqrc) &gt; 0" />
 		<bind nodeset="/qset/nqr_other" type="string" relevant="string(/qset/nqr) = 'OTHER'" />
-		<bind nodeset="/qset/qset{{qset.pk}}/questions" relevant="{% if interviewer.non_response_eas %}int(/qset/nqrc) = 0{% endif %}" />
+		<bind nodeset="/qset/qset{{qset.pk}}/questions" relevant="int(/qset/nqrc) = 0" />
 	{% endif %}
 	{% if qset.parameter_list %}
 		{% for question in qset.parameter_list.questions.all %}
