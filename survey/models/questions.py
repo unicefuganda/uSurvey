@@ -499,7 +499,7 @@ class QuestionSet(
         questions = self.all_questions
         if questions:
             return Question.get(pk=questions[0].id)
-        
+
     def survey_list(self):
         survey_names = []
         survey_names.extend(Survey.objects.filter(listing_form_id=self.id))
