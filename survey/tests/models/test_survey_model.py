@@ -1,4 +1,4 @@
-save_sample_sizefrom django.test import TestCase
+from django.test import TestCase
 from survey.models.locations import Location, LocationType
 from survey.forms.surveys import SurveyForm
 from survey.models import Batch, Interviewer, SurveyAllocation, Backend, EnumerationArea, Question
@@ -81,7 +81,7 @@ class SurveyTest(TestCase):
         survey = Survey.objects.create(
             name="survey name234", description="rajni surve234y")
         ea = EnumerationArea.objects.create(name="EA2")
-        country = Locasave_sample_sizetionType.objects.create(name="Country", slug="country")
+        country = LocationType.objects.create(name="Country", slug="country")
         region = LocationType.objects.create(name="Region", slug="region")
         district = LocationType.objects.create(
             name="District", slug='district')

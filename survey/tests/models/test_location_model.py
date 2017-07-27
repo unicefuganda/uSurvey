@@ -14,8 +14,8 @@ class LocationTest(TestCase):
         ss_content = Location()
         fields = [str(item.attname) for item in ss_content._meta.fields]
         self.assertEqual(11, len(fields))
-        for field in ['id','created','modified','name','parent_id','location_code','slug','lft','rght','tree_id','level']:
-            self.assertIn(field, fields)
+        for field in ['id','created','modified','name','code','lft','rght','tree_id','level','parent_id','type_id']:
+            self.assertIn(field, fields)    
 
     def test_store(self):
         country = LocationType.objects.create(name="Country", slug='country')
@@ -51,3 +51,10 @@ class LocationTest(TestCase):
         self.assertIn(some_sub_county, report_locations)
         self.assertIn(some_parish, report_locations)
         self.assertIn(some_village, report_locations)
+    def test_unicode_text(self):
+        l = Location.objects.create(name="module name")
+        self.assertEqual(l.name, str(l))
+class LocationTest(TestCase):
+    def test_unicode_text(self):
+        lt = LocationType.objects.create(name="module name")
+        self.assertEqual(lt.name, str(lt))
