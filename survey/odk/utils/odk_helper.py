@@ -97,10 +97,11 @@ def process_answers(xml, qset, access_channel, question_map, survey_allocation, 
         # map(lambda node: survey_parameters.extend(get_answers(node, qset, question_map)),
         #     survey_parameters_node.getchildren())
         # now check if non response exists and is selected
-        if _get_nodes(NON_RESPONSE_CONFIRMATION_PATH) and int(_get_nodes(NON_RESPONSE_CONFIRMATION_PATH)[0].text) > 0:
+        if _get_nodes(NON_RESPONSE_CONFIRMATION_PATH,
+                      survey_tree) and int(_get_nodes(NON_RESPONSE_CONFIRMATION_PATH)[0].text, survey_tree) > 0:
             answer = _get_nodes(NON_RESPONSE_PATH)[0].text
             if answer.upper() == 'OTHER':        # user selected non respons
-                answer = _get_nodes(NON_RESPONSE_OTHERS_PATH)[0].text
+                answer = _get_nodes(NON_RESPONSE_OTHERS_PATH, survey_tree)[0].text
             non_response = save_non_response(survey_tree, qset, survey, survey_allocation,
                                              access_channel, answer, reference_interview)
             created_interviews.append(non_response.interview)
