@@ -66,11 +66,14 @@ class InterviewerForm(ModelForm):
                                                                            or [self.instance.ea.id, ]
                                                                            if self.instance.ea else [])
                 ea = self.fields['ea'].initial.last()
-                # get the "parent location" the location holding this EA
-                # this is because Location filters stops one level above EA locations admin level
-                parent_location = ea.locations.first().parent
-                # get sibling EAs
-                self.fields['ea'].queryset = EnumerationArea.objects.filter(locations__parent=parent_location)
+                if ea:
+                    # get the "parent location" the location holding this EA
+                    # this is because Location filters stops one level above EA locations admin level
+                    parent_location = ea.locations.first().parent
+                    # get sibling EAs
+                    self.fields['ea'].queryset = EnumerationArea.objects.filter(locations__parent=parent_location)
+                else:
+                    self.fields['ea'].queryset = EnumerationArea.objects.none()
             except IndexError:
                 pass
         self.fields['ea'].queryset = eas or self.fields['ea'].queryset

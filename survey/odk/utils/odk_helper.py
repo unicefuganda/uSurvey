@@ -85,7 +85,6 @@ def process_answers(xml, qset, access_channel, question_map, survey_allocation, 
         # answers = []
         survey_parameters = []
         survey = survey_allocation.survey
-        question_answers_node = _get_nodes('./questions/surveyQuestions', answers_node)[0]
         reference_interview = None          # typically used if
         if _get_nodes('./sampleData/selectedSample', answers_node):
             # the following looks ugly but ./sampleData/selectedSample is calculated in xform by a concat of
@@ -106,6 +105,7 @@ def process_answers(xml, qset, access_channel, question_map, survey_allocation, 
                                              access_channel, answer, reference_interview)
             created_interviews.append(non_response.interview)
         else:
+            question_answers_node = _get_nodes('./questions/surveyQuestions', answers_node)[0]
             answers = get_answers(question_answers_node, qset, question_map, _get_default_date_created(survey_tree))
             survey_parameters = None
             if hasattr(qset, 'parameter_list'):
