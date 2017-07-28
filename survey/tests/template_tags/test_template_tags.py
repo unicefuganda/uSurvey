@@ -8,6 +8,7 @@ from survey.templatetags.template_tags import *
 from survey.views.location_widget import LocationWidget
 from survey.models.locations import *
 from survey.models.questions import *
+from survey.models.respondents import RespondentGroupCondition,GroupTestArgument,ParameterQuestion,SurveyParameterList,RespondentGroup,ParameterTemplate
 
 
 class TemplateTagsTest(TestCase):
@@ -193,13 +194,13 @@ class TemplateTagsTest(TestCase):
                          is_batch_open_for_location(open_locations, kampala))
 
     def test_condition(self):
-        condition = GroupCondition.objects.create(
+        condition = RespondentGroupCondition.objects.create(
             attribute="AGE", value=2, condition="EQUALS")
         self.assertEqual("EQUALS", condition.condition)
 
     def test_quest_validation_opts(self):
         batch = Batch.objects.create(order=1, name="Batch name")
-        condition = GroupCondition.objects.create(
+        condition = RespondentGroupCondition.objects.create(
             attribute="AGE", value=2, condition="GREATER_THAN")
 
     def test_ancestors_reversed_reversed(self):

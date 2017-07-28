@@ -13,6 +13,7 @@ from survey.models.access_channels import InterviewerAccess, ODKAccess, USSDAcce
 from survey.models.locations import Point
 from survey.utils.decorators import static_var
 from survey.models.interviews import Interview
+from django.test import TestCase
 
 class InterviewTest(TestCase):
 
