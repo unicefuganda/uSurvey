@@ -32,7 +32,7 @@ For development purpose, please see following considerations:
 
 * uSurvey has been tested on Ubuntu and OS X. However it should run on most Linux machines (since there are no distribution specific dependency).
 
-* Minimum of 1GB RAM, 1.6GHz 1 CPU core, 20GB disk space is required for setup and testing.
+* 8GB RAM, 2.0GHz 4 CPU core, 200GB disk space required for a typical setup (though actual sizing depends on projected traffic).
 
 * Postgres and redis-server needs to be installed and should be running (all can run on same machine, but you'll get better experience with higher RAM and CPU specs in that case)
 

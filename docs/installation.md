@@ -5,7 +5,7 @@ Prerequisites
 
 * Has been tested on Ubuntu and OS X. However it should run on most Linux machines (since there are no distribution specific dependency).
 
-* Minimum of 1GB RAM is recommended for setup.
+* 8GB RAM is recommended for setups with less than 1million survey submissions per day.
 
 * Postgres, redis-server should be running
 
