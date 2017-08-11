@@ -70,6 +70,7 @@ def check_user_attribute(**kwargs):
         content_type="application/json")
 
 
+@login_required
 @permission_required('auth.can_view_users')
 def index(request):
     users_filter_form = UsersFilterForm(request.GET)
@@ -92,8 +93,9 @@ def index(request):
                    'users_filter_form': users_filter_form})
 
 
+@login_required
 @permission_required_for_perm_or_current_user('auth.can_view_users')
-def edit(request, user_id, mode=None):
+def edit(request, user_id, mode=''):
     user = get_object_or_404(User, pk=user_id)
     initial = {'mobile_number': ''}
     try:
@@ -127,12 +129,13 @@ def edit(request, user_id, mode=None):
             'button_label': 'Save',
             'loading_text': 'Saving...',
             'country_phone_code': settings.COUNTRY_CODE,
-            'title': '%s User'%mode.title(),
+            'title': '%s User'% mode.title(),
             'mode': mode,
             'user_id': user.id}
     return response or render(request, 'users/new.html', context_variables)
 
 
+@login_required
 @permission_required('auth.can_view_users')
 def show(request, user_id):
     user = User.objects.filter(id=user_id)
@@ -162,17 +165,20 @@ def _activate(request, user_id, status):
     return HttpResponseRedirect("/users/")
 
 
+@login_required
 @permission_required('auth.can_view_users')
 def deactivate(request, user_id):
     return _activate(request, user_id, status=False)
 
 
+@login_required
 @permission_required('auth.can_view_users')
 def activate(request, user_id):
     return _activate(request, user_id, status=True)
 
 
-@permission_required('auth.can_view_interviewers')
+@login_required
+@permission_required('auth.can_view_users')
 def download_users(request):
     filename = 'all_admin_users'
     reports_df = get_model_as_dump(User)

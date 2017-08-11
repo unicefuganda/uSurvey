@@ -1,9 +1,9 @@
 from django.test import TestCase
-from survey.models import EnumerationArea,SurveyAllocation
-
+# from survey.models import EnumerationArea,SurveyAllocation
+from survey.models.enumeration_area import EnumerationArea
 from survey.models.batch import Batch
-from survey.models.interviewer import Interviewer
-from survey.models.surveys import Survey,SurveyAllocation
+from survey.models.interviewer import Interviewer, SurveyAllocation
+from survey.models.surveys import Survey
 from survey.models.questions import Question, QuestionOption
 from survey.models.question_module import QuestionModule
 

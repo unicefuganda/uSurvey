@@ -281,7 +281,18 @@ DOWNLOAD_CACHE_KEY = '/DOWNLOADS/EXPORT/BATCH/%(user_id)s/%(batch_id)s'
 
 SURVEY_REDIS_KEY = "/usurvey/completion_rates/%(survey_id)s"
 
-TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
+#TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
+
+NOSE_ARGS = [
+    '--with-coverage',
+    # '--keepdb',
+    # '--failfast'
+    '--cover-package=survey',
+    '--verbosity=3',
+    # '--quiet',
+    # '--pdb',
+    #'--processes=4'
+]
 
 TABLE_ENTRY_PER_PAGINATION = 10
 

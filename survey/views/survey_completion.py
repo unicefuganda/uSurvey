@@ -13,8 +13,6 @@ from survey.forms.enumeration_area import LocationsFilterForm as LocFilterForm
 from survey.forms.filters import LocationFilterForm
 from survey.models import Survey, Interviewer, SurveyAllocation,\
     Batch, EnumerationArea, Interview
-
-from survey.views.location_widget import LocationWidget
 from survey.utils.views_helper import contains_key, is_not_digit_nor_empty
 from survey.utils.query_helper import get_filterset
 from django.core.urlresolvers import reverse

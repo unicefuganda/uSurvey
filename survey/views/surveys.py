@@ -24,8 +24,7 @@ def index(request):
     context = {'surveys': surveys.order_by('-created'), 'request': request,
                'placeholder': 'name, description',
                'survey_form': SurveyForm(), 'batch_model': Batch}
-    return render(request, 'surveys/index.html',
-                  context)
+    return render(request, 'surveys/index.html', context)
 
 
 @permission_required('auth.can_view_batches')
@@ -38,7 +37,7 @@ def new(request):
         if survey_form.is_valid():
             Survey.save_sample_size(survey_form)
             messages.success(request, 'Survey successfully added.')
-            response = HttpResponseRedirect('/surveys/')
+            response = HttpResponseRedirect(reverse('survey_list_page') )
         elif survey_form.errors.get('__all__'):
             messages.error(request, survey_form.errors['__all__'])
 
@@ -55,6 +54,7 @@ def new(request):
     return response or render(request, 'surveys/new.html', context)
 
 
+@login_required
 @permission_required('auth.can_view_batches')
 def sampling_criteria(request, survey_id):
     survey = get_object_or_404(Survey, pk=survey_id)

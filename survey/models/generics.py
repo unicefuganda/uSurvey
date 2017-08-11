@@ -8,8 +8,7 @@ from survey.models.interviews import Answer
 
 class GenericQuestion(BaseModel):
     ANSWER_TYPES = [(name, name) for name in Answer.answer_types()]
-    identifier = models.CharField(
-        max_length=100, blank=False, null=True, verbose_name='Variable Name')
+    identifier = models.CharField(max_length=100, verbose_name='Variable Name')
     text = models.CharField(max_length=250, blank=False, null=False,)
     answer_type = models.CharField(
         max_length=100, blank=False, null=False, choices=ANSWER_TYPES)

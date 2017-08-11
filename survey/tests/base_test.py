@@ -2,11 +2,11 @@ import csv
 from random import randint
 from urllib import quote
 from datetime import date
-
 from django.test import TestCase
-from django.contrib.auth.models import Group, Permission
+from django.contrib.auth.models import Group, Permission, User
 from django.contrib.contenttypes.models import ContentType
 import xlwt
+from model_mommy import mommy
 from survey.models import Question
 from survey.models import Batch, QuestionModule
 from mock import patch
@@ -44,8 +44,7 @@ class BaseTest(Base):
         some_group = Group.objects.create(
             name='some group that %s' % permission_type)
         auth_content = ContentType.objects.get_for_model(Permission)
-        permission, out = Permission.objects.get_or_create(
-            codename=permission_type, content_type=auth_content)
+        permission, out = Permission.objects.get_or_create(codename=permission_type, content_type=auth_content)
         some_group.permissions.add(permission)
         some_group.user_set.add(user)
         return user
@@ -61,7 +60,7 @@ class BaseTest(Base):
             msg_prefix='')
         self.assertIn(expected_message, response.cookies['messages'].value)
 
-    def assert_restricted_permission_for(self, url):
+    def assert_restricted_permission_for(self, url, required_permission=None):
         self.client.logout()
         self.client.login(username='useless', password='I_Suck')
         response = self.client.get(url)
@@ -73,6 +72,13 @@ class BaseTest(Base):
             status_code=302,
             target_status_code=200,
             msg_prefix='')
+        if required_permission:
+            self.client.logout()
+            user = self.assign_permission_to(User.objects.create_user('test2', 'demo12@b.com', 'demo12'),
+                                             'can_view_batches')
+            self.client.login(username='test2', password='demo12')
+            response = self.client.get(url)
+            self.assertEquals(response.status_code, 200)
 
     def assert_login_required(self, url):
         self.client.logout()
@@ -115,6 +121,5 @@ class BaseTest(Base):
 
     def assert_object_does_not_exist(self, url, message):
         response = self.client.get(url)
-        self.assertRedirects(
-            response, expected_url=reverse('empty_page'), status_code=302)
+        self.assertEquals(response.status_code, 404)
         self.assertIn(message, response.cookies['messages'].value)

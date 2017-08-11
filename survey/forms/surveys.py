@@ -31,7 +31,7 @@ class SurveyForm(ModelForm, FormOrderMixin):
             'has_sampling': InlineRadioSelect(choices=((True, 'Sampled'), (False, 'Census')),
                                               attrs={'class': 'has_sampling'}),
             'email_group':  forms.SelectMultiple(attrs={'class': 'chzn-select',
-                                                        'data-placeholder': 'Search/Choose Users',})
+                                                        'data-placeholder': 'Search/Choose Users', })
         }
 
     def __init__(self, *args, **kwargs):
