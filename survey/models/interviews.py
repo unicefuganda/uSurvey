@@ -983,3 +983,57 @@ class AnswerAccessDefinition(BaseModel):
             AnswerAccessDefinition.objects.filter(
                 channel=channel).values_list(
                 'answer_type', flat=True))
+
+    @classmethod
+    def reload_answer_categories(cls):
+        from survey.models import USSDAccess, ODKAccess, WebAccess
+        cls.objects.get_or_create(channel=USSDAccess.choice_name(),
+                                                     answer_type=AutoResponse.choice_name())
+        cls.objects.get_or_create(channel=USSDAccess.choice_name(),
+                                                     answer_type=NumericalAnswer.choice_name())
+        cls.objects.get_or_create(channel=USSDAccess.choice_name(),
+                                                     answer_type=TextAnswer.choice_name())
+        cls.objects.get_or_create(channel=USSDAccess.choice_name(),
+                                                     answer_type=MultiChoiceAnswer.choice_name())
+
+        # ODK definition
+        cls.objects.get_or_create(channel=ODKAccess.choice_name(),
+                                                     answer_type=AutoResponse.choice_name())
+        cls.objects.get_or_create(channel=ODKAccess.choice_name(),
+                                                     answer_type=NumericalAnswer.choice_name())
+        cls.objects.get_or_create(channel=ODKAccess.choice_name(),
+                                                     answer_type=TextAnswer.choice_name())
+        cls.objects.get_or_create(channel=ODKAccess.choice_name(),
+                                                     answer_type=MultiChoiceAnswer.choice_name())
+        cls.objects.get_or_create(channel=ODKAccess.choice_name(),
+                                                     answer_type=MultiSelectAnswer.choice_name())
+        cls.objects.get_or_create(channel=ODKAccess.choice_name(),
+                                                     answer_type=ImageAnswer.choice_name())
+        cls.objects.get_or_create(channel=ODKAccess.choice_name(),
+                                                     answer_type=GeopointAnswer.choice_name())
+        cls.objects.get_or_create(channel=ODKAccess.choice_name(),
+                                                     answer_type=DateAnswer.choice_name())
+        cls.objects.get_or_create(channel=ODKAccess.choice_name(),
+                                                     answer_type=AudioAnswer.choice_name())
+        cls.objects.get_or_create(channel=ODKAccess.choice_name(),
+                                                     answer_type=VideoAnswer.choice_name())
+
+        # web form definition
+        cls.objects.get_or_create(channel=WebAccess.choice_name(),
+                                                     answer_type=NumericalAnswer.choice_name())
+        cls.objects.get_or_create(channel=WebAccess.choice_name(),
+                                                     answer_type=TextAnswer.choice_name())
+        cls.objects.get_or_create(channel=WebAccess.choice_name(),
+                                                     answer_type=MultiChoiceAnswer.choice_name())
+        cls.objects.get_or_create(channel=WebAccess.choice_name(),
+                                                     answer_type=MultiSelectAnswer.choice_name())
+        cls.objects.get_or_create(channel=WebAccess.choice_name(),
+                                                     answer_type=ImageAnswer.choice_name())
+        cls.objects.get_or_create(channel=WebAccess.choice_name(),
+                                                     answer_type=GeopointAnswer.choice_name())
+        cls.objects.get_or_create(channel=WebAccess.choice_name(),
+                                                     answer_type=DateAnswer.choice_name())
+        cls.objects.get_or_create(channel=WebAccess.choice_name(),
+                                                     answer_type=AudioAnswer.choice_name())
+        cls.objects.get_or_create(channel=WebAccess.choice_name(),
+                                                     answer_type=VideoAnswer.choice_name())

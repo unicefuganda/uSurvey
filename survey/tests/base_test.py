@@ -5,16 +5,24 @@ from datetime import date
 from django.test import TestCase
 from django.contrib.auth.models import Group, Permission, User
 from django.contrib.contenttypes.models import ContentType
+from django.test.utils import setup_test_environment
 import xlwt
 from model_mommy import mommy
 from survey.models import Question
 from survey.models import Batch, QuestionModule
+from survey.models import AnswerAccessDefinition
 from mock import patch
 import datetime
 from django.core.urlresolvers import reverse
 
 
 class Base(TestCase):
+
+    @classmethod
+    def setUpTestData(cls):
+        super(Base, cls).setUpTestData()
+        setup_test_environment()
+        AnswerAccessDefinition.reload_answer_categories()
 
     def mock_date_today(self, target, real_date_class=datetime.date):
         class DateSubclassMeta(type):
@@ -41,8 +49,7 @@ class BaseTest(Base):
             self,
             user,
             permission_type='can_view_investigators'):
-        some_group = Group.objects.create(
-            name='some group that %s' % permission_type)
+        some_group, created = Group.objects.get_or_create(name='some group that %s' % permission_type)
         auth_content = ContentType.objects.get_for_model(Permission)
         permission, out = Permission.objects.get_or_create(codename=permission_type, content_type=auth_content)
         some_group.permissions.add(permission)

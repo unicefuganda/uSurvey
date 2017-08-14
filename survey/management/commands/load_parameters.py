@@ -76,54 +76,5 @@ class Command(BaseCommand):
         self.stdout.write('Created groups.')
         self.stdout.write('Creating answer definition... ')
         # ussd definition
-        AnswerAccessDefinition.objects.get_or_create(channel=USSDAccess.choice_name(),
-                                                     answer_type=AutoResponse.choice_name())
-        AnswerAccessDefinition.objects.get_or_create(channel=USSDAccess.choice_name(),
-                                                     answer_type=NumericalAnswer.choice_name())
-        AnswerAccessDefinition.objects.get_or_create(channel=USSDAccess.choice_name(),
-                                                     answer_type=TextAnswer.choice_name())
-        AnswerAccessDefinition.objects.get_or_create(channel=USSDAccess.choice_name(),
-                                                     answer_type=MultiChoiceAnswer.choice_name())
-
-        # ODK definition
-        AnswerAccessDefinition.objects.get_or_create(channel=ODKAccess.choice_name(),
-                                                     answer_type=AutoResponse.choice_name())
-        AnswerAccessDefinition.objects.get_or_create(channel=ODKAccess.choice_name(),
-                                                     answer_type=NumericalAnswer.choice_name())
-        AnswerAccessDefinition.objects.get_or_create(channel=ODKAccess.choice_name(),
-                                                     answer_type=TextAnswer.choice_name())
-        AnswerAccessDefinition.objects.get_or_create(channel=ODKAccess.choice_name(),
-                                                     answer_type=MultiChoiceAnswer.choice_name())
-        AnswerAccessDefinition.objects.get_or_create(channel=ODKAccess.choice_name(),
-                                                     answer_type=MultiSelectAnswer.choice_name())
-        AnswerAccessDefinition.objects.get_or_create(channel=ODKAccess.choice_name(),
-                                                     answer_type=ImageAnswer.choice_name())
-        AnswerAccessDefinition.objects.get_or_create(channel=ODKAccess.choice_name(),
-                                                     answer_type=GeopointAnswer.choice_name())
-        AnswerAccessDefinition.objects.get_or_create(channel=ODKAccess.choice_name(),
-                                                     answer_type=DateAnswer.choice_name())
-        AnswerAccessDefinition.objects.get_or_create(channel=ODKAccess.choice_name(),
-                                                     answer_type=AudioAnswer.choice_name())
-        AnswerAccessDefinition.objects.get_or_create(channel=ODKAccess.choice_name(),
-                                                     answer_type=VideoAnswer.choice_name())
-
-        # web form definition
-        AnswerAccessDefinition.objects.get_or_create(channel=WebAccess.choice_name(),
-                                                     answer_type=NumericalAnswer.choice_name())
-        AnswerAccessDefinition.objects.get_or_create(channel=WebAccess.choice_name(),
-                                                     answer_type=TextAnswer.choice_name())
-        AnswerAccessDefinition.objects.get_or_create(channel=WebAccess.choice_name(),
-                                                     answer_type=MultiChoiceAnswer.choice_name())
-        AnswerAccessDefinition.objects.get_or_create(channel=WebAccess.choice_name(),
-                                                     answer_type=MultiSelectAnswer.choice_name())
-        AnswerAccessDefinition.objects.get_or_create(channel=WebAccess.choice_name(),
-                                                     answer_type=ImageAnswer.choice_name())
-        AnswerAccessDefinition.objects.get_or_create(channel=WebAccess.choice_name(),
-                                                     answer_type=GeopointAnswer.choice_name())
-        AnswerAccessDefinition.objects.get_or_create(channel=WebAccess.choice_name(),
-                                                     answer_type=DateAnswer.choice_name())
-        AnswerAccessDefinition.objects.get_or_create(channel=WebAccess.choice_name(),
-                                                     answer_type=AudioAnswer.choice_name())
-        AnswerAccessDefinition.objects.get_or_create(channel=WebAccess.choice_name(),
-                                                     answer_type=VideoAnswer.choice_name())
+        AnswerAccessDefinition.reload_answer_categories()
         self.stdout.write('Successfully imported!')

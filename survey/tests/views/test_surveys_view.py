@@ -1,11 +1,12 @@
 from copy import deepcopy
 from django.test.client import Client
 from django.contrib.auth.models import User
+from django.db.models import Q
 from django.core.urlresolvers import reverse
 from model_mommy import mommy
 from survey.models import EnumerationArea
 from survey.models import Interviewer
-from survey.models import Interview
+from survey.models import Interview, NumericalAnswer, TextAnswer, VideoAnswer
 from survey.models import ListingTemplate
 from survey.models import Question
 from survey.models.surveys import Survey
@@ -14,6 +15,7 @@ from survey.tests.base_test import BaseTest
 from survey.models.locations import *
 from survey.models import Batch
 from survey.models.users import UserProfile
+from survey.utils import views_helper
 
 
 class SurveyViewTest(BaseTest):
@@ -25,8 +27,9 @@ class SurveyViewTest(BaseTest):
         raj = self.assign_permission_to(User.objects.create_user('demo12', 'demo12@kant.com', 'demo12'),
                                         'can_view_batches')
         self.listing_form = mommy.make(ListingTemplate)
-        question1 = mommy.make(Question, qset=self.listing_form)
-        question2 = mommy.make(Question, qset=self.listing_form)
+        question1 = mommy.make(Question, qset=self.listing_form, answer_type=NumericalAnswer.choice_name())
+        question2 = mommy.make(Question, qset=self.listing_form, answer_type=TextAnswer.choice_name())
+        question3 = mommy.make(Question, qset=self.listing_form, answer_type=VideoAnswer.choice_name())
         self.client.login(username='demo12', password='demo12')
         self.form_data = {'name': 'survey demo12', 'description': 'survey description demo12',
                           'has_sampling': True, 'sample_size': 10,
@@ -181,9 +184,83 @@ class SurveyViewTest(BaseTest):
         self.assert_restricted_permission_for(sampling_criteria_url)
 
     def test_post_sampling_criteria_page(self):
-        survey = mommy.make(Survey)
+        self.assertEquals(Survey.objects.count(), 0)
+        self.test_new_should_create_survey_on_post()
+        survey = Survey.objects.first()
         # form_dat = {'validation_test': }
         sampling_criteria_url = reverse('listing_criteria_page', args=(survey.id,))
         response = self.client.get(sampling_criteria_url)
         self.assertEquals(response.status_code, 200)
+
+    def test_create_delete_sampling_criteria(self):
+        self.assertEquals(Survey.objects.count(), 0)
+        self.test_new_should_create_survey_on_post()
+        survey = Survey.objects.first()
+        self.failUnless(survey)
+        sampling_criteria_url = reverse('listing_criteria_page', args=(survey.id,))
+        form_data = {'survey': survey.id, 'validation_test': 'equals',
+                     'value': 1, 'listing_question': self.listing_form.questions.first().id, }
+        self.assertEquals(survey.randomization_criteria.count(), 0)     # confirm nothin exists
+        response = self.client.post(sampling_criteria_url, data=form_data)
+        self.assertRedirects(response, sampling_criteria_url, status_code=302,
+                             target_status_code=200, msg_prefix='')
+        self.assertEquals(survey.randomization_criteria.count(), 1)         # confirm one criteria created
+        delete_criteria_url = reverse('delete_listing_criterion', args=(survey.id, ))
+        response = self.client.post(delete_criteria_url, data=form_data)    # delete criteria
+        self.assertEquals(survey.randomization_criteria.count(), 0)     # confirm deleted
+        self.assertRedirects(response, sampling_criteria_url, status_code=302,
+                             target_status_code=200, msg_prefix='')
+
+    def test_only_ussd_question_types_are_used_form_randomization(self):
+        self.assertEquals(Survey.objects.count(), 0)
+        self.test_new_should_create_survey_on_post()
+        survey = Survey.objects.first()
+        self.failUnless(survey)
+        sampling_criteria_url = reverse('listing_criteria_page', args=(survey.id,))
+        form_data = {'survey': survey.id, 'validation_test': 'equals',
+                     'value': 1,
+                     'listing_question': self.listing_form.questions.get(answer_type=VideoAnswer.choice_name()).id,}
+
+        self.assertEquals(survey.randomization_criteria.count(), 0)     # confirm nothin exists
+        response = self.client.post(sampling_criteria_url, data=form_data)
+        self.assertEquals(survey.randomization_criteria.count(), 0)     # confirm nothin exists
+        self.assertEquals(response.context['sampling_form'].is_valid(), False)
+
+    def test_clone_survey_clones_batch_in_another_survey(self):
+        self.test_new_should_create_survey_on_post()
+        survey = Survey.objects.first()
+        batch = mommy.make(Batch, survey=survey, description='')
+        clone_url = reverse('clone_survey_page', args=(survey.id, ))
+        response = self.client.get(clone_url)
+        self.assertRedirects(response, reverse('survey_list_page'), status_code=302,
+                             target_status_code=200, msg_prefix='')
+        cloned_survey = Survey.objects.exclude(name=survey.name).first()
+        self.failUnless(cloned_survey)
+        self.assertFalse(cloned_survey.name == survey.name)
+        self.assertIn(survey.name, cloned_survey.name)
+        self.assertIn(batch.name, cloned_survey.batches.first().name)
+        self.assertIn(batch.description, cloned_survey.batches.first().description)
+
+    # def test_only_super_user_can_wipe_data(self):
+    #     user = User.objects.create_user('user1', 'user@kant.com', 'demo12')
+    #     user.is_superuser = True
+    #     user.is_staff = True
+    #     user.save()
+    #     super_user = self.assign_permission_to(user, 'can_have_super_powers')
+    #     self.test_new_should_create_survey_on_post()
+    #     survey = Survey.objects.first()
+    #     batch = mommy.make(Batch, survey=survey, description='')
+    #     wipe_off_url = reverse('wipe_survey_data', args=(survey.id, ))
+    #     interview = mommy.make(Interview, survey=survey, question_set=batch)
+    #     response = self.client.get(wipe_off_url)
+    #     # confirm interview was not deleted.
+    #     self.assertEquals(Interview.objects.filter(id=interview.id).count(), 1)
+    #     self.client.logout()
+    #     self.client.login(username='user1', password='demo12')
+    #     superpowers_url = reverse('activate_super_powers_page')         # first activate superperwers
+    #     response = self.client.get(superpowers_url)
+    #     views_helper.activate_super_powers()
+    #     response = self.client.get(wipe_off_url)
+    #     # confirm interview was not deleted.
+    #     self.assertEquals(Interview.objects.filter(id=interview.id).count(), 0)
 

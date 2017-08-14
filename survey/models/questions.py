@@ -267,8 +267,6 @@ class QuestionSet(
     objects = InheritanceManager()
     name = models.CharField(
         max_length=100,
-        blank=False,
-        null=True,
         db_index=True)
     description = models.CharField(max_length=300, blank=True, null=True)
     start_question = models.OneToOneField(

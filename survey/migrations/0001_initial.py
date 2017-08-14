@@ -373,8 +373,8 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('created', django_extensions.db.fields.CreationDateTimeField(default=django.utils.timezone.now, verbose_name='created', editable=False, blank=True)),
                 ('modified', django_extensions.db.fields.ModificationDateTimeField(default=django.utils.timezone.now, verbose_name='modified', editable=False, blank=True)),
-                ('identifier', models.CharField(max_length=100, null=True, verbose_name=b'Variable Name')),
-                ('text', models.CharField(max_length=150)),
+                ('identifier', models.CharField(max_length=100, verbose_name=b'Variable Name')),
+                ('text', models.CharField(max_length=250)),
                 ('answer_type', models.CharField(max_length=100, choices=[('Audio Answer', 'Audio Answer'), (b'Auto Generated', b'Auto Generated'), ('Date Answer', 'Date Answer'), ('Geopoint Answer', 'Geopoint Answer'), ('Image Answer', 'Image Answer'), ('Multi Choice Answer', 'Multi Choice Answer'), ('Multi Select Answer', 'Multi Select Answer'), ('Numerical Answer', 'Numerical Answer'), ('Text Answer', 'Text Answer'), ('Video Answer', 'Video Answer')])),
                 ('mandatory', models.BooleanField(default=True)),
             ],
@@ -557,8 +557,8 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('created', django_extensions.db.fields.CreationDateTimeField(default=django.utils.timezone.now, verbose_name='created', editable=False, blank=True)),
                 ('modified', django_extensions.db.fields.ModificationDateTimeField(default=django.utils.timezone.now, verbose_name='modified', editable=False, blank=True)),
-                ('identifier', models.CharField(max_length=100, null=True, verbose_name=b'Variable Name')),
-                ('text', models.CharField(max_length=150)),
+                ('identifier', models.CharField(max_length=100, verbose_name=b'Variable Name')),
+                ('text', models.CharField(max_length=250)),
                 ('answer_type', models.CharField(max_length=100, choices=[('Audio Answer', 'Audio Answer'), (b'Auto Generated', b'Auto Generated'), ('Date Answer', 'Date Answer'), ('Geopoint Answer', 'Geopoint Answer'), ('Image Answer', 'Image Answer'), ('Multi Choice Answer', 'Multi Choice Answer'), ('Multi Select Answer', 'Multi Select Answer'), ('Numerical Answer', 'Numerical Answer'), ('Text Answer', 'Text Answer'), ('Video Answer', 'Video Answer')])),
             ],
             options={
@@ -606,7 +606,7 @@ class Migration(migrations.Migration):
             name='AudioAnswer',
             fields=[
                 ('answer_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='survey.Answer')),
-                ('value', models.FileField(null=True, upload_to=b'/home/eshwar/Documents/projects/uSurvey/answerFiles')),
+                ('value', models.FileField(null=True, upload_to=b'/home/anthony/workspace/uSurvey/answerFiles')),
             ],
             options={
                 'abstract': False,
@@ -677,7 +677,7 @@ class Migration(migrations.Migration):
             name='ImageAnswer',
             fields=[
                 ('answer_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='survey.Answer')),
-                ('value', models.FileField(null=True, upload_to=b'/home/eshwar/Documents/projects/uSurvey/answerFiles')),
+                ('value', models.FileField(null=True, upload_to=b'/home/anthony/workspace/uSurvey/answerFiles')),
             ],
             options={
                 'abstract': False,
@@ -824,7 +824,7 @@ class Migration(migrations.Migration):
             name='VideoAnswer',
             fields=[
                 ('answer_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='survey.Answer')),
-                ('value', models.FileField(null=True, upload_to=b'/home/eshwar/Documents/projects/uSurvey/answerFiles')),
+                ('value', models.FileField(null=True, upload_to=b'/home/anthony/workspace/uSurvey/answerFiles')),
             ],
             options={
                 'abstract': False,
