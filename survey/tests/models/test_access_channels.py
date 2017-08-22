@@ -30,8 +30,8 @@ class InterviewerAccessTest(TestCase):
         self.assertEqual(len(duration.duration),1)
     
     def test_unicode_text(self):
-        access = InterviewerAccess.objects.create(name="abc name")
-        self.assertEqual(access.name, str(access))
+        user_identifier = InterviewerAccess.objects.create(user_identifier="abc name")
+        self.assertEqual(user_identifier.user_identifier, str(user_identifier))
 
 class USSDAccessTest(TestCase):
     def test_fields(self):

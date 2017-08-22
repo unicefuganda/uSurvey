@@ -15,8 +15,8 @@ from survey.utils.decorators import static_var
 from survey.models.interviews import Interview
 from django.test import TestCase
 
-class InterviewTest(TestCase):
+# class InterviewTest(TestCase):
 
-    def test_unicode_text(self):
-        sua = Interview.objects.create(name="abcd name")
-        self.assertEqual(sua.name, str(sua))
+#     def test_unicode_text(self):
+#         sua = Interview.objects.create(name="abcd name")
+#         self.assertEqual(sua.name, str(sua))
