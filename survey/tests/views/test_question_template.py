@@ -6,7 +6,7 @@ from survey.models import QuestionTemplate, Survey, QuestionModule, Batch
 from survey.tests.base_test import BaseTest
 
 
-class QuestionsTemplateViews(BaseTest):
+class QuestionsTemplateViewsTest(BaseTest):
 
     def setUp(self):
         self.client = Client()

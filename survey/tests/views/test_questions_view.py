@@ -9,7 +9,7 @@ from survey.tests.base_test import BaseTest
 from survey.forms.filters import DEFAULT_NUMBER_OF_QUESTION_DISPLAYED_PER_PAGE
 
 
-class QuestionsViews(BaseTest):
+class QuestionsViewsTest(BaseTest):
 
     def setUp(self):
         self.client = Client()
