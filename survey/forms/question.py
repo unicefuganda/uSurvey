@@ -6,7 +6,7 @@ from django.conf import settings
 from survey.models import Question, BatchQuestion, QuestionSet
 from survey.models import (QuestionOption, Batch, Answer, QuestionModule, MultiChoiceAnswer, MultiSelectAnswer,
                            QuestionFlow, AnswerAccessDefinition, ResponseValidation, DateAnswer, TextAnswer,
-                           NumericalAnswer, AutoResponse)
+                           NumericalAnswer, AutoResponse, SurveyParameterList)
 from survey.forms.form_helper import FormOrderMixin, Icons
 
 
@@ -71,6 +71,29 @@ def get_question_form(model_class):
                         "maxlength": "150",
                     }),
             }
+
+        def clean_group(self):
+            group = self.cleaned_data['group']
+            if group:
+                qset = QuestionSet.get(id=self.qset.pk)
+                identifiers = group.parameter_questions().values_list('identifier', flat=True)
+                existing_identifiers = Question.objects.filter(identifier__in=identifiers,
+                                                               qset__pk=self.qset.pk).values_list('identifier', flat=True)
+                if existing_identifiers.exists():
+                    raise ValidationError(
+                        '%s already exist in this %s. '
+                        'Consider creating a question with modified identifier name and using skip logic in your %s' %
+                        (','.join(existing_identifiers), qset.verbose_name(), qset.verbose_name()))
+                if hasattr(qset, 'survey') and qset.survey.listing_form:
+                    existing_identifiers = qset.survey.listing_form.questions.filter(identifier__in=identifiers
+                                                                                     ).values_list('identifier',
+                                                                                                   flat=True)
+                    if existing_identifiers.exists():
+                        raise ValidationError(
+                            '%s already exist as a listing question for this %s. '
+                            'Consider creating a question with modified identifier name and using skip logic in your %s' %
+                            (','.join(existing_identifiers), qset.verbose_name(), qset.verbose_name()))
+            return group
 
         def clean_options(self):
             options = dict(self.data).get('options')
@@ -211,6 +234,9 @@ def get_question_form(model_class):
                     # get the last question inline
                     # create a inline flow with current qset
                     qset = question.qset
+                    qset = QuestionSet.get(id=qset.id)
+                    if hasattr(qset, 'survey'):     # basically check for Batch scenario
+                        SurveyParameterList.update_parameter_list(qset)
                     if self.prev_question:
                         last_question = self.prev_question
                     else:
@@ -232,6 +258,7 @@ def get_question_form(model_class):
                         qset.save()
                 else:
                     question.save()
+
                 # self.qset.questions_inline.invalidate()
             if self.options_supplied(commit):
                 self.save_question_options(question)

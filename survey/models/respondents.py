@@ -31,6 +31,9 @@ class RespondentGroup(BaseModel):
     def __unicode__(self):
         return self.name
 
+    def parameter_questions(self):
+        return ParameterTemplate.objects.filter(group_condition__respondent_group=self)
+
 
 class RespondentGroupCondition(BaseModel):
     VALIDATION_TESTS = [(validator.__name__, validator.__name__)
