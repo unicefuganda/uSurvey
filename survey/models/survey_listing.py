@@ -15,7 +15,7 @@ from survey.models.interviews import Interview
 class ListingTemplate(QuestionSet):
 
     class Meta:
-        ordering = ['name', ]
+        ordering = ('modified', 'created')
         app_label = 'survey'
 
     @classmethod

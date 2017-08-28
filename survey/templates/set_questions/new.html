@@ -27,6 +27,42 @@
     }
 </style>
 {% endblock %}
+{% block page_actions %}
+    <div>
+        {% if batch.survey and batch.survey.has_sampling %}
+            <a href="#view_listing" style="padding-left: 0px;padding-right: 3px;" class="btn btn-white btn-warning btn-bold" data-toggle="modal">
+                        &nbsp;&nbsp;<i class="fa fa-eye"></i>
+                         View Listing&nbsp;</a>
+        {% endif %}
+        {% if batch.parameter_list and batch.parameter_list.parameters %}
+            <a href="#view_group_parameters" style="padding-left: 0px;padding-right: 3px;" class="btn btn-white btn-warning btn-bold" data-toggle="modal">
+                        &nbsp;&nbsp;<i class="fa fa-eye"></i>
+                         View Group Parameters&nbsp;</a>
+        {% endif %}
+    </div>
+    {% if batch.survey and batch.survey.has_sampling %}
+        <div class="modal fade" id="view_listing" tabindex="-1" role="dialog"  aria-hidden="true" >
+            <div class="modal-dialog modal-dialog-1" >
+                <div class="modal-content modal-content-1" >
+                  <div class="modal-body" >
+                    {% include "set_questions/_qset_questions.html" with batch=batch.survey.listing_form questions=batch.survey.listing_form.questions_inline hide_actions=True %}
+                  </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+          </div><!-- /.modal -->
+    {% endif %}
+    {% if batch.parameter_list and batch.parameter_list.parameters %}
+        <div class="modal fade" id="view_group_parameters" tabindex="-1" role="dialog"  aria-hidden="true" >
+            <div class="modal-dialog modal-dialog-1" >
+                <div class="modal-content modal-content-1" >
+                  <div class="modal-body" >
+                    {% include "set_questions/_qset_questions.html" with batch=batch.parameter_list questions=batch.parameter_list.parameters hide_actions=True %}
+                  </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+          </div><!-- /.modal -->
+    {% endif %}
+{% endblock %}
 {% block pre_form_content %}
 {% if parent_question %}
 <h4> to question: {{parent_question.text}} </h4>

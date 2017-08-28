@@ -108,7 +108,13 @@ def get_question_form(model_class):
                     identifier__iexact=identifier).exists():
                 raise ValidationError(
                     '%s is already in captured as a group parameter for this %s' %
-                    (identifier, model_class.type_name()))
+                    (identifier, qset.verbose_name()))
+            # for sampled surveys, check if this is already implemented in listing
+            if hasattr(qset, 'survey') and qset.survey.listing_form and qset.survey.listing_form.questions.filter(
+                    identifier__iexact=identifier).exists():
+                raise ValidationError(
+                    '%s is already in captured as a listing question for this %s' %
+                    (identifier, qset.verbose_name()))
             return self.cleaned_data['identifier']
 
         def clean_text(self):

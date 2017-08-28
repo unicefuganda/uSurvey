@@ -60,6 +60,7 @@ class Interviewer(BaseModel):
 
     class Meta:
         app_label = 'survey'
+        ordering = ('modified', 'created')
 
     def __unicode__(self):
         return self.name

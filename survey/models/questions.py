@@ -28,6 +28,7 @@ class Question(CloneableMixin, GenericQuestion):
     class Meta:
         abstract = False
         unique_together = [('identifier', 'qset'), ]
+        ordering = ('modified', 'created')
 
     @classmethod
     def get(cls, **kwargs):
@@ -174,7 +175,7 @@ class Question(CloneableMixin, GenericQuestion):
 
     @property
     def loop_story(self):
-        return self.qset.get_loop_story()[self.id]
+        return self.qset.get_loop_story().get(self.id, [])
 
 
 class QuestionFlow(CloneableMixin, BaseModel):
@@ -289,6 +290,7 @@ class QuestionSet(
 
     class Meta:
         app_label = 'survey'
+        ordering = ('modified', 'created')
 
     def __unicode__(self):
         return "%s" % self.name

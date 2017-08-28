@@ -41,17 +41,14 @@ def index(request, qset_id):
     try:
         batch = QuestionSet.get(pk=qset_id)
     except QuestionSet.DoesNotExist:
-        raise Http404("No  QuestionSet Model matches the given query.")
+        raise Http404("No QuestionSet Model matches the given query.")
     questions = batch.questions_inline()
     request_data = request.GET if request.method == 'GET' else request.POST
     question_filter_form = QuestionFilterForm(data=request_data, qset=batch)
     search_fields = ['identifier', 'text', ]
     qset_questions = batch.questions.all()
     if 'q' in request_data:
-        questions = get_filterset(
-            qset_questions,
-            request_data['q'],
-            search_fields)
+        questions = get_filterset(qset_questions, request_data['q'], search_fields)
     if 'question_types' in request_data:
         relevant_ids = list(question_filter_form.filter(
             qset_questions).values_list('id', flat=True))

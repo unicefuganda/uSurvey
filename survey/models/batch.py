@@ -24,6 +24,7 @@ class Batch(QuestionSet):
 
     class Meta:
         app_label = 'survey'
+        ordering = ('modified', 'created')
 
     def save(self, *args, **kwargs):
         last_order = Batch.objects.aggregate(Max('order'))['order__max']
