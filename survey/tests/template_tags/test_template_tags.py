@@ -244,3 +244,6 @@ class TemplateTagsTest(TestCase):
                          ancestors_reversed(abim_son_son))
         self.assertEqual([africa, uganda, abim, abim_son,
                           abim_son_son], ancestors_reversed(abim_son_son_son))
+    def test_trim(self):
+        str1 = "survey_test"
+        self.assertEquals(str1.strip(), trim(str1))
