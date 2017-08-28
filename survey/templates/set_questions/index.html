@@ -112,9 +112,9 @@
     </script>
     {% if batch.survey and batch.survey.has_sampling %}
         <div class="modal fade" id="view_listing" tabindex="-1" role="dialog"  aria-hidden="true" >
-            <div class="modal-dialog modal-dialog-1" >
-                <div class="modal-content modal-content-1" >
-                  <div class="modal-body" >
+            <div class="modal-dialog" >
+                <div class="modal-content" >
+                  <div class="modal-body">
                     {% include "set_questions/_qset_questions.html" with batch=batch.survey.listing_form questions=batch.survey.listing_form.questions_inline hide_actions=True %}
                   </div>
                 </div><!-- /.modal-content -->
@@ -123,9 +123,9 @@
     {% endif %}
     {% if batch.parameter_list and batch.parameter_list.parameters %}
         <div class="modal fade" id="view_group_parameters" tabindex="-1" role="dialog"  aria-hidden="true" >
-            <div class="modal-dialog modal-dialog-1" >
-                <div class="modal-content modal-content-1" >
-                  <div class="modal-body" >
+            <div class="modal-dialog" >
+                <div class="modal-content" >
+                  <div class="modal-body">
                     {% include "set_questions/_qset_questions.html" with batch=batch.parameter_list questions=batch.parameter_list.parameters hide_actions=True %}
                   </div>
                 </div><!-- /.modal-content -->
