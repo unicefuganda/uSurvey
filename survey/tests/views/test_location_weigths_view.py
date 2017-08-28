@@ -4,7 +4,8 @@ from django.test import Client
 from mock import patch
 from survey.models.locations import *
 from survey.forms.upload_csv_file import UploadWeightsForm
-from survey.models import LocationWeight, Survey, UploadErrorLog, LocationTypeDetails
+from survey.models import LocationWeight, Survey, UploadErrorLog
+# from survey.models import LocationWeight, Survey, UploadErrorLog, LocationTypeDetails
 from survey.tests.base_test import BaseTest
 from survey.views.location_widget import LocationWidget
 from django.utils.timezone import utc
@@ -39,12 +40,12 @@ class UploadWeightsTest(BaseTest):
         Location.objects.create(
             name="county2", tree_parent=district, type=self.county_type)
 
-        LocationTypeDetails.objects.create(
-            country=region, location_type=self.reqion_type)
-        LocationTypeDetails.objects.create(
-            country=region, location_type=self.district_type)
-        LocationTypeDetails.objects.create(
-            country=region, location_type=self.county_type)
+        # LocationTypeDetails.objects.create(
+        #     country=region, location_type=self.reqion_type)
+        # LocationTypeDetails.objects.create(
+        #     country=region, location_type=self.district_type)
+        # LocationTypeDetails.objects.create(
+        #     country=region, location_type=self.county_type)
 
         self.filename = 'test_uganda.csv'
         self.filedata = [['RegionName', 'DistrictName', 'CountyName', 'Selection Probability'],

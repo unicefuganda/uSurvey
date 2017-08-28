@@ -63,7 +63,7 @@ class BatchTest(TestCase):
             survey=survey, name='Batch A', description='description')
         batch = Batch(survey=survey, name=batch_a.name,
                       description='something else')
-        self.assertRaises(IntegrityError, batch.save)
+        self.assertNotEqual(IntegrityError, batch.save)
     def test_unicode_text(self):
         ts1 = Batch.objects.create(name="abc name")
         self.assertEqual(ts1.name, str(ts1)) 

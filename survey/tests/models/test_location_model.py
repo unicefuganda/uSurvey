@@ -1,4 +1,5 @@
 from django.test import TestCase
+from survey.tests.base_test import BaseTest
 from survey.models.locations import LocationType, Location
 
 
