@@ -4,10 +4,11 @@ from django.contrib.auth.models import User
 from django.template.defaultfilters import slugify
 from django.test import Client
 from survey.models.locations import *
-from survey.models import Survey, Batch, Indicator, Household, Question, HouseholdMemberGroup, \
-    HouseholdMemberBatchCompletion, Backend, LocationTypeDetails, EnumerationArea, Interviewer, HouseholdListing, \
-    SurveyHouseholdListing, SurveyAllocation
-from survey.models.households import HouseholdMember
+# from survey.models import Survey, Batch, Indicator, Household, Question, HouseholdMemberGroup, \
+#     HouseholdMemberBatchCompletion, Backend, LocationTypeDetails, EnumerationArea, Interviewer, HouseholdListing, \
+#     SurveyHouseholdListing, SurveyAllocation
+# from survey.models.households import HouseholdMember
+from survey.models import Survey, Batch, Indicator, Question, Backend, EnumerationArea, Interviewer, SurveyAllocation
 from survey.services.completion_rates_calculator import BatchLocationCompletionRates
 from survey.tests.base_test import BaseTest
 from survey.views.survey_completion import is_valid

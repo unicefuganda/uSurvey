@@ -1,8 +1,6 @@
 from random import randint
 from survey.models.locations import *
-from survey.models import Backend, Interviewer, QuestionModule, Question, QuestionOption, Indicator, Formula, \
-    Household, HouseholdHead, Batch, MultiChoiceAnswer, HouseholdMemberGroup, Survey, GroupCondition, EnumerationArea, HouseholdListing, \
-    SurveyHouseholdListing
+from survey.models import Backend, Interviewer, QuestionModule, Question, QuestionOption, Indicator, Batch, MultiChoiceAnswer, HouseholdMemberGroup, Survey, EnumerationArea
 from survey.services.simple_indicator_service import SimpleIndicatorService
 from survey.tests.base_test import BaseTest
 from survey.features.simple_indicator_chart_step import create_household_head

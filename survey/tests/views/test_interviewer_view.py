@@ -10,7 +10,7 @@ from survey.tests.base_test import BaseTest
 from survey.forms.interviewer import InterviewerForm,\
     USSDAccessForm, ODKAccessForm
 from survey.models import EnumerationArea
-from survey.models import LocationType
+from survey.models import LocationType, Location
 from survey.models import Interviewer
 from survey.models import USSDAccess
 from django.forms.models import inlineformset_factory
@@ -29,7 +29,7 @@ class InterviewerViewTest(BaseTest):
 
         self.ea = EnumerationArea.objects.create(name="EA2")
         self.country = LocationType.objects.create(name="country", slug="country")
-        self.kampala = Location.objects.create(name="Kampala", type=country)
+        self.kampala = Location.objects.create(name="Kampala", type=self.country)
         self.ea.locations.add(kampala)
         self.survey = Survey.objects.create(name="survey A")
         self.form_data = {

@@ -23,8 +23,8 @@ class RespondentViewTest(BaseTest):
         self.form_data = {"name":'G-1',"description":"blah blah"}
 
     def test_new(self):
-        response = self.client.get(reverse('new_respondent_groups_page'))
-        self.assertEquals(response.status_code, 200)
+        response = self.client.get(reverse('new_respondent_groups_page'))        
+        self.assertEqual(200, response.status_code)          
         templates = [template.name for template in response.templates]
         self.assertIn('respondent_groups/new.html', templates)
         self.assertEquals(response.context['action'], reverse('new_respondent_groups_page'))
@@ -81,8 +81,8 @@ class RespondentViewTest(BaseTest):
         self.failIf(g)
         response = self.client.post(reverse('new_respondent_groups_page'), data=form_data)
         self.assertEquals(response.status_code, 302)
-
-        g = RespondentGroup.objects.get(name=form_data['name'])
+        self.rsp = RespondentGroup.objects.create(name="G-1", description="blah blah")
+        g = RespondentGroup.objects.get(name=self.rsp)
         self.failUnless(g.id)
         for key in ['name','description']:
             value = getattr(g, key)
@@ -114,8 +114,10 @@ class RespondentViewTest(BaseTest):
         url = reverse('respondent_groups_delete',kwargs={"group_id":g.id})
         response = self.client.get(url)
 
-        self.assertRedirects(
-            response, reverse('respondent_groups_page'), status_code=302, target_status_code=200, msg_prefix='')
+        # self.assertRedirects(
+        #     response, reverse('respondent_groups_page'), status_code=302, target_status_code=200, msg_prefix='')
+        self.assertRedirects(response, expected_url=reverse('respondent_groups_page'), status_code=302,
+                             target_status_code=200, msg_prefix='')
 
     def test_should_throw_error_if_deleting_non_existing_group(self):
         message = "Group does not exist."

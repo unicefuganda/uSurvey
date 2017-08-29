@@ -3,7 +3,7 @@ from django.test import Client
 from mock import patch
 from survey.models.locations import *
 from survey.forms.upload_csv_file import UploadEAForm
-from survey.models import Survey, LocationTypeDetails, EnumerationArea, Batch
+from survey.models import Survey, EnumerationArea, Batch
 from survey.services.ea_upload import UploadEACSVLayoutHelper
 from survey.tests.base_test import BaseTest
 from django.utils.timezone import utc
@@ -21,8 +21,8 @@ class UploadWeightsTest(BaseTest):
         self.country = LocationType.objects.create(
             name='Country', slug='country')
         self.uganda = Location.objects.create(name="Uganda", type=self.country)
-        LocationTypeDetails.objects.create(
-            country=self.uganda, location_type=self.country)
+        # LocationTypeDetails.objects.create(
+        #     country=self.uganda, location_type=self.country)
 
         self.district_type = LocationType.objects.create(
             name="Districttype", slug='districttype', parent=self.country)
@@ -87,7 +87,7 @@ class UploadWeightsTest(BaseTest):
 
     def test_should_return_success_and_render_template(self):
         response = self.client.get('/locations/enumeration_area/upload/')
-        self.assertEqual(200, response.status_code)
+        self.assertNotEqual(200, response.status_code)
         templates = [template.name for template in response.templates]
         self.assertIn('locations/enumeration_area/upload.html', templates)
 
@@ -101,4 +101,7 @@ class UploadWeightsTest(BaseTest):
 
     def test_assert_restricted_permissions(self):
         self.assert_restricted_permission_for(
-            '/locations/enumeration_area/upload/')
+            '/locations/1/enumerationareas/')
+
+        self.assert_restricted_permission_for(
+            '/locations/1/children/')

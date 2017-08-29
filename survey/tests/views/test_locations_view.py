@@ -67,7 +67,7 @@ class LocationTest(BaseTest):
         self.assertIsNotNone(response.context['request'])
     
     def test_add_location(self):
-        response = self.client.get(reverse('new_enumeration_area_page'))
+        response = self.client.get(reverse('new_enumeration_area_page'))        
         self.assertEqual(200, response.status_code)
         templates = [template.name for template in response.templates]
         self.assertIn('enumeration_area_page/new.html', templates)

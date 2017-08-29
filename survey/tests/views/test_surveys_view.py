@@ -48,7 +48,7 @@ class SurveyViewTest(BaseTest):
         self.assertIsInstance(response.context['survey_form'], SurveyForm)
 
     def test_add_survey(self):
-        response = self.client.get(reverse('new_survey_page'))
+        response = self.client.get(reverse('new_survey_page'))        
         self.assertEqual(200, response.status_code)
         templates = [ template.name for template in response.templates ]
         self.assertIn('surveys/new.html', templates)

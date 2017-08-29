@@ -7,10 +7,11 @@ from django.contrib.auth.models import User, Group, Permission
 from django.contrib.contenttypes.models import ContentType
 from survey.models.locations import *
 from survey.forms.filters import SurveyBatchFilterForm
-from survey.models import GroupCondition, HouseholdMemberGroup, EnumerationArea, QuestionModule, LocationTypeDetails
+# from survey.models import GroupCondition, HouseholdMemberGroup, EnumerationArea, QuestionModule, LocationTypeDetails
+from survey.models import EnumerationArea, QuestionModule
 from survey.models.batch import Batch
 # from survey.models.batch_question_order import *
-from survey.models.households import HouseholdHead, Household, HouseholdMember, HouseholdListing, SurveyHouseholdListing
+# from survey.models.households import HouseholdHead, Household, HouseholdMember, HouseholdListing, SurveyHouseholdListing
 from survey.models.backend import Backend
 from survey.models.interviewer import Interviewer
 
