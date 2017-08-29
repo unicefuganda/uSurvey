@@ -9,7 +9,7 @@ from survey.models.locations import *
 #     SurveyHouseholdListing, SurveyAllocation
 # from survey.models.households import HouseholdMember
 from survey.models import Survey, Batch, Indicator, Question, Backend, EnumerationArea, Interviewer, SurveyAllocation
-from survey.services.completion_rates_calculator import BatchLocationCompletionRates
+# from survey.services.completion_rates_calculator import BatchLocationCompletionRates
 from survey.tests.base_test import BaseTest
 from survey.views.survey_completion import is_valid
 
