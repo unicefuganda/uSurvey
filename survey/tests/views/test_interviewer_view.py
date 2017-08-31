@@ -30,7 +30,7 @@ class InterviewerViewTest(BaseTest):
         self.ea = EnumerationArea.objects.create(name="EA2")
         self.country = LocationType.objects.create(name="country", slug="country")
         self.kampala = Location.objects.create(name="Kampala", type=self.country)
-        self.ea.locations.add(kampala)
+        self.ea.locations.add(self.kampala)
         self.survey = Survey.objects.create(name="survey A")
         self.form_data = {
             'name': 'Interviewer_1',

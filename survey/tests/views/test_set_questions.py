@@ -19,3 +19,19 @@ class SetQuestionViewTest(BaseTest):
         self.question_1 = QuestionTemplate.objects.create(module=self.module,variable_name='a',text='ttt',answer_type='Numerical Answer')
         self.survey = Survey.objects.create(name="haha")
         self.batch = Batch.objects.create(order=1, name="Batch A", survey=self.survey)
+
+    def test_get_set_question_index(self):
+        survey = Survey.objects.create(name="haha")
+        batch = Batch.objects.create(order=1, name="Batch A", survey=survey)
+        qset = QuestionSet.objects.create(name="health", description="blabla")
+        response = self.client.get(reverse('qset_questions_page'))
+        self.assertEqual(200, response.status_code)
+        response = self.client.get('/qsets/1/questions/')
+        self.failUnlessEqual(response.status_code, 200)
+        templates = [template.name for template in response.templates]
+        self.assertIn('set_questions/index.html', templates)
+        self.assertIn(qset, response.context['set_question'])
+            
+
+
+        

@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from django.test import Client
 from survey.forms.question_module_form import QuestionModuleForm
-from survey.forms.question_set import QuestionSetForm, BatchForm
+# from survey.forms.question_set import QuestionSetForm, BatchForm
 from survey.forms import *
 from survey.models import QuestionModule, Question, QuestionSetChannel, QuestionSet
 from survey.models.batch import *

@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User
-from survey.forms.formula import FormulaForm
-from survey.models import Survey, Batch, QuestionModule, Indicator, Formula, HouseholdMemberGroup, Question, QuestionOption
+# from survey.forms.formula import FormulaForm
+from survey.models import Survey, Batch, QuestionModule, Indicator, Question, QuestionOption, QuestionSet, ResponseValidation
 from survey.tests.base_test import BaseTest
 # from survey.models.batch_question_order import *
 from django.test.client import Client
@@ -26,19 +26,22 @@ class IndicatorFormulaViewsTest(BaseTest):
         self.indicator = Indicator.objects.create(name='Test Indicator', measure=Indicator.MEASURE_CHOICES[0][1],
                                                   module=self.module, description="Indicator 1", batch=self.batch)
 
-        self.group = HouseholdMemberGroup.objects.create(
-            name="Females", order=1)
+        # self.group = HouseholdMemberGroup.objects.create(
+        #     name="Females", order=1)
+        self.qset = QuestionSet.objects.create(name="Females")
+        self.rsp = ResponseValidation.objects.create(validation_test="validationtest",
+constraint_message="message")
         self.question_mod = QuestionModule.objects.create(
             name="Test question name", description="test desc")
         self.question_1 = Question.objects.create(identifier='123.1', text="This is a question123.1", answer_type='Numerical Answer',
-                                                  group=self.group, batch=self.batch, module=self.question_mod)
+                                                  qset_id=self.qset, batch=self.batch, module=self.question_mod,response_validation_id=self.rsp)
         self.question_2 = Question.objects.create(identifier='123.2', text="This is a question123.2", answer_type='Numerical Answer',
-                                                  group=self.group, batch=self.batch, module=self.question_mod)
+                                                  qset_id=self.qset, batch=self.batch, module=self.question_mod,response_validation_id=self.rsp)
         self.question_3 = Question.objects.create(identifier='123.3', text="This is a question123.3", answer_type='Numerical Answer',
-                                                  group=self.group, batch=self.batch, module=self.question_mod)
+                                                  qset_id=self.qset, batch=self.batch, module=self.question_mod,response_validation_id=self.rsp)
 
-        self.existing_formula = Formula.objects.create(numerator=self.question_1, denominator=self.question_2,
-                                                       indicator=self.indicator)
+        # self.existing_formula = Formula.objects.create(numerator=self.question_1, denominator=self.question_2,
+        #                                                indicator=self.indicator)
 
     def test_get_new(self):
         response = self.client.get(
@@ -67,8 +70,10 @@ class IndicatorFormulaViewsTest(BaseTest):
         self.assertIn(message, response.cookies['messages'].value)
 
     def test_post_new_for_percentage_indicator_with_multichoice_numerator_and_denominator_question(self):
+        # multichoice_question = Question.objects.create(identifier='123.4', text="This is a question123.4", answer_type='Numerical Answer',
+        #                                                group=self.group, batch=self.batch, module=self.question_mod)
         multichoice_question = Question.objects.create(identifier='123.4', text="This is a question123.4", answer_type='Numerical Answer',
-                                                       group=self.group, batch=self.batch, module=self.question_mod)
+                                                  qset_id=self.qset, batch=self.batch, module=self.question_mod,response_validation_id=self.rsp)
 
         option_1 = QuestionOption.objects.create(
             question=multichoice_question, text='Yes', order=1)
@@ -114,8 +119,10 @@ class IndicatorFormulaViewsTest(BaseTest):
 
     def test_post_new_for_count_indicator_with_multichoice_count_question(self):
 
+        # multichoice_question = Question.objects.create(identifier='123.4', text="This is a question123.4", answer_type='Numerical Answer',
+        #                                                group=self.group, batch=self.batch, module=self.question_mod)
         multichoice_question = Question.objects.create(identifier='123.4', text="This is a question123.4", answer_type='Numerical Answer',
-                                                       group=self.group, batch=self.batch, module=self.question_mod)
+                                                  qset_id=self.qset, batch=self.batch, module=self.question_mod,response_validation_id=self.rsp)
         option_1 = QuestionOption.objects.create(
             question=multichoice_question, text="OPTION 1", order=1)
         option_2 = QuestionOption.objects.create(

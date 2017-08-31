@@ -2,9 +2,10 @@ from django.forms.formsets import formset_factory
 from django.template.defaultfilters import slugify
 from django.test.testcases import TestCase
 from survey.models.locations import *
-from survey.forms.location_details import LocationDetailsForm
+from survey.forms import *
+# from survey.forms.location_details import LocationDetailsForm
 from survey.forms.location_hierarchy import LocationHierarchyForm, BaseArticleFormSet
-from survey.models import LocationTypeDetails
+from survey.models import LocationType
 
 
 class LocationHierarchyFormTest(TestCase):
@@ -86,10 +87,10 @@ class LocationHierarchyFormTest(TestCase):
         self.assertIn(message, details_formset.forms[0].errors['levels'])
 
     def test_should_show_used_country_as_available_choices_if_any_otherwise_show_all_countries(self):
-        LocationTypeDetails.objects.all().delete()
+        LocationType.objects.all().delete()
         other_country = Location.objects.create(
             name="some other country", type=self.uganda.type)
-        LocationTypeDetails.objects.create(
+        Location.objects.create(
             required=True, has_code=False, location_type=self.uganda.type, country=self.uganda)
         hierarchy_form = LocationHierarchyForm()
 

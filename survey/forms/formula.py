@@ -1,7 +1,7 @@
 from django.core.exceptions import ValidationError
 from django.forms import ModelForm
 from django import forms
-from survey.models import Formula
+# from survey.models import Formula
 from survey.models import RespondentGroup
 
 
@@ -45,51 +45,51 @@ class FormulaForm(ModelForm):
             del self.fields[field]
         self.fields['denominator_type'].label = denominator_label
 
-    def clean(self):
-        cleaned_data = self.cleaned_data
-        is_question_selected = cleaned_data['denominator_type'] == 'QUESTION'
-        denominator = cleaned_data.get('denominator', None)
-        groups = cleaned_data.get('groups', None)
-        count = cleaned_data.get('count', None)
+    # def clean(self):
+    #     cleaned_data = self.cleaned_data
+    #     is_question_selected = cleaned_data['denominator_type'] == 'QUESTION'
+    #     denominator = cleaned_data.get('denominator', None)
+    #     groups = cleaned_data.get('groups', None)
+    #     count = cleaned_data.get('count', None)
 
-        error_message = 'Formula already exist for indicator %s.' % self.indicator.name
-        existing_formula = []
+    #     error_message = 'Formula already exist for indicator %s.' % self.indicator.name
+    #     existing_formula = []
 
-        if self.indicator and self.indicator.is_percentage_indicator():
+    #     if self.indicator and self.indicator.is_percentage_indicator():
 
-            if denominator:
-                existing_formula = Formula.objects.filter(
-                    indicator=self.indicator,
-                    numerator=cleaned_data['numerator'],
-                    denominator=denominator)
-            if groups and not is_question_selected:
-                existing_formula = Formula.objects.filter(
-                    indicator=self.indicator, numerator=cleaned_data['numerator'], groups=groups)
+    #         if denominator:
+    #             existing_formula = Formula.objects.filter(
+    #                 indicator=self.indicator,
+    #                 numerator=cleaned_data['numerator'],
+    #                 denominator=denominator)
+    #         if groups and not is_question_selected:
+    #             existing_formula = Formula.objects.filter(
+    #                 indicator=self.indicator, numerator=cleaned_data['numerator'], groups=groups)
 
-        if self.indicator and not self.indicator.is_percentage_indicator():
-            if count:
-                existing_formula = Formula.objects.filter(
-                    indicator=self.indicator, count=count)
+    #     if self.indicator and not self.indicator.is_percentage_indicator():
+    #         if count:
+    #             existing_formula = Formula.objects.filter(
+    #                 indicator=self.indicator, count=count)
 
-            if groups and not is_question_selected:
-                existing_formula = Formula.objects.filter(
-                    indicator=self.indicator, groups=groups)
+    #         if groups and not is_question_selected:
+    #             existing_formula = Formula.objects.filter(
+    #                 indicator=self.indicator, groups=groups)
 
-        if existing_formula:
-            raise ValidationError(error_message)
+    #     if existing_formula:
+    #         raise ValidationError(error_message)
 
-        return self.cleaned_data
+    #     return self.cleaned_data
 
-    class Meta:
-        model = Formula
-        fields = [
-            'numerator',
-            'numerator_options',
-            'denominator_type',
-            'groups',
-            'denominator',
-            'count',
-            'denominator_options']
+    # class Meta:
+    #     model = Formula
+    #     fields = [
+    #         'numerator',
+    #         'numerator_options',
+    #         'denominator_type',
+    #         'groups',
+    #         'denominator',
+    #         'count',
+    #         'denominator_options']
 
     denominator_type = forms.CharField(
         label="Denominator", widget=forms.Select(choices=OPTIONS))

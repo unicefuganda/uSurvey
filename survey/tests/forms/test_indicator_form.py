@@ -13,8 +13,8 @@ class IndicatorFormTest(TestCase):
                           'name': 'Health',
                           'description': 'some description',
                           'question_set': self.batch.id,
-                          'survey': self.survey.id,
-                          'formulae':"{{gender}} /{{age}} *100" }
+                          'survey': self.survey.id
+                          }
 
     def test_valid(self):
         indicator_form = IndicatorForm(self.form_data)

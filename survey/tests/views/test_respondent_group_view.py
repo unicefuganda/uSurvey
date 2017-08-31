@@ -3,8 +3,9 @@ import json
 from django.test.client import Client
 from mock import *
 from django.contrib.auth.models import User, Group
-from survey.models import RespondentGroup, ParameterTemplate, RespondentGroupCondition
-
+from survey.models import RespondentGroup, ParameterTemplate, RespondentGroupCondition, Interviewer
+from survey.models import *
+from survey.forms import *
 from survey.tests.base_test import BaseTest
 
 from survey.forms.respondent_group import GroupForm, RespondentGroupCondition
@@ -116,7 +117,7 @@ class RespondentViewTest(BaseTest):
 
         # self.assertRedirects(
         #     response, reverse('respondent_groups_page'), status_code=302, target_status_code=200, msg_prefix='')
-        self.assertRedirects(response, expected_url=reverse('respondent_groups_page'), status_code=302,
+        self.assertRedirects(response, expected_url=reverse('respondent_groups_delete'), status_code=302,
                              target_status_code=200, msg_prefix='')
 
     def test_should_throw_error_if_deleting_non_existing_group(self):

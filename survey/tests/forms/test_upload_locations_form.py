@@ -2,7 +2,7 @@ import os
 from django.core.files.uploadedfile import SimpleUploadedFile
 from survey.models.locations import *
 from survey.forms.upload_csv_file import UploadWeightsForm, UploadLocationsForm
-from survey.models import Survey, LocationTypeDetails
+from survey.models import Survey, LocationType
 from survey.tests.base_test import BaseTest
 
 
@@ -21,11 +21,11 @@ class UploadLocationsFormTest(BaseTest):
             name='District', slug='district', parent=self.region)
         self.county = LocationType.objects.create(
             name='County', slug='county', parent=self.district)
-        LocationTypeDetails.objects.create(
+        LocationType.objects.create(
             location_type=self.region, required=True, has_code=False)
-        LocationTypeDetails.objects.create(
+        LocationType.objects.create(
             location_type=self.district, required=True, has_code=False)
-        LocationTypeDetails.objects.create(
+        LocationType.objects.create(
             location_type=self.county, required=True, has_code=False)
 
     def tearDown(self):
@@ -41,7 +41,7 @@ class UploadLocationsFormTest(BaseTest):
 
     def test_invalid_if_location_type_not_found(self):
         LocationType.objects.all().delete()
-        LocationTypeDetails.objects.all().delete()
+        LocationType.objects.all().delete()
         data_file = {'file': SimpleUploadedFile(
             self.filename, self.file.read())}
 
@@ -52,7 +52,7 @@ class UploadLocationsFormTest(BaseTest):
                       upload_location_form.non_field_errors())
 
     def test_invalid_if_location_type_details_not_found(self):
-        LocationTypeDetails.objects.all().delete()
+        LocationType.objects.all().delete()
         data_file = {'file': SimpleUploadedFile(
             self.filename, self.file.read())}
 
@@ -75,7 +75,7 @@ class UploadLocationsFormTest(BaseTest):
                       upload_location_form.non_field_errors())
 
     def test_valid_with_has_code(self):
-        district = LocationTypeDetails.objects.get(
+        district = LocationType.objects.get(
             location_type=self.district, required=True)
         district.has_code = True
         district.length_of_code = 3
@@ -94,8 +94,9 @@ class UploadLocationsFormTest(BaseTest):
         self.assertEqual(True, upload_location_form.is_valid())
 
     def test_invalid_if_has_code_is_checked_but_no_type_code_column(self):
-        district = LocationTypeDetails.objects.get(
+        district = LocationType.objects.get(
             location_type=self.district, required=True)
+        Location
         district.has_code = True
         district.length_of_code = 6
         district.save()
