@@ -20,7 +20,7 @@ def test_fields(self):
     fields = [str(item.attname) for item in interview._meta.fields]
     self.assertEqual(13, len(fields))
     for field in ['id','created','modified','closure_date','test_data','ea_id','interview_channel_id','interview_reference_id','interviewer_id','last_question_id','question_set_id','survey_id','uploaded_by_id']:
-    self.assertIn(field, fields)
+        self.assertIn(field, fields)
 
 def test_store(self):
     interview = Interview.objects.create(test_data="True",ea_id=1,interview_channel_id=1,interview_reference_id=1,interviewer_id=1,last_question_id=1,question_set_id=1,survey_id=1,uploaded_by_id=1)

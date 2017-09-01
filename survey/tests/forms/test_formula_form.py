@@ -1,6 +1,6 @@
 from django.test import TestCase
 from survey.forms.formula import FormulaForm
-from survey.models import Indicator, QuestionModule, Batch, Survey, Question, HouseholdMemberGroup, Formula
+from survey.models import Indicator, QuestionModule, Batch, Survey, Question, Formula
 
 
 class FormulaFormTest(TestCase):
@@ -13,18 +13,22 @@ class FormulaFormTest(TestCase):
         self.another_module = QuestionModule.objects.create(
             name='Health', description='Health Module')
 
-        self.group = HouseholdMemberGroup.objects.create(
-            name="Females", order=1)
+        self.qset = QuestionSet.objects.create(name="Females")
+        self.rsp = ResponseValidation.objects.create(validation_test="validationtest",
+constraint_message="message")
+
+        # self.group = HouseholdMemberGroup.objects.create(
+        #     name="Females", order=1)
         self.batch = Batch.objects.create(
             order=1, name="Batch A", survey=self.survey)
         self.question_1 = Question.objects.create(identifier='1.1', text="This is a question", answer_type='Numerical Answer',
-                                                  group=self.group, batch=self.batch, module=self.module)
+                                                  qset_id=self.qset, batch=self.batch, response_validation_id=self.rsp)
         self.question_2 = Question.objects.create(identifier='1.2', text="This is a question", answer_type='Numerical Answer',
-                                                  group=self.group, batch=self.batch, module=self.module)
+                                                  qset_id=self.qset, batch=self.batch, response_validation_id=self.rsp)
         self.question_3 = Question.objects.create(identifier='1.3', text="This is a question", answer_type='Numerical Answer',
-                                                  group=self.group, batch=self.batch, module=self.module)
+                                                  qset_id=self.qset, batch=self.batch, response_validation_id=self.rsp)
         self.question_4 = Question.objects.create(identifier='1.4', text="This is a question", answer_type='Numerical Answer',
-                                                  group=self.group, batch=self.batch, module=self.module)
+                                                  qset_id=self.qset, batch=self.batch, response_validation_id=self.rsp)
 
         self.percentage_indicator = Indicator.objects.create(name='Test Indicator', measure=Indicator.MEASURE_CHOICES[0][1],
                                                              module=self.module, description="Indicator 1", batch=self.batch)
