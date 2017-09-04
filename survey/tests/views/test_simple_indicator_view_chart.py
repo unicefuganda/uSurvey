@@ -1,15 +1,15 @@
 from django.contrib.auth.models import User
 from django.test.client import Client
 from survey.models.locations import *
-from survey.models import HouseholdMemberGroup, Survey, GroupCondition, QuestionModule, Indicator, LocationTypeDetails, \
-    Batch, EnumerationArea, HouseholdListing, SurveyHouseholdListing
+from survey.models import Survey, QuestionModule, Indicator, LocationType, \
+    Batch, EnumerationArea
 from survey.models.backend import Backend
 from survey.models.interviewer import Interviewer
 
-from survey.models.formula import *
-from survey.models.questions import Question, QuestionOption
+# from survey.models.formula import *
+from survey.models.questions import Question, QuestionOption, QuestionSet, ResponseValidation
 from survey.tests.base_test import BaseTest
-from survey.features.simple_indicator_chart_step import create_household_head
+# from survey.features.simple_indicator_chart_step import create_household_head
 
 
 class SimpleIndicatorChartViewTest(BaseTest):
@@ -18,11 +18,6 @@ class SimpleIndicatorChartViewTest(BaseTest):
         self.survey = Survey.objects.create(
             name="Test Survey", description="Desc", sample_size=10, has_sampling=True)
         self.client = Client()
-        self.member_group = HouseholdMemberGroup.objects.create(
-            name="Greater than 2 years", order=1)
-        self.condition = GroupCondition.objects.create(
-            attribute="AGE", value=2, condition="GREATER_THAN")
-        self.condition.groups.add(self.member_group)
 
         User.objects.create_user(
             username='useless', email='rajni@kant.com', password='I_Suck')
@@ -40,11 +35,11 @@ class SimpleIndicatorChartViewTest(BaseTest):
 
         self.uganda = Location.objects.create(name="Uganda", type=self.country)
 
-        LocationTypeDetails.objects.create(
+        LocationType.objects.create(
             location_type=self.country, country=self.uganda)
-        LocationTypeDetails.objects.create(
+        LocationType.objects.create(
             location_type=self.district, country=self.uganda)
-        LocationTypeDetails.objects.create(
+        LocationType.objects.create(
             location_type=self.village, country=self.uganda)
 
         self.west = Location.objects.create(
@@ -74,110 +69,41 @@ class SimpleIndicatorChartViewTest(BaseTest):
                                                          language='Eglish', weights=0)
 
         self.health_module = QuestionModule.objects.create(name="Health")
-        member_group = HouseholdMemberGroup.objects.create(
-            name="Greater than 2 years", order=33)
-        self.question_3 = Question.objects.create(identifier='1.1', text="This is a question1", answer_type='Numerical Answer',
-                                                  group=self.member_group, batch=self.batch, module=self.health_module)
+        # member_group = HouseholdMemberGroup.objects.create(
+        #     name="Greater than 2 years", order=33)
+        self.survey = Survey.objects.create(name='survey name', description='survey descrpition',
+                                            sample_size=10)
+        self.qset = QuestionSet.objects.create(name="Females")
+        self.rsp = ResponseValidation.objects.create(validation_test="validationtest",
+                                                     constraint_message="message")
+        self.question_3 = Question.objects.create(identifier='123.1', text="This is a question123.1",
+                                                  answer_type='Numerical Answer',
+                                                  qset_id=self.qset, batch=self.batch, module=self.question_mod,
+                                                  response_validation_id=self.rsp)
         self.yes_option = QuestionOption.objects.create(
             question=self.question_3, text="Yes", order=1)
         self.no_option = QuestionOption.objects.create(
             question=self.question_3, text="No", order=2)
 
-        self.indicator = Indicator.objects.create(name="ITN 4.5", description="rajni indicator", measure='Percentage',
-                                                  batch=self.batch, module=self.health_module)
-        self.formula = Formula.objects.create(
-            count=self.question_3, indicator=self.indicator)
-
-    def test_get_data_for_simple_indicator_chart(self):
-        household_listing = HouseholdListing.objects.create(
-            ea=self.ea, list_registrar=self.investigator, initial_survey=self.survey)
-        survey_householdlisting = SurveyHouseholdListing.objects.create(
-            listing=household_listing, survey=self.survey)
-        household_head_1 = create_household_head(
-            0, self.investigator, household_listing, survey_householdlisting)
-        household_head_2 = create_household_head(
-            1, self.investigator, household_listing, survey_householdlisting)
-        household_head_3 = create_household_head(
-            2, self.investigator, household_listing, survey_householdlisting)
-        household_head_4 = create_household_head(
-            3, self.investigator, household_listing, survey_householdlisting)
-        household_head_5 = create_household_head(
-            4, self.investigator, household_listing, survey_householdlisting)
-
-        household_head_6 = create_household_head(
-            5, self.investigator_2, household_listing, survey_householdlisting)
-        household_head_7 = create_household_head(
-            6, self.investigator_2, household_listing, survey_householdlisting)
-        household_head_8 = create_household_head(
-            7, self.investigator_2, household_listing, survey_householdlisting)
-        household_head_9 = create_household_head(
-            8, self.investigator_2, household_listing, survey_householdlisting)
-        url = "/indicators/%s/simple/" % self.indicator.id
-        response = self.client.get(url)
-        self.failUnlessEqual(response.status_code, 200)
-        templates = [template.name for template in response.templates]
-        self.assertIn('formula/simple_indicator.html', templates)
-
-        self.assertIsNotNone(response.context['locations_filter'])
-        self.assertIsNotNone(response.context['request'])
-        self.assertEquals(response.context['location_names'], [
-                          self.central.name, self.west.name])
-        region_data_series = [{'data': [0, 0], 'name': 'Yes'}, {
-            'data': [0, 0], 'name': 'No'}]
-        self.assertEquals(response.context['data_series'], region_data_series)
-
-    def test_get_data_for_simple_indicator_chart_for_the_second_hierarchy_level(self):
-        kibungo = Location.objects.create(
-            name="Kibungo", type=self.district, tree_parent=self.west)
-        mpigi = Location.objects.create(
-            name="Mpigi", type=self.district, tree_parent=self.central)
-        household_listing = HouseholdListing.objects.create(
-            ea=self.ea, list_registrar=self.investigator, initial_survey=self.survey)
-        survey_householdlisting = SurveyHouseholdListing.objects.create(
-            listing=household_listing, survey=self.survey)
-        household_head_1 = create_household_head(0, self.investigator, household_listing, survey_householdlisting)
-        household_head_2 = create_household_head(1, self.investigator, household_listing, survey_householdlisting)
-        household_head_3 = create_household_head(
-            2, self.investigator, household_listing, survey_householdlisting)
-        household_head_4 = create_household_head(
-            3, self.investigator, household_listing, survey_householdlisting)
-        household_head_5 = create_household_head(
-            4, self.investigator, household_listing, survey_householdlisting)
-
-        household_head_6 = create_household_head(
-            5, self.investigator_2, household_listing, survey_householdlisting)
-        household_head_7 = create_household_head(
-            6, self.investigator_2, household_listing, survey_householdlisting)
-        household_head_8 = create_household_head(
-            7, self.investigator_2, household_listing, survey_householdlisting)
-        household_head_9 = create_household_head(
-            8, self.investigator_2, household_listing, survey_householdlisting)
-
-        url = "/indicators/%s/simple/?location=%s" % (
-            self.indicator.id, self.west.id)
-        response = self.client.get(url)
-        self.failUnlessEqual(response.status_code, 200)
-        self.assertEquals(response.context['location_names'], [
-                          'CENTRAL', 'WEST'])
-
-        region_data_series = [{'data': [0, 0], 'name': 'Yes'}, {
-            'data': [0, 0], 'name': 'No'}]
-        self.assertEquals(response.context['data_series'], region_data_series)
-
-        url = "/indicators/%s/simple/?location=%s" % (
-            self.indicator.id, self.central.id)
-        response = self.client.get(url)
-        self.failUnlessEqual(response.status_code, 200)
-        self.assertEquals(response.context['location_names'], [
-                          'CENTRAL', 'WEST'])
-
-        region_data_series = [{'data': [0, 0], 'name': self.yes_option.text}, {
-            'data': [0, 0], 'name':self.no_option.text}]
-        self.assertEquals(response.context['data_series'], region_data_series)
+        # self.indicator = Indicator.objects.create(name="ITN 4.5", description="rajni indicator", measure='Percentage',
+        #                                           batch=self.batch, module=self.health_module)
+        self.indicator = Indicator.objects.create(name='Test Indicator', description="dummy",display_on_dashboard=True,
+                                                  formulae="formulae",
+                                                  question_set_id=self.qset.id, survey_id=self.survey.id)
 
     def test_returns_error_message_if_no_formula_is_found_for_that_indicator(self):
-        indicator = Indicator.objects.create(name="ITN 4.5", description="rajni indicator", measure='Percentage',
-                                             batch=self.batch, module=self.health_module)
+        self.survey = Survey.objects.create(name='survey name', description='survey descrpition',
+                                            sample_size=10)
+        self.qset = QuestionSet.objects.create(name="Females")
+        self.rsp = ResponseValidation.objects.create(validation_test="validationtest", constraint_message="message")
+        self.batch = Batch.objects.create(
+            order=1, name="Batch A", survey=self.survey)
+        self.module = QuestionModule.objects.create(
+            name='Education', description='Educational Module')
+        indicator = Indicator.objects.create(name='Test Indicator', description="dummy",display_on_dashboard=True,
+                                             formulae="formulae", question_set_id=self.qset.id,
+                                             survey_id=self.survey.id)
+
         url = "/indicators/%s/simple/?location=%s" % (
             indicator.id, self.west.id)
         response = self.client.get(url)

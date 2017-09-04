@@ -22,8 +22,7 @@ class IndicatorViewTest(BaseTest):
         self.form_data = {
                           'name': 'Health',
                           'description': 'some description',
-                          'question_set' : self.qset,
-                          'formulae':"{{gender}} /{{age}} *100",                          
+                          'question_set' : self.qset,                          
                           'survey': self.survey.id}
 
         User.objects.create_user(
@@ -82,8 +81,7 @@ class IndicatorViewTest(BaseTest):
         self.form_data = {
                           'name': 'Health',
                           'description': 'some description',
-                          'question_set' : self.qset,
-                          'formulae':"{{gender}} /{{age}} *100",
+                          'question_set' : self.qset,                          
                           # 'batch': self.batch.id,
                           'survey': self.survey.id}
 
@@ -108,8 +106,7 @@ class IndicatorViewTest(BaseTest):
         self.form_data = {
                           'name': 'Health',
                           'description': 'some description',
-                          'question_set' : self.qset,
-                          'formulae':"{{gender}} / {{age}} *100",
+                          'question_set' : self.qset,                          
                           # 'batch': self.batch.id,
                           'survey': self.survey.id}
 
