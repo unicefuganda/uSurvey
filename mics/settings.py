@@ -406,6 +406,7 @@ USSD_RESPONSE_FORMAT = 'responseString=%(response)s&action=1'
 USSD_TIMEOUT = 180          # timeout in seconds
 USSD_MAX_CHARS = 160
 
+
 RESULT_REFRESH_FREQ = 6
 MEMORIZE_TIMEOUT = 120
 
@@ -450,6 +451,8 @@ SUPER_POWERS_KEY = 'auth:super_powers'
 
 INTERVIEWER_SESSION_NAMESPACE = '//interviewer/'
 ONLINE_SURVEY_TIME_OUT = 50000
+# the redis key format used for online flows
+FLOWS_REDIS_PATH_FORMAT = '%(np)s/%(access_id)s/%(key)s'
 
 
 RESPONSIVE_MEDIA_QUERIES = {
@@ -498,3 +501,16 @@ try:
     from .localsettings import *
 except ImportError:
     pass
+
+
+import sys
+
+if 'test' in sys.argv:
+    DATABASES = {
+       "default": {
+           "ENGINE": "django.db.backends.sqlite3",
+           "NAME": "testdb",
+       }
+    }
+    FLOWS_REDIS_PATH_FORMAT = '/test/%s' % FLOWS_REDIS_PATH_FORMAT
+

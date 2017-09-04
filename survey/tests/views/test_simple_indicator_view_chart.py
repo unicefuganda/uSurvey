@@ -135,10 +135,8 @@ class SimpleIndicatorChartViewTest(BaseTest):
             ea=self.ea, list_registrar=self.investigator, initial_survey=self.survey)
         survey_householdlisting = SurveyHouseholdListing.objects.create(
             listing=household_listing, survey=self.survey)
-        household_head_1 = create_household_head(
-            0, self.investigator, household_listing, survey_householdlisting)
-        household_head_2 = create_household_head(
-            1, self.investigator, household_listing, survey_householdlisting)
+        household_head_1 = create_household_head(0, self.investigator, household_listing, survey_householdlisting)
+        household_head_2 = create_household_head(1, self.investigator, household_listing, survey_householdlisting)
         household_head_3 = create_household_head(
             2, self.investigator, household_listing, survey_householdlisting)
         household_head_4 = create_household_head(

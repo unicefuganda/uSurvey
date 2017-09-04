@@ -9,7 +9,7 @@ from survey.models.interviews import Answer
 class GenericQuestion(BaseModel):
     ANSWER_TYPES = [(name, name) for name in Answer.answer_types()]
     identifier = models.CharField(max_length=100, verbose_name='Variable Name')
-    text = models.CharField(max_length=250, blank=False, null=False,)
+    text = models.CharField(max_length=250)
     answer_type = models.CharField(
         max_length=100, blank=False, null=False, choices=ANSWER_TYPES)
     response_validation = models.ForeignKey(ResponseValidation, related_name='%(class)s', null=True, blank=True,

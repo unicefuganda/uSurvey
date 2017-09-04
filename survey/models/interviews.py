@@ -14,15 +14,6 @@ from survey.models.locations import Point
 from survey.utils.decorators import static_var
 
 
-@job('default')
-def update_model_obj_serial(model_obj, serial_name, filter_criteria):
-    # get last assigned serial for interview survey in the interviewe ea
-    max_serial = model_obj.__class__.objects.filter(
-        **filter_criteria).aggregate(Max(serial_name)).get('%s__max' % serial_name, 0)
-    setattr(model_obj, serial_name, max_serial + 1)
-    model_obj.save()
-
-
 class Interview(BaseModel):
     interviewer = models.ForeignKey(
         "Interviewer",

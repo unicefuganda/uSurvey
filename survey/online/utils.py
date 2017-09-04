@@ -4,7 +4,7 @@ from django.core.cache import cache
 from django.conf import settings
 
 
-PATH_FORMAT = '%(np)s/%(access_id)s/%(key)s'
+PATH_FORMAT = settings.FLOWS_REDIS_PATH_FORMAT
 
 
 def get_entry(access, key, default=None):

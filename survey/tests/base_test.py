@@ -1,4 +1,5 @@
 import csv
+import redis
 from random import randint
 from urllib import quote
 from datetime import date
@@ -23,6 +24,12 @@ class Base(TestCase):
         super(Base, cls).setUpTestData()
         setup_test_environment()
         AnswerAccessDefinition.reload_answer_categories()
+
+    def tearDown(self):
+        for i in range(16):
+            store = redis.Redis(db=i)
+            for key in store.keys():
+                store.delete(key)
 
     def mock_date_today(self, target, real_date_class=datetime.date):
         class DateSubclassMeta(type):

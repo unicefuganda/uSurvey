@@ -142,30 +142,31 @@ def get_answer_form(interview, access=None):
             return mark_safe('<br />'.join(text))
 
         def clean_value(self):
-            if question.answer_type == MultiChoiceAnswer.choice_name():
-                try:
-                    self.cleaned_data['value'] = question.options.get(
-                        order=self.cleaned_data['value'])
-                except QuestionOption.DoesNotExist:
-                    raise ValidationError('Please select a valid option')
-            if question.answer_type == GeopointAnswer.choice_name():
-                float_entries = self.cleaned_data['value'].split(' ')
-                valid = False
-                try:
-                    map(lambda entry: float(entry), float_entries)
-                    if len(float_entries) == 4:
-                        valid = True
-                except BaseException:
-                    pass
-                if not valid:
-                    raise ValidationError(
-                        'Please enter in format: lat[space]long[space]altitude[space]precision')
-            # validate the response if the last question has validation
-            if interview.last_question and interview.last_question.response_validation:
-                response_validation = interview.last_question.response_validation
-                if response_validation.validate(self.cleaned_data['value'], interview.last_question) is False:
-                    raise ValidationError(response_validation.dconstraint_message)
-            return self.cleaned_data['value']
+            if self.cleaned_data.get('value'):
+                if question.answer_type == MultiChoiceAnswer.choice_name():
+                    try:
+                        self.cleaned_data['value'] = question.options.get(
+                            order=self.cleaned_data['value'])
+                    except QuestionOption.DoesNotExist:
+                        raise ValidationError('Please select a valid option')
+                if question.answer_type == GeopointAnswer.choice_name():
+                    float_entries = self.cleaned_data['value'].split(' ')
+                    valid = False
+                    try:
+                        map(lambda entry: float(entry), float_entries)
+                        if len(float_entries) == 4:
+                            valid = True
+                    except BaseException:
+                        pass
+                    if not valid:
+                        raise ValidationError(
+                            'Please enter in format: lat[space]long[space]altitude[space]precision')
+                # validate the response if the last question has validation
+                if interview.last_question and interview.last_question.response_validation:
+                    response_validation = interview.last_question.response_validation
+                    if response_validation.validate(self.cleaned_data['value'], interview.last_question) is False:
+                        raise ValidationError(response_validation.dconstraint_message)
+                return self.cleaned_data['value']
 
         def save(self, *args, **kwargs):
             return answer_class.create(

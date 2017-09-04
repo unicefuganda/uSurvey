@@ -149,7 +149,7 @@ urlpatterns = patterns(
         'survey.online.simulator.handle_request',
         name="test_qset_flow"),
     url(
-        r'^online/restart/(?P<access_id>\d+)/$',
+        r'^online/restart/(?P<access_id>[^/]+)/$',
         'survey.online.online_handler.restart',
         name="refresh_data_entry"),
     url(
