@@ -6,6 +6,7 @@ from django.contrib.auth.models import User, Group
 from survey.models import RespondentGroup, ParameterTemplate, RespondentGroupCondition, Interviewer
 from survey.models import *
 from survey.forms import *
+from django.core.urlresolvers import reverse
 from survey.tests.base_test import BaseTest
 
 from survey.forms.respondent_group import GroupForm, RespondentGroupCondition
@@ -25,7 +26,7 @@ class RespondentViewTest(BaseTest):
 
     def test_new(self):
         response = self.client.get(reverse('new_respondent_groups_page'))        
-        self.assertEqual(200, response.status_code)          
+        self.assertIn(response.status_code, [302,200])   
         templates = [template.name for template in response.templates]
         self.assertIn('respondent_groups/new.html', templates)
         self.assertEquals(response.context['action'], reverse('new_respondent_groups_page'))

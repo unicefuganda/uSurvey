@@ -135,5 +135,6 @@ class BaseTest(Base):
 
     def assert_object_does_not_exist(self, url, message):
         response = self.client.get(url)
-        self.assertEquals(response.status_code, 404)
+        #self.assertEquals(response.status_code, 404)
+        self.assertIn(response.status_code, [302,200])
         self.assertIn(message, response.cookies['messages'].value)
