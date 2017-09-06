@@ -35,11 +35,11 @@ constraint_message="message")
         self.question_mod = QuestionModule.objects.create(
             name="Test question name", description="test desc")
         self.question_1 = Question.objects.create(identifier='123.1', text="This is a question123.1", answer_type='Numerical Answer',
-                                                  qset_id=self.qset.id, response_validation_id=self.rsp)
+                                                  qset_id=self.qset.id, response_validation_id=1)
         self.question_2 = Question.objects.create(identifier='123.2', text="This is a question123.2", answer_type='Numerical Answer',
-                                                  qset_id=self.qset.id, response_validation_id=self.rsp)
+                                                  qset_id=self.qset.id, response_validation_id=1)
         self.question_3 = Question.objects.create(identifier='123.3', text="This is a question123.3", answer_type='Numerical Answer',
-                                                  qset_id=self.qset.id, response_validation_id=self.rsp)
+                                                  qset_id=self.qset.id, response_validation_id=1)
 
         # self.existing_formula = Formula.objects.create(numerator=self.question_1, denominator=self.question_2,
         #                                                indicator=self.indicator)
@@ -49,7 +49,7 @@ constraint_message="message")
             '/indicators/%s/formula/new/' % self.indicator.id)
         self.failUnlessEqual(response.status_code, 200)
         templates = [template.name for template in response.templates]
-        self.assertIn('formula/new.html', templates)
+        self.assertIn('indicator/formulae.html', templates)
         self.assertEquals('/indicators/%s/formula/new/' %
                           self.indicator.id, response.context['action'])
         self.assertEquals('/indicators/', response.context['cancel_url'])
@@ -123,7 +123,7 @@ constraint_message="message")
         # multichoice_question = Question.objects.create(identifier='123.4', text="This is a question123.4", answer_type='Numerical Answer',
         #                                                group=self.group, batch=self.batch, module=self.question_mod)
         multichoice_question = Question.objects.create(identifier='123.4', text="This is a question123.4", answer_type='Numerical Answer',
-                                                  qset_id=self.qset.id, batch=self.batch, module=self.question_mod,response_validation_id=self.rsp)
+                                                  qset_id=self.qset.id, response_validation_id=self.rsp)
         option_1 = QuestionOption.objects.create(
             question=multichoice_question, text="OPTION 1", order=1)
         option_2 = QuestionOption.objects.create(
