@@ -67,29 +67,32 @@ def respond(request):
 
 class OnlineInterview(OnlineHandler):
 
+    def _render_deny_template(self, request, access, template_file):
+        context = {'button_label': 'send',
+                   'template_file': template_file,
+                   'access': access,
+                   'id': 'interview_form',
+                   'action': self.action_url
+                   }
+        if show_only_answer_form(request):
+            context['display_format'] = get_display_format(request)
+            return render(request, template_file, context)
+        return render(request, 'interviews/new.html', context)
+
     def respond(self, request, session_data):
         access = self.access
         # check if there is any active interview,\
             #if yes, ask interview last question
         interview = session_data.get('interview', None)
         # if interview is Non show select EA form
-        if interview is None and \
-            access.interviewer.unfinished_assignments.exists()\
-                and access.interviewer.unfinished_assignments\
-                .first().survey.is_open() is False:
-            template_file = 'interviews/no-open-survey.html'
-            context = {'button_label': 'send',
-                       'template_file': template_file,
-                       'access': access,
-                       'id': 'interview_form',
-                       'action': self.action_url
-                       }
-            if show_only_answer_form(request):
-                context['display_format'] = get_display_format(request)
-                return render(request, template_file, context)
-            return render(request, 'interviews/new.html', context)
-        else:
-            return super(OnlineInterview, self).respond(request, session_data)
+        if interview is None and access.interviewer.unfinished_assignments.exists():
+            interviewer = access.interviewer
+            survey = interviewer.unfinished_assignments.first().survey
+            if SurveyAllocation.can_start_batch(interviewer, survey=survey) and survey.is_open() is False:
+                return self._render_deny_template(request, access, 'interviews/no-open-survey.html')
+        elif access.interviewer.unfinished_assignments.exists() is False:
+            return self._render_deny_template(request, access, 'interviews/no-ea-left.html')
+        return super(OnlineInterview, self).respond(request, session_data)
 
     def start_interview(self, request, session_data):
         """Steps:
@@ -151,9 +154,10 @@ class OnlineInterview(OnlineHandler):
                     # go straight to listing form
                     return self._initiate_listing(request, interview, survey, session_data)
                 elif interview.survey.has_sampling and 'ref_interview' not in session_data:
+                    # basically request the interviewer to choose listing form if before starting batch questions
                     session_data['_ref_interview'] = interview
                     interview_form = ReferenceInterviewForm(request, access, survey, survey_allocation.allocation_ea)
-                else:   # ready for batch collection
+                elif survey_allocation.open_batches() > 0:   # ready for batch collection
                     # ask user to select the batch if batch is more than one
                     if len(survey_allocation.open_batches()) > 1:
                         session_data['_interview'] = interview
@@ -191,3 +195,5 @@ class OnlineInterview(OnlineHandler):
             context['display_format'] = get_display_format(request)
             return render(request, template_file, context)
         return render(request, 'interviews/new.html', context)
+
+

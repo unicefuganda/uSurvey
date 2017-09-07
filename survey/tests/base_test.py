@@ -4,6 +4,7 @@ from random import randint
 from urllib import quote
 from datetime import date
 from django.test import TestCase
+from django.core.cache import cache
 from django.contrib.auth.models import Group, Permission, User
 from django.contrib.contenttypes.models import ContentType
 from django.test.utils import setup_test_environment
@@ -26,10 +27,9 @@ class Base(TestCase):
         AnswerAccessDefinition.reload_answer_categories()
 
     def tearDown(self):
-        for i in range(16):
-            store = redis.Redis(db=i)
-            for key in store.keys():
-                store.delete(key)
+        """Added to guarantee that the redis caches are refreshed between tests.
+        Care should be taken when running on production box not to affect production keys."""
+        cache.clear()
 
     def mock_date_today(self, target, real_date_class=datetime.date):
         class DateSubclassMeta(type):

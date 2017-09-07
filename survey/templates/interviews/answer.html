@@ -2,7 +2,7 @@
 {% if display_format == 'text' %}
 {% block plain_text_content %}
 {% comment %} being careful about the spacing since the target is USSD or plain text. This part needs to be made more readable {% endcomment %}
-{% if answer_form.errors %}{{answer_form.text_error}}{% endif %}{% if interview %}{% if 'prompt_user_loop' in loops %}{% if loops.prompt_user_loop %}{{loops.prompt_user_loop}}{% else %}Do you want to add another Loop?{% endif %}{{ answer_form.render_extra_ussd }}{% else %}{% build_question_text interview.last_question.text existing_answers as text %}
+{% if answer_form.errors %}{{answer_form.text_error}}{% endif %}{% if interview %}{% if 'prompt_user_loop' in loops %}{% if loops.prompt_user_loop %}{{loops.prompt_user_loop}}{% else %}{{answer_form.DEFAULT_LOOP_PROMPT}}{% endif %}{{ answer_form.render_extra_ussd }}{% else %}{% build_question_text interview.last_question.text existing_answers as text %}
 {% if text %}{% if answer_form.render_prepend_ussd %}
 {{answer_form.render_prepend_ussd}}{% endif %}{{text}} ({{interview.last_question.answer_type}})
 {{ answer_form.render_extra_ussd }}{% endif %}
@@ -67,7 +67,7 @@
                                                             {% block form_fields %}
                                                                 <div class="form_row">
                                                                  {% if 'prompt_user_loop' in loops %}
-                                                                     <label>{% if loops.prompt_user_loop %}{{loops.prompt_user_loop}}{% else %}Do you want to add another Loop?{% endif %}</label>
+                                                                     <label>{% if loops.prompt_user_loop %}{{loops.prompt_user_loop}}{% else %}{{answer_form.DEFAULT_LOOP_PROMPT}}{% endif %}</label>
                                                                  {% else %}
                                                                      {% build_question_text interview.last_question.text existing_answers as text %}
                                                                      {% if text %}

@@ -1,5 +1,8 @@
 # Django settings for mics project.
 import os
+import sys
+
+
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 DEBUG = False
@@ -259,9 +262,7 @@ CACHEOPS = {
         'ops': ('get', ),
         'timeout': CACHE_REFRESH_DURATION},
     # refresh every 3 hrs
-    'survey.enumerationarea': {
-        'ops': 'all',
-        'timeout': CACHE_REFRESH_DURATION},
+    'survey.enumerationarea': {'ops': 'all', 'timeout': CACHE_REFRESH_DURATION},
     # refresh every 3 hrs,
     # 'survey.batch': {'ops': (), 'timeout': CACHE_REFRESH_DURATION},
     # # refresh every 3 hrs,
@@ -414,34 +415,34 @@ RQ_QUEUES = {
     'default': {
         'HOST': 'localhost',
         'PORT': 6379,
-        'DB': 0,
+        'DB': 7,
         'DEFAULT_TIMEOUT': 360,
     },
     'results-queue': {
         'HOST': 'localhost',
         'PORT': 6379,
-        'DB': 0,
+        'DB': 7,
         'DEFAULT_TIMEOUT': 360,
     },
     'email': {
         'HOST': 'localhost',
         'PORT': 6379,
-        'DB': 0,
+        'DB': 7,
     },
     'ws-notice': {
         'HOST': 'localhost',
         'PORT': 6379,
-        'DB': 0,
+        'DB': 7,
     },
     'upload_task': {
         'HOST': 'localhost',
         'PORT': 6379,
-        'DB': 0,
+        'DB': 7,
     },
     'odk': {
         'HOST': 'localhost',
         'PORT': 6379,
-        'DB': 0,
+        'DB': 7,
     }
 }
 
@@ -452,7 +453,7 @@ SUPER_POWERS_KEY = 'auth:super_powers'
 INTERVIEWER_SESSION_NAMESPACE = '//interviewer/'
 ONLINE_SURVEY_TIME_OUT = 50000
 # the redis key format used for online flows
-FLOWS_REDIS_PATH_FORMAT = '%(np)s/%(access_id)s/%(key)s'
+FLOWS_REDIS_PATH_FORMAT = '/usurvey/online/%(np)s/%(access_id)s/%(key)s'
 
 
 RESPONSIVE_MEDIA_QUERIES = {
@@ -503,14 +504,24 @@ except ImportError:
     pass
 
 
-import sys
+TESTING = False
+
 
 if 'test' in sys.argv:
+    TESTING = True
+
+
+if TESTING:
     DATABASES = {
        "default": {
            "ENGINE": "django.db.backends.sqlite3",
            "NAME": "testdb",
        }
     }
+
     FLOWS_REDIS_PATH_FORMAT = '/test/%s' % FLOWS_REDIS_PATH_FORMAT
+    for queueConfig in RQ_QUEUES.itervalues():
+        queueConfig['ASYNC'] = False
+    for key in CACHEOPS:
+        CACHEOPS[key] = {'ops': (), 'timeout': CACHE_REFRESH_DURATION}
 

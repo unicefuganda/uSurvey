@@ -20,6 +20,7 @@ from survey.forms.enumeration_area import LocationsFilterForm
 CREATE_INTERVIEWER_DEFAULT_SELECT = ''
 LIST_INTERVIEWER_DEFAULT_SELECT = 'All'
 
+
 def _create_or_edit(
         request,
         action_text,
@@ -100,7 +101,6 @@ def new_interviewer(request):
 @login_required
 @permission_required('auth.can_view_interviewers')
 def edit_interviewer(request, interviewer_id=None, mode=None):
-    print interviewer_id
     return _create_or_edit(
         request,
         mode,

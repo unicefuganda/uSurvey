@@ -5,8 +5,7 @@ from survey.models.users import UserProfile
 
 
 class Survey(CloneableMixin, BaseModel):
-    name = models.CharField(max_length=100, blank=False,
-                            null=True, unique=True)
+    name = models.CharField(max_length=100, unique=True)
     description = models.CharField(max_length=300, blank=False, null=True)
     has_sampling = models.BooleanField(
         default=True, verbose_name='Survey Type')
@@ -79,6 +78,7 @@ class Survey(CloneableMixin, BaseModel):
         return self.interviews.values_list('ea', flat=True).distinct().count()
 
     def is_open(self):
+        """This is to be used in the context of survey batches. Not to be applied for listing"""
         return any([batch.is_open() for batch in self.batches.all()])
 
     def generate_completion_report(self, batch=None):

@@ -69,7 +69,7 @@ def get_answer_form(interview, access=None):
 
         def __init__(self, *args, **kwargs):
             super(AnswerForm, self).__init__(*args, **kwargs)
-            #>self.fields['uid'] = forms.CharField(initial=access.user_identifier, widget=forms.HiddenInput)
+            # self.fields['uid'] = forms.CharField(initial=access.user_identifier, widget=forms.HiddenInput)
             if question.answer_type == DateAnswer.choice_name():
                 self.fields['value'] = forms.DateField(
                     label='Answer',
@@ -214,6 +214,7 @@ class AddMoreLoopForm(BaseSelectInterview, USSDSerializable):
     ADD_MORE = 1
     DO_NOT_ADD = 2
     CHOICES = [(ADD_MORE, 'Yes'), (DO_NOT_ADD, 'No')]
+    DEFAULT_LOOP_PROMPT = 'Do you want to add another Loop?'
 
     def __init__(self, request, access, *args, **kwargs):
         super(AddMoreLoopForm, self).__init__(request, access, *args, **kwargs)

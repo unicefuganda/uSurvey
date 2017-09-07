@@ -29,9 +29,11 @@ def validate_max_date_of_birth(value):
 class Interviewer(BaseModel):
     MALE = '1'
     FEMALE = '0'
-    name = models.CharField(max_length=100, blank=False, null=False)
-    gender = models.CharField(default=MALE, verbose_name="Gender", choices=[
-                              (MALE, "M"), (FEMALE, "F")], max_length=10)
+    LEVEL_OF_EDUCATION_CHOICES = LEVEL_OF_EDUCATION
+    LANGUAGES_CHOICES = LANGUAGES
+    name = models.CharField(max_length=100)
+    gender = models.CharField(default=MALE, verbose_name="Gender", choices=[(MALE, "M"), (FEMALE, "F")],
+                              max_length=10)
 #     age = models.PositiveIntegerField(validators=[MinValueValidator(18), MaxValueValidator(50)], null=True)
     date_of_birth = models.DateField(
         null=True,
@@ -215,18 +217,20 @@ class SurveyAllocation(BaseModel):
                 batch.is_open_for(self.allocation_ea.locations.all()[0])]
 
     @classmethod
-    def can_start_batch(cls, interviewer):
+    def can_start_batch(cls, interviewer, survey=None):
         survey_allocations = interviewer.unfinished_assignments
-        if survey_allocations.first().survey.has_sampling:
+        if survey:
+            survey_allocations = interviewer.unfinished_assignments.filter(survey=survey)
+        else:
+            survey = survey_allocations.first().survey
+        if survey.has_sampling:
             # essentially allocation usually happens with same survey at a time
             completed = filter(
                 lambda allocation: allocation.sample_size_reached(),
                 survey_allocations)
-            return (
-                1.0 * len(completed)) / survey_allocations.count() >= getattr(
-                settings, 'EAS_PERCENT_TO_START_SURVEY', 1.0)
-        else:
-            return True
+            return (1.0 * len(completed)) / survey_allocations.count() >= getattr(settings,
+                                                                                  'EAS_PERCENT_TO_START_SURVEY', 1.0)
+        return True
 
     def is_valid(self):
         '''

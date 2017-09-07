@@ -8,14 +8,16 @@ from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 from survey.models import (QuestionModule, Interviewer,  EnumerationArea, QuestionTemplate, NumericalAnswer,
                            TextAnswer, MultiChoiceAnswer, DateAnswer, QuestionOption, Interview, ListingTemplate,
-                           Question, ODKAccess, Answer)
+                           Question, ODKAccess, Answer, SurveyAllocation, QuestionLoop)
 from survey.models.surveys import Survey
 from survey.models.questions import Question, QuestionFlow
 from survey.tests.base_test import BaseTest
 from survey.forms.batch import BatchForm
+from survey.forms.answer import SurveyAllocationForm, AddMoreLoopForm
 
 
 class OnlineFlowsTest(BaseTest):
+    fixtures = ['enumeration_area', 'locations', 'location_types']
 
     def setUp(self):
         self.client = Client()
@@ -88,8 +90,154 @@ class OnlineFlowsTest(BaseTest):
         self.assertEqual(response.status_code, 200)
         self.assertIn(inlines[3].text, response.content)
         # fourth question is multichoice
-        response = self.client.post(qflow_url, data={'value': 'yes', 'format': 'text'})
+        response = self.client.post(qflow_url, data={'value': 1, 'format': 'text'})
         self.assertEqual(response.status_code, 200)
+
+    def test_interviewer_gets_correct_survey(self):
+        self.test_add_question_to_listing()
+        listing = ListingTemplate.objects.first()
+        survey = mommy.make(Survey, listing_form=listing)
+        create_interviewer_url = reverse('new_interviewer_page')
+        eas = EnumerationArea.objects.all()[:2]
+        odk_token = 'odk-pass'
+        odk_id = 'odk-user'
+        interviewer_data = {'name': 'Test interviewer', 'date_of_birth': '17-07-1981',
+                            'ea': eas.values_list('id', flat=True), 'survey': survey.id,
+                            'odk_token': odk_token, 'user_identifier': odk_id, 'ussd_access-TOTAL_FORMS': 0,
+                            'ussd_access-INITIAL_FORMS': 0, 'ussd_access-MIN_NUM_FORMS': 0,
+                            'ussd_access-MAX_NUM_FORMS': 0, 'gender': Interviewer.MALE,
+                            'level_of_education': Interviewer.LEVEL_OF_EDUCATION_CHOICES[0][0],
+                            'language': Interviewer.LANGUAGES_CHOICES[0][0]}
+        demo = self.assign_permission_to(User.objects.create_user('demo123', 'demo12@kant1.com', 'demo123'),
+                                         'can_view_interviewers')
+        client = Client()
+        client.login(username='demo123', password='demo123')
+        response = client.post(create_interviewer_url, data=interviewer_data)
+        self.assertEquals(Interviewer.objects.count(), 1)
+        # check if a survey allocation was created
+        self.assertEquals(SurveyAllocation.objects.count(), len(eas))       # equal no of allocations created
+        survey_allocation = SurveyAllocation.objects.first()
+        self.assertEquals(survey_allocation.interviewer.name, interviewer_data['name'])
+        self.assertEquals(survey_allocation.survey.id, interviewer_data['survey'])
+        interviewer_online_flow_url = reverse('online_interviewer_view')
+        answer_data = {'uid': odk_id, 'format': 'text'}
+        response = client.get(interviewer_online_flow_url, data=answer_data)
+        # check that the interviewer is asked to select EA first
+        self.assertIn('answer_form', response.context)
+        self.assertEquals(response.context['answer_form'].__class__, SurveyAllocationForm)
+        # now select the allocation form
+        answer_data['value'] = survey_allocation.id
+        inlines = listing.questions_inline()
+        response = client.get(interviewer_online_flow_url, data=answer_data)
+        self.assertEquals(response.status_code, 200)
+        self.assertIn(inlines[0].text, response.content)
+        answer_data['value'] = 1
+        response = self.client.get(interviewer_online_flow_url, data=answer_data)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(inlines[1].text, response.content)
+        # second question is text
+        answer_data['value'] = 'good'
+        response = self.client.post(interviewer_online_flow_url, data=answer_data)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(inlines[2].text, response.content)
+        # third question is date
+        answer_data['value'] = '2-10-2017'
+        response = self.client.post(interviewer_online_flow_url, data=answer_data)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(inlines[3].text, response.content)
+        # fourth question is multichoice
+        answer_data['value'] = 1        # multi choice selects question order
+        del answer_data['format']
+        response = self.client.post(interviewer_online_flow_url, data=answer_data)
+        self.assertEqual(response.status_code, 200)
+        self.assertEquals(response.context['template_file'], "interviews/completed.html")
+
+    def test_looping_list(self):
+        # create listing and questions
+        self.test_add_question_to_listing()
+        listing = ListingTemplate.objects.first()
+        survey = mommy.make(Survey, listing_form=listing)
+        inlines = listing.questions_inline()
+        manage_loop_url = reverse('loop_qset_question_page', args=(inlines[1].pk, ))
+        response = self.client.get(manage_loop_url)
+        self.assertEquals(response.status_code, 200)
+        # create basic user defined loop from second question to last
+        loop_data = {'loop_starter': inlines[1].pk, 'loop_ender': inlines[2].pk, }
+        response = self.client.post(manage_loop_url, data=loop_data)
+        self.assertEquals(response.status_code, 302)
+        self.assertEquals(QuestionLoop.objects.count(), 1)
+        loop = QuestionLoop.objects.first()
+        self.assertEquals(loop.loop_starter, inlines[1])
+        self.assertEquals(loop.loop_ender, inlines[2])
+        create_interviewer_url = reverse('new_interviewer_page')
+        eas = EnumerationArea.objects.all()[:2]
+        odk_token = 'odk-pass'
+        odk_id = 'odk-user'
+        interviewer_data = {'name': 'Test interviewer', 'date_of_birth': '17-07-1981',
+                            'ea': eas.values_list('id', flat=True), 'survey': survey.id,
+                            'odk_token': odk_token, 'user_identifier': odk_id, 'ussd_access-TOTAL_FORMS': 0,
+                            'ussd_access-INITIAL_FORMS': 0, 'ussd_access-MIN_NUM_FORMS': 0,
+                            'ussd_access-MAX_NUM_FORMS': 0, 'gender': Interviewer.MALE,
+                            'level_of_education': Interviewer.LEVEL_OF_EDUCATION_CHOICES[0][0],
+                            'language': Interviewer.LANGUAGES_CHOICES[0][0]}
+        demo = self.assign_permission_to(User.objects.create_user('demo123', 'demo12@kant1.com', 'demo123'),
+                                         'can_view_interviewers')
+        client = Client()
+        client.login(username='demo123', password='demo123')
+        response = client.post(create_interviewer_url, data=interviewer_data)
+        survey_allocation = SurveyAllocation.objects.first()
+        interviewer = survey_allocation.interviewer
+        client = self.client
+        interviewer_online_flow_url = reverse('online_interviewer_view')
+        answer_data = {'uid': odk_id, 'format': 'text'}
+        response = client.get(interviewer_online_flow_url, data=answer_data)
+        # check that the interviewer is asked to select EA first
+        self.assertIn('answer_form', response.context)
+        self.assertEquals(response.context['answer_form'].__class__, SurveyAllocationForm)
+        # now select the allocation form
+        answer_data['value'] = survey_allocation.id
+        inlines = listing.questions_inline()
+        response = client.get(interviewer_online_flow_url, data=answer_data)
+        self.assertEquals(response.status_code, 200)
+        self.assertIn(inlines[0].text, response.content)
+        answer_data['value'] = 1
+        response = self.client.get(interviewer_online_flow_url, data=answer_data)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(inlines[1].text, response.content)
+        # second question is text
+        answer_data['value'] = 'good'
+        response = self.client.post(interviewer_online_flow_url, data=answer_data)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(inlines[2].text, response.content)
+        # third question is date
+        answer_data['value'] = '2-10-2017'
+        response = self.client.post(interviewer_online_flow_url, data=answer_data)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(AddMoreLoopForm.DEFAULT_LOOP_PROMPT, response.content)
+        answer_data['value'] = '1'      # repeat the loop
+        response = self.client.post(interviewer_online_flow_url, data=answer_data)  # should taje back to ques 1
+        self.assertEqual(response.status_code, 200)
+        # import pdb; pdb.set_trace()
+        # self.assertIn(inlines[1].text, response.content)
+        # # second question is text
+        # answer_data['value'] = 'good'
+        # response = self.client.post(interviewer_online_flow_url, data=answer_data)
+        # self.assertEqual(response.status_code, 200)
+        # self.assertIn(inlines[2].text, response.content)
+        # # third question is date
+        # answer_data['value'] = '2-10-2017'
+        # response = self.client.post(interviewer_online_flow_url, data=answer_data)
+        # self.assertEqual(response.status_code, 200)
+        # self.assertIn(AddMoreLoopForm.DEFAULT_LOOP_PROMPT, response.content)
+        # answer_data['value'] = '2'      # end the loop
+        # response = self.client.post(interviewer_online_flow_url, data=answer_data)
+        # # fourth question is multichoice
+        # self.assertIn(inlines[3].text, response.content)
+        # answer_data['value'] = 1        # multi choice selects question order
+        # del answer_data['format']
+        # response = self.client.post(interviewer_online_flow_url, data=answer_data)
+        # self.assertEqual(response.status_code, 200)
+        # self.assertEquals(response.context['template_file'], "interviews/completed.html")
 
 
 

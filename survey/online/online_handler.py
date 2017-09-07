@@ -72,10 +72,10 @@ class OnlineHandler(object):
         # check if there is any active interview, if yes, ask interview last question
         interview = session_data.get(INTERVIEW, None)
         # if interview is Non show select EA form
-        if interview is None:
-            return self.start_interview(request, session_data)
-        elif interview:
+        if interview:
             return self.respond_interview(request, interview, session_data)
+        else:
+            return self.start_interview(request, session_data)
 
     def _save_answers(self, request, session_data, navigation_interview):
         answers = session_data[ANSWERS]
@@ -107,7 +107,7 @@ class OnlineHandler(object):
 
     def init_responses(self, request, interview, session_data):
         #interview.save()
-        session_data[INTERVIEW] = interview       # This interview is only used for question navigation purposes
+        session_data[INTERVIEW] = deepcopy(interview)       # This interview is only used for question navigation purposes
         session_data[LAST_QUESTION] = None
         session_data[PREVIOUS_QUESTIONS] = []
         session_data[ANSWERS] = [{}, ]
