@@ -10,7 +10,7 @@ from survey.tests.base_test import BaseTest
 from survey.forms.interviewer import InterviewerForm,\
     USSDAccessForm, ODKAccessForm
 from survey.models import EnumerationArea
-from survey.models import LocationType, Location
+from survey.models import LocationType, Location, Survey
 from survey.models import Interviewer
 from survey.models import USSDAccess
 from django.forms.models import inlineformset_factory

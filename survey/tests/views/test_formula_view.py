@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from survey.models import Survey, Batch, QuestionModule, Indicator, Question, QuestionOption, QuestionSet, ResponseValidation
 from survey.tests.base_test import BaseTest
 # from survey.models.batch_question_order import *
+from django.core.urlresolvers import reverse
 from django.test.client import Client
 
 
@@ -35,21 +36,25 @@ constraint_message="message")
         self.question_mod = QuestionModule.objects.create(
             name="Test question name", description="test desc")
         self.question_1 = Question.objects.create(identifier='123.1', text="This is a question123.1", answer_type='Numerical Answer',
-                                                  qset_id=self.qset.id, response_validation_id=self.rsp)
+                                                  qset_id=self.qset.id, response_validation_id=1)
         self.question_2 = Question.objects.create(identifier='123.2', text="This is a question123.2", answer_type='Numerical Answer',
-                                                  qset_id=self.qset.id, response_validation_id=self.rsp)
+                                                  qset_id=self.qset.id, response_validation_id=1)
         self.question_3 = Question.objects.create(identifier='123.3', text="This is a question123.3", answer_type='Numerical Answer',
-                                                  qset_id=self.qset.id, response_validation_id=self.rsp)
+                                                  qset_id=self.qset.id, response_validation_id=1)
 
         # self.existing_formula = Formula.objects.create(numerator=self.question_1, denominator=self.question_2,
         #                                                indicator=self.indicator)
 
     def test_get_new(self):
-        response = self.client.get(
-            '/indicators/%s/formula/new/' % self.indicator.id)
-        self.failUnlessEqual(response.status_code, 200)
+        # response = self.client.get(
+        #     '/indicators/%s/formula/new/' % self.indicator.id)
+        # self.failUnlessEqual(response.status_code, 200)
+
+        response = self.client.get(reverse('add_formula_page'))        
+        self.assertEqual(200, response.status_code)
+
         templates = [template.name for template in response.templates]
-        self.assertIn('formula/new.html', templates)
+        self.assertIn('indicator/formulae.html', templates)
         self.assertEquals('/indicators/%s/formula/new/' %
                           self.indicator.id, response.context['action'])
         self.assertEquals('/indicators/', response.context['cancel_url'])
@@ -62,7 +67,9 @@ constraint_message="message")
         self.assertIsInstance(response.context['formula_form'], FormulaForm)
 
     def test_get_knows_to_throw_error_message_if_indicator_does_not_exist(self):
-        response = self.client.get('/indicators/%s/formula/new/' % 200)
+        # response = self.client.get('/indicators/%s/formula/new/' % 200)
+        response = self.client.get(reverse('add_formula_page'))
+        self.assertEqual(200, response.status_code)
 
         message = "The indicator requested does not exist."
 
@@ -74,7 +81,7 @@ constraint_message="message")
         # multichoice_question = Question.objects.create(identifier='123.4', text="This is a question123.4", answer_type='Numerical Answer',
         #                                                group=self.group, batch=self.batch, module=self.question_mod)
         multichoice_question = Question.objects.create(identifier='123.4', text="This is a question123.4", answer_type='Numerical Answer',
-                                                  qset_id=self.qset.id, response_validation_id=self.rsp)
+                                                  qset_id=self.qset.id, response_validation_id=1)
 
         option_1 = QuestionOption.objects.create(
             question=multichoice_question, text='Yes', order=1)
@@ -95,13 +102,19 @@ constraint_message="message")
         excluded_numerator_formula_options = [option_3, option_4]
         all_denominator_formula_options = [
             option_1, option_2, option_3, option_4]
+        indicator = Indicator.objects.create(name='Test Indicator', description="dummy",display_on_dashboard=True,formulae="formulae",
+                                                  question_set_id=self.qset.id, survey_id=self.survey.id)
         # BatchQuestionOrder.objects.create(batch=self.batch, question=multichoice_question, order=4)
+        new_formula_url = reverse('add_formula_page', args=(indicator.id,))
+        # new_formula_url = '/indicators/%s/formula/new/' % self.indicator.id
+        response = self.client.get(reverse('add_formula_page'))
+        self.assertEqual(200, response.status_code)
 
-        new_formula_url = '/indicators/%s/formula/new/' % self.indicator.id
         response = self.client.post(new_formula_url, data=data)
         message = "Formula successfully added to indicator %s." % self.indicator.name
 
-        self.assertIn(message, response.content)
+        # self.assertIn(message, response.content)
+        self.assertIn(message, response.cookies['messages'].value)
         saved_formula = Formula.objects.filter(numerator=multichoice_question, denominator=multichoice_question,
                                                indicator=self.indicator)
 
@@ -123,7 +136,7 @@ constraint_message="message")
         # multichoice_question = Question.objects.create(identifier='123.4', text="This is a question123.4", answer_type='Numerical Answer',
         #                                                group=self.group, batch=self.batch, module=self.question_mod)
         multichoice_question = Question.objects.create(identifier='123.4', text="This is a question123.4", answer_type='Numerical Answer',
-                                                  qset_id=self.qset.id, batch=self.batch, module=self.question_mod,response_validation_id=self.rsp)
+                                                  qset_id=self.qset.id, response_validation_id=1)
         option_1 = QuestionOption.objects.create(
             question=multichoice_question, text="OPTION 1", order=1)
         option_2 = QuestionOption.objects.create(
@@ -140,11 +153,12 @@ constraint_message="message")
 
         all_formula_options = [option_1, option_2, option_3]
 
-        new_formula_url = '/indicators/%s/formula/new/' % count_indicator.id
+        # new_formula_url = '/indicators/%s/formula/new/' % count_indicator.id
+        new_formula_url = reverse('add_formula_page', args=(count_indicator.id,))
         response = self.client.post(new_formula_url, data=data)
         message = "Formula successfully added to indicator %s." % self.indicator.name
 
-        self.assertIn(message, response.content)
+        self.assertIn(message, response.cookies['messages'].value)
         saved_formula = Formula.objects.filter(
             count=multichoice_question, indicator=count_indicator)
 

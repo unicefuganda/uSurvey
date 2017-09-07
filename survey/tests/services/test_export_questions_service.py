@@ -1,7 +1,7 @@
 from survey.services.export_questions import ExportQuestionsService, get_batch_question_as_dump, get_question_template_as_dump
 
 from survey.tests.base_test import BaseTest
-from survey.models import Question, QuestionOption, HouseholdMemberGroup, Batch, QuestionModule
+from survey.models import Question, QuestionOption, Batch, QuestionModule, QuestionSet, ResponseValidation
 
 
 class ExportQuestionsTest(BaseTest):
@@ -10,14 +10,17 @@ class ExportQuestionsTest(BaseTest):
         self.question_mod = QuestionModule.objects.create(
             name="Test question name", description="test desc")
         self.batch = Batch.objects.create(order=1)
-        self.member_group = HouseholdMemberGroup.objects.create(
-            name="old people", order=0)
+        self.qset = QuestionSet.objects.create(name="Females")
+        self.rsp = ResponseValidation.objects.create(validation_test="validationtest",
+constraint_message="message")
+        # self.member_group = HouseholdMemberGroup.objects.create(
+        #     name="old people", order=0)
         self.question1 = Question.objects.create(identifier='1.1', text="This is a question1", answer_type='Numerical Answer',
-                                                 group=self.member_group, batch=self.batch, module=self.question_mod)
+                                                 qset_id=1, response_validation_id=1)
         self.question2 = Question.objects.create(identifier='1.2', text="This is a question2", answer_type='Text Answer',
-                                                 group=self.member_group, batch=self.batch, module=self.question_mod)
+                                                 qset_id=1, response_validation_id=1)
         self.question3 = Question.objects.create(identifier='1.3', text="This is a question3", answer_type='Numerical Answer',
-                                                 group=self.member_group, batch=self.batch, module=self.question_mod)
+                                                 qset_id=1, response_validation_id=1)
         self.option1 = QuestionOption.objects.create(
             question=self.question3, text="option1", order=1)
         self.option2 = QuestionOption.objects.create(
@@ -29,10 +32,10 @@ class ExportQuestionsTest(BaseTest):
     def test_exports_all_questions_with_normal_group(self):
 
         question1 = "%s; %s; %s" % (
-            self.question1.text, self.question1.group.name, self.question1.answer_type.upper())
+            self.question1.text, self.question1.qset_id.name, self.question1.answer_type.upper())
         question2 = "%s; %s; %s" % (
-            self.question2.text, self.question2.group.name, self.question2.answer_type.upper())
-        question3_1 = "%s; %s; %s; %s" % (self.question3.text, self.question3.group.name,
+            self.question2.text, self.question2.qset_id.name, self.question2.answer_type.upper())
+        question3_1 = "%s; %s; %s; %s" % (self.question3.text, self.question3.qset_id.name,
                                           self.question3.answer_type.upper(), self.option1.text)
         question3_2 = "; ; ; %s" % (self.option2.text)
         question3_3 = "; ; ; %s" % (self.option3.text)
@@ -49,10 +52,10 @@ class ExportQuestionsTest(BaseTest):
         self.create_questions_not_in_batch()
 
         question1 = "%s; %s; %s" % (
-            self.question1.text, self.question1.group.name, self.question1.answer_type.upper())
+            self.question1.text, self.question1.qset_id.name, self.question1.answer_type.upper())
         question2 = "%s; %s; %s" % (
-            self.question2.text, self.question2.group.name, self.question2.answer_type.upper())
-        question3_1 = "%s; %s; %s; %s" % (self.question3.text, self.question3.group.name,
+            self.question2.text, self.question2.qset_id.name, self.question2.answer_type.upper())
+        question3_1 = "%s; %s; %s; %s" % (self.question3.text, self.question3.qset_id.name,
                                           self.question3.answer_type.upper(), self.option1.text)
         question3_2 = "; ; ; %s" % (self.option2.text)
         question3_3 = "; ; ; %s" % (self.option3.text)
