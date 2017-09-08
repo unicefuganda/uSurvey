@@ -210,7 +210,7 @@ class OnlineHandler(object):
             if loop_id not in session_data[LOOPS][COUNT]:
                 session_data[LOOPS][COUNT][loop_id] = 1
         elif hasattr(interview.last_question, 'loop_ended'):
-            import pdb; pdb.set_trace()
+            #import pdb; pdb.set_trace()
             loop = interview.last_question.loop_ended
             count = session_data[LOOPS][COUNT].get(loop.id, 1)
 
