@@ -197,14 +197,7 @@ class QuestionFlow(CloneableMixin, BaseModel):
     next_question_type = models.CharField(max_length=100)
 
     def params_display(self):
-        params = []
-        for arg in self.text_arguments:
-            if self.question.answer_type == MultiChoiceAnswer.choice_name():
-                params.append(self.question.options.get(order=arg.param).text)
-            else:
-                params.append(arg.param)
-
-        return params
+        return self.text_arguments.values_list('param', flat=True)
 
     @property
     def validation_test(self):
@@ -231,11 +224,17 @@ class QuestionFlow(CloneableMixin, BaseModel):
     def text_arguments(self):
         if self.validation:
             return self.validation.text_arguments
+        else:
+            from survey.models import TextArgument
+            return TextArgument.objects.none()
 
     @property
     def test_arguments(self):
         if self.validation:
             return self.validation.test_arguments
+        else:
+            from survey.models import TextArgument
+            return TextArgument.objects.none()
 
     def save(self, *args, **kwargs):
         invalidate_obj(self.question)

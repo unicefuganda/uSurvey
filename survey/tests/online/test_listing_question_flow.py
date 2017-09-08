@@ -214,10 +214,10 @@ class OnlineFlowsTest(BaseTest):
         response = self.client.post(interviewer_online_flow_url, data=answer_data)
         self.assertEqual(response.status_code, 200)
         self.assertIn(AddMoreLoopForm.DEFAULT_LOOP_PROMPT, response.content)
+        # import pdb; pdb.set_trace()
         answer_data['value'] = '1'      # repeat the loop
         response = self.client.post(interviewer_online_flow_url, data=answer_data)  # should taje back to ques 1
         self.assertEqual(response.status_code, 200)
-        # import pdb; pdb.set_trace()
         # self.assertIn(inlines[1].text, response.content)
         # # second question is text
         # answer_data['value'] = 'good'
