@@ -214,30 +214,29 @@ class OnlineFlowsTest(BaseTest):
         response = self.client.post(interviewer_online_flow_url, data=answer_data)
         self.assertEqual(response.status_code, 200)
         self.assertIn(AddMoreLoopForm.DEFAULT_LOOP_PROMPT, response.content)
-        # import pdb; pdb.set_trace()
         answer_data['value'] = '1'      # repeat the loop
         response = self.client.post(interviewer_online_flow_url, data=answer_data)  # should taje back to ques 1
         self.assertEqual(response.status_code, 200)
-        # self.assertIn(inlines[1].text, response.content)
-        # # second question is text
-        # answer_data['value'] = 'good'
-        # response = self.client.post(interviewer_online_flow_url, data=answer_data)
-        # self.assertEqual(response.status_code, 200)
-        # self.assertIn(inlines[2].text, response.content)
-        # # third question is date
-        # answer_data['value'] = '2-10-2017'
-        # response = self.client.post(interviewer_online_flow_url, data=answer_data)
-        # self.assertEqual(response.status_code, 200)
-        # self.assertIn(AddMoreLoopForm.DEFAULT_LOOP_PROMPT, response.content)
-        # answer_data['value'] = '2'      # end the loop
-        # response = self.client.post(interviewer_online_flow_url, data=answer_data)
-        # # fourth question is multichoice
-        # self.assertIn(inlines[3].text, response.content)
-        # answer_data['value'] = 1        # multi choice selects question order
-        # del answer_data['format']
-        # response = self.client.post(interviewer_online_flow_url, data=answer_data)
-        # self.assertEqual(response.status_code, 200)
-        # self.assertEquals(response.context['template_file'], "interviews/completed.html")
+        self.assertIn(inlines[1].text, response.content)
+        # second question is text
+        answer_data['value'] = 'good'
+        response = self.client.post(interviewer_online_flow_url, data=answer_data)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(inlines[2].text, response.content)
+        # third question is date
+        answer_data['value'] = '2-10-2017'
+        response = self.client.post(interviewer_online_flow_url, data=answer_data)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(AddMoreLoopForm.DEFAULT_LOOP_PROMPT, response.content)
+        answer_data['value'] = '2'      # end the loop
+        response = self.client.post(interviewer_online_flow_url, data=answer_data)
+        # fourth question is multichoice
+        self.assertIn(inlines[3].text, response.content)
+        answer_data['value'] = 1        # multi choice selects question order
+        del answer_data['format']
+        response = self.client.post(interviewer_online_flow_url, data=answer_data)
+        self.assertEqual(response.status_code, 200)
+        self.assertEquals(response.context['template_file'], "interviews/completed.html")
 
 
 

@@ -9,7 +9,7 @@ from survey.models import SurveyAllocation
 from survey.forms.answer import\
     (UserAccessForm, SurveyAllocationForm, SelectBatchForm, AddMoreLoopForm, ReferenceInterviewForm)
 from .online_handler import OnlineHandler,\
-    show_only_answer_form, get_display_format
+    show_only_answer_form, get_display_format, INTERVIEW_PROMPT_ANSWER_FORM
 
 
 def ussd_flow(request):

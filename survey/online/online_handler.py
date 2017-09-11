@@ -24,7 +24,8 @@ INTERVIEW = 'interview'
 ANSWERS = 'answers'
 COUNT = 'count'
 PROMPT_USER_LOOP = 'prompt_user_loop'
-
+INTERVIEW_PROMPT_ANSWER_FORM = 'specific_answer_form'
+PENDING_USER_ACTION = -1
 
 def get_display_format(request):
     request_data = request.GET if request.method == 'GET' else request.POST
@@ -142,7 +143,11 @@ class OnlineHandler(object):
             session_data[LAST_QUESTION] = interview.last_question.id
             has_go_back = True
         elif str(session_data[LAST_QUESTION]) == str(interview.last_question.id):
-            answer_form = get_answer_form(interview, access)(request_data, request.FILES)
+            if INTERVIEW_PROMPT_ANSWER_FORM in session_data:
+                answer_form = session_data[INTERVIEW_PROMPT_ANSWER_FORM](request, access, data=request_data)
+                del session_data[INTERVIEW_PROMPT_ANSWER_FORM]
+            else:
+                answer_form = get_answer_form(interview, access)(request_data, request.FILES)
             if answer_form.is_valid():
                 # answer = answer_form.save()     # even for test data, to make sure the answer can actually save
                 # decided to keep both as text and as value
@@ -172,18 +177,12 @@ class OnlineHandler(object):
             session_data[LAST_QUESTION] = interview.last_question.id
         if interview.closure_date:
             template_file = "interviews/completed.html"
-            del session_data[INTERVIEW]
-            del session_data[PREVIOUS_QUESTIONS]
-            if ANSWERS in session_data:
-                del session_data[ANSWERS]
-            if LOOPS in session_data:
-                del session_data[LOOPS]
-            if LAST_QUESTION in session_data:
-                del session_data[LAST_QUESTION]
+            self.clean_session(request, session_data)
         else:
             template_file = "interviews/answer.html"
-        if PROMPT_USER_LOOP in session_data.get(LOOPS, []):
+        if PROMPT_USER_LOOP in session_data.get(LOOPS, {}):
             answer_form = AddMoreLoopForm(request, access)
+            session_data[INTERVIEW_PROMPT_ANSWER_FORM] = AddMoreLoopForm
         context = {'title': "%s Survey" % interview.survey,
                    'button_label': 'send', 'answer_form': answer_form,
                    INTERVIEW: interview,
@@ -193,7 +192,7 @@ class OnlineHandler(object):
                    'ussd_session_timeout': settings.USSD_TIMEOUT,
                    # for display, use answer as text. Answer as value is used for group and question logic
                    'existing_answers': session_data.get(ANSWERS, {}),
-                   LOOPS: session_data.get(LOOPS, []),
+                   LOOPS: session_data.get(LOOPS, {}),
                    'template_file': template_file,
                    'id': 'interview_form',
                    'action': self.action_url,
@@ -204,16 +203,24 @@ class OnlineHandler(object):
             return render(request, template_file, context)
         return render(request, 'interviews/new.html', context)
 
+    def clean_session(self, request, session_data):
+        del session_data[INTERVIEW]
+        del session_data[PREVIOUS_QUESTIONS]
+        if ANSWERS in session_data:
+            del session_data[ANSWERS]
+        if LOOPS in session_data:
+            del session_data[LOOPS]
+        if LAST_QUESTION in session_data:
+            del session_data[LAST_QUESTION]
+
     def get_loop_next(self, request, interview, session_data):
         if hasattr(interview.last_question, 'loop_started'):
             loop_id = interview.last_question.loop_started.id
             if loop_id not in session_data[LOOPS][COUNT]:
                 session_data[LOOPS][COUNT][loop_id] = 1
         elif hasattr(interview.last_question, 'loop_ended'):
-            #import pdb; pdb.set_trace()
             loop = interview.last_question.loop_ended
             count = session_data[LOOPS][COUNT].get(loop.id, 1)
-
             loop_next = None
             if loop.repeat_logic in [QuestionLoop.FIXED_REPEATS, QuestionLoop.PREVIOUS_QUESTION]:
                 if loop.repeat_logic == QuestionLoop.FIXED_REPEATS:
@@ -239,9 +246,9 @@ class OnlineHandler(object):
                             del session_data[LOOPS][PROMPT_USER_LOOP]
                     else:
                         session_data[LOOPS][PROMPT_USER_LOOP] = loop.loop_prompt
-            if PROMPT_USER_LOOP in session_data.get(LOOPS, []):     # if you have to prompt the user to cont loop...
+            if PROMPT_USER_LOOP in session_data.get(LOOPS, {}):     # if you have to prompt the user to cont loop...
                 loop_next = loop.loop_ender         # stay at last loop question
-                session_data[LAST_QUESTION] = None
+                session_data[LAST_QUESTION] = PENDING_USER_ACTION
             elif loop_next:     # not prompt
                 # update answers with new loop row
                 session_data[LOOPS][COUNT][loop.id] = count + 1

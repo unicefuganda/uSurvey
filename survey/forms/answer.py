@@ -31,7 +31,7 @@ class USSDSerializable(object):
 
     def render_prepend_ussd(self):
         if 'value' in self.fields:
-            return self.fields['value'].label
+            return '%s ' % self.fields['value'].label
         return ''
 
     def render_extra_ussd(self):
@@ -125,10 +125,10 @@ def get_answer_form(interview, access=None):
             if question.options.count() > 0:
                 map(lambda opt: text.append('%s: %s' %
                                             (opt.order, opt.text)), question.options.all())
-            elif hasattr(interview.last_question, 'loop_started'):
-                text.append('%s: %s' %
-                            (question.text, self.initial.get('value', 1)))
-                text.append('Enter any key to continue')
+            # elif hasattr(interview.last_question, 'loop_started'):
+            #     text.append('%s: %s' %
+            #                 (question.text, self.initial.get('value', 1)))
+            #     # text.append('Enter any key to continue')
             return mark_safe('\n'.join(text))
 
         def render_extra_ussd_html(self):
@@ -136,9 +136,9 @@ def get_answer_form(interview, access=None):
             if question.options.count() > 0:
                 map(lambda opt: text.append('%s: %s' %
                                             (opt.order, opt.text)), question.options.all())
-            elif hasattr(interview.last_question, 'loop_started'):
-                text.append('%s: %s' %
-                            (question.text, self.initial.get('value', 1)))
+            # elif hasattr(interview.last_question, 'loop_started'):
+            #     text.append('%s: %s' %
+            #                 (question.text, self.initial.get('value', 1)))
             return mark_safe('<br />'.join(text))
 
         def clean_value(self):
