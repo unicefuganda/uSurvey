@@ -36,8 +36,8 @@ class InterviewerViewTest(BaseTest):
             'name': 'Interviewer_1',
             'date_of_birth': '1987-08-06',
             'gender': 1,
-            'ea':self.ea,
-            'survey':self.survey
+            'ea':self.ea
+            # 'survey':self.survey
         }
 
     def test_new(self):
@@ -70,7 +70,7 @@ class InterviewerViewTest(BaseTest):
 
         investigator = Interviewer.objects.get(name=form_data['name'])
         self.failUnless(investigator.id)
-        for key in ['name','gender','date_of_birth','survey','ea']:
+        for key in ['name','gender','date_of_birth','ea']:
             value = getattr(investigator, key)
             self.assertEqual(form_data[key], str(value))
 
@@ -87,7 +87,11 @@ class InterviewerViewTest(BaseTest):
 
 
     def test_list_interviewers(self):
-        investigator = Interviewer.objects.create(name='int_2',survey=self.survey,ea=self.ea,date_of_birth='1987-01-01')
+        # investigator = Interviewer.objects.create(name='int_2',survey=self.survey,ea=self.ea,date_of_birth='1987-01-01')
+        investigator = Interviewer.objects.create(name="Investigator",
+                                                       ea=self.ea,
+                                                       gender='1', level_of_education='Primary',
+                                                       language='Eglish', weights=0,date_of_birth='1987-01-01')
         response = self.client.get(reverse('interviewers_page'))
         self.failUnlessEqual(response.status_code, 200)
         templates = [template.name for template in response.templates]
@@ -97,7 +101,11 @@ class InterviewerViewTest(BaseTest):
 
 
     def test_edit_interviewer_view(self):
-        investigator = Interviewer.objects.create(name='int_3',survey=self.survey,ea=self.ea,date_of_birth='1987-01-01')
+        # investigator = Interviewer.objects.create(name='int_3',survey=self.survey,ea=self.ea,date_of_birth='1987-01-01')
+        investigator = Interviewer.objects.create(name="Investigator",
+                                                       ea=self.ea,
+                                                       gender='1', level_of_education='Primary',
+                                                       language='Eglish', weights=0,date_of_birth='1987-01-01')
         url = reverse(
             'view_interviewer_page',
             kwargs={"interviewer_id":  interviewer_id.pk,"mode":'edit'})
@@ -127,24 +135,25 @@ class InterviewerViewTest(BaseTest):
             'name': 'Interviewer_4',
             'date_of_birth': '1987-08-06',
             'gender': 0,
-            'ea':self.ea,
-            'survey':self.survey
+            'ea':self.ea            
         }
         self.failIf(Interviewer.objects.filter(name=form_data['name']))
-        investigator = Interviewer.objects.create(
-            name=form_data['name'],
-            date_of_birth=form_data['date_of_birth'],
-            gender=form_data['gender'],
-            ea = self.ea,
-            survey=self.survey
-            )
-
+        # investigator = Interviewer.objects.create(
+        #     name=form_data['name'],
+        #     date_of_birth=form_data['date_of_birth'],
+        #     gender=form_data['gender'],
+        #     ea = self.ea,
+        #     survey=self.survey
+        #     )
+        investigator = Interviewer.objects.create(name="Investigator",
+                                                       ea=self.ea,
+                                                       gender='1', level_of_education='Primary',
+                                                       language='Eglish', weights=0,date_of_birth='1987-01-01')
         data = {
             'name': 'Interviewer_4',
             'date_of_birth': '1987-08-06',
             'gender': 1,
-            'ea':self.ea,
-            'survey':self.survey
+            'ea':self.ea            
         }
         url = reverse(
             'view_interviewer_page',
@@ -155,7 +164,11 @@ class InterviewerViewTest(BaseTest):
         self.assertEqual(1, edited_user.count())
 
     def test_view_interviewer_details(self):
-        investigator = Interviewer.objects.create(name='int_5',survey=self.survey,ea=self.ea,date_of_birth='1987-01-01')
+        # investigator = Interviewer.objects.create(name='int_5',survey=self.survey,ea=self.ea,date_of_birth='1987-01-01')
+        investigator = Interviewer.objects.create(name="Investigator",
+                                                       ea=self.ea,
+                                                       gender='1', level_of_education='Primary',
+                                                       language='Eglish', weights=0,date_of_birth='1987-01-01')
         url = reverse('view_interviewer_page', kwargs={"interviewer_id":  investigator.id,"mode":'view'})
         response = self.client.get(url)
         self.failUnlessEqual(response.status_code, 200)
@@ -167,7 +180,11 @@ class InterviewerViewTest(BaseTest):
             reverse('interviewers_page'))
 
     def test_unblock_interviwer_details(self):
-        investigator = Interviewer.objects.create(name='int_6',survey=self.survey,ea=self.ea,date_of_birth='1987-01-01')
+        # investigator = Interviewer.objects.create(name='int_6',survey=self.survey,ea=self.ea,date_of_birth='1987-01-01')
+        investigator = Interviewer.objects.create(name="Investigator",
+                                                       ea=self.ea,
+                                                       gender='1', level_of_education='Primary',
+                                                       language='Eglish', weights=0,date_of_birth='1987-01-01')
         url = reverse('unblock_interviewer_page', kwargs={"interviewer_id":  investigator.id})
         response = self.client.get(url)
         self.failUnlessEqual(response.status_code, 200)
@@ -179,7 +196,11 @@ class InterviewerViewTest(BaseTest):
         self.assertRedirects(response, expected_url=reverse('interviewers_page'))
 
     def test_block_interviewer_details(self):
-        investigator = Interviewer.objects.create(name='int_7',survey=self.survey,ea=self.ea,date_of_birth='1987-01-01')
+        # investigator = Interviewer.objects.create(name='int_7',survey=self.survey,ea=self.ea,date_of_birth='1987-01-01')
+        investigator = Interviewer.objects.create(name="Investigator",
+                                                       ea=self.ea,
+                                                       gender='1', level_of_education='Primary',
+                                                       language='Eglish', weights=0,date_of_birth='1987-01-01')
         url = reverse('block_interviewer_page', kwargs={"interviewer_id":  investigator.id})
         response = self.client.get(url)
         self.failUnlessEqual(response.status_code, 200)
@@ -224,6 +245,10 @@ class InterviewerViewTest(BaseTest):
         self.assertIn("Interviewer not found.", response.cookies['messages'].value)
 
     def test_restricted_permission(self):
+        investigator = Interviewer.objects.create(name="Investigator",
+                                                       ea=self.ea,
+                                                       gender='1', level_of_education='Primary',
+                                                       language='Eglish', weights=0,date_of_birth='1987-01-01')
         self.assert_restricted_permission_for(reverse('interviewers_page'))
         url = reverse('view_interviewer_page', kwargs={"interviewer_id":  investigator.id,"mode":'view'})
         self.assert_restricted_permission_for(reverse(url))
