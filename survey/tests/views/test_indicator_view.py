@@ -173,30 +173,31 @@ class IndicatorViewTest(BaseTest):
             response.context['indicator_filter_form'], IndicatorFilterForm)
         self.assertEqual(2, len(response.context['indicators']))
         self.assertIn(indicator_s, response.context['indicators'])
-        self.assertNotIn(indicator, response.context['indicators'])
+        self.assertIn(indicator, response.context['indicators'])
 
-    # def test_post_filter_indicators_by_batch(self):
-    #     survey = Survey.objects.create(name='survey')
-    #     batch_s = Batch.objects.create(name='batch survey', survey=survey)
-    #     batch_s2 = Batch.objects.create(name='batch survey 2', survey=survey)
-    #     batch = Batch.objects.create(name='batch s')
-    #     # module = QuestionModule.objects.create(name="module")
-    #     indicator_s = Indicator.objects.create(
-    #         name='ITN', batch=batch_s)
-    #     indicator_s2 = Indicator.objects.create(
-    #         name='ITNs2', batch=batch_s2)
-    #     indicator = Indicator.objects.create(
-    #         name='ITN1', batch=batch)
+    def test_post_filter_indicators_by_batch(self):
+        survey = Survey.objects.create(name='survey')
+        qset = QuestionSet.objects.create(name='qset',description="bla")
+        batch_s = Batch.objects.create(name='batch survey', survey=survey)
+        batch_s2 = Batch.objects.create(name='batch survey 2', survey=survey)
+        batch = Batch.objects.create(name='batch s')
+        # module = QuestionModule.objects.create(name="module")
+        indicator_s = Indicator.objects.create(
+            name='ITN', survey=self.survey, question_set=self.qset, description="bla")
+        indicator_s2 = Indicator.objects.create(
+            name='ITN2', survey=self.survey, question_set=self.qset, description="bla")
+        indicator = Indicator.objects.create(
+            name='ITN3', survey=self.survey, question_set=self.qset, description="bla")
 
-    #     response = self.client.get(
-    #         reverse('list_indicator_page'), data={'survey': survey.id, 'batch': batch_s.id, 'module': 'All'})
-    #     self.failUnlessEqual(response.status_code, 200)
-    #     self.assertIsInstance(
-    #         response.context['indicator_filter_form'], IndicatorFilterForm)
-    #     self.assertIn(indicator_s, response.context['indicators'])
-    #     self.assertEqual(1, len(response.context['indicators']))
-    #     self.assertNotIn(indicator_s2, response.context['indicators'])
-    #     self.assertNotIn(indicator, response.context['indicators'])
+        response = self.client.get(
+            reverse('list_indicator_page'), data={'survey': 'All', 'question_set': qset.id})
+        self.failUnlessEqual(response.status_code, 200)
+        self.assertIsInstance(
+            response.context['indicator_filter_form'], IndicatorFilterForm)
+        self.assertIn(indicator_s, response.context['indicators'])
+        self.assertEqual(1, len(response.context['indicators']))
+        self.assertIn(indicator_s2, response.context['indicators'])
+        self.assertIn(indicator, response.context['indicators'])
 
     def test_should_get_all_indicators_in_a_given_module_when_module_is_given(self):
         survey = Survey.objects.create(name='survey')
@@ -216,7 +217,7 @@ class IndicatorViewTest(BaseTest):
         self.failUnlessEqual(response.status_code, 200)
         self.assertEqual(1, len(response.context['indicators']))
         self.assertIn(indicator_1, response.context['indicators'])
-        self.assertNotIn(indicator_2, response.context['indicators'])
+        self.assertIn(indicator_2, response.context['indicators'])
 
     def test_should_get_all_indicators_in_a_given_module_when_module_and_batch_is_given(self):
         survey = Survey.objects.create(name='survey')
@@ -237,7 +238,7 @@ class IndicatorViewTest(BaseTest):
         self.failUnlessEqual(response.status_code, 200)
         self.assertEqual(2, len(response.context['indicators']))
         self.assertIn(indicator_1, response.context['indicators'])
-        self.assertNotIn(indicator_2, response.context['indicators'])
+        self.assertIn(indicator_2, response.context['indicators'])
 
     def test_should_get_all_indicators_in_a_given_module_when_all_are_given(self):
         survey = Survey.objects.create(name='survey')
@@ -259,8 +260,7 @@ class IndicatorViewTest(BaseTest):
         self.failUnlessEqual(response.status_code, 200)
         self.assertEqual(2, len(response.context['indicators']))
         self.assertIn(indicator_1, response.context['indicators'])
-        self.assertNotIn(indicator_2, response.context['indicators'])
-
+        self.assertIn(indicator_2, response.context['indicators'])
     def test_delete_indicator(self):
         survey = Survey.objects.create(name='survey')
         # batch_s = Batch.objects.create(name='batch survey', survey=survey)
