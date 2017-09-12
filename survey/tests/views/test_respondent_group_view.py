@@ -9,7 +9,7 @@ from survey.forms import *
 from django.core.urlresolvers import reverse
 from survey.tests.base_test import BaseTest
 
-from survey.forms.respondent_group import GroupForm, RespondentGroupCondition
+from survey.forms.respondent_group import GroupForm
 from django.core.urlresolvers import reverse
 
 
@@ -23,6 +23,15 @@ class RespondentViewTest(BaseTest):
             'demo11', 'demo11@kant.com', 'demo11'), 'can_view_users')
         self.client.login(username='demo11', password='demo11')
         self.form_data = {"name":'G-1',"description":"blah blah"}
+
+        country = LocationType.objects.create(name="Country", slug="country")
+        uganda = Location.objects.create(name="Uganda", type=country, code="1")
+        district = LocationType.objects.create(
+            name='District', parent=country, slug='district')
+        kampala = Location.objects.create(
+            name="Kampala", type=district, parent=uganda, code="2")
+        ea = EnumerationArea.objects.create(name="Kampala EA")
+        ea.locations.add(kampala)
 
     def test_new(self):
         response = self.client.get(reverse('new_respondent_groups_page'))        
