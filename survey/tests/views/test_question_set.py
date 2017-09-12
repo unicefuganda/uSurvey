@@ -3,7 +3,7 @@ from django.test import Client
 from survey.forms.question_module_form import QuestionModuleForm
 # from survey.forms.question_set import QuestionSetForm, BatchForm
 from survey.forms import *
-from survey.models import QuestionModule, Question, QuestionSetChannel, QuestionSet
+from survey.models import QuestionModule, Question, QuestionSetChannel, QuestionSet, ResponseValidation
 from survey.models.batch import *
 from survey.tests.base_test import BaseTest
 
@@ -17,8 +17,10 @@ class QuestionSetViewTest(BaseTest):
         self.assign_permission_to(raj, 'can_view_investigators')
         self.client.login(username='demo8', password='demo8')
         self.qset = QuestionSet.objects.create(name="health", description="blabla")
+        self.rsp = ResponseValidation.objects.create(validation_test="validationtest",
+constraint_message="message")
         self.module = QuestionModule.objects.create(name="Education")
-        self.question_1 = QuestionTemplate.objects.create(module=self.module,variable_name='a',text='ttt',answer_type='Numerical Answer')
+        self.question_1 = QuestionTemplate.objects.create(module=self.module,variable_name='a',text='ttt',answer_type='Numerical Answer',response_validation=self.rsp)
         self.survey = Survey.objects.create(name="haha")
         self.batch = Batch.objects.create(order=1, name="Batch A", survey=self.survey)
     def test_get_new_question_set_module(self):

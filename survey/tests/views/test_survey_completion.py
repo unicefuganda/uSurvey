@@ -70,26 +70,26 @@ class TestSurveyCompletion(BaseTest):
                                                          gender='1', level_of_education='Primary',
                                                          language='Eglish', weights=0)
 
-        self.household_listing = HouseholdListing.objects.create(
-            ea=self.kampala_ea, list_registrar=self.investigator_1, initial_survey=self.survey)
-        self.household = Household.objects.create(house_number=123456, listing=self.household_listing, physical_address='Test address',
-                                                  last_registrar=self.investigator_1, registration_channel="ODK Access", head_desc="Head",
-                                                  head_sex='MALE')
-        self.household_listing_1 = HouseholdListing.objects.create(
-            ea=self.city_ea, list_registrar=self.investigator_2, initial_survey=self.survey)
-        self.household_1 = Household.objects.create(house_number=1234567, listing=self.household_listing_1, physical_address='Test address',
-                                                    last_registrar=self.investigator_2, registration_channel="ODK Access", head_desc="Head",
-                                                    head_sex='MALE')
-        self.survey_householdlisting = SurveyHouseholdListing.objects.create(
-            listing=self.household_listing, survey=self.survey)
-        self.member_1 = HouseholdMember.objects.create(surname="sur", first_name='fir', gender='MALE', date_of_birth="1988-01-01",
-                                                       household=self.household, survey_listing=self.survey_householdlisting,
-                                                       registrar=self.investigator_1, registration_channel="ODK Access")
-        self.survey_householdlisting_1 = SurveyHouseholdListing.objects.create(
-            listing=self.household_listing_1, survey=self.survey)
-        self.member_2 = HouseholdMember.objects.create(surname="sur1", first_name='fir1', gender='MALE', date_of_birth="1988-01-01",
-                                                       household=self.household_1, survey_listing=self.survey_householdlisting_1,
-                                                       registrar=self.investigator_2, registration_channel="ODK Access")
+        # self.household_listing = HouseholdListing.objects.create(
+        #     ea=self.kampala_ea, list_registrar=self.investigator_1, initial_survey=self.survey)
+        # self.household = Household.objects.create(house_number=123456, listing=self.household_listing, physical_address='Test address',
+        #                                           last_registrar=self.investigator_1, registration_channel="ODK Access", head_desc="Head",
+        #                                           head_sex='MALE')
+        # self.household_listing_1 = HouseholdListing.objects.create(
+        #     ea=self.city_ea, list_registrar=self.investigator_2, initial_survey=self.survey)
+        # self.household_1 = Household.objects.create(house_number=1234567, listing=self.household_listing_1, physical_address='Test address',
+        #                                             last_registrar=self.investigator_2, registration_channel="ODK Access", head_desc="Head",
+        #                                             head_sex='MALE')
+        # self.survey_householdlisting = SurveyHouseholdListing.objects.create(
+        #     listing=self.household_listing, survey=self.survey)
+        # self.member_1 = HouseholdMember.objects.create(surname="sur", first_name='fir', gender='MALE', date_of_birth="1988-01-01",
+        #                                                household=self.household, survey_listing=self.survey_householdlisting,
+        #                                                registrar=self.investigator_1, registration_channel="ODK Access")
+        # self.survey_householdlisting_1 = SurveyHouseholdListing.objects.create(
+        #     listing=self.household_listing_1, survey=self.survey)
+        # self.member_2 = HouseholdMember.objects.create(surname="sur1", first_name='fir1', gender='MALE', date_of_birth="1988-01-01",
+        #                                                household=self.household_1, survey_listing=self.survey_householdlisting_1,
+        #                                                registrar=self.investigator_2, registration_channel="ODK Access")
 
         self.batch = Batch.objects.create(
             order=1, name='somebatch', survey=self.survey)
