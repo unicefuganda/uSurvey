@@ -12,7 +12,7 @@ from survey.models.survey_listing import ListingQuestion, ListingTemplate, Rando
 from survey.models.survey_listing import CriterionTestArgument
 from survey.models.question_templates import QuestionTemplate
 from survey.models.generics import TemplateQuestion, TemplateOption
-from survey.models.respondents import ParameterTemplate, SurveyParameterList
+from survey.models.respondents import ParameterTemplate, SurveyParameterList, ParameterQuestion
 from survey.models.base import BaseModel
 from survey.models.batch import Batch, BatchLocationStatus, BatchChannel
 from survey.models.enumeration_area import EnumerationArea

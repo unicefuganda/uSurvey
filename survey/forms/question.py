@@ -234,8 +234,8 @@ def get_question_form(model_class):
                     # get the last question inline
                     # create a inline flow with current qset
                     qset = question.qset
-                    qset = QuestionSet.get(id=qset.id)
-                    if hasattr(qset, 'survey'):     # basically check for Batch scenario
+                    # qset = QuestionSet.get(id=qset.id)
+                    if hasattr(qset, 'survey'):     # basicallyy check for Batch scenario
                         SurveyParameterList.update_parameter_list(qset)
                     if self.prev_question:
                         last_question = self.prev_question

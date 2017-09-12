@@ -27,6 +27,7 @@ PROMPT_USER_LOOP = 'prompt_user_loop'
 INTERVIEW_PROMPT_ANSWER_FORM = 'specific_answer_form'
 PENDING_USER_ACTION = -1
 
+
 def get_display_format(request):
     request_data = request.GET if request.method == 'GET' else request.POST
     return request_data.get('format', 'html').lower()

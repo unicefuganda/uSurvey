@@ -8,7 +8,8 @@ from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 from survey.models import (QuestionModule, Interviewer,  EnumerationArea, QuestionTemplate, NumericalAnswer,
                            TextAnswer, MultiChoiceAnswer, DateAnswer, QuestionOption, Interview, ListingTemplate,
-                           Question, ODKAccess, Answer, SurveyAllocation, QuestionLoop)
+                           Question, ODKAccess, Answer, SurveyAllocation, QuestionLoop, ParameterTemplate,
+                           RespondentGroup)
 from survey.models.surveys import Survey
 from survey.models.questions import Question, QuestionFlow
 from survey.tests.base_test import BaseTest
@@ -237,6 +238,15 @@ class OnlineFlowsTest(BaseTest):
         response = self.client.post(interviewer_online_flow_url, data=answer_data)
         self.assertEqual(response.status_code, 200)
         self.assertEquals(response.context['template_file'], "interviews/completed.html")
+
+
+    def test_conditional_flow(self):
+        pass
+
+
+
+
+
 
 
 

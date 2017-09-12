@@ -21,8 +21,7 @@ def get_question_templates_form(model_class):
 
     class TemplateForm(ModelForm, FormOrderMixin):
 
-        options = forms.CharField(
-            max_length=50, widget=forms.HiddenInput(), required=False)
+        options = forms.CharField(max_length=50, widget=forms.HiddenInput(), required=False)
 
         def __init__(self, *args, **kwargs):
             super(TemplateForm, self).__init__(*args, **kwargs)

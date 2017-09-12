@@ -12,7 +12,7 @@ from survey.utils.views_helper import contains_key
 from survey.utils.query_helper import get_filterset
 
 
-@permission_required('auth.can_view_interviewers')
+@permission_required('auth.can_view_household_groups')
 def index(request):
     groups = RespondentGroup.objects.all()
     search_fields = ['name', 'description']

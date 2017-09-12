@@ -353,7 +353,7 @@ class QuestionSet(
 
     def inline_flows(self):
         return QuestionFlow.objects.filter(
-            question__qset=self,
+            question__qset__id=self.id,
             validation__isnull=True,
             next_question__isnull=False)
 
@@ -389,7 +389,6 @@ class QuestionSet(
     def questions_inline(self):
         qflows = self.inline_flows()
         start_question_id = None
-
         @cached_as(QuestionSet.objects.get(id=self.id),
                    Question.objects.filter(qset__id=self.id),
                    QuestionFlow.objects.filter(question__qset__id=self.id),
@@ -405,7 +404,6 @@ class QuestionSet(
                 return inlines
             else:
                 return []
-        #>import pdb; pdb.set_trace()
         return _questions_inline()
 
     def previous_inlines(self, question):
@@ -453,7 +451,10 @@ class QuestionSet(
     def flow_questions(self):
         # @cached_as(Question.objects.filter(qset__id=self.id)) # to find out best caching for this.
         def _flow_questions():
-            inline_ques = self.questions_inline()
+            # next line is to normalize to question set. Otherwise it seems to be causing some issues with flows
+            # since the flow is more native to Qset. Additional attributes in subclasses are just extras
+            qset = QuestionSet.get(id=self.id)
+            inline_ques = qset.questions_inline()
             OrderedSet(inline_ques)
             flow_questions = OrderedSet()
             for ques in inline_ques:

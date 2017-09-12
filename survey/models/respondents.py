@@ -102,7 +102,7 @@ class SurveyParameterList(
 
     @property
     def parameters(self):
-        return ParameterQuestion.objects.filter(qset=self)
+        return ParameterQuestion.objects.filter(qset__id=self.id)
 
     class Meta:
         app_label = 'survey'
