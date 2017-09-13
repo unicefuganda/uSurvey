@@ -194,14 +194,12 @@ class TemplateTagsTest(TestCase):
                          is_batch_open_for_location(open_locations, kampala))
 
     def test_condition(self):
-        condition = RespondentGroupCondition.objects.create(
-            attribute="AGE", value=2, condition="EQUALS")
-        self.assertEqual("EQUALS", condition.condition)
+        condition = RespondentGroupCondition.objects.create(validation_test="EQUALS",respondent_group_id   =1,test_question_id=1)
+        self.assertEqual("EQUALS", condition.validation_test)
 
     def test_quest_validation_opts(self):
-        batch = Batch.objects.create(order=1, name="Batch name")
-        condition = RespondentGroupCondition.objects.create(
-            attribute="AGE", value=2, condition="GREATER_THAN")
+        batch = Batch.objects.create(order=1, name="Batch name")        
+        condition = RespondentGroupCondition.objects.create(validation_test="EQUALS",respondent_group_id   =1,test_question_id=1)
 
     def test_ancestors_reversed_reversed(self):
         country = LocationType.objects.create(name='Country', slug='country')
