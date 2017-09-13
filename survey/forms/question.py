@@ -169,10 +169,11 @@ def get_question_form(model_class):
                 answer_type, options)
             self._strip_special_characters_for_ussd(text)
             self._prevent_duplicate_subquestions(text)
-            answer_class = Answer.get_class(answer_type)
-            validator_names = [validator.__name__ for validator in answer_class.validators()]
-            if response_validation and response_validation.validation_test not in validator_names:
-                raise ValidationError('Selected Validation is not compatible with chosen answer type')
+            if answer_type:
+                answer_class = Answer.get_class(answer_type)
+                validator_names = [validator.__name__ for validator in answer_class.validators()]
+                if response_validation and response_validation.validation_test not in validator_names:
+                    raise ValidationError('Selected Validation is not compatible with chosen answer type')
             return self.cleaned_data
 
         def _check__multichoice_and_options_compatibility(

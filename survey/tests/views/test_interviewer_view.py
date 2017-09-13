@@ -237,9 +237,13 @@ class InterviewerViewTest(BaseTest):
 
 
     def test_view_interviewer_details_when_no_such_interviewer_exists(self):
+        investigator = Interviewer.objects.create(name="Investigator",
+                                                       ea=self.ea,
+                                                       gender='1', level_of_education='Primary',
+                                                       language='Eglish', weights=0,date_of_birth='1987-01-01')
         url = reverse(
             'view_interviewer_page',
-            kwargs={"interviewer_id":  11111111111})
+            kwargs={"interviewer_id":  investigator.id})
         response = self.client.get(url)
         self.assertRedirects(response, expected_url=reverse('interviewers_page'))
         self.assertIn("Interviewer not found.", response.cookies['messages'].value)
