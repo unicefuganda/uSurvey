@@ -71,10 +71,10 @@ class IndicatorViewTest(BaseTest):
         self.assertEqual(response.context['button_label'], "Save")
 
     def test_post_edit_indicator_updates_and_returns_success(self):
+        survey = Survey.objects.create(name='survey')
         indicator = Indicator.objects.create(
             name='ITN1', survey=self.survey, question_set=self.qset, description="bla")        
-        survey = Survey.objects.create(name='Survey A')
-        self.survey = Survey.objects.create(name="Health survey")
+        #survey = Survey.objects.create(name='Survey A')        
         # self.batch = Batch.objects.create(name='Batch A', survey=survey)
         self.qset = QuestionSet.objects.create(name="qset",description="blahblah")
         # self.module = QuestionModule.objects.create(name="Health")
@@ -85,24 +85,24 @@ class IndicatorViewTest(BaseTest):
                           # 'batch': self.batch.id,
                           'survey': self.survey.id}
 
-        data = form_data.copy()
+        data = self.form_data.copy()
         del data['survey']
         self.failIf(Indicator.objects.filter(**data))
-        response = self.client.post(reverse('edit_indicator_page',kwargs={"indicator_id":indicator.id}), data=form_data)
+        response = self.client.post(reverse('edit_indicator_page',kwargs={"indicator_id":indicator.id}), data=self.form_data)
 
         self.failUnless(Indicator.objects.filter(
-            name=form_data['name'], description=form_data['description']))
+            name=self.form_data['name'], description=self.form_data['description']))
         self.assertRedirects(response, expected_url=reverse('list_indicator_page'))
         success_message = "Indicator successfully edited."
         self.assertIn(success_message, response.cookies['messages'].value)
 
     def test_post_edit_indicator_updates_and_returns_error(self):
+        survey = Survey.objects.create(name='survey')
         self.qset = QuestionSet.objects.create(name="qset",description="blahblah")
         # self.module = QuestionModule.objects.create(name="Health")
         # self.batch = Batch.objects.create(name='Batch A', survey=self.survey)
         indicator = Indicator.objects.create(
-            name='ITN1', survey=self.survey, question_set=self.qset, description="bla")
-        self.survey = Survey.objects.create(name="Health survey")
+            name='ITN1', survey=self.survey, question_set=self.qset, description="bla")        
         self.form_data = {
                           'name': 'Health',
                           'description': 'some description',
@@ -110,13 +110,13 @@ class IndicatorViewTest(BaseTest):
                           # 'batch': self.batch.id,
                           'survey': self.survey.id}
 
-        data = form_data.copy()
+        data = self.form_data.copy()
         del data['survey']
         self.failIf(Indicator.objects.filter(**data))
-        response = self.client.post(reverse('edit_indicator_page',kwargs={"indicator_id":indicator.id}), data=form_data)
+        response = self.client.post(reverse('edit_indicator_page',kwargs={"indicator_id":indicator.id}), data=self.form_data)
 
-        self.failIf(Indicator.objects.filter(name=form_data[
-                    'name'], description=form_data['description']))
+        self.failIf(Indicator.objects.filter(name=self.form_data[
+                    'name'], description=self.form_data['description']))
         self.failUnlessEqual(response.status_code, 200)
         error_message = "Indicator was not successfully edited."
         self.assertIn(error_message, response.content)
@@ -128,7 +128,7 @@ class IndicatorViewTest(BaseTest):
         response = self.client.post(reverse('new_indicator_page'), data=self.form_data)
         # self.failUnless(Indicator.objects.filter(**data))
         self.failUnless(Indicator.objects.filter(
-            name=form_data['name'], description=form_data['description']))
+            name=self.form_data['name'], description=self.form_data['description']))
         self.assertRedirects(response, reverse('list_indicator_page'), 302, 200)
         success_message = "Indicator successfully created."
         self.assertIn(success_message, response.cookies['messages'].value)
@@ -195,7 +195,7 @@ class IndicatorViewTest(BaseTest):
         self.assertIsInstance(
             response.context['indicator_filter_form'], IndicatorFilterForm)
         self.assertIn(indicator_s, response.context['indicators'])
-        self.assertEqual(1, len(response.context['indicators']))
+        self.assertEqual(3, len(response.context['indicators']))
         self.assertIn(indicator_s2, response.context['indicators'])
         self.assertIn(indicator, response.context['indicators'])
 
@@ -203,7 +203,7 @@ class IndicatorViewTest(BaseTest):
         survey = Survey.objects.create(name='survey')
         qset = QuestionSet.objects.create(name='qset',description='bla')
         # batch_s = Batch.objects.create(name='batch survey', survey=survey)
-        # module = QuestionModule.objects.create(name="module")
+        module = QuestionModule.objects.create(name="module")
         # module_1 = QuestionModule.objects.create(name="module")
         self.qset = QuestionSet.objects.create(name="qset",description="blahblah")
 
@@ -215,7 +215,7 @@ class IndicatorViewTest(BaseTest):
         response = self.client.get(
             reverse('list_indicator_page'), data={'survey': 'All', 'qustion_set': 'All', 'module': module.id})
         self.failUnlessEqual(response.status_code, 200)
-        self.assertEqual(1, len(response.context['indicators']))
+        self.assertEqual(2, len(response.context['indicators']))
         self.assertIn(indicator_1, response.context['indicators'])
         self.assertIn(indicator_2, response.context['indicators'])
 
@@ -276,7 +276,7 @@ class IndicatorViewTest(BaseTest):
                                                question_set=self.qset,
                                                survey=survey)
 
-        response = self.client.get(reverse('delete_indicator_page',kwargs={"indicator_id":indicator_1.id}),)
+        response = self.client.get(reverse('delete_indicator_page',kwargs={"indicator_id":indicator_1.id}))
         recovered_indicator = Indicator.objects.filter(id=indicator_1.id)
         self.assertRedirects(response, expected_url=reverse('list_indicator_page'), status_code=302,
                              target_status_code=200, msg_prefix='')

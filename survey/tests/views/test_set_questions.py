@@ -90,6 +90,8 @@ class SetQuestionViewTest(BaseTest):
     def test_new_subquestion(self):
         list_1 = ListingTemplate.objects.create(name="List A2")
         batch = QuestionSet.get(pk=list_1.id)
+        batch =  Batch.objects.create(name="batchname")
+        qset = QuestionSet.objects.create(name="qset", description="bla")
 
 
     def test_add_listing(self):
@@ -98,9 +100,9 @@ class SetQuestionViewTest(BaseTest):
         self.assertEquals(ListingTemplate.objects.count(), 1)
         self.assertEquals(ListingTemplate.objects.first().name, self.listing_data['name'])
     
-    def test_new_subquestion(self):
-        batch =  Batch.objects.create(name="batchname")
-        qset = QuestionSet.objects.create(name="qset", description="bla")
+    # def test_new_subquestion(self):
+    #     batch =  Batch.objects.create(name="batchname")
+    #     qset = QuestionSet.objects.create(name="qset", description="bla")
 
     def text_add_question_fails_if_id_has_space(self):
         self.test_add_listing()
@@ -175,3 +177,8 @@ class SetQuestionViewTest(BaseTest):
         self.assertEquals(question.answer_type, data['answer_type'])
         question_template = QuestionTemplate.objects.first()
         self.assertIn(create_sq_url, response.url)
+    def test_restricted_permissions(self):
+        self.assert_restricted_permission_for('/qset/questions/1/new/')
+        self.assert_restricted_permission_for('/qsets/2/questions/')        
+        self.assert_restricted_permission_for('/set_questions/1/edit/')        
+        self.assert_restricted_permission_for('/qset/questions/1/insert/')
