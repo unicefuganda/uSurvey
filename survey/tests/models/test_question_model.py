@@ -18,17 +18,18 @@ class QuestionTest(TestCase):
         fields = [str(item.attname) for item in ss_content._meta.fields]
         self.assertEqual(9, len(fields))
         for field in ['id','created','modified','identifier','text','answer_type','mandatory','qset_id','response_validation_id']:
-            self.assertIn(field, fields)
+            self.assertIn(field, fields)        
+class QuestionOptionTest(TestCase):
+    def test_unicode_text(self):
+        opt = QuestionOption.objects.create(text="module name", order=1)
+        self.assertEqual(opt.text, str(opt))
 
+    def test_fields(self):
         s_content = QuestionOption()
         fields = [str(item.attname) for item in s_content._meta.fields]
         self.assertEqual(6, len(fields))
         for field in ['id', 'created', 'modified', 'question_id', 'text', 'order']:
             self.assertIn(field, fields)
-class QuestionOptionTest(TestCase):
-    def test_unicode_text(self):
-        opt = QuestionOption.objects.create(text="module name")
-        self.assertEqual(opt.text, str(opt))
 class QuestionSetTest(TestCase):
     def test_unicode_text(self):
         qst = QuestionSet.objects.create(name="module name")

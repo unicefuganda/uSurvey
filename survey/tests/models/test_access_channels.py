@@ -20,7 +20,9 @@ class InterviewerAccessTest(TestCase):
         self.failUnless(access.interviewer)
         self.failUnless(access.duration)
     def setUp(self):
-        InterviewerAccess.objects.create(user_identifier="Identifier",duration='5')
+        # InterviewerAccess.objects.create(user_identifier="Identifier",duration='5')
+        interviewer = Interviewer.objects.create(name="Interviewer")
+        InterviewerAccess.objects.create(user_identifier="useridentifier",reponse_timeout=1,duration="123",interviewer_id=1)
     def test_backend(self):
         user_identifier = InterviewerAccess.objects.get(user_identifier="Identifier")
         duration = InterviewerAccess.objects.get(duration="5")        
@@ -30,10 +32,16 @@ class InterviewerAccessTest(TestCase):
         self.assertEqual(len(duration.duration),1)
     
     def test_unicode_text(self):
-        user_identifier = InterviewerAccess.objects.create(user_identifier="abc name")
+        interviewer = Interviewer.objects.create(name="Interviewer")
+        user_identifier = InterviewerAccess.objects.create(user_identifier="abc name", interviewer_id=1)
         self.assertEqual(user_identifier.user_identifier, str(user_identifier))
 
 class USSDAccessTest(TestCase):
+    def setUp(self):
+        interviewer = Interviewer.objects.create(name="Interviewer") 
+        intervieweraccess=InterviewerAccess.objects.create(user_identifier="useridentifier",reponse_timeout=1,duration="123",interviewer_id=interviewer.id)
+        USSDAccess.objects.create(aggregator="Dummy",interviewer_id=1)
+
     def test_fields(self):
         ussd = USSDAccess()
         fields = [str(item.attname) for item in ussd._meta.fields]
@@ -41,11 +49,10 @@ class USSDAccessTest(TestCase):
         for field in ['intervieweraccess_ptr_id', 'aggregator']:
             self.assertIn(field, fields)
     def test_store(self):
-        ussd = USSDAccess.objects.create(aggregator="blah blah")
+        ussd = USSDAccess.objects.create(aggregator="blah blah",interviewer_id=1)
         self.failUnless(ussd.intervieweraccess_ptr_id)
-        self.failUnless(ussd.aggregator)    
-    def setUp(self):
-        USSDAccess.objects.create(aggregator="Dummy")    
+        self.failUnless(ussd.aggregator)
+
     def test_content(self):
         aggregator = USSDAccess.objects.get(aggregator="Dummy")
         self.assertEqual(aggregator.aggregator,'Dummy')
@@ -64,7 +71,7 @@ class ODKAccessTest(TestCase):
         self.failUnless(odk_access.intervieweraccess_ptr_id)
         self.failUnless(odk_access.odk_token)
     def setUp(self):
-        ODKAccess.objects.create(odk_token="Dummy")    
+        ODKAccess.objects.create(odk_token="Dummy",interviewer_id=1)    
     def test_content(self):
         odk_token = ODKAccess.objects.get(odk_token="Dummy")
         self.assertEqual(odk_token.odk_token,'Dummy')
