@@ -40,3 +40,33 @@ class QuestionsViewsTest(BaseTest):
         self.assertEqual(DEFAULT_NUMBER_OF_QUESTION_DISPLAYED_PER_PAGE,
                          response.context['max_question_per_page'])
         self.assertIsNotNone(response.context['request'])
+
+
+    def test_question_filters(self):
+        search_fields = ['identifier', 'text', ]
+        list_1 = ListingTemplate.objects.create(name="ListA3")
+        batch = QuestionSet.get(pk=list_1.id)
+        q1 = Question.objects.create(identifier='123.1', text="This is a question123.1", answer_type='Numerical Answer',
+                                                  qset_id=list_1.id, response_validation_id=1)
+        
+        response = self.client.get(reverse('qset_questions_page', kwargs={'qset_id':list_1.id}))
+        q = 'q2'
+        qset_questions = batch.questions.all()
+        filter_result = get_filterset(qset_questions, q, search_fields)
+        #self.assertIn(list_1, filter_result)
+        response = self.client.get("%s?q=ListA3"%(reverse('qset_questions_page', kwargs={'qset_id':list_1.id})))
+        self.assertEqual(200, response.status_code)
+        response = self.client.get("%s?q=ListA3&question_types=Numerical Answer"%(reverse('qset_questions_page', kwargs={'qset_id':list_1.id})))
+        self.assertEqual(200, response.status_code)
+
+    def test_new_subquestion(self):
+        survey_obj = Survey.objects.create(
+            name='survey name', description='survey descrpition')
+        batch_obj = Batch.objects.create(
+            order=1, name="Batch A", survey=survey_obj)
+
+        
+        list_1 = ListingTemplate.objects.create(name="List A9")
+        qset = QuestionSet.get(pk=list_1.id)
+        response = self.client.get(reverse('add_qset_subquestion_page', kwargs={"batch_id" : qset.id}))
+        self.assertIn(response.status_code,[200,302])
