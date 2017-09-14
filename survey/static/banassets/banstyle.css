@@ -53,7 +53,7 @@
 }
 
 .sp-slideshow input + label {
-    border: 3px solid rgba(255, 255, 255, 0.9);
+    /*border: 3px solid rgba(255, 255, 255, 0.9);*/
     border-radius: 50%;
     bottom: 15px;
     display: block;
@@ -73,8 +73,8 @@
     transition: background-color linear 0.1s;
 }
 .sp-slideshow input:checked + label {
-    background-color: yellow;
-    border: 3px solid yellow;
+    /*background-color: yellow;
+    border: 3px solid yellow;*/
 }
 
 .sp-selector-1, .button-label-1 {
@@ -120,17 +120,17 @@
 .sp-selector-2:checked ~ .sp-arrow.sp-a3,
 .sp-selector-3:checked ~ .sp-arrow.sp-a4,
 .sp-selector-4:checked ~ .sp-arrow.sp-a5 {
-    right: 15px;
+    /*right: 15px;
 	display: block;
-	background-position: top right;
+	background-position: top right;*/
 }
 .sp-selector-2:checked ~ .sp-arrow.sp-a1,
 .sp-selector-3:checked ~ .sp-arrow.sp-a2,
 .sp-selector-4:checked ~ .sp-arrow.sp-a3,
 .sp-selector-5:checked ~ .sp-arrow.sp-a4 {
-    left: 15px;
+    /*left: 15px;
 	display: block;
-	background-position: top left;
+	background-position: top left;*/
 }
 
 .sp-slideshow input:checked ~ .sp-content {
