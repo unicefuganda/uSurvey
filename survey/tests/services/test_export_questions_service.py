@@ -32,10 +32,10 @@ constraint_message="message")
     def test_exports_all_questions_with_normal_group(self):
 
         question1 = "%s; %s; %s" % (
-            self.question1.text, self.question1.qset_id.name, self.question1.answer_type.upper())
+            self.question1.text, self.question1.qset_id, self.question1.answer_type.upper())
         question2 = "%s; %s; %s" % (
-            self.question2.text, self.question2.qset_id.name, self.question2.answer_type.upper())
-        question3_1 = "%s; %s; %s; %s" % (self.question3.text, self.question3.qset_id.name,
+            self.question2.text, self.question2.qset_id, self.question2.answer_type.upper())
+        question3_1 = "%s; %s; %s; %s" % (self.question3.text, self.question3.qset_id,
                                           self.question3.answer_type.upper(), self.option1.text)
         question3_2 = "; ; ; %s" % (self.option2.text)
         question3_3 = "; ; ; %s" % (self.option3.text)
@@ -49,13 +49,13 @@ constraint_message="message")
         self.assertIn(str(expected_data[0]), actual_data)
 
     def test_exports_all_questions_in_a_batch(self):
-        self.create_questions_not_in_batch()
+        # self.create_questions_not_in_batch()
 
         question1 = "%s; %s; %s" % (
-            self.question1.text, self.question1.qset_id.name, self.question1.answer_type.upper())
+            self.question1.text, self.question1.qset_id, self.question1.answer_type.upper())
         question2 = "%s; %s; %s" % (
-            self.question2.text, self.question2.qset_id.name, self.question2.answer_type.upper())
-        question3_1 = "%s; %s; %s; %s" % (self.question3.text, self.question3.qset_id.name,
+            self.question2.text, self.question2.qset_id, self.question2.answer_type.upper())
+        question3_1 = "%s; %s; %s; %s" % (self.question3.text, self.question3.qset_id,
                                           self.question3.answer_type.upper(), self.option1.text)
         question3_2 = "; ; ; %s" % (self.option2.text)
         question3_3 = "; ; ; %s" % (self.option3.text)
