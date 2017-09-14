@@ -72,19 +72,19 @@ class LocationHierarchyFormTest(TestCase):
     #     self.assertIn(message, details_formset.forms[
     #                   0].errors['length_of_code'])
 
-    def test_form_set_has_error_if_level_field_is_empty(self):
-        DetailsFormSet = formset_factory(
-            LocationDetailsForm, formset=BaseArticleFormSet)
+    # def test_form_set_has_error_if_level_field_is_empty(self):
+    #     DetailsFormSet = formset_factory(
+    #         LocationDetailsForm, formset=BaseArticleFormSet)
 
-        data = {'form-0-levels': '', 'form-MAX_NUM_FORMS': '1000', 'form-0-required': 'on',
-                'form-TOTAL_FORMS': '1', 'form-0-length_of_code': '', 'form-INITIAL_FORMS': '0'}
+    #     data = {'form-0-levels': '', 'form-MAX_NUM_FORMS': '1000', 'form-0-required': 'on',
+    #             'form-TOTAL_FORMS': '1', 'form-0-length_of_code': '', 'form-INITIAL_FORMS': '0'}
 
-        details_formset = DetailsFormSet(data, prefix='form')
-        message = "field cannot be empty."
+    #     details_formset = DetailsFormSet(data, prefix='form')
+    #     message = "field cannot be empty."
 
-        self.assertFalse(details_formset.is_valid())
+    #     self.assertFalse(details_formset.is_valid())
 
-        self.assertIn(message, details_formset.forms[0].errors['levels'])
+    #     self.assertIn(message, details_formset.forms[0].errors['levels'])
 
     # def test_should_show_used_country_as_available_choices_if_any_otherwise_show_all_countries(self):
     #     LocationType.objects.all().delete()

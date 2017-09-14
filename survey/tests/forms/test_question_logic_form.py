@@ -23,7 +23,7 @@ class LogicFormTest(TestCase):
     def test_correct_validators_is_applied_as_per_question_answer_type(self):
         answer_types = Answer.supported_answers()  # different types of questions
         for answer_type in answer_types:
-            q = Question.objects.create(qset_id=self.qset, response_validation_id=self.rsp, batch=self.batch,
+            q = Question.objects.create(qset_id=self.qset.id, response_validation_id=1,
                                         identifier=answer_type.choice_name(), text='test',
                                         answer_type=answer_type.choice_name())
             l = LogicForm(q)
@@ -37,7 +37,7 @@ class LogicFormTest(TestCase):
             # q = Question.objects.create(group=self.group, module=self.module, batch=self.batch,
             #                             identifier=answer_type, text='test', answer_type=answer_type)
             q = Question.objects.create(identifier=answer_type, text="text", answer_type=answer_type,
-                                                qset_id=self.qset, batch=self.batch,response_validation_id=self.rsp)
+                                                qset_id=self.qset.id, response_validation_id=1)
             l = LogicForm(q)
             self.assertTrue(l.fields.get('option'))
 
@@ -48,7 +48,7 @@ class LogicFormTest(TestCase):
                 # q = Question.objects.create(group=self.group, module=self.module, batch=self.batch,
                 #                             identifier=answer_type, text='test', answer_type=answer_type)
                 q = Question.objects.create(identifier=answer_type, text="text", answer_type=answer_type,
-                                                qset_id=self.qset, batch=self.batch,response_validation_id=self.rsp)
+                                                qset_id=self.qset.id, response_validation_id=1)
                 l = LogicForm(q)
                 self.assertFalse(l.fields.get('option'))
 
@@ -57,19 +57,17 @@ class LogicFormTest(TestCase):
 
         :return:
         '''
-        q1 = Question.objects.create(qset_id=self.qset, response_validation_id=self.rsp, batch=self.batch,
-                                     identifier='test1',
-                                     text='test1', answer_type=NumericalAnswer.choice_name())
-        q2 = Question.objects.create(qset_id=self.qset, response_validation_id=self.rsp, batch=self.batch,
+        q1 = Question.objects.create(qset_id=self.qset.id, response_validation_id=1,identifier='test1',text='test1', answer_type=NumericalAnswer.choice_name())
+        q2 = Question.objects.create(qset_id=self.qset.id, response_validation_id=1,
                                      identifier='test2',
                                      text='test2', answer_type=NumericalAnswer.choice_name())
-        q3 = Question.objects.create(qset_id=self.qset, response_validation_id=self.rsp, batch=self.batch,
+        q3 = Question.objects.create(qset_id=self.qset.id, response_validation_id=1,
                                      identifier='test3',
                                      text='test3', answer_type=NumericalAnswer.choice_name())
-        q4 = Question.objects.create(qset_id=self.qset, response_validation_id=self.rsp, batch=self.batch,
+        q4 = Question.objects.create(qset_id=self.qset.id, response_validation_id=1,
                                      identifier='test4',
                                      text='test4', answer_type=NumericalAnswer.choice_name())
-        q5 = Question.objects.create(qset_id=self.qset, response_validation_id=self.rsp, batch=self.batch,
+        q5 = Question.objects.create(qset_id=self.qset.id, response_validation_id=1,
                                      identifier='test5',
                                      text='test5', answer_type=NumericalAnswer.choice_name())
         test_condition = NumericalAnswer.validators()[0].__name__
@@ -81,10 +79,10 @@ class LogicFormTest(TestCase):
             'value': test_param
         }
         self.batch.start_question = q1
-        QuestionFlow.objects.create(question=q1, next_question=q2)
-        QuestionFlow.objects.create(question=q2, next_question=q3)
-        QuestionFlow.objects.create(question=q3, next_question=q4)
-        QuestionFlow.objects.create(question=q4, next_question=q5)
+        QuestionFlow.objects.create(question_id=q1.id, next_question_id=q2.id)
+        QuestionFlow.objects.create(question_id=q2.id, next_question_id=q3.id)
+        QuestionFlow.objects.create(question_id=q3.id, next_question_id=q4.id)
+        QuestionFlow.objects.create(question_id=q4.id, next_question_id=q5.id)
         l = LogicForm(q1, data=form_data)
         if l.is_valid():
             l.save()
@@ -92,7 +90,7 @@ class LogicFormTest(TestCase):
             # created
             try:
                 qf = QuestionFlow.objects.get(
-                    question=q1, next_question=q4, validation_test=test_condition)
+                    question_id=q1.id, next_question_id=q4.id)
                 TextArgument.objects.get(flow=qf, param=test_param)
                 self.assertTrue(True)
                 return
@@ -111,24 +109,24 @@ class LogicFormTest(TestCase):
 
         :return:
         '''
-        q1 = Question.objects.create(qset_id=self.qset, response_validation_id=self.rsp, batch=self.batch,
+        q1 = Question.objects.create(qset_id=self.qset.id, response_validation_id=1,
                                      identifier='test1',
                                      text='test1', answer_type=TextAnswer.choice_name())
-        q2 = Question.objects.create(qset_id=self.qset, response_validation_id=self.rsp, batch=self.batch,
+        q2 = Question.objects.create(qset_id=self.qset.id, response_validation_id=1,
                                      identifier='test2',
                                      text='test2', answer_type=TextAnswer.choice_name())
-        q3 = Question.objects.create(qset_id=self.qset, response_validation_id=self.rsp, batch=self.batch,
+        q3 = Question.objects.create(qset_id=self.qset.id, response_validation_id=1,
                                      identifier='test3',
                                      text='test3', answer_type=TextAnswer.choice_name())
-        q4 = Question.objects.create(qset_id=self.qset, response_validation_id=self.rsp, batch=self.batch,
+        q4 = Question.objects.create(qset_id=self.qset, response_validation_id=1,
                                      identifier='test4',
                                      text='test4', answer_type=TextAnswer.choice_name())
-        q5 = Question.objects.create(qset_id=self.qset, response_validation_id=self.rsp, batch=self.batch,
+        q5 = Question.objects.create(qset_id=self.qset, response_validation_id=1,
                                      identifier='test5',
                                      text='test5', answer_type=TextAnswer.choice_name())
         self.batch.start_question = q1
-        QuestionFlow.objects.create(question=q1, next_question=q3)
-        QuestionFlow.objects.create(question=q3, next_question=q5)
+        QuestionFlow.objects.create(question_id=q1.id, next_question_id=q3.id)
+        QuestionFlow.objects.create(question_id=q3.id, next_question_id=q5.id)
         test_condition = TextAnswer.validators()[0].__name__
         test_param = 'Hey you!!'
         form_data = {
@@ -144,10 +142,10 @@ class LogicFormTest(TestCase):
             # created
             try:
                 qf = QuestionFlow.objects.get(
-                    question=q1, next_question=q4, validation_test=test_condition)
+                    question_id=q1.id, next_question_id=q4.id)
                 TextArgument.objects.get(flow=qf, param=test_param)
                 qf = QuestionFlow.objects.get(
-                    question=q1, next_question=q3, validation_test__isnull=True)
+                    question_id=q1.id, next_question_id=q3.id)
                 self.assertTrue(True)
                 return
             except QuestionFlow.DoesNotExist:
@@ -165,24 +163,24 @@ class LogicFormTest(TestCase):
 
         :return:
         '''
-        q1 = Question.objects.create(qset_id=self.qset, response_validation_id=self.rsp, batch=self.batch,
+        q1 = Question.objects.create(qset_id=self.qset.id, response_validation_id=1,
                                      identifier='test1',
                                      text='test1', answer_type=TextAnswer.choice_name())
-        q2 = Question.objects.create(qset_id=self.qset, response_validation_id=self.rsp, batch=self.batch,
+        q2 = Question.objects.create(qset_id=self.qset.id, response_validation_id=1,
                                      identifier='test2',
                                      text='test2', answer_type=TextAnswer.choice_name())
-        q3 = Question.objects.create(qset_id=self.qset, response_validation_id=self.rsp, batch=self.batch,
+        q3 = Question.objects.create(qset_id=self.qset.id, response_validation_id=1,
                                      identifier='test3',
                                      text='test3', answer_type=TextAnswer.choice_name())
-        q4 = Question.objects.create(qset_id=self.qset, response_validation_id=self.rsp, batch=self.batch,
+        q4 = Question.objects.create(qset_id=self.qset.id, response_validation_id=1,
                                      identifier='test4',
                                      text='test4', answer_type=TextAnswer.choice_name())
-        q5 = Question.objects.create(qset_id=self.qset, response_validation_id=self.rsp, batch=self.batch,
+        q5 = Question.objects.create(qset_id=self.qset.id, response_validation_id=1,
                                      identifier='test5',
                                      text='test5', answer_type=TextAnswer.choice_name())
         self.batch.start_question = q1
-        QuestionFlow.objects.create(question=q1, next_question=q3)
-        QuestionFlow.objects.create(question=q3, next_question=q5)
+        QuestionFlow.objects.create(question_id=q1.id, next_question_id=q3.id)
+        QuestionFlow.objects.create(question_id=q3.id, next_question_id=q5.id)
         test_condition = TextAnswer.validators()[0].__name__
         test_param = 'Hey you!!'
         form_data = {
@@ -198,10 +196,10 @@ class LogicFormTest(TestCase):
             # created
             try:
                 qf = QuestionFlow.objects.get(
-                    question=q1, next_question=q4, validation_test=test_condition)
+                    question_id=q1.id, next_question_id=q4.id)
                 TextArgument.objects.get(flow=qf, param=test_param)
                 qf = QuestionFlow.objects.get(
-                    question=q1, next_question=q3, validation_test__isnull=True)
+                    question_id=q1.id, next_question_id=q3.id)
                 self.assertTrue(True)
                 return
             except QuestionFlow.DoesNotExist:
@@ -219,26 +217,26 @@ class LogicFormTest(TestCase):
 
         :return:
         '''
-        q1 = Question.objects.create(qset_id=self.qset, response_validation_id=self.rsp, batch=self.batch,
+        q1 = Question.objects.create(qset_id=self.qset.id, response_validation_id=1,
                                      identifier='test1',
                                      text='test1', answer_type=DateAnswer.choice_name())
-        q2 = Question.objects.create(qset_id=self.qset, response_validation_id=self.rsp, batch=self.batch,
+        q2 = Question.objects.create(qset_id=self.qset.id, response_validation_id=1,
                                      identifier='test2',
                                      text='test2', answer_type=DateAnswer.choice_name())
-        q3 = Question.objects.create(qset_id=self.qset, response_validation_id=self.rsp, batch=self.batch,
+        q3 = Question.objects.create(qset_id=self.qset.id, response_validation_id=1,
                                      identifier='test3',
                                      text='test3', answer_type=DateAnswer.choice_name())
-        q4 = Question.objects.create(qset_id=self.qset, response_validation_id=self.rsp, batch=self.batch,
+        q4 = Question.objects.create(qset_id=self.qset.id, response_validation_id=1,
                                      identifier='test4',
                                      text='test4', answer_type=DateAnswer.choice_name())
-        q5 = Question.objects.create(qset_id=self.qset, response_validation_id=self.rsp, batch=self.batch,
+        q5 = Question.objects.create(qset_id=self.qset.id, response_validation_id=1,
                                      identifier='test5',
                                      text='test5', answer_type=DateAnswer.choice_name())
         self.batch.start_question = q1
-        QuestionFlow.objects.create(question=q1, next_question=q2)
-        QuestionFlow.objects.create(question=q2, next_question=q3)
-        QuestionFlow.objects.create(question=q3, next_question=q4)
-        QuestionFlow.objects.create(question=q4, next_question=q5)
+        QuestionFlow.objects.create(question_id=q1.id, next_question_id=q2.id)
+        QuestionFlow.objects.create(question_id=q2.id, next_question_id=q3.id)
+        QuestionFlow.objects.create(question_id=q3.id, next_question_id=q4.id)
+        QuestionFlow.objects.create(question_id=q4.id, next_question_id=q5.id)
         test_condition = 'between'
         test_param_upper = datetime.now()
         test_param_lower = datetime.now() - timedelta(days=3)
@@ -255,15 +253,15 @@ class LogicFormTest(TestCase):
             # created
             try:
                 qf = QuestionFlow.objects.get(
-                    question=q2, next_question=q2, validation_test=test_condition)
+                    question_id=q2.id, next_question_id=q2.id)
                 TextArgument.objects.get(
                     flow=qf, position=0, param=test_param_lower)
                 TextArgument.objects.create(
                     flow=qf, position=1, param=test_param_upper)
                 QuestionFlow.objects.get(
-                    question=q1, next_question=q2, validation_test__isnull=True)
+                    question_id=q1.id, next_question_id=q2.id)
                 QuestionFlow.objects.get(
-                    question=q2, next_question=q3, validation_test__isnull=True)
+                    question_id=q2.id, next_question_id=q3.id)
                 self.assertTrue(True)
                 return
             except QuestionFlow.DoesNotExist:
@@ -283,28 +281,28 @@ class LogicFormTest(TestCase):
         '''
         yes = 'yes'
         no = 'no'
-        q1 = Question.objects.create(qset_id=self.qset, response_validation_id=self.rsp, batch=self.batch,
+        q1 = Question.objects.create(qset_id=self.qset.id, response_validation_id=1,
                                      identifier='test1',
                                      text='test1', answer_type=DateAnswer.choice_name())
-        q2 = Question.objects.create(qset_id=self.qset, response_validation_id=self.rsp, batch=self.batch,
+        q2 = Question.objects.create(qset_id=self.qset.id, response_validation_id=1,
                                      identifier='test2',
                                      text='test2', answer_type=MultiChoiceAnswer.choice_name())
-        q_o1 = QuestionOption.objects.create(question=q2, text=yes, order=1)
-        QuestionOption.objects.create(question=q2, text=no, order=2)
-        q3 = Question.objects.create(qset_id=self.qset, response_validation_id=self.rsp, batch=self.batch,
+        q_o1 = QuestionOption.objects.create(question_is=q2.id, text=yes, order=1)
+        QuestionOption.objects.create(question_id=q2.id, text=no, order=2)
+        q3 = Question.objects.create(qset_id=self.qset.id, response_validation_id=1,
                                      identifier='test3',
                                      text='test3', answer_type=DateAnswer.choice_name())
-        q4 = Question.objects.create(qset_id=self.qset, response_validation_id=self.rsp, batch=self.batch,
+        q4 = Question.objects.create(qset_id=self.qset.id, response_validation_id=1,
                                      identifier='test4',
                                      text='test4', answer_type=DateAnswer.choice_name())
-        q5 = Question.objects.create(qset_id=self.qset, response_validation_id=self.rsp, batch=self.batch,
+        q5 = Question.objects.create(qset_id=self.qset.id, response_validation_id=1,
                                      identifier='test5',
                                      text='test5', answer_type=DateAnswer.choice_name())
         self.batch.start_question = q1
-        QuestionFlow.objects.create(question=q1, next_question=q2)
-        QuestionFlow.objects.create(question=q2, next_question=q3)
-        QuestionFlow.objects.create(question=q3, next_question=q4)
-        QuestionFlow.objects.create(question=q4, next_question=q5)
+        QuestionFlow.objects.create(question_id=q1.id, next_question_id=q2.id)
+        QuestionFlow.objects.create(question_id=q2.id, next_question_id=q3.id)
+        QuestionFlow.objects.create(question_id=q3.id, next_question_id=q4.id)
+        QuestionFlow.objects.create(question_id=q4.id, next_question_id=q5.id)
         test_condition = MultiChoiceAnswer.validators()[0].__name__
         form_data = {
             'action': LogicForm.END_INTERVIEW,
@@ -318,12 +316,12 @@ class LogicFormTest(TestCase):
             # created
             try:
                 qf = QuestionFlow.objects.get(
-                    question=q2, next_question__isnull=True, validation_test=test_condition)
+                    question_id=q2.id, next_question_id__isnull=True)
                 TextArgument.objects.get(flow=qf, position=0, param=q_o1.order)
                 QuestionFlow.objects.get(
-                    question=q1, next_question=q2, validation_test__isnull=True)
+                    question_id=q1.id, next_question_id=q2.id)
                 QuestionFlow.objects.get(
-                    question=q2, next_question=q3, validation_test__isnull=True)
+                    question_id=q2.id, next_question_id=q3.id)
                 self.assertTrue(True)
                 return
             except QuestionFlow.DoesNotExist:
@@ -341,19 +339,19 @@ class LogicFormTest(TestCase):
 
         :return:
         '''
-        q1 = Question.objects.create(qset_id=self.qset, response_validation_id=self.rsp, batch=self.batch,
+        q1 = Question.objects.create(qset_id=self.qset.id, response_validation_id=1,
                                      identifier='test1',
                                      text='test1', answer_type=NumericalAnswer.choice_name())
-        q2 = Question.objects.create(qset_id=self.qset, response_validation_id=self.rsp, batch=self.batch,
+        q2 = Question.objects.create(qset_id=self.qset.id, response_validation_id=1,
                                      identifier='test2',
                                      text='test2', answer_type=NumericalAnswer.choice_name())
-        q3 = Question.objects.create(qset_id=self.qset, response_validation_id=self.rsp, batch=self.batch,
+        q3 = Question.objects.create(qset_id=self.qset.id, response_validation_id=1,
                                      identifier='test3',
                                      text='test3', answer_type=NumericalAnswer.choice_name())
-        q4 = Question.objects.create(qset_id=self.qset, response_validation_id=self.rsp, batch=self.batch,
+        q4 = Question.objects.create(qset_id=self.qset.id, response_validation_id=1,
                                      identifier='test4',
                                      text='test4', answer_type=NumericalAnswer.choice_name())
-        q5 = Question.objects.create(qset_id=self.qset, response_validation_id=self.rsp, batch=self.batch,
+        q5 = Question.objects.create(qset_id=self.qset.id, response_validation_id=1,
                                      identifier='test5',
                                      text='test5', answer_type=NumericalAnswer.choice_name())
         test_condition = NumericalAnswer.validators()[0].__name__
@@ -365,10 +363,10 @@ class LogicFormTest(TestCase):
             'value': test_param
         }
         self.batch.start_question = q1
-        QuestionFlow.objects.create(question=q1, next_question=q2)
-        QuestionFlow.objects.create(question=q2, next_question=q3)
-        QuestionFlow.objects.create(question=q3, next_question=q4)
-        QuestionFlow.objects.create(question=q4, next_question=q5)
+        QuestionFlow.objects.create(question_id=q1.id, next_question_id=q2.id)
+        QuestionFlow.objects.create(question_id=q2.id, next_question_id=q3.id)
+        QuestionFlow.objects.create(question_id=q3.id, next_question_id=q4.id)
+        QuestionFlow.objects.create(question_id=q4.id, next_question_id=q5.id)
         l = LogicForm(q1, data=form_data)
         if l.is_valid():
             l.save()
@@ -376,7 +374,7 @@ class LogicFormTest(TestCase):
             # created
             try:
                 qf = QuestionFlow.objects.get(
-                    question=q1, next_question=q4, validation_test=test_condition)
+                    question_id=q1.id, next_question_id=q4.id)
                 TextArgument.objects.get(flow=qf, param=test_param)
                 self.assertTrue(False, 'completely wrong. value saved as good')
                 return
@@ -395,26 +393,26 @@ class LogicFormTest(TestCase):
 
         :return:
         '''
-        q1 = Question.objects.create(qset_id=self.qset, response_validation_id=self.rsp, batch=self.batch,
+        q1 = Question.objects.create(qset_id=self.qset.id, response_validation_id=1,
                                      identifier='test1',
                                      text='test1', answer_type=DateAnswer.choice_name())
-        q2 = Question.objects.create(qset_id=self.qset, response_validation_id=self.rsp, batch=self.batch,
+        q2 = Question.objects.create(qset_id=self.qset.id, response_validation_id=1,
                                      identifier='test2',
                                      text='test2', answer_type=DateAnswer.choice_name())
-        q3 = Question.objects.create(qset_id=self.qset, response_validation_id=self.rsp, batch=self.batch,
+        q3 = Question.objects.create(qset_id=self.qset.id, response_validation_id=1,
                                      identifier='test3',
                                      text='test3', answer_type=DateAnswer.choice_name())
-        q4 = Question.objects.create(qset_id=self.qset, response_validation_id=self.rsp, batch=self.batch,
+        q4 = Question.objects.create(qset_id=self.qset.id, response_validation_id=1,
                                      identifier='test4',
                                      text='test4', answer_type=DateAnswer.choice_name())
-        q5 = Question.objects.create(qset_id=self.qset, response_validation_id=self.rsp, batch=self.batch,
+        q5 = Question.objects.create(qset_id=self.qset.id, response_validation_id=1,
                                      identifier='test5',
                                      text='test5', answer_type=DateAnswer.choice_name())
         self.batch.start_question = q1
-        QuestionFlow.objects.create(question=q1, next_question=q2)
-        QuestionFlow.objects.create(question=q2, next_question=q3)
-        QuestionFlow.objects.create(question=q3, next_question=q4)
-        QuestionFlow.objects.create(question=q4, next_question=q5)
+        QuestionFlow.objects.create(question_id=q1.id, next_question_id=q2.id)
+        QuestionFlow.objects.create(question_id=q2.id, next_question_id=q3.id)
+        QuestionFlow.objects.create(question_id=q3.id, next_question_id=q4.id)
+        QuestionFlow.objects.create(question_id=q4.id, next_question_id=q5.id)
         test_condition = 'between'
         test_param_upper = 'now()'
         test_param_lower = datetime.now() - timedelta(days=3)
@@ -431,15 +429,15 @@ class LogicFormTest(TestCase):
             # created
             try:
                 qf = QuestionFlow.objects.get(
-                    question=q2, next_question=q2, validation_test=test_condition)
+                    question_id=q2.id, next_question_id=q2.id)
                 TextArgument.objects.get(
                     flow=qf, position=0, param=test_param_lower)
                 TextArgument.objects.create(
                     flow=qf, position=1, param=test_param_upper)
                 QuestionFlow.objects.get(
-                    question=q1, next_question=q2, validation_test__isnull=True)
+                    question_id=q1.id, next_question_id=q2.id)
                 QuestionFlow.objects.get(
-                    question=q2, next_question=q3, validation_test__isnull=True)
+                    question_id=q2.id, next_question_id=q3.id)
                 self.assertTrue(
                     False, 'completely wrong. bad values was saved as good!!')
                 return
@@ -458,26 +456,26 @@ class LogicFormTest(TestCase):
 
         :return:
         '''
-        q1 = Question.objects.create(qset_id=self.qset, response_validation_id=self.rsp, batch=self.batch,
+        q1 = Question.objects.create(qset_id=self.qset.id, response_validation_id=1,
                                      identifier='test1',
                                      text='test1', answer_type=DateAnswer.choice_name())
-        q2 = Question.objects.create(qset_id=self.qset, response_validation_id=self.rsp, batch=self.batch,
+        q2 = Question.objects.create(qset_id=self.qset.id, response_validation_id=1,
                                      identifier='test2',
                                      text='test2', answer_type=DateAnswer.choice_name())
-        q3 = Question.objects.create(qset_id=self.qset, response_validation_id=self.rsp, batch=self.batch,
+        q3 = Question.objects.create(qset_id=self.qset.id, response_validation_id=1,
                                      identifier='test3',
                                      text='test3', answer_type=DateAnswer.choice_name())
-        q4 = Question.objects.create(qset_id=self.qset, response_validation_id=self.rsp, batch=self.batch,
+        q4 = Question.objects.create(qset_id=self.qset.id, response_validation_id=1,
                                      identifier='test4',
                                      text='test4', answer_type=DateAnswer.choice_name())
-        q5 = Question.objects.create(qset_id=self.qset, response_validation_id=self.rsp, batch=self.batch,
+        q5 = Question.objects.create(qset_id=self.qset.id, response_validation_id=1,
                                      identifier='test5',
                                      text='test5', answer_type=DateAnswer.choice_name())
         self.batch.start_question = q1
-        QuestionFlow.objects.create(question=q1, next_question=q2)
-        QuestionFlow.objects.create(question=q2, next_question=q3)
-        QuestionFlow.objects.create(question=q3, next_question=q4)
-        QuestionFlow.objects.create(question=q4, next_question=q5)
+        QuestionFlow.objects.create(question_id=q1.id, next_question_id=q2.id)
+        QuestionFlow.objects.create(question_id=q2.id, next_question_id=q3.id)
+        QuestionFlow.objects.create(question_id=q3.id, next_question_id=q4.id)
+        QuestionFlow.objects.create(question_id=q4.id, next_question_id=q5.id)
         test_condition = 'between'
         test_param_upper = datetime.now()
         test_param_lower = 'some time ago'
@@ -494,15 +492,15 @@ class LogicFormTest(TestCase):
             # created
             try:
                 qf = QuestionFlow.objects.get(
-                    question=q2, next_question=q2, validation_test=test_condition)
+                    question_id=q2.id, next_question_id=q2.id)
                 TextArgument.objects.get(
                     flow=qf, position=0, param=test_param_lower)
                 TextArgument.objects.create(
                     flow=qf, position=1, param=test_param_upper)
                 QuestionFlow.objects.get(
-                    question=q1, next_question=q2, validation_test__isnull=True)
+                    question_id=q1.id, next_question_id=q2.id)
                 QuestionFlow.objects.get(
-                    question=q2, next_question=q3, validation_test__isnull=True)
+                    question_id=q2.id, next_question_id=q3.id)
                 self.assertTrue(
                     False, 'completely wrong. bad values was saved as good!!')
                 return
