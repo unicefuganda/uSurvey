@@ -42,6 +42,13 @@ class InterviewerTest(TestCase):
         self.assertEqual(itr.name, str(itr))
 class SurveyAllocationTest(TestCase):
 
+    # def test_unicode_text(self):
+    #     sua = SurveyAllocation.objects.create(allocation_ea="abcd name")
+    #     self.assertEqual(sua.allocation_ea.name, str(sua))
     def test_unicode_text(self):
-        sua = SurveyAllocation.objects.create(allocation_ea="abcd name")
+        # sua = SurveyAllocation.objects.create(allocation_ea="abcd name")
+        self.survey = Survey.objects.create(name="sai",has_sampling=True,sample_size=1)
+        self.interviewer = Interviewer.objects.create(name="raju",gender="male",is_blocked=True,weights=20)
+        self.enumerationarea = EnumerationArea.objects.create(name="anushka")
+        sua = SurveyAllocation.objects.create(status=1,allocation_ea_id=self.enumerationarea.id,interviewer_id=self.interviewer.id,survey_id=self.survey.id)
         self.assertEqual(sua.allocation_ea.name, str(sua))
