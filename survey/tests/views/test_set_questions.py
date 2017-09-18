@@ -44,15 +44,7 @@ class SetQuestionViewTest(BaseTest):
         response = self.client.get(reverse('listing_template_home'))
         self.assertEqual(200, response.status_code)
         response = self.client.get(reverse('qset_questions_page', kwargs={'qset_id':list_1.id}))
-        self.assertEqual(200, response.status_code)
-        # templates = [ template.name for template in response.templates ]
-        # self.assertIn('set_questions/index.html', templates)
-
-        # self.assertIn(survey_1, response.context['surveys'])
-        # self.assertIn(survey_2, response.context['surveys'])
-        # self.assertIsNotNone(response.context['request'])
-        # self.assertIsInstance(response.context['survey_form'], SurveyForm)
-    
+        self.assertEqual(200, response.status_code)    
     def test_add_question(self):
         list_1 = ListingTemplate.objects.create(name="List A2")
         batch = QuestionSet.get(pk=list_1.id)        
@@ -106,7 +98,7 @@ class SetQuestionViewTest(BaseTest):
         response = self.client.get(reverse('add_qset_subquestion_page', kwargs={"batch_id" : qset.id}))
         self.assertIn(response.status_code,[200,302])
         templates = [ template.name for template in response.templates ]
-        self.assertIn('set_questions/_add_question.html', templates)
+        self.assertIn('set_questions/logic.html', templates)
         module_obj = QuestionModule.objects.create(name='test')
         qset_obj = QuestionSet.objects.create(name="Females")
         rsp_obj = ResponseValidation.objects.create(validation_test="validationtest",constraint_message="message")
@@ -121,11 +113,11 @@ class SetQuestionViewTest(BaseTest):
         
 
     def test_get_sub_questions_for_question(self):
-        list_1 = ListingTemplate.objects.create(name="List A2")
+        list_1 = ListingTemplate.objects.create(name="List A2")        
         qset = QuestionSet.get(pk=list_1.id)
         q_obj = Question.objects.create(identifier='123.1', text="This is a question123.1", answer_type='Numerical Answer',
                                                   qset_id=qset.id, response_validation_id=1)
-        response = self.client.get(reverse('questions_subquestion_json_page', kwargs={"question_id" : q_obj.id}))
+        response = self.client.get(reverse('questions_subquestion_json_page', kwargs={"question_id" : list_1.id}))
         self.assertIn(response.status_code,[200,302])
     
     def test_add_listing(self):
