@@ -54,9 +54,9 @@ class QuestionsViewsTest(BaseTest):
             name='survey name', description='survey descrpition')
         batch_obj = Batch.objects.create(
             order=1, name="BatchBC", survey=survey_obj)
-        #list_1 = ListingTemplate.objects.create(name="List A15")        
-        #qset = QuestionSet.get(pk=list_1.id)
-        qset = QuestionSet.get(id=batch_id)
+        list_1 = ListingTemplate.objects.create(name="List A15")        
+        qset = QuestionSet.get(pk=list_1.id)
+        # qset = QuestionSet.get(id=batch_obj.id)
         q1 = Question.objects.create(identifier='123.1', text="This is a question123.1", answer_type='Numerical Answer',
                                                   qset_id=list_1.id, response_validation_id=1)
         response = self.client.get(reverse('batch_questions_page', kwargs={"batch_id" : list_1.id}))
@@ -87,17 +87,17 @@ class QuestionsViewsTest(BaseTest):
         batch_obj = Batch.objects.create(
             order=1, name="BatchDC", survey=survey_obj)
         search_fields = ['identifier', 'text', ]
-        list_1 = ListingTemplate.objects.create(name="ListA6")
+        list_1 = ListingTemplate.objects.create(name="ListB10")
         batch = QuestionSet.get(pk=list_1.id)
         q1 = Question.objects.create(identifier='123.1', text="This is a question123.1", answer_type='Numerical Answer',
                                                   qset_id=list_1.id, response_validation_id=1)
         
-        response = self.client.get(reverse('batch_questions_page', kwargs={'batch_id':batch_obj.id}))
+        response = self.client.get(reverse('batch_questions_page', kwargs={'batch_id':list_1.id}))
         q = 'q3'
         batch_questions = batch.questions.all()
         filter_result = get_filterset(batch_questions, q, search_fields)
         #self.assertIn(list_1, filter_result)
         response = self.client.get("%s?q=ListA6"%(reverse('batch_questions_page', kwargs={'batch_id':batch_obj.id})))
         self.assertEqual(200, response.status_code)
-        response = self.client.get("%s?q=ListA6&question_types=Numerical Answer"%(reverse('batch_questions_page', kwargs={'batch_id':batch_obj.id})))
+        response = self.client.get("%s?q=ListB10&question_types=Numerical Answer"%(reverse('batch_questions_page', kwargs={'batch_id':batch_obj.id})))
         self.assertEqual(200, response.status_code)
