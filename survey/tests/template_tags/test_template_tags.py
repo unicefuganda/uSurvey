@@ -100,8 +100,11 @@ class TemplateTagsTest(TestCase):
         self.assertEqual('1, 2', add_string('1', '2'))
 
     def test_concat_strings(self):
-        arg = 'a b c'
-        self.assertEqual(arg, " ".join(["a","b","c"]))
+        arg = "abc"
+        self.assertEqual('abc', arg)
+    def test_condition_text(self):        
+        self.assertEqual('EQUALS', condition_text('EQUALS'))
+        self.assertEqual('', condition_text('abv'))
 
     def test_should_return_repeated_string(self):
         self.assertEqual('000', repeat_string('0', 4))
