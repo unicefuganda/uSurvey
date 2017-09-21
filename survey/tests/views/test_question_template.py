@@ -1,7 +1,11 @@
 from django.test.client import Client
 from django.contrib.auth.models import User
 from survey.models.batch import Batch
-from survey.models import QuestionTemplate, Survey, QuestionModule, Batch
+from django.core.urlresolvers import reverse
+from survey.models import (QuestionModule, Interviewer,  EnumerationArea, QuestionTemplate, NumericalAnswer,
+                           TextAnswer, MultiChoiceAnswer, DateAnswer, QuestionOption, Interview, ListingTemplate,
+                           ODKAccess, Question, QuestionSet,Batch, ResponseValidation, Survey)
+from survey.models import QuestionTemplate, Survey, QuestionModule, Batch, ResponseValidation
 
 from survey.tests.base_test import BaseTest
 
@@ -15,8 +19,9 @@ class QuestionsTemplateViewsTest(BaseTest):
         raj = self.assign_permission_to(User.objects.create_user('demo9', 'demo9@kant.com', 'demo9'),
                                         'can_view_batches')
         self.client.login(username='demo9', password='demo9')
-        self.module = QuestionModule.objects.create(name="Education")
-        self.question_1 = QuestionTemplate.objects.create(module=self.module,variable_name='a',text='ttt',answer_type='Numerical Answer')
+        self.rsp = ResponseValidation.objects.create(validation_test="validation",constraint_message="msg")
+        self.module = QuestionModule.objects.create(name="Education",description="bla blaaa")
+        self.question_1 = QuestionTemplate.objects.create(module_id=self.module.id,identifier='1.1',text='ttt',answer_type='Numerical Answer',response_validation_id=1)
 
     def test_index(self):
         response = self.client.get(reverse('show_question_library'))

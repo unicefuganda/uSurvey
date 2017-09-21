@@ -29,7 +29,7 @@ class ListingViewTest(BaseTest):
         self.form_data = {
             'name': 'survey demo6',
             'description': 'listing description demo6',
-            'access_channels': 'Odk Access'
+            # 'access_channels': 'Odk Access'
         }
 
     def test_add_listing(self):
@@ -49,8 +49,8 @@ class ListingViewTest(BaseTest):
 
 
     def test_view_Listing_list(self):
-        list_1 = ListingTemplate.objects.create(name="List A", access_channels='Odk Access')
-        list_2 = ListingTemplate.objects.create(name="List B", access_channels='USSD Access')
+        list_1 = ListingTemplate.objects.create(name="List A")
+        list_2 = ListingTemplate.objects.create(name="List B")
         response = self.client.get(reverse('listing_template_home'))
         self.assertEqual(200, response.status_code)
         templates = [template.name for template in response.templates]
@@ -100,7 +100,7 @@ class ListingViewTest(BaseTest):
         self.assertIn(reverse('edit_listing_template_page', kwargs={'qset_id':listing.id}), response.context['action'])
 
     def test_edit_should_post_should_edit_the_listing(self):
-        listing = ListingTemplate.objects.create(**self.form_data)
+        listing = ListingTemplate.objects.create(name="sudh",description="desc")
         self.failUnless(listing)
         form_data = self.form_data
         form_data['name'] = 'edited_name'
@@ -146,6 +146,7 @@ class ListingViewTest(BaseTest):
         self.assert_restricted_permission_for(url)
         url =reverse('new_listing_template_page')
         self.assert_restricted_permission_for(url)
+        listing = ListingTemplate.objects.create(**self.form_data)
         url =reverse('edit_listing_template_page', kwargs={'qset_id':listing.id})
         self.assert_restricted_permission_for(url)
         url = reverse('delete_listing_template',kwargs={"qset_id":500})
@@ -153,7 +154,7 @@ class ListingViewTest(BaseTest):
 
 
     def test_add_listing_question(self):
-        list_1 = ListingTemplate.objects.create(name="List A1", access_channels='Odk Access')
+        list_1 = ListingTemplate.objects.create(name="List A1")
         response = self.client.get(reverse('new_qset_question_page', kwargs={'qset_id':list_1.id}))
         self.assertEqual(200, response.status_code)
         templates = [template.name for template in response.templates]
@@ -173,7 +174,7 @@ class ListingViewTest(BaseTest):
 
 
     def test_new_should_create_listing_question_on_post(self):
-        list_1 = ListingTemplate.objects.create(name="List A2", access_channels='Odk Access')
+        list_1 = ListingTemplate.objects.create(name="List A2")
         batch = QuestionSet.get(pk=list_1)
         form_data = {'identifier':'i_1',
         'text':'blah blah',
