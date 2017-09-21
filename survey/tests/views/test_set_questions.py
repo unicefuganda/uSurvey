@@ -11,6 +11,7 @@ from survey.models import (QuestionModule, Interviewer,  EnumerationArea, Questi
 from survey.utils.query_helper import get_filterset
 from survey.tests.base_test import BaseTest
 
+
 class SetQuestionViewTest(BaseTest):
 
     def setUp(self):
@@ -18,7 +19,7 @@ class SetQuestionViewTest(BaseTest):
         self.listing_data = {'name': 'test-listing', 'access_channels': [ODKAccess.choice_name(), ], }
 
         self.questions_data = []
-        self.rsp = ResponseValidation.objects.create(validation_test="validationtest",constraint_message="message")
+        self.rsp = ResponseValidation.objects.create(validation_test="validationtest", constraint_message="message")
         # create a inline flows for this listing
         for answer_class in [NumericalAnswer, TextAnswer, DateAnswer, MultiChoiceAnswer]:
             self.questions_data.append({'text': 'text: %s' % answer_class.choice_name(),
@@ -38,73 +39,53 @@ class SetQuestionViewTest(BaseTest):
             'description': 'listing description demo6',
         }
 
-
     def test_view_questions_list(self):
         list_1 = ListingTemplate.objects.create(**self.listing_form_data)
         response = self.client.get(reverse('listing_template_home'))
         self.assertEqual(200, response.status_code)
         response = self.client.get(reverse('qset_questions_page', kwargs={'qset_id':list_1.id}))
         self.assertEqual(200, response.status_code)
-        # templates = [ template.name for template in response.templates ]
-        # self.assertIn('set_questions/index.html', templates)
-
-        # self.assertIn(survey_1, response.context['surveys'])
-        # self.assertIn(survey_2, response.context['surveys'])
-        # self.assertIsNotNone(response.context['request'])
-        # self.assertIsInstance(response.context['survey_form'], SurveyForm)
     
     def test_add_question(self):
         list_1 = ListingTemplate.objects.create(name="List A2")
         batch = QuestionSet.get(pk=list_1.id)        
         qset1 = QuestionSet.objects.create(name="dummy", description="bla bla")
-        response = self.client.get(reverse('qset_questions_page', kwargs={'qset_id':list_1.id}))
+        response = self.client.get(reverse('qset_questions_page', kwargs={'qset_id': list_1.id}))
         self.assertEqual(200, response.status_code)
-        templates = [ template.name for template in response.templates ]
+        templates = [template.name for template in response.templates]
         self.assertIn('set_questions/index.html', templates)
         self.assertNotIn('Add Question', response.context['title'])        
         self.assertNotIn(reverse('qset_questions_page', kwargs={'qset_id':list_1.id}), response.context['action'])
     
-    def test_question_doesnotexist(self):
-        response = self.client.get(reverse('qset_questions_page', kwargs={'qset_id':99999}))
-        self.assertEqual(404, response.status_code)       
-        try:
-            qf = QuestionSet.objects.get(name="dummy1", description="bla bla")
-            self.assertTrue(True)
-        except QuestionSet.DoesNotExist as e:
-            self.assertFalse(False)
-            self.assertEquals(str(e),"QuestionSet matching query does not exist.")
-            pass
+    def test_questionset_doesnotexist(self):
+        response = self.client.get(reverse('qset_questions_page', kwargs={'qset_id': 99999}))
+        self.assertEqual(404, response.status_code)
+
     def test_question_filters(self):
         search_fields = ['identifier', 'text', ]
         list_1 = ListingTemplate.objects.create(name="ListA3")
         batch = QuestionSet.get(pk=list_1.id)
         q1 = Question.objects.create(identifier='123.1', text="This is a question123.1", answer_type='Numerical Answer',
                                                   qset_id=list_1.id, response_validation_id=1)
-        
         response = self.client.get(reverse('qset_questions_page', kwargs={'qset_id':list_1.id}))
         q = 'q2'
         qset_questions = batch.questions.all()
         filter_result = get_filterset(qset_questions, q, search_fields)
-        #self.assertIn(list_1, filter_result)
         response = self.client.get("%s?q=ListA3"%(reverse('qset_questions_page', kwargs={'qset_id':list_1.id})))
         self.assertEqual(200, response.status_code)
-        response = self.client.get("%s?q=ListA3&question_types=Numerical Answer"%(reverse('qset_questions_page', kwargs={'qset_id':list_1.id})))
+        response = self.client.get("%s?q=ListA3&question_types=Numerical Answer"%(reverse('qset_questions_page',
+                                                                                          kwargs={'qset_id':list_1.id})))
         self.assertEqual(200, response.status_code)
 
-
-
-    
     def test_new_subquestion(self):
         survey_obj = Survey.objects.create(
             name='survey name', description='survey descrpition')
         batch_obj = Batch.objects.create(
             order=1, name="Batch A", survey=survey_obj)
-
-        
         list_1 = ListingTemplate.objects.create(name="List A9")
         qset = QuestionSet.get(pk=list_1.id)
         response = self.client.get(reverse('add_qset_subquestion_page', kwargs={"batch_id" : qset.id}))
-        self.assertIn(response.status_code,[200,302])
+        self.assertIn(response.status_code, [200, 302])
         templates = [ template.name for template in response.templates ]
         self.assertIn('set_questions/_add_question.html', templates)
         module_obj = QuestionModule.objects.create(name='test')
@@ -112,13 +93,9 @@ class SetQuestionViewTest(BaseTest):
         rsp_obj = ResponseValidation.objects.create(validation_test="validationtest",constraint_message="message")
         data = {"qset_id" :qset_obj.id,  "identifier" : '', "text": "hello","answer_type":'',"response_validation_id":1 }
         response = self.client.post(reverse('add_qset_subquestion_page', kwargs={"batch_id" : qset.id}),data=data)
-        print response.status_code
-        self.assertIn(response.status_code,[200,302])
-        print response.context
+        self.assertIn(response.status_code, [200, 302])
         self.client.post(reverse('add_qset_subquestion_page', kwargs={"batch_id" : batch_obj.id}),data={})
-        print response.content
-        self.assertIn(response.status_code,[200,302])
-        
+        self.assertIn(response.status_code, [200, 302])
 
     def test_get_sub_questions_for_question(self):
         list_1 = ListingTemplate.objects.create(name="List A2")
@@ -126,17 +103,13 @@ class SetQuestionViewTest(BaseTest):
         q_obj = Question.objects.create(identifier='123.1', text="This is a question123.1", answer_type='Numerical Answer',
                                                   qset_id=qset.id, response_validation_id=1)
         response = self.client.get(reverse('questions_subquestion_json_page', kwargs={"question_id" : q_obj.id}))
-        self.assertIn(response.status_code,[200,302])
+        self.assertIn(response.status_code, [200, 302])
     
     def test_add_listing(self):
         create_qset_url = reverse('new_%s_page' % ListingTemplate.resolve_tag())
         response = self.client.post(create_qset_url, data=self.listing_data)
         self.assertEquals(ListingTemplate.objects.count(), 1)
         self.assertEquals(ListingTemplate.objects.first().name, self.listing_data['name'])
-    
-    # def test_new_subquestion(self):
-    #     batch =  Batch.objects.create(name="batchname")
-    #     qset = QuestionSet.objects.create(name="qset", description="bla")
 
     def text_add_question_fails_if_id_has_space(self):
         self.test_add_listing()
@@ -211,6 +184,7 @@ class SetQuestionViewTest(BaseTest):
         self.assertEquals(question.answer_type, data['answer_type'])
         question_template = QuestionTemplate.objects.first()
         self.assertIn(create_sq_url, response.url)
+
     def test_restricted_permissions(self):
         self.assert_restricted_permission_for('/qset/questions/1/new/')
         self.assert_restricted_permission_for('/qsets/2/questions/')        
