@@ -363,7 +363,7 @@ urlpatterns = patterns(
     # url(
     # r'^batches/(?P<batch_id>\d+)/questions/(?P<question_id>\d+)/delete/$',
     # 'survey.views.questions.delete', name='delete_batch_question_page'),
-    # """
+    # """""""
     url(
         r'^batches/(?P<batch_id>\d+)/questions/(?P<question_id>\d+)/remove/$',
         'survey.views.questions.remove',
