@@ -275,22 +275,22 @@ urlpatterns = patterns(
         r'^batches/(?P<batch_id>\d+)/update_question_orders/$',
         'survey.views.batch.update_orders',
         name='update_question_order_page'),
-    url(
-        r'^batches/(?P<batch_id>\d+)/questions/$',
-        'survey.views.questions.index',
-        name='batch_questions_page'),
+    # url(
+    #     r'^batches/(?P<batch_id>\d+)/questions/$',
+    #     'survey.views.questions.index',
+    #     name='batch_questions_page'),
     url(
         r'^qsets/(?P<qset_id>\d+)/questions/$',
         'survey.views.set_questions.index',
         name='qset_questions_page'),
-    url(
-        r'^batches/(?P<batch_id>\d+)/submit_questions/$',
-        'survey.views.questions.submit',
-        name='batch_questions_submission'),
-    url(
-        r'^batches/(?P<batch_id>\d+)/questions/export/$',
-        'survey.views.questions.export_batch_questions',
-        name='export_questions_in_batch'),
+    # url(
+    #     r'^batches/(?P<batch_id>\d+)/submit_questions/$',
+    #     'survey.views.questions.submit',
+    #     name='batch_questions_submission'),
+    # url(
+    #     r'^batches/(?P<batch_id>\d+)/questions/export/$',
+    #     'survey.views.questions.export_batch_questions',
+    #     name='export_questions_in_batch'),
     url(
         r'^qset/(?P<qset_id>\d+)/questions/export/$',
         'survey.views.set_questions.export_batch_questions',
@@ -315,25 +315,25 @@ urlpatterns = patterns(
         r'^batches/(?P<batch_id>\d+)/close_to$',
         'survey.views.batch.close',
         name='batch_close_page'),
-    url(
-        r'^batches/(?P<batch_id>\d+)/questions/(?P<question_id>\d+)/add_logic/$',
-        'survey.views.questions.add_logic',
-        name='add_question_logic_page'),
+    # url(
+    #     r'^batches/(?P<batch_id>\d+)/questions/(?P<question_id>\d+)/add_logic/$',
+    #     'survey.views.questions.add_logic',
+    #     name='add_question_logic_page'),
     url(
         r'^qsets/(?P<qset_id>\d+)/questions/(?P<question_id>\d+)/add_logic/$',
         'survey.views.set_questions.add_logic',
         name='add_qset_question_logic_page'),
-    url(
-        r'^batches/questions/delete_logic/(?P<flow_id>\d+)/$',
-        'survey.views.questions.delete_logic',
-        name='delete_question_logic_page'),
+    # url(
+    #     r'^batches/questions/delete_logic/(?P<flow_id>\d+)/$',
+    #     'survey.views.questions.delete_logic',
+    #     name='delete_question_logic_page'),
     url(
         r'^qset/questions/delete_logic/(?P<flow_id>\d+)/$',
         'survey.views.set_questions.delete_logic',
         name='delete_qset_question_logic_page'),
     url(
         r'^batches/(?P<batch_id>\d+)/questions/(?P<question_id>\d+)/questions_json/$',
-        'survey.views.questions.get_questions_for_batch',
+        'survey.views.set_questions.get_questions_for_batch',
         name='batch_questions_json_page'),
     url(
         r'^response_validation/create/$',
@@ -347,27 +347,27 @@ urlpatterns = patterns(
         r'^get_answer_validations/$',
         'survey.views.set_questions.get_answer_validations',
         name='get_answer_validations'),
-    url(
-        r'^batches/(?P<batch_id>\d+)/questions/sub_questions/new/$',
-        'survey.views.questions.new_subquestion',
-        name='add_batch_subquestion_page'),
+    # url(
+    #     r'^batches/(?P<batch_id>\d+)/questions/sub_questions/new/$',
+    #     'survey.views.questions.new_subquestion',
+    #     name='add_batch_subquestion_page'),
     url(
         r'^qset/batches/(?P<batch_id>\d+)/questions/sub_questions/new/$',
         'survey.views.set_questions.new_subquestion',
         name='add_qset_subquestion_page'),
     url(
         r'^batches/(?P<batch_id>\d+)/questions/(?P<question_id>\d+)/sub_questions/edit/$',
-        'survey.views.questions.edit_subquestion',
+        'survey.views.set_questions.edit_subquestion',
         name='edit_batch_subquestion_page'),
     # """
     # url(
     # r'^batches/(?P<batch_id>\d+)/questions/(?P<question_id>\d+)/delete/$',
     # 'survey.views.questions.delete', name='delete_batch_question_page'),
     # """""""
-    url(
-        r'^batches/(?P<batch_id>\d+)/questions/(?P<question_id>\d+)/remove/$',
-        'survey.views.questions.remove',
-        name='remove_question_page'),
+    # url(
+    #     r'^batches/(?P<batch_id>\d+)/questions/(?P<question_id>\d+)/remove/$',
+    #     'survey.views.questions.remove',
+    #     name='remove_question_page'),
 
     url(
         r'^qset/batches/questions/(?P<question_id>\d+)/remove/$',
@@ -592,10 +592,10 @@ urlpatterns = patterns(
     # url(r'^questions/(?P<question_id>\d+)/sub_questions/new/$', 'survey.views.questions.new_subquestion', name='add_subquestion_page'),
     # url(r'^questions/(?P<question_id>\d+)/sub_questions/edit/$', 'survey.views.questions.edit_subquestion', name='edit_subquestion_page'),
     # """
-    url(
-        r'^questions/(?P<batch_id>\d+)/new/$',
-        'survey.views.questions.new',
-        name='new_batch_question_page'),
+    # url(
+    #     r'^questions/(?P<batch_id>\d+)/new/$',
+    #     'survey.views.questions.new',
+    #     name='new_batch_question_page'),
     url(
         r'^qset/questions/(?P<qset_id>\d+)/new/$',
         'survey.views.set_questions.new',
@@ -608,10 +608,10 @@ urlpatterns = patterns(
         r'^qset/questions/(?P<question_id>\d+)/loop/$',
         'survey.views.set_questions.manage_loop',
         name='loop_qset_question_page'),
-    url(
-        r'^question_set/(?P<qset_id>\d+)/questions/$',
-        'survey.views.questions.index',
-        name='set_questions_index_page'),
+    # url(
+    #     r'^question_set/(?P<qset_id>\d+)/questions/$',
+    #     'survey.views.questions.index',
+    #     name='set_questions_index_page'),
     url(
         r'^qset/view_data/(?P<qset_id>\d+)/$',
         'survey.views.question_set.view_data',
@@ -666,25 +666,25 @@ urlpatterns = patterns(
         r'^listing_form/sampling_criteria/(?P<id>\d+)/$',
         'survey.views.survey_listing.index',
         name='sampling_criteria'),
-    url(
-        r'^questions/(?P<question_id>\d+)/edit/$',
-        'survey.views.questions.edit',
-        name='edit_question_page'),
+    # url(
+    #     r'^questions/(?P<question_id>\d+)/edit/$',
+    #     'survey.views.questions.edit',
+    #     name='edit_question_page'),
     url(
         r'^set_questions/(?P<question_id>\d+)/edit/$',
         'survey.views.set_questions.edit',
         name='qset_edit_question_page'),
     url(
         r'^questions/(?P<question_id>\d+)/sub_questions_json/$',
-        'survey.views.questions.get_sub_questions_for_question',
+        'survey.views.set_questions.get_sub_questions_for_question',
         name='questions_subquestion_json_page'),
     url(
         r'^questions/(?P<question_id>\d+)/prev_questions_json/$',
-        'survey.views.questions.get_prev_questions_for_question',
+        'survey.views.set_questions.get_prev_questions_for_question',
         name='prev_inline_questions_json_page'),
     url(
         r'^questions/(?P<question_id>\d+)/delete/$',
-        'survey.views.questions.delete',
+        'survey.views.set_questions.delete',
         name='delete_question_page'),
 
     url(
