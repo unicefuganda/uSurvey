@@ -1,5 +1,6 @@
 python-Levenshtein
 Django==1.8.1
+gunicorn
 psycopg2==2.5
 django-nose==1.4
 sure==1.2.3
