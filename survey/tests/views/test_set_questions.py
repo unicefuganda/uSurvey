@@ -251,6 +251,17 @@ constraint_message="message")
                                                   qset_id=qset.id, response_validation_id=1)
         response = self.client.get(reverse('delete_question_page', kwargs={"question_id" : list_1.id}))
         self.assertIn(response.status_code,[200,302])
+    def test_edit_subquestion(self):
+        survey_obj = Survey.objects.create(
+            name='survey name2', description='survey descrpition2')
+        batch_obj = Batch.objects.create(
+            order=1, name="Batch A2", survey=survey_obj) 
+        list_1 = ListingTemplate.objects.create(name="List b5")        
+        qset = QuestionSet.get(pk=list_1.id)
+        q_obj = Question.objects.create(identifier='id_5', text="This is a question123.9", answer_type='Numerical Answer',
+                                                  qset_id=qset.id, response_validation_id=1)
+        response = self.client.get(reverse('edit_batch_subquestion_page', kwargs={"batch_id" : batch_obj.id,"question_id":q_obj.id}))
+        self.assertIn(response.status_code,[200,302])
     def test_get_questions_for_batch(self):
         survey_obj = Survey.objects.create(
             name='survey name1', description='survey descrpition1')
