@@ -23,6 +23,10 @@ constraint_message="message")
         self.question_1 = QuestionTemplate.objects.create(module=self.module,variable_name='a',text='ttt',answer_type='Numerical Answer',response_validation=self.rsp)
         self.survey = Survey.objects.create(name="haha")
         self.batch = Batch.objects.create(order=1, name="Batch A", survey=self.survey)
+        self.form_data = {
+            'name': 'test listing1 q2',
+            'description': 'listing description demo9',
+        }
     def test_get_new_question_set_module(self):
         health_module = QuestionSet.objects.create(name="health")
         response = self.client.get('qset/questions/%s/new/' % health_module.id)
@@ -42,7 +46,7 @@ constraint_message="message")
     def test_delete_should_delete_the_question(self):
         qset = QuestionSet.objects.create(**self.form_data)
         self.survey = Survey.objects.create(name="haha")
-        batch = Batch.objects.create(order=1, name="Batch A", survey=self.survey)
+        batch = Batch.objects.create(order=1, name="Batch B", survey=self.survey)
         self.failUnless(qset)
         response = self.client.get('/qset/delete/%d/batch/%d/' % qset.id,batch.id)
         self.assertRedirects(response, reverse('qset_questions_page'), status_code=302,
