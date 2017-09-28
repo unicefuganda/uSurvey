@@ -19,7 +19,7 @@ Installation Instructions
 
 * Execute the following commands from your installation directory:
 
-        git clone https://github.com/unicefuganda/uSurvey.git
+        git clone https://github.com/unicefuganda/uSurvey.git origin dev
 
         cd uSurvey/mics
 
