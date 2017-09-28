@@ -19,9 +19,11 @@ Installation Instructions
 
 * Execute the following commands from your installation directory:
 
-        git clone https://github.com/unicefuganda/uSurvey.git origin dev
+        git clone https://github.com/unicefuganda/uSurvey.git
 
         cd uSurvey/mics
+
+        git checkout dev
 
         cp travis-settings.py localsettings.py
         (adjust localsettings.py for db and test_db setup)
