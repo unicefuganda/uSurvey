@@ -25,9 +25,14 @@ Installation Instructions
 
         git clone https://github.com/unicefuganda/uSurvey.git
 
+* Switch to dev branch (most recent changes are here. Merge with main branch is in progress)
+
+        cd uSurvey
+        git checkout dev
+
 * Go to mics folder in uSurvey 
 
-        cd uSurvey/mics
+        cd mics
 
 * Copy customized settings in localsettings.py 
 
