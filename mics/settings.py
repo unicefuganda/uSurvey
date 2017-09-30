@@ -20,10 +20,10 @@ MANAGERS = ADMINS
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql_psycopg2",
-        "NAME": os.getenv('USURVEY_DB', 'usurvey'),
+        "NAME": os.getenv('USURVEY_DB', 'postgres'),
         "USER": os.getenv('USURVEY_DB_USER', 'postgres'),
-        "PASSWORD": os.getenv('USURVEY_DB_PASS', 'postgres'),
-        "HOST": os.getenv('USURVEY_DB_HOST', ''),
+        "PASSWORD": os.getenv('USURVEY_DB_PASS', ''),
+        "HOST": os.getenv('USURVEY_DB_HOST', 'localhost'),
     }
 
 }

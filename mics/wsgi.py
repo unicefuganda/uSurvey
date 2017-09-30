@@ -22,8 +22,8 @@ from django.core.wsgi import get_wsgi_application
 from django.conf import settings
 
 application = get_wsgi_application()
-application = WhiteNoise(application, root=settings.STATIC_ROOT)
+#application = WhiteNoise(application, root=settings.STATIC_ROOT)
 
 
-if settings.STATICFILES_DIRS:
-    application.add_files(os.pathsep.join(settings.STATICFILES_DIRS))
+#if settings.STATICFILES_DIRS:
+#    application.add_files(os.pathsep.join(settings.STATICFILES_DIRS))

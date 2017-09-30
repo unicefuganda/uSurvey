@@ -11,9 +11,7 @@ services:
       - USURVEY_DB
       - USURVEY_DB_USER
       - USURVEY_DB_PASS
-    build:
-      context: .
-      dockerfile: ./Dockerfile
+    image: antsmc2/usurvey
     command: gunicorn -b 0.0.0.0:8080 --workers=8 --max-requests 1000 --timeout 120 mics.wsgi
     depends_on:
       - redis_server

@@ -275,36 +275,18 @@ urlpatterns = patterns(
         r'^batches/(?P<batch_id>\d+)/update_question_orders/$',
         'survey.views.batch.update_orders',
         name='update_question_order_page'),
-<<<<<<< HEAD
     url(
         r'^batches/(?P<batch_id>\d+)/questions/$',
         'survey.views.set_questions.index',
         name='batch_questions_page'),
-=======
-    # url(
-    #     r'^batches/(?P<batch_id>\d+)/questions/$',
-    #     'survey.views.questions.index',
-    #     name='batch_questions_page'),
->>>>>>> 0c11fa6c1696d0352db3bcd531ddc28874535ea0
     url(
         r'^qsets/(?P<qset_id>\d+)/questions/$',
         'survey.views.set_questions.index',
         name='qset_questions_page'),
-<<<<<<< HEAD
     url(
         r'^batches/(?P<batch_id>\d+)/questions/export/$',
         'survey.views.set_questions.export_batch_questions',
         name='export_questions_in_batch'),
-=======
-    # url(
-    #     r'^batches/(?P<batch_id>\d+)/submit_questions/$',
-    #     'survey.views.questions.submit',
-    #     name='batch_questions_submission'),
-    # url(
-    #     r'^batches/(?P<batch_id>\d+)/questions/export/$',
-    #     'survey.views.questions.export_batch_questions',
-    #     name='export_questions_in_batch'),
->>>>>>> 0c11fa6c1696d0352db3bcd531ddc28874535ea0
     url(
         r'^qset/(?P<qset_id>\d+)/questions/export/$',
         'survey.views.set_questions.export_batch_questions',
@@ -329,32 +311,18 @@ urlpatterns = patterns(
         r'^batches/(?P<batch_id>\d+)/close_to$',
         'survey.views.batch.close',
         name='batch_close_page'),
-<<<<<<< HEAD
     url(
         r'^batches/(?P<batch_id>\d+)/questions/(?P<question_id>\d+)/add_logic/$',
         'survey.views.set_questions.add_logic',
         name='add_question_logic_page'),
-=======
-    # url(
-    #     r'^batches/(?P<batch_id>\d+)/questions/(?P<question_id>\d+)/add_logic/$',
-    #     'survey.views.questions.add_logic',
-    #     name='add_question_logic_page'),
->>>>>>> 0c11fa6c1696d0352db3bcd531ddc28874535ea0
     url(
         r'^qsets/(?P<qset_id>\d+)/questions/(?P<question_id>\d+)/add_logic/$',
         'survey.views.set_questions.add_logic',
         name='add_qset_question_logic_page'),
-<<<<<<< HEAD
     url(
         r'^batches/questions/delete_logic/(?P<flow_id>\d+)/$',
         'survey.views.set_questions.delete_logic',
         name='delete_question_logic_page'),
-=======
-    # url(
-    #     r'^batches/questions/delete_logic/(?P<flow_id>\d+)/$',
-    #     'survey.views.questions.delete_logic',
-    #     name='delete_question_logic_page'),
->>>>>>> 0c11fa6c1696d0352db3bcd531ddc28874535ea0
     url(
         r'^qset/questions/delete_logic/(?P<flow_id>\d+)/$',
         'survey.views.set_questions.delete_logic',
@@ -375,17 +343,10 @@ urlpatterns = patterns(
         r'^get_answer_validations/$',
         'survey.views.set_questions.get_answer_validations',
         name='get_answer_validations'),
-<<<<<<< HEAD
     url(
         r'^batches/(?P<batch_id>\d+)/questions/sub_questions/new/$',
         'survey.views.set_questions.new_subquestion',
         name='add_batch_subquestion_page'),
-=======
-    # url(
-    #     r'^batches/(?P<batch_id>\d+)/questions/sub_questions/new/$',
-    #     'survey.views.questions.new_subquestion',
-    #     name='add_batch_subquestion_page'),
->>>>>>> 0c11fa6c1696d0352db3bcd531ddc28874535ea0
     url(
         r'^qset/batches/(?P<batch_id>\d+)/questions/sub_questions/new/$',
         'survey.views.set_questions.new_subquestion',
@@ -394,24 +355,10 @@ urlpatterns = patterns(
         r'^batches/(?P<batch_id>\d+)/questions/(?P<question_id>\d+)/sub_questions/edit/$',
         'survey.views.set_questions.edit_subquestion',
         name='edit_batch_subquestion_page'),
-    # """
-    # url(
-    # r'^batches/(?P<batch_id>\d+)/questions/(?P<question_id>\d+)/delete/$',
-<<<<<<< HEAD
-    # 'survey.views.set_questions.delete', name='delete_batch_question_page'),
-    # """
     url(
         r'^batches/(?P<batch_id>\d+)/questions/(?P<question_id>\d+)/remove/$',
         'survey.views.set_questions.remove',
         name='remove_question_page'),
-=======
-    # 'survey.views.questions.delete', name='delete_batch_question_page'),
-    # """""""
-    # url(
-    #     r'^batches/(?P<batch_id>\d+)/questions/(?P<question_id>\d+)/remove/$',
-    #     'survey.views.questions.remove',
-    #     name='remove_question_page'),
->>>>>>> 0c11fa6c1696d0352db3bcd531ddc28874535ea0
 
     url(
         r'^qset/batches/questions/(?P<question_id>\d+)/remove/$',
@@ -468,16 +415,6 @@ urlpatterns = patterns(
         r'^groups/(?P<group_id>\d+)/delete/$',
         'survey.views.respondent_group.delete_group',
         name='respondent_groups_delete'),
-    # """
-    # url(
-    #     r'^conditions/$',
-    #     'survey.views.respondent_group.conditions',
-    #     name='show_group_condition'),
-    # url(
-    #     r'^conditions/new/$',
-    #     'survey.views.respondent_group.add_condition',
-    #     name='new_group_condition'),
-    # """
     url(
         r'^conditions/(?P<condition_id>\d+)/delete/$',
         'survey.views.respondent_group.delete_condition',
@@ -490,12 +427,6 @@ urlpatterns = patterns(
         r'^surveys/wipe_data/(?P<survey_id>\d+)$',
         'survey.views.surveys.wipe_survey_data',
         name='wipe_survey_data'),
-    # """
-    # url(
-    #     r'^surveys/(?P<survey_id>\d+)/manage$',
-    #     'survey.views.surveys.manage',
-    #     name='manage_survey_page'),
-    # """
     url(
         r'^surveys/new/$',
         'survey.views.surveys.new',
@@ -630,23 +561,10 @@ urlpatterns = patterns(
         r'^question_library/json_filter/',
         'survey.views.question_template.filter',
         name='filter_question_list'),
-<<<<<<< HEAD
     url(
         r'^questions/(?P<batch_id>\d+)/new/$',
         'survey.views.set_questions.new',
         name='new_batch_question_page'),
-=======
-    # """
-    # url(r'^questions/new/$', 'survey.views.questions.new', name='new_question_page'),
-    # url(r'^questions/(?P<question_id>\d+)/is_multichoice/$', 'survey.views.questions.is_multichoice', name='check_multichoice'),
-    # url(r'^questions/(?P<question_id>\d+)/sub_questions/new/$', 'survey.views.questions.new_subquestion', name='add_subquestion_page'),
-    # url(r'^questions/(?P<question_id>\d+)/sub_questions/edit/$', 'survey.views.questions.edit_subquestion', name='edit_subquestion_page'),
-    # """
-    # url(
-    #     r'^questions/(?P<batch_id>\d+)/new/$',
-    #     'survey.views.questions.new',
-    #     name='new_batch_question_page'),
->>>>>>> 0c11fa6c1696d0352db3bcd531ddc28874535ea0
     url(
         r'^qset/questions/(?P<qset_id>\d+)/new/$',
         'survey.views.set_questions.new',
@@ -659,17 +577,10 @@ urlpatterns = patterns(
         r'^qset/questions/(?P<question_id>\d+)/loop/$',
         'survey.views.set_questions.manage_loop',
         name='loop_qset_question_page'),
-<<<<<<< HEAD
     url(
         r'^question_set/(?P<qset_id>\d+)/questions/$',
         'survey.views.set_questions.index',
         name='set_questions_index_page'),
-=======
-    # url(
-    #     r'^question_set/(?P<qset_id>\d+)/questions/$',
-    #     'survey.views.questions.index',
-    #     name='set_questions_index_page'),
->>>>>>> 0c11fa6c1696d0352db3bcd531ddc28874535ea0
     url(
         r'^qset/view_data/(?P<qset_id>\d+)/$',
         'survey.views.question_set.view_data',
@@ -724,17 +635,10 @@ urlpatterns = patterns(
         r'^listing_form/sampling_criteria/(?P<id>\d+)/$',
         'survey.views.survey_listing.index',
         name='sampling_criteria'),
-<<<<<<< HEAD
     url(
         r'^questions/(?P<question_id>\d+)/edit/$',
         'survey.views.set_questions.edit',
         name='edit_question_page'),
-=======
-    # url(
-    #     r'^questions/(?P<question_id>\d+)/edit/$',
-    #     'survey.views.questions.edit',
-    #     name='edit_question_page'),
->>>>>>> 0c11fa6c1696d0352db3bcd531ddc28874535ea0
     url(
         r'^set_questions/(?P<question_id>\d+)/edit/$',
         'survey.views.set_questions.edit',
