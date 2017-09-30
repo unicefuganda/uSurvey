@@ -21,7 +21,11 @@ Installation Instructions
 
         git clone https://github.com/unicefuganda/uSurvey.git
 
-        cd uSurvey/mics
+        cd uSurvey
+
+        git checkout dev
+        
+        cd mics
 
         cp travis-settings.py localsettings.py
         (adjust localsettings.py for db and test_db setup)

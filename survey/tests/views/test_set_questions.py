@@ -235,3 +235,40 @@ class SetQuestionViewTest(BaseTest):
         response = self.client.get(reverse('prev_inline_questions_json_page', kwargs={"question_id" : self.question_1.id}))
         print response,"RESPONSEEEEEEEE"
         self.assertIn(response.status_code,[200,302])
+    def test_delete(self):
+        list_1 = ListingTemplate.objects.create(name="List b3")        
+        qset = QuestionSet.get(pk=list_1.id)
+        q_obj = Question.objects.create(identifier='id_2', text="This is a question123.6", answer_type='Numerical Answer',
+                                                  qset_id=qset.id, response_validation_id=1)
+        response = self.client.get(reverse('delete_question_page', kwargs={"question_id" : list_1.id}))
+        self.assertIn(response.status_code,[200,302])
+    def test_edit_subquestion(self):
+        survey_obj = Survey.objects.create(
+            name='survey name2', description='survey descrpition2')
+        batch_obj = Batch.objects.create(
+            order=1, name="Batch A2", survey=survey_obj) 
+        list_1 = ListingTemplate.objects.create(name="List b5")        
+        qset = QuestionSet.get(pk=list_1.id)
+        q_obj = Question.objects.create(identifier='id_5', text="This is a question123.9", answer_type='Numerical Answer',
+                                                  qset_id=qset.id, response_validation_id=1)
+        response = self.client.get(reverse('edit_batch_subquestion_page', kwargs={"batch_id" : batch_obj.id,"question_id":q_obj.id}))
+        self.assertIn(response.status_code,[200,302])
+    def test_get_questions_for_batch(self):
+        survey_obj = Survey.objects.create(
+            name='survey name1', description='survey descrpition1')
+        batch_obj = Batch.objects.create(
+            order=1, name="Batch A1", survey=survey_obj)        
+        # list_1 = ListingTemplate.objects.create(name="List A10")
+        qset = QuestionSet.get(id=batch_obj.id)
+        q_obj = Question.objects.create(identifier='id_4', text="This is a question123.8", answer_type='Numerical Answer',
+                                                  qset_id=qset.id, response_validation_id=1)        
+        response = self.client.get(reverse('batch_questions_json_page', kwargs={"batch_id" : batch_obj.id,"question_id":q_obj.id}))
+        self.assertIn(response.status_code,[200,302])
+
+    def test_remove(self):
+        list_1 = ListingTemplate.objects.create(name="List b4")        
+        qset = QuestionSet.get(pk=list_1.id)
+        q_obj = Question.objects.create(identifier='id_3', text="This is a question123.7", answer_type='Numerical Answer',
+                                                  qset_id=qset.id, response_validation_id=1)
+        response = self.client.get(reverse('remove_qset_question_page', kwargs={"question_id" : list_1.id}))
+        self.assertIn(response.status_code,[200,302])

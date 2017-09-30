@@ -241,26 +241,26 @@ class SurveyViewTest(BaseTest):
         self.assertIn(batch.name, cloned_survey.batches.first().name)
         self.assertIn(batch.description, cloned_survey.batches.first().description)
 
-    # def test_only_super_user_can_wipe_data(self):
-    #     user = User.objects.create_user('user1', 'user@kant.com', 'demo12')
-    #     user.is_superuser = True
-    #     user.is_staff = True
-    #     user.save()
-    #     super_user = self.assign_permission_to(user, 'can_have_super_powers')
-    #     self.test_new_should_create_survey_on_post()
-    #     survey = Survey.objects.first()
-    #     batch = mommy.make(Batch, survey=survey, description='')
-    #     wipe_off_url = reverse('wipe_survey_data', args=(survey.id, ))
-    #     interview = mommy.make(Interview, survey=survey, question_set=batch)
-    #     response = self.client.get(wipe_off_url)
-    #     # confirm interview was not deleted.
-    #     self.assertEquals(Interview.objects.filter(id=interview.id).count(), 1)
-    #     self.client.logout()
-    #     self.client.login(username='user1', password='demo12')
-    #     superpowers_url = reverse('activate_super_powers_page')         # first activate superperwers
-    #     response = self.client.get(superpowers_url)
-    #     views_helper.activate_super_powers()
-    #     response = self.client.get(wipe_off_url)
-    #     # confirm interview was not deleted.
-    #     self.assertEquals(Interview.objects.filter(id=interview.id).count(), 0)
+    def test_only_super_user_can_wipe_data(self):
+        user = User.objects.create_user('user1', 'user@kant.com', 'demo12')
+        user.is_superuser = True
+        user.is_staff = True
+        user.save()
+        super_user = self.assign_permission_to(user, 'can_have_super_powers')
+        self.test_new_should_create_survey_on_post()
+        survey = Survey.objects.first()
+        batch = mommy.make(Batch, survey=survey, description='')
+        wipe_off_url = reverse('wipe_survey_data', args=(survey.id, ))
+        interview = mommy.make(Interview, survey=survey, question_set=batch)
+        response = self.client.get(wipe_off_url)
+        # confirm interview was not deleted.
+        self.assertEquals(Interview.objects.filter(id=interview.id).count(), 1)
+        self.client.logout()
+        self.client.login(username='user1', password='demo12')
+        superpowers_url = reverse('activate_super_powers_page')         # first activate superperwers
+        response = self.client.get(superpowers_url)
+        views_helper.activate_super_powers()
+        response = self.client.get(wipe_off_url)
+        # confirm interview was not deleted.
+        self.assertEquals(Interview.objects.filter(id=interview.id).count(), 0)
 
