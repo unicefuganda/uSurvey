@@ -55,3 +55,6 @@ survey/static/admin/*
 survey/migrations/*
 *.log*
 
+#ignore whitenoise files
+_notes/*
+*.gz
