@@ -110,7 +110,7 @@ STATICFILES_FINDERS = (
     #    'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
 
-STATICFILES_STORAGE = 'contrib.storage.my_whitenoise.WhitenoiseErrorSquashingStorage'
+#STATICFILES_STORAGE = 'contrib.storage.my_whitenoise.WhitenoiseErrorSquashingStorage'
 
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = '6-bycz-+xpv@9+u8b^)#$-l&3cheum3i4cb_6$u6s%j6uu6s91'
