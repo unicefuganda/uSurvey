@@ -43,3 +43,4 @@ django-responsive2
 model-mommy
 names
 whitenoise
+coverage
