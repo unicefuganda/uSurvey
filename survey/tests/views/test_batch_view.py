@@ -56,8 +56,10 @@ class BatchViewsTest(BaseTest):
         self.ea = EnumerationArea.objects.create(name="EA2")
 
     def test_get_index(self):
-        response = self.client.get('/surveys/%d/batches/' % self.survey.id)
-        self.failUnlessEqual(response.status_code, 200)
+        # response = self.client.get('/surveys/%d/batches/' % self.survey.id)
+        # self.failUnlessEqual(response.status_code, 200)
+        response = self.client.get(reverse('batch_index_page', kwargs={"survey_id" : self.survey.id}))
+        self.assertEquals(response.status_code, 200)
         templates = [template.name for template in response.templates]
         self.assertIn('questions_set/index.html', templates)
         self.assertIn(self.batch, response.context['batches'])
@@ -237,3 +239,8 @@ class BatchViewsTest(BaseTest):
         self.failUnlessEqual(response.status_code, 200)
         json_response = json.loads(response.content)
         self.assertTrue(json_response)
+    def test_survey_id_is_None:
+        batch = Batch.objects.create(
+            survey=self.survey, name="batch a", description="batch a description")
+        response = self.client.get(reverse('survey_batches_page', kwargs={"survey_id" : self.survey.id}))
+        self.failUnlessEqual(response.status_code, 200)

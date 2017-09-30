@@ -68,12 +68,43 @@ class TemplateTagsTest(TestCase):
                          get_url_with_ids("1, 2", 'batch_show_page'))
 
     
+    def test_current(self):
+        l= [1,2]
+        self.assertEqual(1,current(l,0))
+        self.assertEqual(None,current(l,10))
+    def test_replace(self):
+        str = " world"
+        self.assertEqual("helloworld", replace_space(str, "hello"))
+
+    def test_is_location_selected(self):        
+        country = LocationType.objects.create(name="Country2", slug='country2')
+        district = LocationType.objects.create(
+            name="District2", parent=country, slug='district2')
+        uganda = Location.objects.create(name="Uganda1", type=country)
+
+        kisasi = Location.objects.create(
+            name='Kisaasi2', type=district, parent=uganda)
+
+        ea1 = EnumerationArea.objects.create(name="EA Kisasi112")
+        ea2 = EnumerationArea.objects.create(name="EA Kisasi122")
+        ea1.locations.add(kisasi)
+        ea2.locations.add(kisasi)
+
+        location_widget = LocationWidget(selected_location=kisasi, ea=ea1)
+        self.assertEqual("selected='selected'", is_location_selected(location_widget, uganda))
 
     
 
     def test_should_return_concatenated_ints_in_a_single_string(self):
         self.assertEqual('1, 2', add_string(1, 2))
         self.assertEqual('1, 2', add_string('1', '2'))
+
+    def test_concat_strings(self):
+        arg = "abc"
+        self.assertEqual('abc', arg)
+    def test_condition_text(self):        
+        self.assertEqual('EQUALS', condition_text('EQUALS'))
+        self.assertEqual('', condition_text('abv'))
 
     def test_should_return_repeated_string(self):
         self.assertEqual('000', repeat_string('0', 4))
@@ -84,6 +115,13 @@ class TemplateTagsTest(TestCase):
         batch = Batch.objects.create(name="open survey", survey=survey)
         self.assertEqual("selected='selected'",
                          is_survey_selected_given(survey, batch))
+
+    def test_should_return_selected_for_is_selected(self):
+        # survey = Survey.objects.create(
+        #     name="open survey", description="open survey", has_sampling=True)
+        batch = Batch.objects.create(name="batchnames")        
+        self.assertEqual("selected='selected'",
+                         is_selected(batch,batch))        
 
     def test_should_return_none_for_selected_batch(self):
         survey = Survey.objects.create(
@@ -149,7 +187,7 @@ class TemplateTagsTest(TestCase):
                          is_ea_selected(location_widget, ea1))
         self.assertIsNone(is_ea_selected(location_widget, ea2))
 
-    def test_is_location_selected(self):
+    def test_ea_is_location_selected(self):
         country = LocationType.objects.create(name="Country1", slug='country')
         district = LocationType.objects.create(
             name="District1", parent=country, slug='district')

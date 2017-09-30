@@ -4,7 +4,7 @@ import sys
 
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
-
+REDIS_HOST = os.getenv('REDIS_HOST', 'localhost')
 DEBUG = False
 TEMPLATE_DEBUG = DEBUG
 
@@ -18,26 +18,21 @@ COUNTRY = 'UGANDA'
 MANAGERS = ADMINS
 
 DATABASES = {
-    'default': {
-        # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'ENGINE': 'django.db.backends.',
-        # Or path to database file if using sqlite3.
-        'NAME': '',
-        # The following settings are not used with sqlite3:
-        'USER': '',
-        'PASSWORD': '',
-        # Empty for localhost through domain sockets or '127.0.0.1' for
-        # localhost through TCP.
-        'HOST': '',
-        'PORT': '',                      # Set to empty string for default.
+    "default": {
+        "ENGINE": "django.db.backends.postgresql_psycopg2",
+        "NAME": os.getenv('USURVEY_DB', 'usurvey'),
+        "USER": os.getenv('USURVEY_DB_USER', 'postgres'),
+        "PASSWORD": os.getenv('USURVEY_DB_PASS', 'postgres'),
+        "HOST": os.getenv('USURVEY_DB_HOST', ''),
     }
+
 }
 
 CACHES = {
     'default': {
         'BACKEND': 'redis_cache.RedisCache',
         'LOCATION': [
-            '127.0.0.1:6379',
+            '%s:6379' % REDIS_HOST,
         ],
         'OPTIONS': {
             'DB': 1,
@@ -93,7 +88,7 @@ MEDIA_URL = '/media/'
 # Don't put anything in this directory yourself; store your static files
 # in apps' "static/" subdirectories and in STATICFILES_DIRS.
 # Example: "/var/www/example.com/static/"
-STATIC_ROOT = ''
+STATIC_ROOT = os.path.join(BASE_DIR, 'survey', 'static')
 
 # URL prefix for static files.
 # Example: "http://example.com/static/", "http://static.example.com/"
@@ -104,6 +99,7 @@ STATICFILES_DIRS = (
     # Put strings here, like "/home/html/static" or "C:/www/django/static".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
+
 )
 
 # List of finder classes that know how to find static files in
@@ -113,6 +109,8 @@ STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
     #    'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
+
+STATICFILES_STORAGE = 'contrib.storage.my_whitenoise.WhitenoiseErrorSquashingStorage'
 
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = '6-bycz-+xpv@9+u8b^)#$-l&3cheum3i4cb_6$u6s%j6uu6s91'
@@ -140,6 +138,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 MIDDLEWARE_CLASSES = [
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -180,7 +179,6 @@ INSTALLED_APPS = [
     'mptt',
     'django_rq',
     'django_rq_dashboard',
-    'channels',
     'macros',
     'responsive'
     # Uncomment the next line to enable the admin:
@@ -189,15 +187,6 @@ INSTALLED_APPS = [
     # 'django.contrib.admindocs',
 ]
 
-CHANNEL_LAYERS = {
-    "default": {
-        "BACKEND": "asgi_redis.RedisChannelLayer",
-        "CONFIG": {
-            "hosts": [("localhost", 6379)],
-        },
-        "ROUTING": "mics.routing.channel_routing",
-    },
-}
 
 
 # A sample logging configuration. The only tangible logging
@@ -230,13 +219,13 @@ LOGGING = {
 }
 
 CACHEOPS_REDIS = {
-    'host': 'localhost',  # redis-server is on same machine
+    'host': REDIS_HOST,  # redis-server is on same machine
     'port': 6379,        # default redis port
     'db': 1,             # SELECT non-default redis database
                          # using separate redis db or redis instance
                          # is highly recommended
-
 }
+
 
 CACHE_REFRESH_DURATION = 10800
 CACHEOPS = {
@@ -392,8 +381,11 @@ DATE_FORMAT = "%d-%m-%Y"
 MOBILE_NUM_MIN_LENGTH = 9
 MOBILE_NUM_MAX_LENGTH = 9
 LOOP_QUESTION_REPORT_DEPT = 3  # reports up to 5 question loops
+# following setting refers to the URL for loading the map data
 SHAPE_FILE_URI = '/static/map_resources/uganda_districts_2011_005.json'
+# field in the geojson referring to the field name holding the admin divisions polygon
 SHAPE_FILE_LOC_FIELD = 'DNAME_2010'
+# field refers to the alternative name to look for the polygon in addition to SHAPE_FILE_LOC_FIELD
 SHAPE_FILE_LOC_ALT_FIELD = 'DNAME_2006'
 # must be in format for log lat. see: http://geojson.org/geojson-spec.html
 MAP_CENTER = '1.34,32.683525'
@@ -413,34 +405,34 @@ MEMORIZE_TIMEOUT = 120
 
 RQ_QUEUES = {
     'default': {
-        'HOST': 'localhost',
+        'HOST': REDIS_HOST,
         'PORT': 6379,
         'DB': 7,
         'DEFAULT_TIMEOUT': 360,
     },
     'results-queue': {
-        'HOST': 'localhost',
+        'HOST': REDIS_HOST,
         'PORT': 6379,
         'DB': 7,
         'DEFAULT_TIMEOUT': 360,
     },
     'email': {
-        'HOST': 'localhost',
+        'HOST': REDIS_HOST,
         'PORT': 6379,
         'DB': 7,
     },
     'ws-notice': {
-        'HOST': 'localhost',
+        'HOST': REDIS_HOST,
         'PORT': 6379,
         'DB': 7,
     },
     'upload_task': {
-        'HOST': 'localhost',
+        'HOST': REDIS_HOST,
         'PORT': 6379,
         'DB': 7,
     },
     'odk': {
-        'HOST': 'localhost',
+        'HOST': REDIS_HOST,
         'PORT': 6379,
         'DB': 7,
     }

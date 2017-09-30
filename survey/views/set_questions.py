@@ -287,7 +287,7 @@ def edit(request, question_id):
 
 @permission_required('auth.can_view_batches')
 def new(request, qset_id):
-    batch = QuestionSet.get(pk=qset_id)
+    batch = QuestionSet.get(pk=qset_id)             # can be listng or actual batch
     response, context = _render_question_view(request, batch)
     context['page_title '] = 'Add Question'
     return response or render(request, 'set_questions/new.html', context)

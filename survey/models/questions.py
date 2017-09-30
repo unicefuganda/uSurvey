@@ -261,9 +261,7 @@ class QuestionOption(CloneableMixin, BaseModel):
         return self.text
 
 
-class QuestionSet(
-        CloneableMixin,
-        BaseModel):   # can be qset, listing, respondent personal
+class QuestionSet(CloneableMixin, BaseModel):   # can be qset, listing, respondent personal
     objects = InheritanceManager()
     name = models.CharField(
         max_length=100,
@@ -389,6 +387,7 @@ class QuestionSet(
     def questions_inline(self):
         qflows = self.inline_flows()
         start_question_id = None
+
         @cached_as(QuestionSet.objects.get(id=self.id),
                    Question.objects.filter(qset__id=self.id),
                    QuestionFlow.objects.filter(question__qset__id=self.id),

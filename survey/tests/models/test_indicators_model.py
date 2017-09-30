@@ -15,7 +15,7 @@ class IndicatorTest(TestCase):
             self.assertIn(field, fields)
 
     def test_store(self):
-        survey = Survey.objects.create(name="Survey")        
+        survey = Survey.objects.create(name="Survey")
         question_set = QuestionSet.objects.create(name="QuestionSet")
         indicator = Indicator.objects.create(name="indicator name", description="rajni indicator", survey=survey, formulae='indicatoir formule', question_set=question_set)
         self.failUnless(indicator.id)
@@ -27,17 +27,24 @@ class IndicatorTest(TestCase):
         self.failUnless(indicator.question_set)
 
     def test_store(self):
-        health_module = QuestionModule.objects.create(name="Health")
-        batch = Batch.objects.create(name="Batch")
-        indicator = Indicator.objects.create(name="indicator name", description="rajni indicator", measure='Percentage',
-                                             module=health_module, batch=batch)
+        # health_module = QuestionModule.objects.create(name="Health")
+        # batch = Batch.objects.create(name="Batch")
+        # indicator = Indicator.objects.create(name="indicator name", description="rajni indicator", measure='Percentage',
+        #                                      module=health_module, batch=batch)
+        self.survey = Survey.objects.create(name="say",has_sampling=True,sample_size=1)
+        self.questionset = QuestionSet.objects.create(name="santh")
+        indicator = Indicator.objects.create(name="indicator name", description="rajni indicator",display_on_dashboard=True,formulae="formulae",question_set_id=self.questionset.id,survey_id=self.survey.id)
         self.failUnless(indicator.id)
         self.failUnless(indicator.created)
         self.failUnless(indicator.description)
         self.failUnless(indicator.name)
-        self.failUnless(indicator.measure)
-        self.failUnless(indicator.batch)
-        self.failUnless(indicator.module)
+        # self.failUnless(indicator.measure)
+        # self.failUnless(indicator.batch)
+        # self.failUnless(indicator.module)
+        self.failUnless(indicator.display_on_dashboard)
+        self.failUnless(indicator.formulae)
+        self.failUnless(indicator.question_set_id)
+        self.failUnless(indicator.survey_id)
 
     def test_unicode_text(self):
         survey = Survey.objects.create(name="Survey")        

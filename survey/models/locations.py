@@ -91,7 +91,10 @@ class Location(MPTTModel, BaseModel):
 
     @classmethod
     def country(cls):
-        return Location.objects.get(parent__isnull=True)
+        try:
+            return Location.objects.get(parent__isnull=True)
+        except Location.DoesNotExist:
+            return None
 
     def is_sub_location(self, location):
         return location.is_ancestor_of(self)

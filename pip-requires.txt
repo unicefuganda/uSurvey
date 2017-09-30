@@ -1,4 +1,3 @@
-python-Levenshtein
 Django==1.8.1
 gunicorn
 psycopg2==2.5
@@ -29,10 +28,8 @@ rq>0.3.1
 rq_scheduler>=0.5.2
 django-rq
 django-rq-dashboard
-supervisor
+supervisor>=3.2
 phonenumbers
-channels
-asgi_redis
 django-cacheops
 django-macros
 django-cloneable
@@ -45,3 +42,4 @@ line_profiler
 django-responsive2
 model-mommy
 names
+whitenoise

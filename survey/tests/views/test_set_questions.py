@@ -38,6 +38,29 @@ class SetQuestionViewTest(BaseTest):
             'name': 'test listing1 q1',
             'description': 'listing description demo6',
         }
+        self.sub_data={
+            'identifier':"dummy",
+            'response_validation':self.rsp,
+            'text' : "dummss",
+            'answer_type' : "Text Answer"
+        }
+    def test_add_subquestion(self):
+        l_qset = ListingTemplate.objects.create(**self.listing_form_data)
+        qset = QuestionSet.objects.get(pk=l_qset.id)
+        q_obj = Question.objects.create(identifier='identifiersss', text="This is a questiod",
+                                        answer_type='Numerical Answer', qset_id=l_qset.id, response_validation_id=1)
+        self.sub_data['parent_question'] = q_obj
+        response = self.client.post(reverse('add_qset_subquestion_page', kwargs={"batch_id" : l_qset.id}),
+                                    self.sub_data, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        self.assertIn(response.status_code, [200, 302])
+        print response.templates
+        print response.cookies
+        templates = [template.name for template in response.templates]
+        self.assertIn('set_questions/_add_question.html', templates)
+        #self.assertIn('Sub Question saved.', response.cookies['messages'].__str__())
+        #print response.content
+
+    
 
     def test_view_questions_list(self):
         list_1 = ListingTemplate.objects.create(**self.listing_form_data)
@@ -45,7 +68,6 @@ class SetQuestionViewTest(BaseTest):
         self.assertEqual(200, response.status_code)
         response = self.client.get(reverse('qset_questions_page', kwargs={'qset_id':list_1.id}))
         self.assertEqual(200, response.status_code)
-    
     def test_add_question(self):
         list_1 = ListingTemplate.objects.create(name="List A2")
         batch = QuestionSet.get(pk=list_1.id)        
@@ -190,3 +212,26 @@ class SetQuestionViewTest(BaseTest):
         self.assert_restricted_permission_for('/qsets/2/questions/')        
         self.assert_restricted_permission_for('/set_questions/1/edit/')        
         self.assert_restricted_permission_for('/qset/questions/1/insert/')
+
+    def test_get_sub_questions_for_question(self):
+        list_1 = ListingTemplate.objects.create(name="List b2")        
+        qset = QuestionSet.get(pk=list_1.id)
+        q_obj = Question.objects.create(identifier='id_1', text="This is a question123.5", answer_type='Numerical Answer',
+                                                  qset_id=qset.id, response_validation_id=1)
+        response = self.client.get(reverse('questions_subquestion_json_page', kwargs={"question_id" : list_1.id}))
+        self.assertIn(response.status_code,[200,302])
+
+    def test_get_prev_questions_for_question(self):
+        self.qset = QuestionSet.objects.create(name="Females")
+        print self.qset,"QSET"
+        self.rsp = ResponseValidation.objects.create(validation_test="validationtest", constraint_message="message")
+        print self.rsp,"RSP"
+        # list_1 = ListingTemplate.objects.create(name="List b5")
+        # qset = QuestionSet.get(pk=list_1.id)
+        self.question_1 = Question.objects.create(identifier='id_1', text="This is a question 1111.1",
+                                                  answer_type='Numerical Answer',
+                                                  qset_id=self.qset.id, response_validation_id=1)
+        print self.question_1.identifier,self.question_1.text,"QSETIdentifier"
+        response = self.client.get(reverse('prev_inline_questions_json_page', kwargs={"question_id" : self.question_1.id}))
+        print response,"RESPONSEEEEEEEE"
+        self.assertIn(response.status_code,[200,302])
