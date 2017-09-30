@@ -5,6 +5,7 @@ import sys
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 REDIS_HOST = os.getenv('REDIS_HOST', 'localhost')
+REDIS_PORT = int(os.getenv('REDIS_PORT', 6379))
 DEBUG = False
 TEMPLATE_DEBUG = DEBUG
 
@@ -32,7 +33,7 @@ CACHES = {
     'default': {
         'BACKEND': 'redis_cache.RedisCache',
         'LOCATION': [
-            '%s:6379' % REDIS_HOST,
+            '%s:%s' % (REDIS_HOST, REDIS_PORT),
         ],
         'OPTIONS': {
             'DB': 1,
@@ -50,7 +51,7 @@ CACHES = {
 
 # Hosts/domain names that are valid for this site; required if DEBUG is False
 # See https://docs.djangoproject.com/en/1.5/ref/settings/#allowed-hosts
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '*']
+ALLOWED_HOSTS = ['*', ]
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -110,7 +111,7 @@ STATICFILES_FINDERS = (
     #    'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
 
-#STATICFILES_STORAGE = 'contrib.storage.my_whitenoise.WhitenoiseErrorSquashingStorage'
+STATICFILES_STORAGE = 'contrib.storage.my_whitenoise.WhitenoiseErrorSquashingStorage'
 
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = '6-bycz-+xpv@9+u8b^)#$-l&3cheum3i4cb_6$u6s%j6uu6s91'
@@ -220,7 +221,7 @@ LOGGING = {
 
 CACHEOPS_REDIS = {
     'host': REDIS_HOST,  # redis-server is on same machine
-    'port': 6379,        # default redis port
+    'port': REDIS_PORT,        # default redis port
     'db': 1,             # SELECT non-default redis database
                          # using separate redis db or redis instance
                          # is highly recommended
@@ -406,34 +407,34 @@ MEMORIZE_TIMEOUT = 120
 RQ_QUEUES = {
     'default': {
         'HOST': REDIS_HOST,
-        'PORT': 6379,
+        'PORT': REDIS_PORT,
         'DB': 7,
         'DEFAULT_TIMEOUT': 360,
     },
     'results-queue': {
         'HOST': REDIS_HOST,
-        'PORT': 6379,
+        'PORT': REDIS_PORT,
         'DB': 7,
         'DEFAULT_TIMEOUT': 360,
     },
     'email': {
         'HOST': REDIS_HOST,
-        'PORT': 6379,
+        'PORT': REDIS_PORT,
         'DB': 7,
     },
     'ws-notice': {
         'HOST': REDIS_HOST,
-        'PORT': 6379,
+        'PORT': REDIS_PORT,
         'DB': 7,
     },
     'upload_task': {
         'HOST': REDIS_HOST,
-        'PORT': 6379,
+        'PORT': REDIS_PORT,
         'DB': 7,
     },
     'odk': {
         'HOST': REDIS_HOST,
-        'PORT': 6379,
+        'PORT': REDIS_PORT,
         'DB': 7,
     }
 }

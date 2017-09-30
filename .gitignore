@@ -52,7 +52,6 @@ tags
 submissions/*
 answerFiles/*
 survey/static/admin/*
-survey/migrations/*
 *.log*
 
 #ignore whitenoise files

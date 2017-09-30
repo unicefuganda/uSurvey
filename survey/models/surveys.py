@@ -5,7 +5,7 @@ from survey.models.users import UserProfile
 
 
 class Survey(CloneableMixin, BaseModel):
-    name = models.CharField(max_length=100, unique=True)
+    name = models.CharField(max_length=100, unique=True, default='')     # dummy default for smooth migrate
     description = models.CharField(max_length=300, blank=False, null=True)
     has_sampling = models.BooleanField(
         default=True, verbose_name='Survey Type')

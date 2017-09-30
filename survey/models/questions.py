@@ -265,7 +265,7 @@ class QuestionSet(CloneableMixin, BaseModel):   # can be qset, listing, responde
     objects = InheritanceManager()
     name = models.CharField(
         max_length=100,
-        db_index=True)
+        db_index=True, default='')          # dummy default for smooth migrate
     description = models.CharField(max_length=300, blank=True, null=True)
     start_question = models.OneToOneField(
         Question,
