@@ -20,19 +20,19 @@ Quick Start
 
 * Clone the uSurvey Application from Github 
 
-        >git clone https://github.com/unicefuganda/uSurvey.git -b dev
+        git clone https://github.com/unicefuganda/uSurvey.git -b dev
 
 
 * Enter the project directory 
 
-        >cd uSurvey
+        cd uSurvey
 
 * Update the database entries in `.env` file in the project directory
         
 * Run the setup script in the project directory and follow the instructions
 
-        >chmod +x docker_setup_linux.sh
-        >./docker_setup_linux.sh
+        chmod +x docker_setup_linux.sh
+        ./docker_setup_linux.sh
         
     * This step performs the following activities:
         1. Creates path where database files are stored on host machine
@@ -41,7 +41,8 @@ Quick Start
 
 * Once done, enter the following address on your browser to be sure uSurvey is properly setup:
     
-    > http://localhost:8071/
+    
+    http://localhost:8071/
 
 
 
@@ -54,9 +55,10 @@ Customizing the country data
 
     * A sample of the required CSV file is available in the project directory (administrative_divisions.csv.example)
 
-* To load administrative divisions into the system, run the following commands from the project directory and follow the steps:
-    
-    >sh ./loaders/load_ea_locations.sh
+* To load administrative divisions into the system, run the following commands from the project directory and follow the steps:    
+
+
+    sh ./loaders/load_ea_locations.sh
 
 ####Note
 **The first line of the csv file shall be taken as file header.** 
@@ -93,8 +95,8 @@ Starting Up
 
 * To startup using docker-compose, run the command below:
 
-        > docker-compose up -d
+         docker-compose up -d
         
 * To stop uSurvey using docker-compose, run the command below:
         
-       > docker-compose down
+        docker-compose down

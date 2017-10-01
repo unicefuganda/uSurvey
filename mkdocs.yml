@@ -4,6 +4,7 @@ pages:
 - User Manual: User_Guides.md
 - Data Collection: ODK_App.md
 - Installation Guide: installation.md
+- Installation Guide (Docker): docker_installation.md
 - Deployment Guide: deployment_guide.md
 - Testing and Coverage: tests.md
 
