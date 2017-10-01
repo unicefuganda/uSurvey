@@ -2,7 +2,7 @@ version: '2'
 
 services:
 
-  app:
+  usurvey_app:
     environment:
       # pick db details from environment variables
       - DATABASE_URL=postgres://${USURVEY_DB_USER}:${USURVEY_DB_PASS}@db/${USURVEY_DB}
@@ -12,12 +12,12 @@ services:
       - USURVEY_DB_USER
       - USURVEY_DB_PASS
     image: antsmc2/usurvey
-    command: gunicorn -b 0.0.0.0:8080 --workers=8 --max-requests 1000 --timeout 120 mics.wsgi
+    command: gunicorn -b 0.0.0.0:3691 --workers=$USURVEY_APP_WORKERS  --max-requests $USURVEY_APP_MAX_REQUESTS --timeout $USURVEY_APP_TIMEOUT mics.wsgi
     depends_on:
       - redis_server
       - db
     ports:
-      - "8080:8080"
+      - "$USURVEY_APP_PORT:3691"
 
   db:
     environment:

@@ -2,7 +2,10 @@
 
 # Basic basic script to boostrap uSurvey setup on linux
 
+POSTGRES_DATA_PATH=$1
+
 DEFAULT_PSQL_LOC=/opt/db/data/psql
+
 if [ -z "${POSTGRES_DATA_PATH}" ]; then
     echo "No Volume path set for postgres"
     echo "Setting volume path to $DEFAULT_PSQL_LOC"
@@ -13,7 +16,7 @@ else
 echo "creating directory $POSTGRES_DATA_PATH is not existing"
 sudo mkdir -p $POSTGRES_DATA_PATH
 sudo chown -R $USER:$USER $POSTGRES_DATA_PATH
-
+chmod +x loaders/*
 
 echo '#####                     '
 sleep 1
@@ -26,9 +29,10 @@ echo "Done starting up. "
 echo '#############             '
 sleep 1
 echo "1. Running migrations..."
-echo "2. create superuser..."
-docker-compose run app sh -c "python manage.py makemigrations && python manage.py migrate --noinput && \
-                                python manage.py createsuperuser"
+echo "2. Load Roles and Permissions"
+echo "3. create superuser..."
+docker-compose run usurvey_app sh -c "python manage.py makemigrations && python manage.py migrate --noinput && \
+                                python manage.py load_parameters && python manage.py createsuperuser"
 echo "Done creating super user. "
 
 echo '#######################   '
