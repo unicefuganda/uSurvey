@@ -5,7 +5,7 @@ pages:
 - Data Collection: ODK_App.md
 - Installation Guide: installation.md
 - Deployment Guide: deployment_guide.md
-- Testing & Coverage: tests.md
+- Testing and Coverage: tests.md
 
 #theme: readthedocs
 #theme: cerulean
