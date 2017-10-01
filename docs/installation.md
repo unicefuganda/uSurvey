@@ -2,7 +2,11 @@ uSurvey Installation (From source)
 ==================================
 
 * This section covers uSurvey installation from source. 
+
+Installation from docker image
+------------------------------
 * **For uSurvey installation from already prepared docker image, [check here](./docker-installation.md)**
+
 
 Prerequisites
 ------------- 
