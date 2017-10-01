@@ -1,4 +1,8 @@
+uSurvey Installation (From source)
+==================================
 
+* This section covers uSurvey installation from source. 
+* **For uSurvey installation from already prepared docker image, [check here](./docker-installation.md)**
 
 Prerequisites
 ------------- 
@@ -7,7 +11,7 @@ Prerequisites
 
 * Minimum of 2GB RAM for test environment 
 
-* 16GB RAM should be enough for production setups with less than 1million survey submissions per day.
+* 16GB RAM should be enough for production setups with less than 1million survey submissions per day on a 2GHz clock speed machine..
 
 * Postgres, redis-server should be running
 
@@ -120,4 +124,4 @@ Starting Up
         supervisord -c supervisord.conf
 
 > In supervisord.conf, the configuration under [program:odk-server] is required to serve ODK requests, while the configuration under [program:django-interface-server] is for serving other requests.
-> Only the ports configured in [program:odk-server] and [program:django-interface-server] are required to handle requests. Other ports configured on supervisord.conf file are for managing supervisor
+> Only the ports configured in [program:odk-server] and [program:web-app-server] are required to handle requests. Other ports configured on supervisord.conf file are for managing supervisor

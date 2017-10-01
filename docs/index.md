@@ -117,7 +117,8 @@ Data collection and submission is done in two ways:
 <pre></pre>
 + ######Installation Guide
     - [Prerequisites](./installation.md#prerequisites)
-    - [Installation](./installation.md#installation-instructions)
+    - [Installation (from source)](./installation.md#installation-instructions)
+    - [Installation (docker)](./docker-installation.md)
 <pre></pre>
 + ######Deployment Guide
     - [uSurvey Deployment](./deployment_guide.md)
