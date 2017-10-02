@@ -27,7 +27,7 @@ Quick Start
 
         cd uSurvey
 
-* Update the database entries in `.env` file in the project directory
+* Update the database entries in ``.env`` file in the project directory
         
 * Run the setup script in the project directory and follow the instructions
 
@@ -70,7 +70,7 @@ Customizing the country data
 
 **If you plan to use uSurvey in Uganda, then this step is not required!**
 
-To enable uSurvey capture survey data in a specific country's map, you need to update the map settings section ``.env`` file.
+To enable uSurvey capture survey data in a specific country's map, you need to update the map settings section in the ``.env`` file.
 
 This is required because uSurvey must be made aware of the shape file to use. 
 
