@@ -6,7 +6,7 @@ pages:
 - Installation Guide: installation.md
 - Installation Guide (Docker): docker_installation.md
 - Deployment Guide: deployment_guide.md
-- Testing & Coverage: tests.md
+- Testing and Coverage: tests.md
 
 #theme: readthedocs
 #theme: cerulean
