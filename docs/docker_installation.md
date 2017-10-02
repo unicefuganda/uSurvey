@@ -70,7 +70,7 @@ Customizing the country data
 
 **If you plan to use uSurvey in Uganda, then this step is not required!**
 
-To enable uSurvey capture survey data in a specific country's map, you need to update the map settings section in the ``.env`` file.
+To enable uSurvey capture survey data in a specific country's map, you need to update the map settings section within the ``.env`` file. This file is available in the project directory.
 
 This is required because uSurvey must be made aware of the shape file to use. 
 
