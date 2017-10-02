@@ -42,6 +42,14 @@ docker-compose run usurvey_app sh -c "python manage.py makemigrations && python 
                                 python manage.py load_parameters && python manage.py createsuperuser"
 echo "Done creating super user. "
 
+echo "copying map shape file"
+
+set -x
+# expected that docker must have created the file _docker_mapf
+sudo chown -R $USER:$USER ._docker_mapf
+cp survey/static/map_resources/country_shape_file.json ._docker_mapf/
+set +x
+
 echo '#######################   '
 echo "Setup Complete!"
 

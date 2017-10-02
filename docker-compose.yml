@@ -29,6 +29,8 @@ services:
       - db
     ports:
       - "$USURVEY_APP_PORT:3691"
+    volumes:
+      - ._docker_mapf:/src/survey/static/map_resources
 
   db:
     environment:
