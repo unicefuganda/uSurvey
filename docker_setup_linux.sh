@@ -2,6 +2,13 @@
 
 # Basic basic script to boostrap uSurvey setup on linux
 
+# stop docker if it is currently running
+# addresses issue if this file is re-run multiple times
+docker-compose down
+
+set -e
+#set -x
+
 POSTGRES_DATA_PATH=$1
 
 DEFAULT_PSQL_LOC=/opt/db/data/psql

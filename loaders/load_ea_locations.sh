@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -e
+#set -x
 
 read -p "Enter full path to locations CSV file (see example file administrative_divisions.csv.example): " locations_file
 

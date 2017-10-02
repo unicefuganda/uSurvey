@@ -39,7 +39,7 @@ services:
     restart: always
     image: postgres:alpine
     ports:
-      - "5430:5432"
+      - "$USURVEY_DB_PORT:5432"
     volumes:
       - ${POSTGRES_DATA_PATH}:/var/lib/postgresql/data
 
@@ -47,4 +47,4 @@ services:
     restart: always
     image: redis:alpine
     ports:
-      - "6378:6379"
+      - "$USURVEY_REDIS_PORT:6379"
