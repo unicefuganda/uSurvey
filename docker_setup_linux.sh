@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 # Basic basic script to boostrap uSurvey setup on linux
 
