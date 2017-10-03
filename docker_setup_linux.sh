@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Basic basic script to boostrap uSurvey setup on linux
 
@@ -72,7 +72,7 @@ echo "trying out first admin first guess"
 set -x
 geojson_file="${tmp_dir}/${country_name}/admin_level_4.geojson"
 feature_count=$(python -c "import json;print len(json.loads(open('$geojson_file').read()).get('features', []))")
-if [ "$feature_count" == "0" ];
+if [ "$feature_count" = "0" ];
     then
         set +x
         echo "trying out second admin first guess"
@@ -86,6 +86,8 @@ if [ "$feature_count" != "0" ];
         echo "Found map file: $geojson_file."
         echo "coping $geojson_file..."
         cp $geojson_file ._docker_mapf/country_shape_file.json
+        echo "Also keeping a copy in _docker_mapf/"
+        cp $geojson_file ._docker_mapf/
 else
     echo "Map file not found. Please resolve manually"
     cp survey/static/map_resources/country_shape_file.json ._docker_mapf/
