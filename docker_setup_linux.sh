@@ -50,7 +50,8 @@ YELLOW='\033[1;33m'
 RED='\033[0;31m'
 NC='\033[0m' # No Color
 printf "${RED}Attempting map setup.${NC}\n"
-printf "${RED}Note:${NC} ${YELLOW}If this step fail, either re-run this setup script or resolve the map manually${NC}\n"
+printf "${RED}Note:${NC} ${YELLOW}If this step fails, either re-run this setup script or resolve the map's \
+shape file manually${NC}\n"
 printf "${YELLOW}To setup the map manually, see map section on  \
 https://usurvey.readthedocs.io/en/latest/docker_installation/ ${NC}\n"
 
@@ -71,7 +72,7 @@ echo "trying out first admin first guess"
 set -x
 geojson_file="${tmp_dir}/${country_name}/admin_level_4.geojson"
 feature_count=$(python -c "import json;print len(json.loads(open('$geojson_file').read()).get('features', []))")
-if [ $feature_count == "0" ];
+if [ "$feature_count" == "0" ];
     then
         set +x
         echo "trying out second admin first guess"
@@ -80,7 +81,7 @@ if [ $feature_count == "0" ];
         feature_count=$(python -c "import json;print len(json.loads(open('$geojson_file').read()).get('features', []))")
 fi
 #if after everything no show, exit
-if [ $feature_count != "0" ];
+if [ "$feature_count" != "0" ];
     then
         echo "Found map file: $geojson_file."
         echo "coping $geojson_file..."
