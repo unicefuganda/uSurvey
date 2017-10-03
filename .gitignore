@@ -57,3 +57,4 @@ survey/static/admin/*
 #ignore whitenoise files
 _notes/*
 *.gz
+.docker_mapf
