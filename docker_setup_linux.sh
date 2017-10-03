@@ -68,14 +68,14 @@ tmp_dir=$(mktemp -d "/tmp/usurvey-${country_name}.XXXXX")
 wget -P $tmp_dir $country_url
 tar -xzf "$tmp_dir/${country_name}_geojson.tgz"  --directory $tmp_dir
 set +x
-echo "trying out first admin first guess"
+echo "trying out first admin level first guess"
 set -x
 geojson_file="${tmp_dir}/${country_name}/admin_level_4.geojson"
 feature_count=$(python -c "import json;print len(json.loads(open('$geojson_file').read()).get('features', []))")
 if [ "$feature_count" = "0" ];
     then
         set +x
-        echo "trying out second admin first guess"
+        echo "trying out admin level second guess"
         set -x
         geojson_file="${tmp_dir}/${country_name}/admin_level_3.geojson"
         feature_count=$(python -c "import json;print len(json.loads(open('$geojson_file').read()).get('features', []))")
