@@ -615,7 +615,7 @@ function getCompletionFor(){
 
 function refreshMap() {
     geojson = L.geoJson(mapData, {style: style, onEachFeature: onEachFeature}).addTo(map);
-    map.panTo(geojson.getBounds().getCenter());
+    map.fitBounds(geojson.getBounds());
 }
 
 

@@ -14,7 +14,7 @@ ADMINS = (
 )
 
 PROJECT_TITLE = 'uSurvey'
-COUNTRY = 'UGANDA'
+COUNTRY = os.getenv('COUNTRY', 'Uganda').upper()
 
 MANAGERS = ADMINS
 

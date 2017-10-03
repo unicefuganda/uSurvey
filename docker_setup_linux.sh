@@ -42,13 +42,59 @@ docker-compose run usurvey_app sh -c "python manage.py makemigrations && python 
                                 python manage.py load_parameters && python manage.py createsuperuser"
 echo "Done creating super user. "
 
-echo "copying map shape file"
 
-set -x
+
 # expected that docker must have created the file _docker_mapf
 sudo chown -R $USER:$USER ._docker_mapf
-cp survey/static/map_resources/country_shape_file.json ._docker_mapf/
+YELLOW='\033[1;33m'
+RED='\033[0;31m'
+NC='\033[0m' # No Color
+printf "${RED}Attempting map setup.${NC}\n"
+printf "${RED}Note:${NC} ${YELLOW}If this step fail, either re-run this setup script or resolve the map manually${NC}\n"
+printf "${YELLOW}To setup the map manually, see map section on  \
+https://usurvey.readthedocs.io/en/latest/docker_installation/ ${NC}\n"
+
+read -p "Enter country name in full (e.g Uganda or United States of America): " country_name
+# country name to lower case
+country_name=$(echo "$country_name" | tr '[:upper:]' '[:lower:]')
+# replace space with hyphen
+country_name=$(echo $country_name | sed -e 's, ,-,g')
+MAP_URL_BASE=https://s3.amazonaws.com/osm-polygons.mapzen.com
+country_filename="${country_name}_geojson.tgz"
+country_url="${MAP_URL_BASE}/${country_filename}"
+set -x
+tmp_dir=$(mktemp -d "/tmp/usurvey-${country_name}.XXXXX")
+wget -P $tmp_dir $country_url
+tar -xzf "$tmp_dir/${country_name}_geojson.tgz"  --directory $tmp_dir
 set +x
+echo "trying out first admin first guess"
+set -x
+geojson_file="${tmp_dir}/${country_name}/admin_level_4.geojson"
+feature_count=$(python -c "import json;print len(json.loads(open('$geojson_file').read()).get('features', []))")
+if [ $feature_count == "0" ];
+    then
+        set +x
+        echo "trying out second admin first guess"
+        set -x
+        geojson_file="${tmp_dir}/${country_name}/admin_level_3.geojson"
+        feature_count=$(python -c "import json;print len(json.loads(open('$geojson_file').read()).get('features', []))")
+fi
+#if after everything no show, exit
+if [ $feature_count != "0" ];
+    then
+        echo "Found map file: $geojson_file."
+        echo "coping $geojson_file..."
+        cp $geojson_file ._docker_mapf/country_shape_file.json
+else
+    echo "Map file not found. Please resolve manually"
+    cp survey/static/map_resources/country_shape_file.json ._docker_mapf/
+fi
+
+#cleaning up
+rm -rf $tmp_dir
+set +x
+
+#
 
 echo '#######################   '
 echo "Setup Complete!"
