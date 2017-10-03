@@ -385,11 +385,12 @@ LOOP_QUESTION_REPORT_DEPT = 3  # reports up to 5 question loops
 # following setting refers to the URL for loading the map data
 SHAPE_FILE_URI = os.getenv('SHAPE_FILE_URI', '/static/map_resources/country_shape_file.json')
 # field in the geojson referring to the field name holding the admin divisions polygon
-SHAPE_FILE_LOC_FIELD = os.getenv('SHAPE_FILE_LOC_FIELD', 'DNAME_2010')
+SHAPE_FILE_LOC_FIELD = os.getenv('SHAPE_FILE_LOC_FIELD', 'name:en')
 # field refers to the alternative name to look for the polygon in addition to SHAPE_FILE_LOC_FIELD
-SHAPE_FILE_LOC_ALT_FIELD = os.getenv('SHAPE_FILE_LOC_ALT_FIELD', 'DNAME_2006')
+SHAPE_FILE_LOC_ALT_FIELD = os.getenv('SHAPE_FILE_LOC_ALT_FIELD', 'name')
+# starting location of the map. Though map would auto adjust to map center. This field may not have much effect
 # must be in format for log lat. see: http://geojson.org/geojson-spec.html
-MAP_CENTER = os.getenv('MAP_CENTER', '1.34,32.683525')
+MAP_CENTER = os.getenv('MAP_CENTER', '13.34,32.683525')
 # 0 for country level, 1 first level below country, 2 for second level etc.
 MAP_ADMIN_LEVEL = int(os.getenv('MAP_ADMIN_LEVEL', 1))
 MAP_ZOOM_LEVEL = int(os.getenv('MAP_ZOOM_LEVEL', 7))

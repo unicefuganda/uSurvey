@@ -608,9 +608,14 @@ function getCompletionFor(){
         });
        //update legend
         updateLegend(max_rate);
-       geojson = L.geoJson(mapData, {style: style, onEachFeature: onEachFeature}).addTo(map);
+        refreshMap();
     });
 
+}
+
+function refreshMap() {
+    geojson = L.geoJson(mapData, {style: style, onEachFeature: onEachFeature}).addTo(map);
+    map.panTo(geojson.getBounds().getCenter());
 }
 
 
@@ -650,7 +655,7 @@ function resetMap() {
     mapData.features.map(function(feature){
             feature.properties.rate = {value: null};
         });
-       geojson = L.geoJson(mapData, {style: style, onEachFeature: onEachFeature}).addTo(map);
+       refreshMap();
 }
 
 var colorCodes = ['#EFF3FF', '#C6DBEF', '#9ECAE1', '#6BAED6', '#3182BD', '#08519C']
