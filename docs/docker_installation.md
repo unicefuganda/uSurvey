@@ -40,6 +40,7 @@ Quick Start
         1. Creates path where database files are stored on host machine
         2. Loads the necessary Permissions categories.
         3. Creates a super user to enable you login to uSurvey (requires you to supply login credentials)
+        4. Attempts to setup up the map for your country
 
 * Once done, enter the following address on your browser to be sure uSurvey is properly setup:
     
