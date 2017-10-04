@@ -1,4 +1,4 @@
-Docker Setup (Linux)
+Docker Setup (Linux)c
 ===================
 
 * This section covers uSurvey installation from docker image. 
@@ -56,7 +56,7 @@ Customizing the country data
        
 * Before using the setup, you need to load data for administrative divisions of the required country.
 
-    * A sample of the required CSV file is available in the project directory (administrative_divisions.csv.example)
+    * A sample of the required CSV file is available in the project directory ([administrative_divisions.csv.example](./administrative_divisions.csv.example))
 
 * To load administrative divisions into the system, run the following commands from the project directory and follow the steps:    
 
@@ -66,7 +66,7 @@ Customizing the country data
 ####Note
 **The first line of the csv file shall be taken as file header.** 
 
-**The file header is expected to contain names as per the administrative division in a comma separated format. In addition, there can be an additional header for enumeration area. This header should be named *EAName*. Sample file for Uganda is included in the project directory as administrative_divisions.csv.example.**
+**The file header is expected to contain names as per the administrative division in a comma separated format. In addition, there can be an additional header for enumeration area. This header should be named *EAName*. Sample file for Uganda is included in the project directory as [administrative_divisions.csv.example](./administrative_divisions.csv.example).**
 
 
 ###Setting Up Map Reporting
