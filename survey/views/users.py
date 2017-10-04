@@ -43,7 +43,6 @@ def new(request):
         ('User list', reverse('users_index')),
     ])
     template_variables = {'userform': userform,
-                          'country_phone_code': settings.COUNTRY_CODE,
                           'action': reverse('new_user_page'),
                           'cancel_url': reverse('users_index'),
                           'id': "create-user-form",
@@ -128,7 +127,6 @@ def edit(request, user_id, mode=''):
         'class': 'user-form',
             'button_label': 'Save',
             'loading_text': 'Saving...',
-            'country_phone_code': settings.COUNTRY_CODE,
             'title': '%s User'% mode.title(),
             'mode': mode,
             'user_id': user.id}

@@ -1,3 +1,5 @@
+import phonenumbers
+import pycountry
 from django import forms
 from django.forms import ModelForm
 from survey.models import EnumerationArea
@@ -9,7 +11,6 @@ from survey.models import USSDAccess
 from survey.models import LocationType
 from django.conf import settings
 from django.core.exceptions import ValidationError
-import phonenumbers
 
 
 class InterviewerForm(ModelForm):
@@ -162,9 +163,9 @@ class USSDAccessForm(ModelForm):
     def clean_user_identifier(self):
         identifier = self.cleaned_data.get('user_identifier', '')
         try:
-            identifier = phonenumbers.parse(identifier, settings.COUNTRY_CODE)
-            if phonenumbers.is_valid_number_for_region(
-                    identifier, settings.COUNTRY_CODE):
+            country_code = pycountry.countries.lookup(settings.COUNTRY).alpha_2
+            identifier = phonenumbers.parse(identifier, country_code)
+            if phonenumbers.is_valid_number_for_region(identifier, country_code):
                 self.cleaned_data[
                     'user_identifier'] = identifier.national_number
             else:

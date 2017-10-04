@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 __author__ = 'anthony <antsmc2@gmail.com>'
 import phonenumbers
+import pycountry
 from django.conf import settings
 from django.shortcuts import render
 from django.core.urlresolvers import reverse
@@ -18,8 +19,9 @@ def ussd_flow(request):
     request_data['format'] = 'text'
     mobile = request_data.get(settings.USSD_MOBILE_NUMBER_FIELD, '')
     try:
-        pn = phonenumbers.parse(mobile, settings.COUNTRY_CODE)
-        if phonenumbers.is_valid_number_for_region(pn, settings.COUNTRY_CODE):
+        country_code = pycountry.countries.lookup(settings.COUNTRY).alpha_2
+        pn = phonenumbers.parse(mobile, country_code)
+        if phonenumbers.is_valid_number_for_region(pn, country_code):
             mobile = pn.national_number
             request_data['uid'] = mobile
             request_data['value'] = request_data.get(

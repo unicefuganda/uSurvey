@@ -1,6 +1,8 @@
 # Django settings for mics project.
 import os
 import sys
+import phonenumbers
+import pycountry
 
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
@@ -57,7 +59,7 @@ ALLOWED_HOSTS = ['*', ]
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 # although not all choices may be available on all operating systems.
 # In a Windows environment this must be set to your system time zone.
-TIME_ZONE = 'Africa/Kampala'
+TIME_ZONE = os.getenv('TIME_ZONE', 'Africa/Kampala')
 
 # Language code for this installation. All choices can be found here:
 # http://www.i18nguy.com/unicode/language-identifiers.html
@@ -294,8 +296,6 @@ INSTALLED_BACKENDS = {
     # },
 }
 
-COUNTRY_CODE = 'UG'
-COUNTRY_PHONE_CODE = '256'
 
 PRODUCTION = False
 

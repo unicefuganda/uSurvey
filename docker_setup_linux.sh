@@ -27,6 +27,21 @@ chmod +x loaders/*
 
 echo '#####                     '
 sleep 1
+
+
+YELLOW='\033[1;33m'
+RED='\033[0;31m'
+NC='\033[0m' # No Color
+printf "${YELLOW}For the next step, you can check out the country names as they appear on  \
+https://mapzen.com/data/borders/ ${NC}\n"
+read -p "Enter country name in full (e.g Uganda or United States of America): " country_name
+
+# country name to lower case
+country_name=$(echo "$country_name" | tr '[:upper:]' '[:lower:]')
+#make save country setting to env file
+echo "COUNTRY=$country_name" >> .env
+
+
 echo "Starting app..."
 echo ""
 
@@ -38,26 +53,22 @@ sleep 1
 echo "1. Running migrations..."
 echo "2. Load Roles and Permissions"
 echo "3. create superuser..."
+echo "4. Attempts to setup map for your country..."
 docker-compose run usurvey_app sh -c "python manage.py makemigrations && python manage.py migrate --noinput && \
                                 python manage.py load_parameters && python manage.py createsuperuser"
 echo "Done creating super user. "
 
 
-
 # expected that docker must have created the file _docker_mapf
 sudo chown -R $USER:$USER ._docker_mapf
-YELLOW='\033[1;33m'
-RED='\033[0;31m'
-NC='\033[0m' # No Color
 printf "${RED}Attempting map setup.${NC}\n"
 printf "${RED}Note:${NC} ${YELLOW}If this step fails, either re-run this setup script or resolve the map's \
 shape file manually${NC}\n"
 printf "${YELLOW}To setup the map manually, see map section on  \
 https://usurvey.readthedocs.io/en/latest/docker_installation/ ${NC}\n"
-
-read -p "Enter country name in full (e.g Uganda or United States of America): " country_name
-# country name to lower case
-country_name=$(echo "$country_name" | tr '[:upper:]' '[:lower:]')
+#printf "${YELLOW}For the next step, you can check out the country names as they appear on  \
+#https://mapzen.com/data/borders/ ${NC}\n"
+#read -p "Enter country name in full (e.g Uganda or United States of America): " country_name
 # replace space with hyphen
 country_name=$(echo $country_name | sed -e 's, ,-,g')
 MAP_URL_BASE=https://s3.amazonaws.com/osm-polygons.mapzen.com

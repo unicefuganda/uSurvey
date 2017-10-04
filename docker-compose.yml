@@ -22,6 +22,9 @@ services:
       - MAP_CENTER
       - MAP_ADMIN_LEVEL
       - MAP_ZOOM_LEVEL
+      - COUNTRY
+      - TIME_ZONE
+
     image: antsmc2/usurvey
     command: gunicorn -b 0.0.0.0:3691 --workers=$USURVEY_APP_WORKERS  --max-requests $USURVEY_APP_MAX_REQUESTS --timeout $USURVEY_APP_TIMEOUT mics.wsgi
     depends_on:

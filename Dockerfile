@@ -21,7 +21,7 @@ RUN set -ex \
             libffi-dev \
             postgresql-client \
     && LIBRARY_PATH=/lib:/usr/lib /bin/sh -c "pip install -U pip" \
-    && LIBRARY_PATH=/lib:/usr/lib /bin/sh -c "pip install -r /pip-requires.txt"
+    && LIBRARY_PATH=/lib:/usr/lib /bin/sh -c "pip install -r /pip-freeze.txt"
 
 
 # Copy application code to the container
