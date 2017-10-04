@@ -1,7 +1,7 @@
 FROM python:2.7-alpine
 
 # Copy in your requirements file
-ADD pip-requires.txt /pip-requires.txt
+ADD pip-requires.txt /pip-freeze.txt
 
 # Install build deps, then run `pip install`, then remove unneeded build deps all in a single step. Correct the path to your production requirements file, if needed.
 RUN set -ex \
