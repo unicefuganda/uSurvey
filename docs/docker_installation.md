@@ -8,7 +8,7 @@ Docker Setup (Linux)
 Prerequisites
 ------------- 
 
-* Linux Machine (Preferably Ubuntu)
+* Linux Machine (Preferably Ubuntu 12+)
 
 * Minimum of 2GB RAM for test environment 
 
@@ -72,7 +72,7 @@ Customizing the country data
 
 **If you plan to use uSurvey in Uganda, then this step is not required!**
 
-**The recommended way to setup the map on linux is using the docker_setup_linux.sh script. However if that fails, following steps explains how map setup can be done manually**
+**The recommended way to setup the map on linux is using the docker_setup_linux.sh script. However if that fails, the following steps explains how map setup can be done manually**
 
 To enable uSurvey capture survey data in a specific country's map, you need to update the map settings section within the ``.env`` file. This file is available in the project directory.
 
