@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth.models import User, Group
 from django.forms import ModelForm
+from django.conf import settings
 
 from django.contrib.auth.forms import UserCreationForm
 
@@ -8,14 +9,14 @@ from survey.models.users import UserProfile
 
 
 class UserForm(UserCreationForm):
-    mobile_number = forms.DecimalField(
-        min_value=100000000,
-        max_digits=9,
+    mobile_number = forms.CharField(
+        max_length=settings.MOBILE_NUM_MAX_LENGTH,
+        min_length=settings.MOBILE_NUM_MIN_LENGTH,
         widget=forms.TextInput(
             attrs={
                 'placeholder': 'Format: 771234567',
                 'style': "width:172px;",
-                'maxlength': '10'}))
+                'maxlength': settings.MOBILE_NUM_MAX_LENGTH}))
 
     def __init__(self, *args, **kwargs):
         super(UserForm, self).__init__(*args, **kwargs)
@@ -31,36 +32,32 @@ class UserForm(UserCreationForm):
             'groups']
         self.fields['groups'].queryset = Group.objects.all().order_by('name')
 
-    def _clean_attribute(self, Klass, **kwargs):
-        attribute_name = kwargs.keys()[0]
-        data_attr = kwargs[attribute_name]
-        users_with_same_attr = Klass.objects.filter(**kwargs)
-        if users_with_same_attr and self.initial.get(
-                attribute_name, None) != str(data_attr):
-            message = "%s is already associated to a different user." % data_attr
-            self._errors[attribute_name] = self.error_class([message])
-            del self.cleaned_data[attribute_name]
-        return data_attr
-
-    def clean_username(self):
-        username = self.cleaned_data['username']
-        return self._clean_attribute(User, username=username)
+    def clean_email(self):
+        email = self.cleaned_data['email']
+        users_with_email = User.objects.filter(email=email)
+        if self.instance:
+            users_with_email = users_with_email.exclude(pk=self.instance.pk)
+        if users_with_email.exists():
+            raise forms.ValidationError('This email already exist with: %s' %
+                                        users_with_email.first().username)
+        return email
 
     def clean_mobile_number(self):
         mobile_number = self.cleaned_data['mobile_number']
-        return self._clean_attribute(UserProfile, mobile_number=mobile_number)
-
-    def clean_email(self):
-        email = self.cleaned_data['email']
-        return self._clean_attribute(User, email=email)
+        users_with_mobile_number = UserProfile.objects.filter(mobile_number=mobile_number)
+        if self.instance:
+            users_with_mobile_number = users_with_mobile_number.exclude(user__pk=self.instance.pk)
+        if users_with_mobile_number.exists():
+            raise forms.ValidationError('This mobile_number already exist with: %s' %
+                                        users_with_mobile_number.first().user.username)
+        return mobile_number
 
     def save(self, commit=True, *args, **kwargs):
         user = super(UserForm, self).save(commit=commit, *args, **kwargs)
         if commit:
             self.save_m2m()
-            user_profile, b = UserProfile.objects.get_or_create(user=user)
-            user_profile.mobile_number = self.cleaned_data['mobile_number']
-            user_profile.save()
+            mobile_number = self.cleaned_data['mobile_number']
+            user_profile, b = UserProfile.objects.get_or_create(user=user, mobile_number=mobile_number)
 
         return user
 
@@ -73,14 +70,14 @@ class UserForm(UserCreationForm):
 
 
 class EditUserForm(ModelForm):
-    mobile_number = forms.DecimalField(
-        min_value=100000000,
-        max_digits=9,
+    mobile_number = forms.CharField(
+        max_length=settings.MOBILE_NUM_MAX_LENGTH,
+        min_length=settings.MOBILE_NUM_MIN_LENGTH,
         widget=forms.TextInput(
             attrs={
                 'placeholder': 'Format: 771234567',
                 'style': "width:172px;",
-                'maxlength': '10'}))
+                'maxlength': settings.MOBILE_NUM_MAX_LENGTH}))
     password = forms.CharField(label="Password", required=False,
                                widget=forms.PasswordInput())
 
@@ -99,35 +96,24 @@ class EditUserForm(ModelForm):
             self.fields.keyOrder.extend(
                 ['password', 'confirm_password', 'groups'])
 
-    def _clean_attribute(self, Klass, **kwargs):
-        attribute_name = kwargs.keys()[0]
-        data_attr = kwargs[attribute_name]
-        users_with_same_attr = Klass.objects.filter(**kwargs)
-        if users_with_same_attr and self.initial.get(
-                attribute_name, None) != str(data_attr):
-            message = "%s is already associated to a different user." % data_attr
-            self._errors[attribute_name] = self.error_class([message])
-            del self.cleaned_data[attribute_name]
-        return data_attr
-
-    def clean_username(self):
-        username = self.cleaned_data['username']
-        users_with_same_username = User.objects.filter(username=username)
-        if self.initial.get('username', None) != str(
-                username) or not users_with_same_username:
-            message = "username cannot be changed."
-            self._errors['username'] = self.error_class([message])
-            del self.cleaned_data['username']
-
-        return username
-
     def clean_mobile_number(self):
         mobile_number = self.cleaned_data['mobile_number']
-        return self._clean_attribute(UserProfile, mobile_number=mobile_number)
+        users_with_mobile_number = UserProfile.objects.filter(mobile_number=mobile_number)
+        if self.instance:
+            users_with_mobile_number = users_with_mobile_number.exclude(user__pk=self.instance.pk)
+        if users_with_mobile_number.exists():
+            raise forms.ValidationError('This mobile_number already exist with: %s' %
+                                        users_with_mobile_number.first().user.username)
+        return mobile_number
 
     def clean_email(self):
         email = self.cleaned_data['email']
-        return self._clean_attribute(User, email=email)
+        users_with_email = User.objects.filter(email=email)
+        if self.instance:
+            users_with_email = users_with_email.exclude(pk=self.instance.pk)
+        if users_with_email.exists():
+            raise forms.ValidationError('This email already exist with: %s' % users_with_email.first().username)
+        return email
 
     def _clean_passwords(self, cleaned_data):
         password = cleaned_data.get('password', '')
@@ -158,9 +144,8 @@ class EditUserForm(ModelForm):
             user.set_password(password)
 
     def _create_or_update_profile(self, user):
-        user_profile, created = UserProfile.objects.get_or_create(user=user)
-        user_profile.mobile_number = self.cleaned_data['mobile_number']
-        user_profile.save()
+        mobile_number = self.cleaned_data['mobile_number']
+        user_profile, b = UserProfile.objects.get_or_create(user=user, mobile_number=mobile_number)
 
     class Meta:
         model = User
@@ -169,7 +154,7 @@ class EditUserForm(ModelForm):
             'username': forms.TextInput(attrs={'readonly': 'readonly'}),
         }
         labels = {
-            "groups": ("Roles"),
+            "groups": "Roles",
         }
 
 

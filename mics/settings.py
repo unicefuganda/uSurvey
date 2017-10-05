@@ -8,7 +8,7 @@ import pycountry
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 REDIS_HOST = os.getenv('REDIS_HOST', 'localhost')
 REDIS_PORT = int(os.getenv('REDIS_PORT', 6379))
-DEBUG = False
+DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
@@ -189,7 +189,6 @@ INSTALLED_APPS = [
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
 ]
-
 
 
 # A sample logging configuration. The only tangible logging
@@ -379,8 +378,8 @@ USSD_IGNORED_CHARACTERS = "*!#';&"
 MAX_DISPLAY_PER_PAGE = 3
 DEFAULT_TOTAL_HOUSEHOLDS_IN_EA = 1000
 DATE_FORMAT = "%d-%m-%Y"
-MOBILE_NUM_MIN_LENGTH = 9
-MOBILE_NUM_MAX_LENGTH = 9
+MOBILE_NUM_MIN_LENGTH = 7       # this is the min digits of phone numbers in national format (excluding leading 0)
+MOBILE_NUM_MAX_LENGTH = 12      # this is the max digits of phone numbers in national format (excluding leading 0)
 LOOP_QUESTION_REPORT_DEPT = 3  # reports up to 5 question loops
 # following setting refers to the URL for loading the map data
 SHAPE_FILE_URI = os.getenv('SHAPE_FILE_URI', '/static/map_resources/country_shape_file.json')
