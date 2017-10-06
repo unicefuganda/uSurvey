@@ -53,7 +53,7 @@ sleep 1
 echo "1. Running migrations..."
 echo "2. Load Roles and Permissions"
 echo "3. create superuser..."
-echo "4. Attempts to setup map for your country..."
+echo "4. Attempts to setup map for $country_name..."
 docker-compose run usurvey_app sh -c "python manage.py makemigrations && python manage.py migrate --noinput && \
                                 python manage.py load_parameters && python manage.py createsuperuser"
 echo "Done creating super user. "
