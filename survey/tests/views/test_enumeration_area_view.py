@@ -6,7 +6,9 @@ from survey.forms.upload_csv_file import UploadEAForm
 from survey.models import Survey, EnumerationArea, Batch
 from survey.services.ea_upload import UploadEACSVLayoutHelper
 from survey.tests.base_test import BaseTest
+from survey.views.enumeration_area import _process_form
 from django.utils.timezone import utc
+from django.core.urlresolvers import reverse
 
 
 class UploadWeightsTest(BaseTest):
@@ -21,8 +23,6 @@ class UploadWeightsTest(BaseTest):
         self.country = LocationType.objects.create(
             name='Country', slug='country')
         self.uganda = Location.objects.create(name="Uganda", type=self.country)
-        # LocationTypeDetails.objects.create(
-        #     country=self.uganda, location_type=self.country)
 
         self.district_type = LocationType.objects.create(
             name="Districttype", slug='districttype', parent=self.country)
@@ -81,27 +81,13 @@ class UploadWeightsTest(BaseTest):
         response = self.client.get('/enumeration_area/filter/')
         self.assertEqual(200, response.status_code)
 
-    def test_open_ea(self):
-        response = self.client.get('/enumeration_area/ea_filter/')
+    def test_open_ea(self):        
+        response = self.client.get(reverse('enumeration_area_filter'))
         self.assertEqual(200, response.status_code)
+    def test_delete_ea(self):
+        x= EnumerationArea.objects.create(name="tremp")
+        response = self.client.get(reverse('delete_enumeration_area', kwargs={'ea_id': x.id}))        
+        self.assertIn(response.status_code, [200,302])
 
-    def test_should_return_success_and_render_template(self):
-        response = self.client.get('/locations/enumeration_area/upload/')
-        self.assertNotEqual(200, response.status_code)
-        templates = [template.name for template in response.templates]
-        self.assertIn('locations/enumeration_area/upload.html', templates)
-
-    def test_should_render_context_data(self):
-        response = self.client.get('/locations/enumeration_area/upload/')
-        self.assertEqual(response.context['button_label'], "Upload")
-        self.assertEqual(response.context['id'], "upload-location-ea-form")
-        self.assertIsInstance(
-            response.context['csv_layout'], UploadEACSVLayoutHelper)
-        self.assertIsInstance(response.context['upload_form'], UploadEAForm)
-
-    def test_assert_restricted_permissions(self):
-        self.assert_restricted_permission_for(
-            '/locations/1/enumerationareas/')
-
-        self.assert_restricted_permission_for(
-            '/locations/1/children/')
+    def test_process_form(self):        
+        __process_form(None,None)
