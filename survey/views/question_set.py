@@ -150,22 +150,25 @@ class QuestionSetView(object):
             qset.delete()
         return HttpResponseRedirect('%s_home' % self.model.resolve_tag())
 
-
+@permission_required('auth.can_view_batches')
 def delete(request, question_id, batch_id):
-    qset = QuestionSet.get(pk=question_id)
+    qset = get_object_or_404(QuestionSet, pk=question_id)
+
     if qset.interviews.exists():
         messages.error(
             request,
             "%s cannot be deleted because it already has interviews." %
-            qset.verbose_name())
+        qset.verbose_name())
     else:
+        messages.success(request, "Question Set Deleted Successfully")
         qset.delete()
     return HttpResponseRedirect(
         reverse(
             'batch_index_page',
             args=(
-                qset.survey.id,
-            )))
+                batch_id
+            )
+        ))
 
 
 def delete_qset_listingform(request, question_id):
@@ -412,7 +415,7 @@ def list_questions(request):
             for q in QuestionSet.get(id=request.GET.get('id')).all_questions]
     else:
         values = list(
-            QuestionSet.objects.questions.values(
+            Question.objects.all().values(
                 'id', 'identifier', 'text'))
     return HttpResponse(
         json.dumps(

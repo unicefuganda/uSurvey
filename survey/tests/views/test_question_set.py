@@ -2,10 +2,15 @@ from django.contrib.auth.models import User
 from django.test import Client
 from survey.forms.question_module_form import QuestionModuleForm
 # from survey.forms.question_set import QuestionSetForm, BatchForm
+from model_mommy import mommy
 from survey.forms import *
-from survey.models import QuestionModule, Question, QuestionSetChannel, QuestionSet, ResponseValidation
+from survey.models import *
 from survey.models.batch import *
 from survey.tests.base_test import BaseTest
+from survey.forms.batch import BatchForm
+from survey.forms.question_set import get_question_set_form
+from survey.views.question_set import QuestionSetView
+import json
 
 class QuestionSetViewTest(BaseTest):
     def setUp(self):
@@ -16,53 +21,171 @@ class QuestionSetViewTest(BaseTest):
                                         'can_view_batches')
         self.assign_permission_to(raj, 'can_view_investigators')
         self.client.login(username='demo8', password='demo8')
-        self.qset = QuestionSet.objects.create(name="health", description="blabla")
-        self.rsp = ResponseValidation.objects.create(validation_test="validationtest",
-constraint_message="message")
-        self.module = QuestionModule.objects.create(name="Education")
-        self.question_1 = QuestionTemplate.objects.create(module=self.module,variable_name='a',text='ttt',answer_type='Numerical Answer',response_validation=self.rsp)
-        self.survey = Survey.objects.create(name="haha")
-        self.batch = Batch.objects.create(order=1, name="Batch A", survey=self.survey)
-    def test_get_new_question_set_module(self):
-        health_module = QuestionSet.objects.create(name="health")
-        response = self.client.get('qset/questions/%s/new/' % health_module.id)
-        self.failUnlessEqual(response.status_code, 200)        
-        templates = [template.name for template in response.templates]
-        self.assertIn('question_set/new.html', templates)
-        self.assertIsNotNone(response.context['question_set'])
-        self.assertIsInstance(
-            response.context['question_set'], QuestionSetForm)
-        self.assertEqual(response.context['title'], "New QuestionSet")
-        self.assertEqual(response.context['button_label'], "Create")
-        self.assertEqual(response.context['action'], "qset/questions/%s/new/")
     
     def test_index(self):
-        response = self.client.get(reverse('qset_questions_page'))
-        self.failUnlessEqual(response.status_code, 200)
-    def test_delete_should_delete_the_question(self):
-        qset = QuestionSet.objects.create(**self.form_data)
-        self.survey = Survey.objects.create(name="haha")
-        batch = Batch.objects.create(order=1, name="Batch A", survey=self.survey)
-        self.failUnless(qset)
-        response = self.client.get('/qset/delete/%d/batch/%d/' % qset.id,batch.id)
-        self.assertRedirects(response, reverse('qset_questions_page'), status_code=302,
-                             target_status_code=200, msg_prefix='')
-    def test_post_question_set_returns_error_message_if_similar_module_exists(self):        
-        QuestionSet.objects.create(name="health", description="blabla")
-        form_data = {'name': 'health'}
-        response = self.client.post('qset/questions/%s/new/', data=form_data)
-        self.failUnlessEqual(response.status_code, 200)
+        survey_obj = mommy.make(Survey)
+        batch = Batch.objects.create(order=1, name="Batch A1", survey=survey_obj)
+        response = self.client.get(reverse('batch_index_page', kwargs={"survey_id" : survey_obj.id}))
+        self.assertIn(response.status_code, [200, 302])
         templates = [template.name for template in response.templates]
-        self.assertIn('question_set/new.html', templates)
-        error_message = "Question set was not created."
-        self.assertIn(error_message, str(response))
+        self.assertIn('question_set/index.html', templates)
+        self.assertIn('name, description', response.context['placeholder'])
+        self.assertEqual(Batch, response.context['model'])
+        self.assertEqual(Batch.__name__, response.context['model_name'])
+        self.assertIn(batch, response.context['question_sets'])
+        self.assertEqual(survey_obj, response.context['survey'])
 
-    def test_permission_for_question_modules(self):
-        self.assert_restricted_permission_for('/qsets/')
-        self.assert_restricted_permission_for('/list_questions/')
-        self.assert_restricted_permission_for('/question_validators/')
-        self.assert_restricted_permission_for('/question_options/')
-        self.assert_restricted_permission_for('/question_set/1/questions/')
-        self.assert_restricted_permission_for('/qset/delete//1/batch/1/')          
-        self.assert_restricted_permission_for('/qset/qset_identifiers/')
-        self.assert_restricted_permission_for('/qset/delete/1/')        
+    def test_delete_should_delete_the_question(self):
+        survey_obj = mommy.make(Survey)
+        batch = Batch.objects.create(order=1, name="Batch ABC", survey=survey_obj)
+        qset = QuestionSet.get(id=batch.id)
+        response = self.client.get(reverse('delete_qset', kwargs={"question_id":qset.id, "batch_id":survey_obj.id}))
+        self.assertIn('Question Set Deleted Successfully', response.cookies['messages'].__str__())
+        self.assertRedirects(response, reverse('batch_index_page', kwargs={"survey_id" : survey_obj.id}), msg_prefix='')
+    
+    def test_delete_should_throws_404(self):
+        response = self.client.get(reverse('delete_qset', kwargs={"question_id":999, "batch_id":999}))
+        self.assertEqual(response.status_code, 404)
+
+    def test_search_questionset(self):
+        survey_obj = mommy.make(Survey)
+        batch = Batch.objects.create(order=1, name="bsearch", survey=survey_obj)
+        url = reverse('batch_index_page', kwargs={"survey_id" : survey_obj.id})
+        url = url+"?q=bsearch"
+        response = self.client.get(url)
+        self.assertIn(response.status_code, [200, 302])
+        templates = [template.name for template in response.templates]
+        self.assertIn('question_set/index.html', templates)
+        self.assertIn('name, description', response.context['placeholder'])
+        self.assertEqual(Batch, response.context['model'])
+        self.assertEqual(Batch.__name__, response.context['model_name'])
+        self.assertIn(batch, response.context['question_sets'])
+        self.assertEqual(survey_obj, response.context['survey'])
+
+    def test_question_options_by_question(self):
+        listing_form = mommy.make(ListingTemplate)
+        qset =  QuestionSet.get(pk=listing_form.id)
+        question1 = mommy.make(Question, qset=qset, answer_type=NumericalAnswer.choice_name())
+        QuestionOption.objects.create(
+            question=question1,
+            order=1,
+            text="q1"
+            )        
+        url = reverse('question_options')
+        url = url + "?ques_id=%s"%question1.id
+        response = self.client.get(url)
+        self.assertIn(response.status_code, [200, 302])
+        self.assertEqual(response.content, '{"1": "q1"}')
+
+
+    def test_question_options_by_qset(self):
+        survey_obj = mommy.make(Survey)
+        batch = Batch.objects.create(order=1, name="bsearch", survey=survey_obj)
+        qset =  QuestionSet.get(pk=batch.id)
+        question1 = mommy.make(Question, qset=qset, answer_type=TextAnswer.choice_name())
+        QuestionOption.objects.create(
+            question=question1,
+            order=3,
+            text="q3"
+            )
+
+        question2 = mommy.make(Question, qset=qset, answer_type=TextAnswer.choice_name())
+        QuestionOption.objects.create(
+            question=question1,
+            order=4,
+            text="q4"
+            )
+        QuestionFlow.objects.create(
+            name = 'a1',
+            desc = 'descq',
+            question = question2,
+            question_type = TextAnswer.choice_name(),
+            next_question = question1,
+            next_question_type = TextAnswer.choice_name()
+            )
+        QuestionLoop.objects.create(
+            loop_starter = question2,
+            loop_ender = question1
+            )
+        url = reverse('question_options')
+        url = url + "?id=%s"%qset.id
+        response = self.client.get(url)
+        self.assertIn(response.status_code, [200, 302])
+        self.assertEqual(response.content,'{}')
+
+    def test_question_validators(self):
+        listing_form = mommy.make(ListingTemplate)
+        qset =  QuestionSet.get(pk=listing_form.id)
+        question1 = mommy.make(Question, qset=qset, answer_type=NumericalAnswer.choice_name())
+        QuestionOption.objects.create(
+            question=question1,
+            order=1,
+            text="q5"
+            )        
+        url = reverse('question_validators')
+        url = url + "?ques_id=%s"%question1.id
+        response = self.client.get(url)
+        self.assertIn(response.status_code, [200, 302])
+        self.assertEqual(response.content, '["equals", "between", "less_than", "greater_than"]')
+
+        url = reverse('question_validators')
+        url = url + "?id=%s"%qset.id
+        response = self.client.get(url)
+        self.assertIn(response.status_code, [200, 302])
+        self.assertEqual(response.content, '{}')
+
+
+    def test_list_questions(self):
+        listing_form = mommy.make(ListingTemplate)
+        qset =  QuestionSet.get(pk=listing_form.id)
+        question1 = mommy.make(Question, qset=qset, answer_type=NumericalAnswer.choice_name())
+        QuestionOption.objects.create(
+            question=question1,
+            order=1,
+            text="q6"
+            )        
+        url = reverse('list_questions')
+        url = url + "?id=%s"%qset.id
+        response = self.client.get(url)
+        self.assertIn(response.status_code, [200, 302])
+        self.assertEqual(response.content, '[]')
+
+        url = reverse('list_questions')
+        response = self.client.get(url)
+        response_data = json.loads(response.content)
+        is_exist = False
+        for each in response_data:
+            if each['id'] == question1.id:
+                is_exist = True
+                break
+        self.assertTrue(is_exist)
+
+
+    def test_list_qsets(self):
+        survey_obj = mommy.make(Survey)
+        batch = Batch.objects.create(order=1, name="b2", survey=survey_obj)
+        qset =  QuestionSet.get(pk=batch.id)
+        url = reverse('view_qsets')
+        url = url + "?survey_id=%s"%survey_obj.id
+        response = self.client.get(url)
+        self.assertIn(response.status_code, [200, 302])
+        response_data = json.loads(response.content)
+        is_exist = False
+        for each in response_data:
+            if each['id'] == batch.id:
+                is_exist = True
+                break
+        self.assertTrue(is_exist)
+    
+        url = reverse('view_qsets')
+        response = self.client.get(url)
+        is_exist = False
+        response_data = json.loads(response.content)
+        for each in response_data:
+            if each['id'] == batch.id:
+                is_exist = True
+                break
+        self.assertTrue(is_exist)
+
+
+ 

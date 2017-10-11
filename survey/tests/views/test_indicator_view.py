@@ -73,7 +73,7 @@ class IndicatorViewTest(BaseTest):
     def test_post_edit_indicator_updates_and_returns_success(self):
         survey = Survey.objects.create(name='survey')
         indicator = Indicator.objects.create(
-            name='ITN1', survey=self.survey, question_set=self.qset, description="bla")        
+            name='ITN2', survey=self.survey, question_set=self.qset, description="bla")        
         #survey = Survey.objects.create(name='Survey A')        
         # self.batch = Batch.objects.create(name='Batch A', survey=survey)
         self.qset = QuestionSet.objects.create(name="qset",description="blahblah")
@@ -91,7 +91,7 @@ class IndicatorViewTest(BaseTest):
         response = self.client.post(reverse('edit_indicator_page',kwargs={"indicator_id":indicator.id}), data=self.form_data)
 
         self.failUnless(Indicator.objects.filter(
-            name='ITN1', description='bla'))
+            name='ITN2', description='bla'))
         self.assertRedirects(response, expected_url=reverse('list_indicator_page'))
         success_message = "Indicator successfully edited."
         self.assertIn(success_message, response.cookies['messages'].value)
@@ -102,7 +102,7 @@ class IndicatorViewTest(BaseTest):
         # self.module = QuestionModule.objects.create(name="Health")
         # self.batch = Batch.objects.create(name='Batch A', survey=self.survey)
         indicator = Indicator.objects.create(
-            name='ITN1', survey=self.survey, question_set=self.qset, description="bla")        
+            name='ITN3', survey=self.survey, question_set=self.qset, description="bla")        
         self.form_data = {
                           'name': 'Health',
                           'description': 'some description',
@@ -139,13 +139,15 @@ class IndicatorViewTest(BaseTest):
         self.assert_restricted_permission_for(reverse('new_indicator_page'))
 
     def test_get_indicator_index(self):
+        self.survey =Survey.objects.create(name="ssandu")
         another_form_data = self.form_data.copy()
         another_form_data['name'] = 'Education'
         another_form_data['description'] = 'bla'
         another_form_data['question_set'] = self.qset
         # another_form_data['module'] = self.module
         # another_form_data['batch'] = self.batch
-        del another_form_data['survey']
+        # del another_form_data['survey']
+        another_form_data['survey'] = self.survey
 
         education_indicator = Indicator.objects.create(**another_form_data)
         response = self.client.get(reverse('list_indicator_page'))
@@ -165,7 +167,7 @@ class IndicatorViewTest(BaseTest):
         indicator_s = Indicator.objects.create(
             name='ITN', survey=self.survey, question_set=self.qset, description="bla")
         indicator = Indicator.objects.create(
-            name='ITN1', survey=self.survey, question_set=self.qset, description="bla")
+            name='ITN4', survey=self.survey, question_set=self.qset, description="bla")
 
         response = self.client.get(
             reverse('list_indicator_page'), data={'survey': survey.id, 'question_set': qset.id})
