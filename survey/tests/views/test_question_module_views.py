@@ -20,7 +20,7 @@ class QuestionModuleViewTest(BaseTest):
     def test_get_new_question_module(self):
         response = self.client.get('/modules/new/')
         self.failUnlessEqual(response.status_code, 200)
-        templates = [template.name for template in response.templates]
+        templates = [template.name for template in response.templates]        
         self.assertIn('question_module/new.html', templates)
         self.assertIsNotNone(response.context['question_module_form'])
         self.assertIsInstance(

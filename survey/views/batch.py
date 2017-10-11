@@ -151,7 +151,7 @@ def _add_success_message(request, action_str):
 
 
 @permission_required('auth.can_view_batches')
-def delete(request, batch_id):
+def delete(request, survey_id, batch_id):
     try:
         batch = Batch.get(id=batch_id)
         QuestionSetView(model_class=Batch).delete(request, batch)
