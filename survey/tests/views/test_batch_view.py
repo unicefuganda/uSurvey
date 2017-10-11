@@ -245,8 +245,9 @@ class BatchViewsTest(BaseTest):
         response = self.client.get(reverse('delete_batch', kwargs={'survey_id':self.survey.id, 'batch_id':self.batch.id}))
         self.assertIn(response.status_code, [200,302])
         recovered_batch = Batch.objects.filter(id=self.batch.id)
-        self.assertRedirects(response, expected_url='/surveys/%d/batches/' % self.survey.id, status_code=302,
-                             target_status_code=200, msg_prefix='')
+        # self.assertRedirects(response, expected_url='/surveys/%d/batches/' % self.survey.id, status_code=302,
+        #                      target_status_code=200, msg_prefix='')
+        self.assertRedirects(response, reverse('batch_index_page', kwargs={"survey_id" : self.survey.id}), msg_prefix='')
         self.failIf(recovered_batch)
 
 
