@@ -415,7 +415,7 @@ def list_questions(request):
             for q in QuestionSet.get(id=request.GET.get('id')).all_questions]
     else:
         values = list(
-            QuestionSet.objects.questions.values(
+            Question.objects.all().values(
                 'id', 'identifier', 'text'))
     return HttpResponse(
         json.dumps(
