@@ -249,6 +249,7 @@ class BatchViewsTest(BaseTest):
                              target_status_code=200, msg_prefix='')
         self.failIf(recovered_batch)
 
+
     def test_should_tell_if_name_is_already_taken(self):
         batch = Batch.objects.create(
             survey=self.survey, name="batch a", description="batch a description")
@@ -263,9 +264,6 @@ class BatchViewsTest(BaseTest):
         self.failUnlessEqual(response.status_code, 200)
         json_response = json.loads(response.content)
         self.assertTrue(json_response)
-
-    # def test_survey_id_is_None(self):
-    #     batch = Batch.objects.create(survey=self.survey, name="batch a", description="batch a description")
     
     def test_survey_id_is_None(self):
         batch = Batch.objects.create(
