@@ -285,11 +285,6 @@ def _view_qset_data(request, model_class, interviews,title, disabled_fields=[]):
                 max_rows=items_per_page))
     return render(request, 'question_set/view_all_data.html', context)
 
-
-def get_result():
-    pass
-
-
 @login_required
 @permission_required('auth.can_view_aggregates')
 def listing_entries(request, qset_id):
