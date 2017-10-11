@@ -18,6 +18,9 @@ from survey.models import Survey
 from survey.forms.enumeration_area import LocationsFilterForm
 
 
+INDICATOR_DOES_NOT_EXIST_MSG = "The indicator requested does not exist."
+
+
 @login_required
 @permission_required('auth.can_view_batches')
 def new(request):
@@ -126,7 +129,6 @@ def _add_variable(request, indicator=None):
     form_action = reverse('add_variable')
     parameter_questions = []
     if indicator:
-        form_action = reverse("add_indicator_variable", args=(indicator.id, ))
         form_action = reverse("add_indicator_variable", args=(indicator.id, ))
         parameter_questions = indicator.eqset.all_questions
     variable_form = IndicatorVariableForm(indicator)
@@ -284,10 +286,13 @@ def variables(request):
 @login_required
 @permission_required('auth.can_view_batches')
 def indicator_formula(request, indicator_id):
-    indicator = Indicator.get(id=indicator_id)
+    try:
+        indicator = Indicator.get(id=indicator_id)
+    except Indicator.DoesNotExist:
+        messages.error(request, INDICATOR_DOES_NOT_EXIST_MSG)
+        return HttpResponseRedirect(reverse('list_indicator_page'))
     if request.method == 'POST':
-        formulae_form = IndicatorFormulaeForm(
-            instance=indicator, data=request.POST)
+        formulae_form = IndicatorFormulaeForm(instance=indicator, data=request.POST)
         if formulae_form.is_valid():
             formulae_form.save()
             messages.info(request, 'Formulae has been saved!')
@@ -301,6 +306,7 @@ def indicator_formula(request, indicator_id):
         'indicator_form': formulae_form,
         'title': 'Indicator Formulae',
         'button_label': 'Save',
+        'indicator': indicator,
         'cancel_url': reverse('list_indicator_page')}
     return render(request, 'indicator/formulae.html', context)
 

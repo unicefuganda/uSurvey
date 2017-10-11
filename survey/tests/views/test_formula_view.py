@@ -1,10 +1,11 @@
 from django.contrib.auth.models import User
-# from survey.forms.formula import FormulaForm
-from survey.models import Survey, Batch, QuestionModule, Indicator, Question, QuestionOption, QuestionSet, ResponseValidation
-from survey.tests.base_test import BaseTest
-# from survey.models.batch_question_order import *
 from django.core.urlresolvers import reverse
 from django.test.client import Client
+from survey.forms.indicator import IndicatorFormulaeForm
+from survey.models import (Survey, Batch, QuestionModule, Indicator, Question, QuestionOption,
+                           QuestionSet, ResponseValidation, IndicatorVariable, IndicatorVariableCriteria)
+from survey.views.indicators import INDICATOR_DOES_NOT_EXIST_MSG
+from survey.tests.base_test import BaseTest
 
 
 class IndicatorFormulaViewsTest(BaseTest):
@@ -21,67 +22,63 @@ class IndicatorFormulaViewsTest(BaseTest):
         self.survey = Survey.objects.create(name='survey name', description='survey descrpition',
                                             sample_size=10)
         self.qset = QuestionSet.objects.create(name="Females")
-        self.rsp = ResponseValidation.objects.create(validation_test="validationtest",
-constraint_message="message")
+        self.rsp = ResponseValidation.objects.create(validation_test="validationtest", constraint_message="message")
         self.batch = Batch.objects.create(
             order=1, name="Batch A", survey=self.survey)
         self.module = QuestionModule.objects.create(
             name='Education', description='Educational Module')
-        self.indicator = Indicator.objects.create(name='Test Indicator', description="dummy",display_on_dashboard=True,formulae="formulae",
+        self.indicator = Indicator.objects.create(name='Test Indicator', description="dummy",
+                                                  display_on_dashboard=True, formulae="formulae",
                                                   question_set_id=self.qset.id, survey_id=self.survey.id)
-
-        # self.group = HouseholdMemberGroup.objects.create(
-        #     name="Females", order=1)
         
         self.question_mod = QuestionModule.objects.create(
             name="Test question name", description="test desc")
-        self.question_1 = Question.objects.create(identifier='123.1', text="This is a question123.1", answer_type='Numerical Answer',
+        self.question_1 = Question.objects.create(identifier='123.1', text="This is a question123.1",
+                                                  answer_type='Numerical Answer',
                                                   qset_id=self.qset.id, response_validation_id=1)
-        self.question_2 = Question.objects.create(identifier='123.2', text="This is a question123.2", answer_type='Numerical Answer',
+        self.question_2 = Question.objects.create(identifier='123.2', text="This is a question123.2",
+                                                  answer_type='Numerical Answer',
                                                   qset_id=self.qset.id, response_validation_id=1)
-        self.question_3 = Question.objects.create(identifier='123.3', text="This is a question123.3", answer_type='Numerical Answer',
+        self.question_3 = Question.objects.create(identifier='123.3', text="This is a question123.3",
+                                                  answer_type='Numerical Answer',
                                                   qset_id=self.qset.id, response_validation_id=1)
 
-        # self.existing_formula = Formula.objects.create(numerator=self.question_1, denominator=self.question_2,
-        #                                                indicator=self.indicator)
+
+    def test_indicator_variable(self):
+        pass
 
     def test_get_new(self):
-        # response = self.client.get(
-        #     '/indicators/%s/formula/new/' % self.indicator.id)
-        # self.failUnlessEqual(response.status_code, 200)
-
-        response = self.client.get(reverse('add_formula_page'))        
+        response = self.client.get(reverse('add_formula_page', args=(self.indicator.id, )))
         self.assertEqual(200, response.status_code)
-
         templates = [template.name for template in response.templates]
         self.assertIn('indicator/formulae.html', templates)
-        self.assertEquals('/indicators/%s/formula/new/' %
-                          self.indicator.id, response.context['action'])
-        self.assertEquals('/indicators/', response.context['cancel_url'])
+        self.assertEquals(reverse('list_indicator_page'), response.context['cancel_url'])
         self.assertEquals(self.indicator, response.context['indicator'])
-        self.assertEquals('Formula for Indicator %s' %
-                          self.indicator.name, response.context['title'])
-        self.assertEquals('Create', response.context['button_label'])
-        # self.assertIn(self.existing_formula,
-        #               response.context['existing_formula'])
-        self.assertIsInstance(response.context['formula_form'], FormulaForm)
+        self.assertEquals('Save', response.context['button_label'])
+        self.assertIsInstance(response.context['indicator_form'], IndicatorFormulaeForm)
+
+    def test_create_indicator_formular(self):
+        formular_url = reverse('add_formula_page', args=(self.indicator.id, ))
+        response = self.client.get(formular_url)
+        # create two variables
+        var1 = Indica
+        self.assertEqual(200, response.status_code)
+        templates = [template.name for template in response.templates]
+        self.assertIn('indicator/formulae.html', templates)
+        response = self.client.post(formular_url, data={})
 
     def test_get_knows_to_throw_error_message_if_indicator_does_not_exist(self):
-        # response = self.client.get('/indicators/%s/formula/new/' % 200)
-        response = self.client.get(reverse('add_formula_page'))
+        response = self.client.get(reverse('add_formula_page', args=(self.indicator.id,)))
         self.assertEqual(200, response.status_code)
-
-        message = "The indicator requested does not exist."
-
+        message = INDICATOR_DOES_NOT_EXIST_MSG
         self.failUnlessEqual(response.status_code, 302)
-        self.assertRedirects(response, '/indicators/', 302, 200)
+        self.assertRedirects(response, reverse('list_indicator_page'), 302, 200)
         self.assertIn(message, response.cookies['messages'].value)
 
     def test_post_new_for_percentage_indicator_with_multichoice_numerator_and_denominator_question(self):
-        # multichoice_question = Question.objects.create(identifier='123.4', text="This is a question123.4", answer_type='Numerical Answer',
-        #                                                group=self.group, batch=self.batch, module=self.question_mod)
-        multichoice_question = Question.objects.create(identifier='123.4', text="This is a question123.4", answer_type='Numerical Answer',
-                                                  qset_id=self.qset.id, response_validation_id=1)
+        multichoice_question = Question.objects.create(identifier='aman', text="This is a question123.4",
+                                                       answer_type='Numerical Answer', qset_id=self.qset.id,
+                                                       response_validation_id=1)
 
         option_1 = QuestionOption.objects.create(
             question=multichoice_question, text='Yes', order=1)

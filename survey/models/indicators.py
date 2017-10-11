@@ -39,12 +39,6 @@ class Indicator(BaseModel):
         """
         return QuestionSet.get(id=self.question_set.id)
 
-    def is_percentage_indicator(self):
-        percentage_measure = [
-            Indicator.MEASURE_CHOICES[0][1],
-            Indicator.MEASURE_CHOICES[0][0]]
-        return self.measure in percentage_measure
-
     def get_matching_interviews(self, batch, loc):
         pass
 
