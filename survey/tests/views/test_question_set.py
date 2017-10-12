@@ -20,6 +20,7 @@ class QuestionSetViewTest(BaseTest):
         raj = self.assign_permission_to(User.objects.create_user('demo8', 'demo8@kant.com', 'demo8'),
                                         'can_view_batches')
         self.assign_permission_to(raj, 'can_view_investigators')
+        self.assign_permission_to(raj, 'can_view_aggregates')
         self.client.login(username='demo8', password='demo8')
         self.country = LocationType.objects.create(
             name='Country', slug='country')
@@ -216,7 +217,13 @@ class QuestionSetViewTest(BaseTest):
         survey_obj = mommy.make(Survey)
         batch = Batch.objects.create(order=1, name="b21", survey=survey_obj)
         qset =  QuestionSet.get(pk=batch.id)
-        question1 = mommy.make(Question, qset=qset, answer_type=NumericalAnswer.choice_name())
+        q_data = {'identifier':"dummy",
+            'text' : "dummss",
+            'answer_type' : "Text Answer",
+            'qset_id' : qset.id
+            }
+        question1 = Question.objects.create(**q_data)
+
         
         investigator = Interviewer.objects.create(name="Investigator1",
                                                        ea=self.ea,
@@ -228,9 +235,25 @@ class QuestionSetViewTest(BaseTest):
             survey = survey_obj,
             question_set = qset,
             )
+        ans_data = {
+        "question_type" : "qt1",
+        "interview" : interview_obj,
+        "question": question1,
+        "identifier" : "identifier",
+        "as_text" : "as_text",
+        "as_value" : 1
+        }
+        ans_obj = Answer.objects.create(**ans_data)
+        ans_data['value'] = 1
+        url = reverse('download_qset_attachment', kwargs={"interview_id": interview_obj.id, "question_id":question1.id})
+        response = self.client.get(url)
+        self.assertEqual(response.content, 'TextAnswer matching query does not exist.')
+
+        text_obj = TextAnswer.objects.create(**ans_data)
         url = reverse('download_qset_attachment', kwargs={"interview_id": interview_obj.id, "question_id":question1.id})
         response = self.client.get(url)
         self.assertIn(response.status_code, [200, 302])
+
 
     def test_clone_qset_page(self):
         listing_form = ListingTemplate.objects.create(
@@ -270,27 +293,47 @@ class QuestionSetViewTest(BaseTest):
         self.assertEqual(response.content, '[]')
 
     def test_listing_entries(self):
-        listing_form = mommy.make(ListingTemplate)
+        listing_form = ListingTemplate.objects.create(name='l1', description='desc1')
         kwargs = {'name': 'survey9', 'description': 'survey description demo12',
                           'has_sampling': True, 'sample_size': 10,'listing_form_id':listing_form.id}
         survey_obj = Survey.objects.create(**kwargs)
+        
+        investigator = Interviewer.objects.create(name="InvestigatorViewdata",
+                                                       ea=self.ea,
+                                                       gender='1', level_of_education='Primary',
+                                                       language='Eglish', weights=0,date_of_birth='1987-01-01')
+
+        surveyAllocation_obj = SurveyAllocation.objects.create(
+            interviewer = investigator,
+            survey = survey_obj,
+            allocation_ea = self.ea,
+            status = 1
+
+            )
         qset =  QuestionSet.get(pk=listing_form.id)
         url = reverse('listing_entries',kwargs={"qset_id":qset.id})
         response = self.client.get(url)
         self.assertIn(response.status_code, [200, 302])
-        #templates = [template.name for template in response.templates]
-        #self.assertIn('question_set/listing_entries.html', templates)
-        # self.assertIn('name', response.context['placeholder'])
-        # self.assertIn(survey_obj, response.context['surveys'])
-        # self.assertIn(listing_form, response.context['question_set'])
+        templates = [template.name for template in response.templates]
+        self.assertIn('question_set/listing_entries.html', templates)
+        self.assertIn('name', response.context['placeholder'])
+        self.assertIn(survey_obj, response.context['surveys'])
+        self.assertEqual(qset, response.context['question_set'])
         url = url + "?q=survey9"
         response = self.client.get(url)
         self.assertIn(response.status_code, [200, 302])
-        #templates = [template.name for template in response.templates]
-        #self.assertIn('question_set/listing_entries.html', templates)
-        # self.assertIn('name', response.context['placeholder'])
-        # self.assertIn(survey_obj, response.context['surveys'])
-        # self.assertIn(listing_form, response.context['question_set'])
+        templates = [template.name for template in response.templates]
+        self.assertIn('question_set/listing_entries.html', templates)
+        self.assertIn('name', response.context['placeholder'])
+        self.assertIn(survey_obj, response.context['surveys'])
+        self.assertEqual(qset, response.context['question_set'])
+
+    def test_listing_entries_404(self):
+        url = reverse('listing_entries',kwargs={"qset_id":999})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 404)
+
+
 
 
 
