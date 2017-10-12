@@ -25,7 +25,6 @@ class UserFormTest(TestCase):
         self.failUnless(user.id)
         user_retrieved = User.objects.get(last_name='Rajni')
         self.assertEqual(user_retrieved, user)
-
         user_profile = UserProfile.objects.filter(user=user)
         self.failUnless(user_profile)
         self.assertEquals(
@@ -59,7 +58,6 @@ class UserFormTest(TestCase):
     def test_email_already_used(self):
         form_data = self.form_data
         user = User.objects.create(email=form_data['email'])
-
         user_form = UserForm(form_data)
         self.assertFalse(user_form.is_valid())
         message = "%s is already associated to a different user." % form_data[
@@ -70,7 +68,6 @@ class UserFormTest(TestCase):
         form_data = self.form_data
         user = User.objects.create(
             username=form_data['username'], email=form_data['email'])
-
         user_form = UserForm(form_data, instance=user)
         self.assertTrue(user_form.is_valid())
 
@@ -79,7 +76,6 @@ class UserFormTest(TestCase):
         user = User.objects.create(username='some_other_name')
         userprofile = UserProfile.objects.create(
             user=user, mobile_number=form_data['mobile_number'])
-
         user_form = UserForm(form_data)
         self.assertFalse(user_form.is_valid())
         message = "%s is already associated to a different user." % form_data[
@@ -91,7 +87,6 @@ class UserFormTest(TestCase):
         user = User.objects.create(username=form_data['username'])
         userprofile = UserProfile.objects.create(
             user=user, mobile_number=form_data['mobile_number'])
-
         user_form = UserForm(form_data, instance=user, initial={
                              'mobile_number': form_data['mobile_number']})
         self.assertTrue(user_form.is_valid())
@@ -108,7 +103,6 @@ class UserFormTest(TestCase):
     def test_clean_user_name_when_editing_a_user(self):
         form_data = self.form_data
         user = User.objects.create(username=form_data['username'])
-
         user_form = UserForm(form_data, instance=user)
         self.assertTrue(user_form.is_valid())
 
@@ -119,7 +113,6 @@ class UserFormTest(TestCase):
         self.assertFalse(user_form.is_valid())
         message = "The two password fields didn't match."
         self.assertEquals(user_form.errors['password2'], [message])
-
         form_data['password2'] = form_data['password1']
         user_form = UserForm(form_data)
         self.assertTrue(user_form.is_valid())
@@ -149,7 +142,6 @@ class EditUserFormTest(TestCase):
         self.failUnless(user.id)
         user_retrieved = User.objects.get(**user_data)
         self.assertEqual(user_retrieved, user)
-
         user_profile = UserProfile.objects.filter(user=user)
         self.failUnless(user_profile)
         self.assertEquals(
@@ -158,7 +150,6 @@ class EditUserFormTest(TestCase):
     def test_NaN_mobile_number(self):
         user_data = self.user_data
         form_data = dict(user_data, **{'mobile_number': 'not a number'})
-
         user_form = EditUserForm(data=form_data, user=self.user_to_be_edited,
                                  instance=self.user_to_be_edited, initial=self.initial)
         self.assertFalse(user_form.is_valid())
@@ -168,7 +159,6 @@ class EditUserFormTest(TestCase):
     def test_Negative_mobile_number(self):
         user_data = self.user_data
         form_data = dict(user_data, **{'mobile_number': -123456789})
-
         user_form = EditUserForm(data=form_data, user=self.user_to_be_edited,
                                  instance=self.user_to_be_edited, initial=self.initial)
         self.assertFalse(user_form.is_valid())
@@ -180,7 +170,6 @@ class EditUserFormTest(TestCase):
         user_data = self.user_data
         form_data = dict(
             user_data, **{'mobile_number': number_of_length_greater_than_9})
-
         user_form = EditUserForm(data=form_data, user=self.user_to_be_edited,
                                  instance=self.user_to_be_edited, initial=self.initial)
         self.assertFalse(user_form.is_valid())
@@ -192,9 +181,7 @@ class EditUserFormTest(TestCase):
         form_data = dict(user_data, **self.initial)
         some_email = 'haha@ha.ha'
         form_data['email'] = some_email
-
         other_user = User.objects.create(email=some_email)
-
         user_form = EditUserForm(data=form_data, user=self.user_to_be_edited,
                                  instance=self.user_to_be_edited, initial=self.initial)
         self.assertFalse(user_form.is_valid())
@@ -207,11 +194,9 @@ class EditUserFormTest(TestCase):
         form_data = dict(user_data, **self.initial)
         some_number = '111111111'
         form_data['mobile_number'] = some_number
-
         other_user = User.objects.create(username='some_other_name')
         userprofile = UserProfile.objects.create(
             user=other_user, mobile_number=form_data['mobile_number'])
-
         user_form = EditUserForm(data=form_data, user=self.user_to_be_edited,
                                  instance=self.user_to_be_edited, initial=self.initial)
         self.assertFalse(user_form.is_valid())
@@ -223,7 +208,6 @@ class EditUserFormTest(TestCase):
         user_data = self.user_data
         form_data = dict(user_data, **self.initial)
         form_data['username'] = 'some_non_existant_username'
-
         user = User.objects.filter(username=form_data['username'])
         self.failIf(user)
         user_form = EditUserForm(data=form_data, user=self.user_to_be_edited,
@@ -238,7 +222,6 @@ class EditUserFormTest(TestCase):
         existing_username = 'some_other_existing_username'
         other_user, b = User.objects.get_or_create(username=existing_username)
         form_data['username'] = existing_username
-
         user_form = EditUserForm(data=form_data, user=self.user_to_be_edited,
                                  instance=self.user_to_be_edited, initial=self.initial)
         self.assertFalse(user_form.is_valid())
@@ -260,7 +243,6 @@ class EditUserFormTest(TestCase):
         raj, some_group = self.create_admin_user()
         form_data = dict(self.user_data, **self.initial)
         form_data['groups'] = [str(some_group.id)]
-
         user_form = EditUserForm(
             data=form_data, user=raj, instance=self.user_to_be_edited, initial=self.initial)
         self.assertTrue(user_form.is_valid())
@@ -273,9 +255,7 @@ class EditUserFormTest(TestCase):
         user_data['password'] = EMPTY
         user_data['confirm_password'] = EMPTY
         form_data = dict(user_data, **self.initial)
-
         raj, some_group = self.create_admin_user()
-
         user_form = EditUserForm(
             data=form_data, user=raj, instance=self.user_to_be_edited, initial=self.initial)
         self.assertTrue(user_form.is_valid())
@@ -287,19 +267,15 @@ class EditUserFormTest(TestCase):
         user_data['password'] = EMPTY
         user_data['confirm_password'] = EMPTY
         form_data = dict(user_data, **self.initial)
-
         raj, some_group = self.create_admin_user()
-
         user_form = EditUserForm(
             data=form_data, user=raj, instance=self.user_to_be_edited, initial=self.initial)
         user_form.is_valid()
-
         user = user_form.save()
         self.failUnless(user.id)
         del user_data['password']
         del user_data['confirm_password']
         user_retrieved = User.objects.get(**user_data)
-
         self.assertEqual(user_retrieved, user)
         self.assertEqual(self.user_to_be_edited.password,
                          user_retrieved.password)
@@ -310,9 +286,7 @@ class EditUserFormTest(TestCase):
         user_data['password'] = 'something'
         user_data['confirm_password'] = 'something else'
         form_data = dict(user_data, **self.initial)
-
         raj, some_group = self.create_admin_user()
-
         user_form = EditUserForm(
             data=form_data, user=raj, instance=self.user_to_be_edited, initial=self.initial)
         self.assertFalse(user_form.is_valid())
@@ -326,19 +300,15 @@ class EditUserFormTest(TestCase):
         user_data['password'] = SOME_PASSWORD
         user_data['confirm_password'] = SOME_PASSWORD
         form_data = dict(user_data, **self.initial)
-
         raj, some_group = self.create_admin_user()
-
         user_form = EditUserForm(
             data=form_data, user=raj, instance=self.user_to_be_edited, initial=self.initial)
         user_form.is_valid()
-
         user = user_form.save()
         self.failUnless(user.id)
         del user_data['password']
         del user_data['confirm_password']
         user_retrieved = User.objects.get(**user_data)
-
         self.assertEqual(user_retrieved, user)
         self.assertTrue(user_retrieved.check_password(SOME_PASSWORD))
 
@@ -349,17 +319,14 @@ class EditUserFormTest(TestCase):
         user_data['password'] = SOME_PASSWD
         user_data['confirm_password'] = SOME_PASSWD
         form_data = dict(user_data, **self.initial)
-
         user_form = EditUserForm(data=form_data, user=self.user_to_be_edited,
                                  instance=self.user_to_be_edited, initial=self.initial)
         user_form.is_valid()
-
         user = user_form.save()
         self.failUnless(user.id)
         del user_data['password']
         del user_data['confirm_password']
         user_retrieved = User.objects.get(**user_data)
-
         self.assertEqual(user_retrieved, user)
         self.assertEqual(self.user_to_be_edited.password,
                          user_retrieved.password)
@@ -372,7 +339,6 @@ class UserProfileFormTest(TestCase):
         self.form_data = {
             'mobile_number': '791234567',
         }
-
     def test_valid(self):
         user_profile_form = UserProfileForm(self.form_data)
         self.assertTrue(user_profile_form.is_valid())

@@ -1,15 +1,11 @@
 import json
-
 from django.test.client import Client
 from django.core.urlresolvers import reverse
 from mock import *
 from django.contrib.auth.models import User, Group
 from survey.models.users import UserProfile
-
 from survey.tests.base_test import BaseTest
-
 from survey.forms.users import UserForm, EditUserForm
-
 
 class UsersViewTest(BaseTest):
 
@@ -48,7 +44,6 @@ class UsersViewTest(BaseTest):
             'email': 'mm@mm.mm',
             'groups': some_group.id,
         }
-
         user = User.objects.filter(username=form_data['username'])
         self.failIf(user)
         response = self.client.post(reverse('new_user_page'), data=form_data)
@@ -83,7 +78,6 @@ class UsersViewTest(BaseTest):
             'email': 'mm@mm.mm',
             'groups': some_group.id,
         }
-
         user = User.objects.filter(username=form_data['username'])
         self.failIf(user)
 
@@ -216,7 +210,6 @@ class UsersViewTest(BaseTest):
             password=form_data['password'])
         UserProfile.objects.create(
             user=user, mobile_number=form_data['mobile_number'])
-
         data = {
             'username': 'knight',
             'password': 'mk',
@@ -252,14 +245,12 @@ class UsersViewTest(BaseTest):
             password=form_data['password'])
         UserProfile.objects.create(
             user=user, mobile_number=form_data['mobile_number'])
-
         data = form_data.copy()
         data['username'] = 'changed'
         url = reverse(
             'users_edit',
             kwargs={"user_id":  str(user.pk), "mode":  "edit"})
-        response = self.client.post(url, data=data)
-        # self.failUnlessEqual(response.status_code, 200)
+        response = self.client.post(url, data=data)        
         self.assertIn(response.status_code, [302,200])
         edited_user = User.objects.filter(username=data['username'])
         self.failIfUnless(edited_user)
@@ -288,12 +279,10 @@ class UsersViewTest(BaseTest):
         UserProfile.objects.create(
             user=user_without_permission,
             mobile_number=form_data['mobile_number'])
-
         self.client.logout()
         self.client.login(
             username=form_data['username'],
             password=form_data['password'])
-
         data = {
             'username': 'knight',
             'first_name': 'michael',
@@ -328,10 +317,8 @@ class UsersViewTest(BaseTest):
             'mobile_number': '123456789',
             'email': 'mm@mm.mm',
         }
-
         original_demo13_attributes = User.objects.filter(
             username=self.raj).values()[0]
-
         edit_demo13_url = reverse(
             'users_edit',
             kwargs={"user_id":  str(self.raj.pk), "mode":  "edit"})
@@ -350,13 +337,11 @@ class UsersViewTest(BaseTest):
         self.client.logout()
         self.client.login(
             username=user_without_permission.username, password='I_Suck')
-
         original_demo13_attributes = User.objects.filter(
             username=self.raj).values()[0]
         edit_demo13_url = reverse(
             'users_edit',
             kwargs={"user_id":  str(self.raj.pk), "mode":  "edit"})
-
         response = self.client.get(edit_demo13_url)
         self.assertRedirects(
             response, expected_url="%s?next=%s" % (
@@ -373,7 +358,6 @@ class UsersViewTest(BaseTest):
             first_name='some name',
             last_name='last_name')
         UserProfile.objects.create(user=user, mobile_number='123456666')
-
         url = reverse('users_edit', kwargs={"user_id":  user.id,'mode':'view'})
         response = self.client.get(url)
         self.assertEquals(response.status_code, 200)
@@ -399,7 +383,6 @@ class UsersViewTest(BaseTest):
             first_name='some name',
             last_name='last_name')
         UserProfile.objects.create(user=user, mobile_number='123456666')
-
         response = self.client.get(
             reverse('deactivate_user', kwargs={"user_id":  user.id}))
         self.assertRedirects(response, expected_url=reverse('users_index'))
@@ -425,7 +408,6 @@ class UsersViewTest(BaseTest):
         UserProfile.objects.create(user=user, mobile_number='123456666')
         user.is_active = False
         user.save()
-
         self.assertFalse(user.is_active)
         url = reverse('activate_user', kwargs={"user_id":  user.id})
         response = self.client.get(url)
@@ -446,7 +428,6 @@ class UsersViewTest(BaseTest):
         self.assert_restricted_permission_for(reverse('new_user_page'))
         self.assert_restricted_permission_for(reverse('users_index'))
         url = reverse('users_edit', kwargs={"user_id":  1, "mode": "view"})
-        #self.assert_restricted_permission_for(url)
         url = reverse('deactivate_user', kwargs={"user_id":  1})
         self.assert_restricted_permission_for(url)
 

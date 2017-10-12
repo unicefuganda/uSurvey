@@ -17,7 +17,6 @@ from mock import patch
 import datetime
 from django.core.urlresolvers import reverse
 
-
 class Base(TestCase):
 
     @classmethod

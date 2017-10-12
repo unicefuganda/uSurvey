@@ -4,14 +4,12 @@ from survey.models import Survey, UploadErrorLog, LocationWeight
 from survey.services.location_weights_upload import UploadLocationWeights
 from survey.tests.base_test import BaseTest
 
-
 class LocationWeightUploadHelper(BaseTest):
 
     def setUp(self):
         self.data = [['RegionName', 'DistrictName', 'CountyName', 'Selection Probability'],
                      ['region1', 'district1', 'county1', '0.01'],
                      ['region2', 'district2', 'county2', '0.1']]
-
         self.write_to_csv('wb', self.data)
         self.filename = 'test.csv'
         _file = open(self.filename, 'rb')
@@ -37,7 +35,6 @@ class LocationWeightUploadHelper(BaseTest):
                 ['region1', 'district1', '', '0.2']]
         self.write_to_csv('wb', data)
         _file = open(self.filename, 'rb')
-
         rtype = LocationType.objects.create(name="region", slug='region')
         dtype = LocationType.objects.create(
             name="district", slug='district', parent=rtype)
@@ -47,7 +44,6 @@ class LocationWeightUploadHelper(BaseTest):
         district = Location.objects.create(
             name="district1", parent=region, type=dtype)
         Location.objects.create(name="county1", parent=district, type=ctype)
-
         uploader = UploadLocationWeights(_file)
         uploader.upload(self.survey)
         error_log = UploadErrorLog.objects.filter(
@@ -57,7 +53,6 @@ class LocationWeightUploadHelper(BaseTest):
                                          error='There is no county with name: , in district1.'))
 
     def test_should_return_false__and_message_if_location_tree_parent_does_not_match_one_provided(self):
-
         rtype = LocationType.objects.create(name="region", slug='region')
         dtype = LocationType.objects.create(
             name="district", slug='district', parent=rtype)
@@ -80,7 +75,6 @@ class LocationWeightUploadHelper(BaseTest):
                 ['region1', 'district1', 'county1', '']]
         self.write_to_csv('wb', data)
         _file = open(self.filename, 'rb')
-
         rtype = LocationType.objects.create(name="region", slug='region')
         dtype = LocationType.objects.create(
             name="district", slug='district', parent=rtype)
@@ -90,9 +84,7 @@ class LocationWeightUploadHelper(BaseTest):
         district = Location.objects.create(
             name="district1", parent=region, type=dtype)
         Location.objects.create(name="county1", parent=district, type=ctype)
-
         uploader = UploadLocationWeights(_file)
-
         uploader.upload(self.survey)
         error_log = UploadErrorLog.objects.filter(
             model=self.uploader.MODEL, filename=self.filename)
@@ -115,9 +107,7 @@ class LocationWeightUploadHelper(BaseTest):
         district = Location.objects.create(
             name="district1", parent=region, type=dtype)
         Location.objects.create(name="county1", parent=district, type=ctype)
-
         uploader = UploadLocationWeights(_file)
-
         uploader.upload(self.survey)
         error_log = UploadErrorLog.objects.filter(
             model=self.uploader.MODEL, filename=self.filename)
@@ -130,7 +120,6 @@ class LocationWeightUploadHelper(BaseTest):
                 ['region1', 'district1', 'county1', '0.02']]
         self.write_to_csv('wb', data)
         _file = open(self.filename, 'rb')
-
         rtype = LocationType.objects.create(name="region", slug='region')
         dtype = LocationType.objects.create(
             name="district", slug='district', parent=rtype)
@@ -140,20 +129,16 @@ class LocationWeightUploadHelper(BaseTest):
         district = Location.objects.create(
             name="district1", parent=region, type=dtype)
         Location.objects.create(name="county1", parent=district, type=ctype)
-
         region = Location.objects.create(name="region2", type=rtype)
         district = Location.objects.create(
             name="district2", parent=region, type=dtype)
         Location.objects.create(name="county2", parent=district, type=ctype)
-
         uploader = UploadLocationWeights(_file)
-
         uploader.upload(self.survey)
         error_log = UploadErrorLog.objects.filter(
             model=self.uploader.MODEL, filename=self.filename)
         self.failIf(error_log.filter(
             row_number=1, error='Selection probability must be a number.'))
-
         self.failUnless(LocationWeight.objects.filter(
             location__name=data[1][2], selection_probability=data[1][3]))
 
@@ -163,7 +148,6 @@ class LocationWeightUploadHelper(BaseTest):
         self.generate_non_csv_file(self.filename)
         file = open(self.filename, 'rb')
         uploader = UploadLocationWeights(file)
-
         uploader.upload(self.survey)
         error_log = UploadErrorLog.objects.filter(
             model=self.uploader.MODEL, filename=self.filename)

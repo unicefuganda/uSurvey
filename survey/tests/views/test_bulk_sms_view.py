@@ -1,9 +1,7 @@
 from django.test.client import Client
 from django.contrib.auth.models import User
 from survey.models.locations import *
-
 from survey.tests.base_test import BaseTest
-
 
 class BulkSMSTest(BaseTest):
 
@@ -49,7 +47,6 @@ class BulkSMSTest(BaseTest):
             self.assertEquals(str(message), "Please select a location.")
         self.failUnlessEqual(response.status_code, 200)
         self.assertRedirects(response, 'http://testserver/bulk_sms')
-
         response = self.client.post(
             '/bulk_sms/send', data={'locations': [self.kampala.pk, self.abim.pk], 'text': ''}, follow=True)
         for message in response.context['messages']:

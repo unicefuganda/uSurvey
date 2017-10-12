@@ -11,13 +11,11 @@ from survey.models import (QuestionModule, Interviewer,  EnumerationArea, Questi
 from survey.utils.query_helper import get_filterset
 from survey.tests.base_test import BaseTest
 
-
 class SetQuestionViewTest(BaseTest):
 
     def setUp(self):
         self.client = Client()
         self.listing_data = {'name': 'test-listing', 'access_channels': [ODKAccess.choice_name(), ], }
-
         self.questions_data = []
         self.rsp = ResponseValidation.objects.create(validation_test="validationtest", constraint_message="message")
         # create a inline flows for this listing
@@ -26,13 +24,12 @@ class SetQuestionViewTest(BaseTest):
                                         'answer_type': answer_class.choice_name(),
                                         'identifier': 'id: %s' % answer_class.choice_name()})
         self.questions_data[-1]['options'] = ['Yes', 'No']
-
         raj = self.assign_permission_to(User.objects.create_user('demo12', 'demo12@kant.com', 'demo12'),
                                         'can_view_batches')
         self.client.login(username='demo12', password='demo12')
         self.listing_form_data = {
             'name': 'test listing1',
-            'description': 'listing description demo6'            
+            'description': 'listing description demo6'
         }
         self.qset_form_data = {
             'name': 'test listing1 q1',
@@ -44,6 +41,7 @@ class SetQuestionViewTest(BaseTest):
             'text' : "dummss",
             'answer_type' : "Text Answer"
         }
+    
     def test_add_subquestion(self):
         l_qset = ListingTemplate.objects.create(**self.listing_form_data)
         qset = QuestionSet.objects.get(pk=l_qset.id)
@@ -52,15 +50,9 @@ class SetQuestionViewTest(BaseTest):
         self.sub_data['parent_question'] = q_obj
         response = self.client.post(reverse('add_qset_subquestion_page', kwargs={"batch_id" : l_qset.id}),
                                     self.sub_data, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
-        self.assertIn(response.status_code, [200, 302])
-        print response.templates
-        print response.cookies
+        self.assertIn(response.status_code, [200, 302])        
         templates = [template.name for template in response.templates]
         self.assertIn('set_questions/_add_question.html', templates)
-        #self.assertIn('Sub Question saved.', response.cookies['messages'].__str__())
-        #print response.content
-
-    
 
     def test_view_questions_list(self):
         list_1 = ListingTemplate.objects.create(**self.listing_form_data)
@@ -68,6 +60,7 @@ class SetQuestionViewTest(BaseTest):
         self.assertEqual(200, response.status_code)
         response = self.client.get(reverse('qset_questions_page', kwargs={'qset_id':list_1.id}))
         self.assertEqual(200, response.status_code)
+    
     def test_add_question(self):
         list_1 = ListingTemplate.objects.create(name="List A2")
         batch = QuestionSet.get(pk=list_1.id)        
@@ -76,7 +69,7 @@ class SetQuestionViewTest(BaseTest):
         self.assertEqual(200, response.status_code)
         templates = [template.name for template in response.templates]
         self.assertIn('set_questions/index.html', templates)
-        self.assertNotIn('Add Question', response.context['title'])        
+        self.assertNotIn('Add Question', response.context['title'])
         self.assertNotIn(reverse('qset_questions_page', kwargs={'qset_id':list_1.id}), response.context['action'])
     
     def test_questionset_doesnotexist(self):
@@ -209,12 +202,12 @@ class SetQuestionViewTest(BaseTest):
 
     def test_restricted_permissions(self):
         self.assert_restricted_permission_for('/qset/questions/1/new/')
-        self.assert_restricted_permission_for('/qsets/2/questions/')        
-        self.assert_restricted_permission_for('/set_questions/1/edit/')        
+        self.assert_restricted_permission_for('/qsets/2/questions/')
+        self.assert_restricted_permission_for('/set_questions/1/edit/')
         self.assert_restricted_permission_for('/qset/questions/1/insert/')
 
     def test_get_sub_questions_for_question(self):
-        list_1 = ListingTemplate.objects.create(name="List b2")        
+        list_1 = ListingTemplate.objects.create(name="List b2")
         qset = QuestionSet.get(pk=list_1.id)
         q_obj = Question.objects.create(identifier='id_1', text="This is a question123.5", answer_type='Numerical Answer',
                                                   qset_id=qset.id, response_validation_id=1)
@@ -223,41 +216,38 @@ class SetQuestionViewTest(BaseTest):
 
     def test_get_prev_questions_for_question(self):
         self.qset = QuestionSet.objects.create(name="Females")
-        print self.qset,"QSET"
-        self.rsp = ResponseValidation.objects.create(validation_test="validationtest", constraint_message="message")
-        print self.rsp,"RSP"
-        # list_1 = ListingTemplate.objects.create(name="List b5")
-        # qset = QuestionSet.get(pk=list_1.id)
+        self.rsp = ResponseValidation.objects.create(validation_test="validationtest", constraint_message="message")        
         self.question_1 = Question.objects.create(identifier='id_1', text="This is a question 1111.1",
                                                   answer_type='Numerical Answer',
                                                   qset_id=self.qset.id, response_validation_id=1)
-        print self.question_1.identifier,self.question_1.text,"QSETIdentifier"
         response = self.client.get(reverse('prev_inline_questions_json_page', kwargs={"question_id" : self.question_1.id}))
-        print response,"RESPONSEEEEEEEE"
         self.assertIn(response.status_code,[200,302])
+    
     def test_delete(self):
-        list_1 = ListingTemplate.objects.create(name="List b3")        
+        list_1 = ListingTemplate.objects.create(name="List b3")
         qset = QuestionSet.get(pk=list_1.id)
         q_obj = Question.objects.create(identifier='id_2', text="This is a question123.6", answer_type='Numerical Answer',
                                                   qset_id=qset.id, response_validation_id=1)
         response = self.client.get(reverse('delete_question_page', kwargs={"question_id" : list_1.id}))
         self.assertIn(response.status_code,[200,302])
+    
     def test_edit_subquestion(self):
         survey_obj = Survey.objects.create(
             name='survey name2', description='survey descrpition2')
         batch_obj = Batch.objects.create(
             order=1, name="Batch A2", survey=survey_obj) 
-        list_1 = ListingTemplate.objects.create(name="List b5")        
+        list_1 = ListingTemplate.objects.create(name="List b5")
         qset = QuestionSet.get(pk=list_1.id)
         q_obj = Question.objects.create(identifier='id_5', text="This is a question123.9", answer_type='Numerical Answer',
                                                   qset_id=qset.id, response_validation_id=1)
         response = self.client.get(reverse('edit_batch_subquestion_page', kwargs={"batch_id" : batch_obj.id,"question_id":q_obj.id}))
         self.assertIn(response.status_code,[200,302])
+    
     def test_get_questions_for_batch(self):
         survey_obj = Survey.objects.create(
             name='survey name1', description='survey descrpition1')
         batch_obj = Batch.objects.create(
-            order=1, name="Batch A1", survey=survey_obj)        
+            order=1, name="Batch A1", survey=survey_obj)
         # list_1 = ListingTemplate.objects.create(name="List A10")
         qset = QuestionSet.get(id=batch_obj.id)
         q_obj = Question.objects.create(identifier='id_4', text="This is a question123.8", answer_type='Numerical Answer',
@@ -266,7 +256,7 @@ class SetQuestionViewTest(BaseTest):
         self.assertIn(response.status_code,[200,302])
 
     def test_remove(self):
-        list_1 = ListingTemplate.objects.create(name="List b4")        
+        list_1 = ListingTemplate.objects.create(name="List b4")
         qset = QuestionSet.get(pk=list_1.id)
         q_obj = Question.objects.create(identifier='id_3', text="This is a question123.7", answer_type='Numerical Answer',
                                                   qset_id=qset.id, response_validation_id=1)

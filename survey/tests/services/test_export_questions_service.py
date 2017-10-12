@@ -1,8 +1,6 @@
 from survey.services.export_questions import ExportQuestionsService, get_batch_question_as_dump, get_question_template_as_dump
-
 from survey.tests.base_test import BaseTest
 from survey.models import Question, QuestionOption, Batch, QuestionModule, QuestionSet, ResponseValidation
-
 
 class ExportQuestionsTest(BaseTest):
 
@@ -13,8 +11,6 @@ class ExportQuestionsTest(BaseTest):
         self.qset = QuestionSet.objects.create(name="Females")
         self.rsp = ResponseValidation.objects.create(validation_test="validationtest",
 constraint_message="message")
-        # self.member_group = HouseholdMemberGroup.objects.create(
-        #     name="old people", order=0)
         self.question1 = Question.objects.create(identifier='1.1', text="This is a question1", answer_type='Numerical Answer',
                                                  qset_id=1, response_validation_id=1)
         self.question2 = Question.objects.create(identifier='1.2', text="This is a question2", answer_type='Text Answer',
@@ -39,10 +35,8 @@ constraint_message="message")
                                           self.question3.answer_type.upper(), self.option1.text)
         question3_2 = "; ; ; %s" % (self.option2.text)
         question3_3 = "; ; ; %s" % (self.option3.text)
-
         expected_data = [self.headings, question1,
                          question2, question3_1, question3_2, question3_3]
-
         export_questions_service = ExportQuestionsService()
         actual_data = export_questions_service.formatted_responses()
         self.assertEqual(len(expected_data), len(actual_data))
@@ -50,7 +44,6 @@ constraint_message="message")
 
     def test_exports_all_questions_in_a_batch(self):
         # self.create_questions_not_in_batch()
-
         question1 = "%s; %s; %s" % (
             self.question1.text, self.question1.qset_id, self.question1.answer_type.upper())
         question2 = "%s; %s; %s" % (
@@ -62,9 +55,7 @@ constraint_message="message")
 
         expected_data = [self.headings, question1,
                          question2, question3_1, question3_2, question3_3]
-
         export_questions_service = ExportQuestionsService()
         actual_data = export_questions_service.formatted_responses()
-
         self.assertEqual(8, len(actual_data))
         self.assertIn(str(expected_data[0]), actual_data)

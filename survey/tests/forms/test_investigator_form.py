@@ -5,7 +5,6 @@ from survey.forms.interviewer import *
 from survey.models import EnumerationArea, Survey
 from survey.models.backend import Backend
 
-
 class InvestigatorFormTest(TestCase):
 
     def setUp(self):

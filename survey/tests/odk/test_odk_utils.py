@@ -1,13 +1,10 @@
 __author__ = 'Eswar'
-
 from django.test import TestCase
 from survey.models.batch import Batch
 from survey.models import GroupCondition, HouseholdHead, QuestionModule, Indicator, Formula, Survey, EnumerationArea, \
     HouseholdMemberGroup, InterviewerAccess, NumericalAnswer
-
 from survey.models.locations import *
 from survey.odk.utils.odk_helper import *
-
 
 class ODKHelperTest(TestCase):
 
@@ -34,18 +31,14 @@ class ODKHelperTest(TestCase):
         self.question = Question.objects.create(identifier='123.1', text="This is a question", answer_type='Numerical Answer',
                                                 group=self.household_member_group, batch=self.batch, module=self.question_mod)
 
-    def test_get_answer_path(self):
-        # question = Question.objects.create(identifier='123.1',text="This is a question", answer_type='Numerical Answer',
-        #                                    group=self.household_member_group,batch=self.batch,module=self.question_mod)
+    def test_get_answer_path(self):        
         answer_path = get_answer_path(self.batch, self.question)
 
         expected_result = '//survey/b%s/q%s' % (
             self.batch.pk, self.question.pk)
         self.assertEqual(answer_path, expected_result)
 
-    def test_record_interview_answer(self):
-        # question = Question.objects.create(identifier='123.2',text="This is a question", answer_type='Numerical Answer',
-        #                                    group=self.household_member_group,batch=self.batch,module=self.question_mod)
+    def test_record_interview_answer(self):        
         survey = Survey.objects.create(
             name="Test Survey", description="Desc", sample_size=10, has_sampling=True)
         household_listing = HouseholdListing.objects.create(

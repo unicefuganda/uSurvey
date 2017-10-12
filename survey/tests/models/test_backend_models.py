@@ -19,10 +19,10 @@ class BackendTest(TestCase):
         Backend.objects.create(name="Kampala")
 
     def test_backend(self):
-        name = Backend.objects.get(name="Kampala")        
-        self.assertEqual(name.name,'Kampala')        
+        name = Backend.objects.get(name="Kampala")
+        self.assertEqual(name.name,'Kampala')
         self.assertEqual(len(name.name),7)
 
     def test_unicode_text(self):
         ts1 = Backend.objects.create(name="abc name")
-        self.assertEqual(ts1.name, str(ts1)) 
+        self.assertEqual(ts1.name, str(ts1))

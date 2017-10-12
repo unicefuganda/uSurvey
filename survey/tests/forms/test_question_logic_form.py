@@ -13,12 +13,9 @@ class LogicFormTest(TestCase):
         # create some questions
         self.survey = Survey.objects.create(name='test')
         self.batch = Batch.objects.create(name='test', survey=self.survey)
-        self.module = QuestionModule.objects.create(name='test')
-        # self.group = HouseholdMemberGroup.objects.create(name='test', order=1)
+        self.module = QuestionModule.objects.create(name='test')        
         self.qset = QuestionSet.objects.create(name="Females")
-        self.rsp = ResponseValidation.objects.create(validation_test="validationtest",constraint_message="message")
-        # self.question_1 = Question.objects.create(identifier='123.1', text="This is a question123.1", answer_type='Numerical Answer',
-        #                                           qset_id=self.qset, batch=self.batch, module=self.question_mod,response_validation_id=self.rsp)
+        self.rsp = ResponseValidation.objects.create(validation_test="validationtest",constraint_message="message")        
 
     def test_correct_validators_is_applied_as_per_question_answer_type(self):
         answer_types = Answer.supported_answers()  # different types of questions
@@ -33,9 +30,7 @@ class LogicFormTest(TestCase):
                 set(l.fields['condition'].choices), set(answer_choice_names))
 
     def test_logic_form_has_options_for_multi_type_questions(self):
-        for answer_type in [MultiSelectAnswer.choice_name(), MultiChoiceAnswer.choice_name()]:
-            # q = Question.objects.create(group=self.group, module=self.module, batch=self.batch,
-            #                             identifier=answer_type, text='test', answer_type=answer_type)
+        for answer_type in [MultiSelectAnswer.choice_name(), MultiChoiceAnswer.choice_name()]:            
             q = Question.objects.create(identifier=answer_type, text="text", answer_type=answer_type,
                                                 qset_id=self.qset.id, response_validation_id=1)
             l = LogicForm(q)
@@ -44,9 +39,7 @@ class LogicFormTest(TestCase):
     def test_logic_form_does_not_have_options_for_non_multi_type_questions(self):
         answer_types = Answer.answer_types()
         for answer_type in answer_types:
-            if answer_type not in [MultiSelectAnswer.choice_name(), MultiChoiceAnswer.choice_name()]:
-                # q = Question.objects.create(group=self.group, module=self.module, batch=self.batch,
-                #                             identifier=answer_type, text='test', answer_type=answer_type)
+            if answer_type not in [MultiSelectAnswer.choice_name(), MultiChoiceAnswer.choice_name()]:                
                 q = Question.objects.create(identifier=answer_type, text="text", answer_type=answer_type,
                                                 qset_id=self.qset.id, response_validation_id=1)
                 l = LogicForm(q)
@@ -54,7 +47,6 @@ class LogicFormTest(TestCase):
 
     def test_skip_logic_selection_in_form_question_creates_skip_flow(self):
         '''
-
         :return:
         '''
         q1 = Question.objects.create(qset_id=self.qset.id, response_validation_id=1,identifier='test1',text='test1', answer_type=NumericalAnswer.choice_name())
@@ -106,7 +98,6 @@ class LogicFormTest(TestCase):
 
     def test_subquestion_selection_in_form_question_creates_skip_flow(self):
         '''
-
         :return:
         '''
         q1 = Question.objects.create(qset_id=self.qset.id, response_validation_id=1,
@@ -160,7 +151,6 @@ class LogicFormTest(TestCase):
 
     def test_subquestion_selection_in_form_question_creates_branch_flow(self):
         '''
-
         :return:
         '''
         q1 = Question.objects.create(qset_id=self.qset.id, response_validation_id=1,
@@ -276,7 +266,6 @@ class LogicFormTest(TestCase):
 
     def test_end_interview_selection_in_form_question_creates_flow_to_with_no_next_question(self):
         '''
-
         :return:
         '''
         yes = 'yes'
@@ -336,7 +325,6 @@ class LogicFormTest(TestCase):
 
     def test_attempt_to_set_incorrect_value_gives_form_error(self):
         '''
-
         :return:
         '''
         q1 = Question.objects.create(qset_id=self.qset.id, response_validation_id=1,
@@ -390,7 +378,6 @@ class LogicFormTest(TestCase):
 
     def test_specify_wrong_max_value_gives_form_error(self):
         '''
-
         :return:
         '''
         q1 = Question.objects.create(qset_id=self.qset.id, response_validation_id=1,
@@ -453,7 +440,6 @@ class LogicFormTest(TestCase):
 
     def test_specify_wrong_min_value_gives_form_error(self):
         '''
-
         :return:
         '''
         q1 = Question.objects.create(qset_id=self.qset.id, response_validation_id=1,

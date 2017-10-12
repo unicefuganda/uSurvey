@@ -1,12 +1,9 @@
 import json
-
 from django.test.client import Client
 from mock import *
 from django.contrib.auth.models import User, Group
 from survey.models.users import UserProfile
-
 from survey.tests.base_test import BaseTest
-
 from survey.forms.interviewer import InterviewerForm,\
     USSDAccessForm, ODKAccessForm
 from survey.models import EnumerationArea
@@ -15,7 +12,6 @@ from survey.models import Interviewer
 from survey.models import USSDAccess
 from django.forms.models import inlineformset_factory
 from django.core.urlresolvers import reverse
-
 
 class InterviewerViewTest(BaseTest):
 
@@ -27,7 +23,6 @@ class InterviewerViewTest(BaseTest):
             'demo5', 'demo5@kant.com', 'demo5'), 'can_view_interviewers')
         self.assign_permission_to(self.raj, 'can_view_interviewers')
         self.client.login(username='demo5', password='demo5')
-
         self.ea = EnumerationArea.objects.create(name="BUBEMBE", code="11-BUBEMBE")
         self.country = LocationType.objects.create(name="country", slug="country")
         self.kampala = Location.objects.create(name="Kampala", type=self.country)
@@ -37,8 +32,7 @@ class InterviewerViewTest(BaseTest):
             'name': 'Interviewer_1',
             'date_of_birth': '1987-08-06',
             'gender': 1,
-            'ea':self.ea
-            # 'survey':self.survey
+            'ea':self.ea            
         }
 
     def test_new(self):
@@ -68,27 +62,22 @@ class InterviewerViewTest(BaseTest):
         self.failIf(investigator)
         response = self.client.post(reverse('new_interviewer_page'), data=form_data)
         self.failUnlessEqual(response.status_code, 302)
-
         investigator = Interviewer.objects.get(name=form_data['name'])
         self.failUnless(investigator.id)
         for key in ['name','gender','date_of_birth','ea']:
             value = getattr(investigator, key)
             self.assertEqual(form_data[key], str(value))
-
         investigator = Interviewer.objects.filter(name=investigator)
         self.failUnless(investigator)
         self.assertEquals(
             investigator[0].date_of_birth, form_data['date_of_birth'])
         assert success_message.called
 
-
     def test_index(self):
         response = self.client.get(reverse('interviewers_page'))
         self.failUnlessEqual(response.status_code, 200)
 
-
     def test_list_interviewers(self):
-        # investigator = Interviewer.objects.create(name='int_2',survey=self.survey,ea=self.ea,date_of_birth='1987-01-01')
         investigator = Interviewer.objects.create(name="Investigator",
                                                        ea=self.ea,
                                                        gender='1', level_of_education='Primary',
@@ -100,9 +89,7 @@ class InterviewerViewTest(BaseTest):
         self.assertIn(investigator, response.context['interviewers'])
         self.assertNotEqual(None, response.context['request'])
 
-
     def test_edit_interviewer_view(self):
-        # investigator = Interviewer.objects.create(name='int_3',survey=self.survey,ea=self.ea,date_of_birth='1987-01-01')
         investigator = Interviewer.objects.create(name="Investigator1",
                                                        ea=self.ea,
                                                        gender='1', level_of_education='Primary',
@@ -130,7 +117,6 @@ class InterviewerViewTest(BaseTest):
         self.assertIsInstance(response.context['odk_access_form'], odk_access_form)
         self.assertEqual(response.context['title'], 'New Interviewer')
 
-
     def test_edit_interviewer_updates_interviewer_information(self):
         form_data = {
             'name': 'Interviewer_4',
@@ -139,13 +125,6 @@ class InterviewerViewTest(BaseTest):
             'ea':self.ea            
         }
         self.failIf(Interviewer.objects.filter(name=form_data['name']))
-        # investigator = Interviewer.objects.create(
-        #     name=form_data['name'],
-        #     date_of_birth=form_data['date_of_birth'],
-        #     gender=form_data['gender'],
-        #     ea = self.ea,
-        #     survey=self.survey
-        #     )
         investigator = Interviewer.objects.create(name="Investigator2",
                                                        ea=self.ea,
                                                        gender='1', level_of_education='Primary',
@@ -165,16 +144,11 @@ class InterviewerViewTest(BaseTest):
         self.assertEqual(1, edited_user.count())
 
     def test_view_interviewer_details(self):
-        # investigator = Interviewer.objects.create(name='int_5',survey=self.survey,ea=self.ea,date_of_birth='1987-01-01')
         investigator = Interviewer.objects.create(name="Investigator3",
                                                        ea=self.ea,
                                                        gender='1', level_of_education='Primary',
-                                                       language='Eglish', weights=0,date_of_birth='1987-01-01')
-        # url = reverse('view_interviewer_page', kwargs={"interviewer_id":  investigator.id,"mode":'view'})
-        # response = self.client.get(url)
-        response = self.client.get(reverse('view_interviewer_page', kwargs={'interviewer_id':investigator.id}))
-        
-        # self.failUnlessEqual(response.status_code, 200)
+                                                       language='Eglish', weights=0,date_of_birth='1987-01-01')        
+        response = self.client.get(reverse('view_interviewer_page', kwargs={'interviewer_id':investigator.id}))        
         self.assertIn(response.status_code, [302,200])
         templates = [template.name for template in response.templates]
         self.assertIn('interviewers/interviewer_form.html', templates)
@@ -184,37 +158,24 @@ class InterviewerViewTest(BaseTest):
             reverse('interviewers_page'))
 
     def test_unblock_interviwer_details(self):
-        # investigator = Interviewer.objects.create(name='int_6',survey=self.survey,ea=self.ea,date_of_birth='1987-01-01')
         investigator = Interviewer.objects.create(name="Investigator6",
                                                        ea=self.ea,
                                                        gender='1', level_of_education='Primary',
-                                                       language='Eglish', weights=0,date_of_birth='1987-01-01')
-        # url = reverse('unblock_interviewer_page', kwargs={"interviewer_id":  investigator.id})
-        # response = self.client.get(url)
-        response = self.client.get(reverse('unblock_interviewer_page', kwargs={'interviewer_id':investigator.id}))
-        print response.context,"ssssf"
-        self.assertIn(response.status_code, [302,200])
-        # self.failUnlessEqual(response.status_code, 200)
-        # templates = [template.name for template in response.templates]
-        # self.assertIn('interviewers/index.html', templates)
+                                                       language='Eglish', weights=0,date_of_birth='1987-01-01')        
+        response = self.client.get(reverse('unblock_interviewer_page', kwargs={'interviewer_id':investigator.id}))        
+        self.assertIn(response.status_code, [302,200])        
         investigator = Interviewer.objects.get(name='Investigator6')
         self.assertEquals(investigator.is_blocked, False)
         self.assertIn("Interviewer USSD Access successfully unblocked.", response.cookies['messages'].value)        
         self.assertRedirects(response, expected_url=reverse('interviewers_page'))
 
     def test_block_interviewer_details(self):
-        # investigator = Interviewer.objects.create(name='int_7',survey=self.survey,ea=self.ea,date_of_birth='1987-01-01')
         investigator = Interviewer.objects.create(name="Investigator5",
                                                        ea=self.ea,
                                                        gender='1', level_of_education='Primary',
-                                                       language='Eglish', weights=0,date_of_birth='1987-01-01')
-        # url = reverse('block_interviewer_page', kwargs={"interviewer_id":  investigator.id})
-        # response = self.client.get(url)
-        # self.failUnlessEqual(response.status_code, 200)
+                                                       language='Eglish', weights=0,date_of_birth='1987-01-01')        
         response = self.client.get(reverse('block_interviewer_page', kwargs={'interviewer_id':investigator.id}))
         self.assertIn(response.status_code, [302,200])
-        # templates = [template.name for template in response.templates]
-        # self.assertIn('interviewers/index.html', templates)
         investigator = Interviewer.objects.get(name='Investigator5')
         self.assertEquals(investigator.is_blocked, True)
         self.assertIn("Interviewer USSD Access successfully blocked.", response.cookies['messages'].value)
@@ -226,14 +187,11 @@ class InterviewerViewTest(BaseTest):
         self.assertRedirects(response, expected_url=reverse('interviewers_page'))
         self.assertIn("Interviewer does not exist.", response.cookies['messages'].value)
 
-
     def test_block_interviwer_when_no_such_interviewer_exist(self):
         url = reverse('unblock_interviewer_page', kwargs={"interviewer_id":  99999})
         response = self.client.get(url)
         self.assertRedirects(response, expected_url=reverse('interviewers_page'))
         self.assertIn("Interviewer does not exist.", response.cookies['messages'].value)
-        
-
 
     def test_download_interviewers(self):
         response = self.client.get(reverse('download_interviewers'))
@@ -243,7 +201,6 @@ class InterviewerViewTest(BaseTest):
         res_csv = 'attachment; \
         filename="%s.csv"' % filename
         self.assertIn(response['Content-Disposition'], res_csv)
-
 
     def test_view_interviewer_details_when_no_such_interviewer_exists(self):
         investigator = Interviewer.objects.create(name="Investigator10",

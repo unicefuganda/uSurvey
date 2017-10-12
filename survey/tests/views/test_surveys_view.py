@@ -17,7 +17,6 @@ from survey.models import Batch
 from survey.models.users import UserProfile
 from survey.utils import views_helper
 
-
 class SurveyViewTest(BaseTest):
 
     def setUp(self):
@@ -187,7 +186,6 @@ class SurveyViewTest(BaseTest):
         self.assertEquals(Survey.objects.count(), 0)
         self.test_new_should_create_survey_on_post()
         survey = Survey.objects.first()
-        # form_dat = {'validation_test': }
         sampling_criteria_url = reverse('listing_criteria_page', args=(survey.id,))
         response = self.client.get(sampling_criteria_url)
         self.assertEquals(response.status_code, 200)
@@ -220,7 +218,6 @@ class SurveyViewTest(BaseTest):
         form_data = {'survey': survey.id, 'validation_test': 'equals',
                      'value': 1,
                      'listing_question': self.listing_form.questions.get(answer_type=VideoAnswer.choice_name()).id,}
-
         self.assertEquals(survey.randomization_criteria.count(), 0)     # confirm nothin exists
         response = self.client.post(sampling_criteria_url, data=form_data)
         self.assertEquals(survey.randomization_criteria.count(), 0)     # confirm nothin exists
@@ -263,4 +260,3 @@ class SurveyViewTest(BaseTest):
         response = self.client.get(wipe_off_url)
         # confirm interview was not deleted.
         self.assertEquals(Interview.objects.filter(id=interview.id).count(), 0)
-

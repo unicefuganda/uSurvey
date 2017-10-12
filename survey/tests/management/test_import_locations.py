@@ -24,7 +24,6 @@ class ImportLocationTest(BaseTest):
         self.data = [['RegionName', 'DistrictName', 'CountyName'],
                      ['region1', 'district1', 'county1'],
                      ['region2', 'district2', 'county2']]
-
         self.write_to_csv('wb', self.data)
         self.filename = 'test.csv'
         open(self.filename, 'rb')

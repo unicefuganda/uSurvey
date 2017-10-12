@@ -17,15 +17,12 @@ class UploadCSVFileFormTest(BaseTest):
 
     def test_should_know_fields(self):
         upload_location_form = UploadCSVFileForm(uploader=UploadLocation)
-
         fields = ['file']
-
         [self.assertIn(field, upload_location_form.fields) for field in fields]
 
     def test_empty_file(self):
         data_file = {'file': SimpleUploadedFile(
             self.filename, open(self.filename, 'a').close())}
-
         upload_location_form = UploadCSVFileForm(UploadLocation, {}, data_file)
         self.assertEqual(False, upload_location_form.is_valid())
         self.assertIn('The submitted file is empty.',

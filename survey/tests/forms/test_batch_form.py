@@ -1,6 +1,5 @@
 from django.test import TestCase
 from survey.forms.batch import BatchForm
-# from survey.models import BatchQuestionOrder
 from survey.models.locations import *
 from survey.models import EnumerationArea
 from survey.models import Interviewer
@@ -8,17 +7,14 @@ from survey.models.access_channels import *
 from survey.models.batch import Batch
 from survey.models.surveys import Survey
 
-
 class BatchFormTest(TestCase):
-
+    
     def test_valid(self):
         self.country = LocationType.objects.create(
             name='Country', slug='country')
-        self.africa = Location.objects.create(name='Africa', type=self.country)
-        
+        self.africa = Location.objects.create(name='Africa', type=self.country)        
         self.city_ea = EnumerationArea.objects.create(name="CITY EA")
         self.city_ea.locations.add(self.africa)
-
         self.investigator_1 = Interviewer.objects.create(name="Investigator",
                                                          ea=self.city_ea,
                                                          gender='1', level_of_education='Primary',
@@ -37,7 +33,6 @@ class BatchFormTest(TestCase):
             'name': 'test',
             'description': 'description goes here',
         }
-
         batch_form = BatchForm(form_data)
         self.assertFalse(batch_form.is_valid())
 
@@ -52,7 +47,6 @@ class BatchFormTest(TestCase):
         survey = Survey.objects.create(name="very fast")
         Batch.objects.create(survey=survey, name='Batch A',
                              description='description')
-
         form_data = {
             'name': 'Batch A',
             'description': 'description goes here',

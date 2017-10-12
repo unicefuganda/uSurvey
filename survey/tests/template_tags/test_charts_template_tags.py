@@ -3,7 +3,6 @@ from django.utils.datastructures import SortedDict
 from survey.templatetags.chart_template_tags import get_computational_value_by_answer
 from survey.models.locations import *
 
-
 class ChartTemplateTagsTest(TestCase):
 
     def setUp(self):
@@ -12,9 +11,7 @@ class ChartTemplateTagsTest(TestCase):
         self.region = LocationType.objects.create(name="Region", slug="region")
         self.district = LocationType.objects.create(
             name="District", slug='district')
-
         self.uganda = Location.objects.create(name="Uganda", type=self.country)
-
         self.central = Location.objects.create(
             name="EAST", type=self.region, parent=self.uganda, )
         self.west = Location.objects.create(
