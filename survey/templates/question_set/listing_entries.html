@@ -32,7 +32,7 @@
       {% for survey in surveys %}
         <tr>
           <td>
-             <a href="{% url 'view_data_home' question_set.pk survey.pk %}">{{ survey.name }}</a>
+             <a href="{% url 'view_data_home' question_set.pk %}?survey={{survey.pk}}">{{ survey.name }}</a>
           </td>
           <td>
             {{ survey.interviews.count }}
