@@ -345,16 +345,19 @@ def download_attachment(request, question_id, interview_id):
     interview = get_object_or_404(Interview, pk=interview_id)
     answer_class = Answer.get_class(question.answer_type)
     filename = '%s-%s.zip' % (question.identifier, question_id)
-    attachment_dir = os.path.join(
-        settings.SUBMISSION_UPLOAD_BASE,
-        str(answer_class.get(
-            interview=interview,
-            question=question).value),
-        'attachments')
-    response = HttpResponse(content_type='application/zip')
-    response['Content-Disposition'] = 'attachment; filename="%s"' % filename
-    response.write(get_zipped_dir(attachment_dir))
-    return response
+    try:
+        attachment_dir = os.path.join(
+            settings.SUBMISSION_UPLOAD_BASE,
+            str(answer_class.get(
+                interview=interview,
+                question=question).value),
+            'attachments')
+        response = HttpResponse(content_type='application/zip')
+        response['Content-Disposition'] = 'attachment; filename="%s"' % filename
+        response.write(get_zipped_dir(attachment_dir))
+        return response
+    except Exception as e:
+        return HttpResponse(str(e))
 
 
 def download_data(request, qset_id):
