@@ -1,4 +1,4 @@
-Docker Setup (Linux)c
+Docker Setup (Linux)
 ===================
 
 * This section covers uSurvey installation from docker image. 
