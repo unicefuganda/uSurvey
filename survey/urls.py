@@ -602,7 +602,7 @@ urlpatterns = patterns(
         'survey.views.question_set.download_data',
         name='download_qset_data'),
     url(
-        r'^qset/download_attachment/(?P<question_id>\d+/)/(?P<interview_id>\d+/)$',
+        r'^qset/download_attachment/(?P<question_id>\d+)/(?P<interview_id>\d+)/$',
         'survey.views.question_set.download_attachment',
         name='download_qset_attachment'),
     url(
