@@ -21,7 +21,6 @@ class ImportCountriesTest(BaseTest):
 
     def setUp(self):
         self.data = [['uganda'], ['ayoyo'], ['hoho']]
-
         self.write_to_csv('wb', self.data)
         self.filename = 'test.csv'
         open(self.filename, 'rb')

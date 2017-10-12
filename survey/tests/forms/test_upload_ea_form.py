@@ -19,7 +19,6 @@ class UploadEAFormTest(BaseTest):
             ['region2',    'district2',    'county2',   '',
              'parish2',    'ea_under_parish'],
             ['region2',    'district2',    'county2',   '',                     'parish2',    'ea_under_parish']]
-
         self.write_to_csv('wb', self.filedata, self.filename)
 
     def tearDown(self):
@@ -27,16 +26,13 @@ class UploadEAFormTest(BaseTest):
 
     def test_should_know_fields(self):
         upload_location_form = UploadEAForm()
-
         fields = ['file', 'survey']
-
         [self.assertIn(field, upload_location_form.fields) for field in fields]
 
     def test_empty_survey(self):
         survey = Survey.objects.create(name="not to be used")
         data_file = {'file': SimpleUploadedFile(
             self.filename, open(self.filename, 'rb').close())}
-
         upload_location_form = UploadEAForm({'survey': ''}, data_file)
         self.assertEqual(False, upload_location_form.is_valid())
         self.assertIn('This field is required.',
@@ -47,7 +43,6 @@ class UploadEAFormTest(BaseTest):
         data_file = {'file': SimpleUploadedFile(
             self.filename, open(self.filename, 'rb').close())}
         invalid_survey_id = '1121'
-
         upload_location_form = UploadEAForm(
             {'survey': invalid_survey_id}, data_file)
         self.assertEqual(False, upload_location_form.is_valid())

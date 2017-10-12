@@ -5,7 +5,6 @@ from survey.models import Survey, AboutUs, SuccessStories
 from survey.tests.base_test import BaseTest
 from django.core.urlresolvers import reverse
 
-
 class HomepageViewTest(BaseTest):
 
     def setUp(self):
@@ -31,7 +30,6 @@ class HomepageViewTest(BaseTest):
         self.failUnlessEqual(response.status_code, 200)
         templates = [template.name for template in response.templates]
         self.assertIn('main/about.html', templates)
-
         about_us = AboutUs.objects.all()[0]
         self.assertEqual(about_us, response.context['about_content'])
         self.assertEqual(about_us.content, 'No content available yet !!')

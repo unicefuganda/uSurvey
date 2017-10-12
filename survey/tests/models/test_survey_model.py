@@ -37,18 +37,14 @@ class SurveyTest(TestCase):
         kampala = Location.objects.create(
             name="Kampala", tree_parent=uganda, type=district)
         ea.locations.add(kampala)
-
         self.investigator = Interviewer.objects.create(name="Investigator",
                                                        ea=ea,
                                                        gender='1', level_of_education='Primary',
                                                        language='Eglish', weights=0)
-
         survey = Survey.objects.create(
             name="survey name123", description="rajni survey123")
         batch = Batch.objects.create(order=1, survey=survey)
-
         batch.open_for_location(kampala)
-
         self.assertTrue(survey.is_open())
 
     def test_survey_knows_it_is_open_for_investigator_location_if_provided(self):
@@ -63,12 +59,10 @@ class SurveyTest(TestCase):
         kampala = Location.objects.create(
             name="Kampala", tree_parent=uganda, type=district)
         ea.locations.add(kampala)
-
         self.investigator = Interviewer.objects.create(name="Investigator",
                                                        ea=ea,
                                                        gender='1', level_of_education='Primary',
                                                        language='Eglish', weights=0)
-
         survey = Survey.objects.create(
             name="survey name333", description="rajni survey33333")
         batch = Batch.objects.create(order=1, survey=survey)
@@ -89,12 +83,10 @@ class SurveyTest(TestCase):
         kampala = Location.objects.create(
             name="Kampala", tree_parent=uganda, type=district)
         ea.locations.add(kampala)
-
         self.investigator = Interviewer.objects.create(name="Investigator",
                                                        ea=ea,
                                                        gender='1', level_of_education='Primary',
                                                        language='Eglish', weights=0)
-
         survey = Survey.objects.create(
             name="survey name333", description="rajni survey33333")
         batch = Batch.objects.create(order=1, survey=survey)
@@ -114,12 +106,10 @@ class SurveyTest(TestCase):
         kampala = Location.objects.create(
             name="Kampala", tree_parent=uganda, type=district)
         ea.locations.add(kampala)
-
         self.investigator = Interviewer.objects.create(name="Investigator_closed",
                                                        ea=ea,
                                                        gender='1', level_of_education='Primary',
                                                        language='Eglish', weights=0)
-
         survey = Survey.objects.create(
             name="survey name up for close", description="rajni survey close")
         batch = Batch.objects.create(order=1, survey=survey)
@@ -169,21 +159,18 @@ class SurveyTest(TestCase):
         uganda = Location.objects.create(name="Uganda", type=country)
         kampala = Location.objects.create(
             name="Kampala", type=district, tree_parent=uganda)
-
         open_survey = Survey.objects.create(
             name="open survey", description="open survey")
         closed_survey = Survey.objects.create(
             name="closed survey", description="closed survey")
         another_closed_survey = Survey.objects.create(
             name="another closed survey", description="another closed survey")
-
         open_batch = Batch.objects.create(
             order=1, name="Open Batch", survey=open_survey)
         closed_batch = Batch.objects.create(
             order=2, name="Closed Batch", survey=closed_survey)
         another_closed_batch = Batch.objects.create(
             order=3, name="Another Closed Batch", survey=another_closed_survey)
-
         open_batch.open_for_location(kampala)
         self.assertTrue(open_survey.is_open())
         self.assertFalse(closed_survey.is_open())
@@ -195,21 +182,18 @@ class SurveyTest(TestCase):
         uganda = Location.objects.create(name="Uganda", type=country)
         kampala = Location.objects.create(
             name="Kampala", type=district, tree_parent=uganda)
-
         open_survey = Survey.objects.create(
             name="open survey", description="open survey")
         closed_survey = Survey.objects.create(
             name="closed survey", description="closed survey")
         another_closed_survey = Survey.objects.create(
             name="another closed survey", description="another closed survey")
-
         open_batch = Batch.objects.create(
             order=1, name="Open Batch", survey=open_survey)
         closed_batch = Batch.objects.create(
             order=2, name="Closed Batch", survey=closed_survey)
         another_closed_batch = Batch.objects.create(
             order=3, name="Another Closed Batch", survey=another_closed_survey)
-
         self.assertFalse(None, open_batch.open_for_location(kampala)[1])
 
     def test__survey_knows_is_currently_open_for_location(self):
@@ -223,10 +207,8 @@ class SurveyTest(TestCase):
             name="masaka", type=district, tree_parent=uganda)
         wakiso = Location.objects.create(
             name="wakiso", type=district, tree_parent=uganda)
-
         open_survey = Survey.objects.create(
             name="open survey", description="open survey")
-
         open_batch = Batch.objects.create(
             order=1, name="Open Batch", survey=open_survey)
         open_batch_2 = Batch.objects.create(

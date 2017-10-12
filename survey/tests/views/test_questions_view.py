@@ -97,8 +97,6 @@
 #             self.sub_data, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
 #         templates = [ template.name for template in response.templates ]
 #         # self.assertIn('questions/index.html', templates)
-#         print response.cookies
-#         print response.content
 #         print templates,"TEMPLATEDD"
 #         self.assertEqual(200,response.status_code)
 

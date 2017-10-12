@@ -4,7 +4,6 @@ from survey.models import Survey, UploadErrorLog, EnumerationArea
 from survey.services.ea_upload import UploadEA, UploadEACSVLayoutHelper
 from survey.tests.base_test import BaseTest
 
-
 class EAUploadTest(BaseTest):
 
     def setUp(self):
@@ -18,7 +17,6 @@ class EAUploadTest(BaseTest):
             ['region2',    'district2',    'county2',   '',
              'parish2',    'ea_under_parish'],
             ['region2',    'district2',    'county2',   '',                     'parish2',    'ea_under_parish']]
-
         self.write_to_csv('wb', self.data)
         self.filename = 'test.csv'
         _file = open(self.filename, 'rb')
@@ -51,7 +49,6 @@ class EAUploadTest(BaseTest):
             ['region1',    'district1',    'county1',   'ea_containing_parish', EMPTY_PARISH_NAME,   '']]
         self.write_to_csv('wb', data)
         _file = open(self.filename, 'rb')
-
         rtype = LocationType.objects.create(name="Region", slug="region")
         region = Location.objects.create(name="region1", type=rtype)
         dtype = LocationType.objects.create(
@@ -61,7 +58,6 @@ class EAUploadTest(BaseTest):
         ctype = LocationType.objects.create(
             name="County", slug="county", parent=dtype)
         Location.objects.create(name="county1", parent=district, type=ctype)
-
         uploader = UploadEA(_file)
         uploader.upload(self.survey)
         error_log = UploadErrorLog.objects.filter(
@@ -130,14 +126,12 @@ class EAUploadTest(BaseTest):
         self.generate_non_csv_file(self.filename)
         file = open(self.filename, 'rb')
         uploader = UploadEA(file)
-
         uploader.upload(self.survey)
         error_log = UploadErrorLog.objects.filter(
             model=self.uploader.MODEL, filename=self.filename)
         self.failUnless(error_log.filter(
             error='Enumeration Areas not uploaded. %s is not a valid csv file.' % self.filename))
         self.failIf(EnumerationArea.objects.all())
-
 
 class EAUploadCSVLayoutHelperTest(BaseTest):
 
@@ -154,7 +148,6 @@ class EAUploadCSVLayoutHelperTest(BaseTest):
             name="Countytype", slug='countytype', parent=self.district_type)
         self.parish_type = LocationType.objects.create(
             name="Parishtype", slug='parishtype', parent=self.county_type)
-
         self.region = Location.objects.create(
             name="region1", type=self.region_type, parent=self.uganda)
         self.district = Location.objects.create(
@@ -165,7 +158,6 @@ class EAUploadCSVLayoutHelperTest(BaseTest):
             name="parish_1", parent=self.county_1, type=self.parish_type)
         self.parish_1_b = Location.objects.create(
             name="parish_1b", parent=self.county_1, type=self.parish_type)
-
         self.region = Location.objects.create(
             name="region2", parent=self.uganda, type=self.region_type)
         self.district = Location.objects.create(
@@ -174,7 +166,6 @@ class EAUploadCSVLayoutHelperTest(BaseTest):
             name="county2", parent=self.district, type=self.county_type)
         self.parish_2 = Location.objects.create(
             name="parish_2", parent=self.county_2, type=self.parish_type)
-
         self.ea_csv_layout = UploadEACSVLayoutHelper()
 
     def test_headers_format(self):

@@ -2,13 +2,11 @@ from django.test import TestCase
 from survey.forms.indicator import IndicatorForm
 from survey.models import QuestionModule, Batch, Survey
 
-
 class IndicatorFormTest(TestCase):
 
     def setUp(self):
         self.survey = Survey.objects.create(name="Health survey")
         self.batch = Batch.objects.create(name="Health", survey=self.survey)
-
         self.form_data = {
                           'name': 'Health',
                           'description': 'some description',

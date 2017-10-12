@@ -4,7 +4,6 @@ from django.contrib.auth.models import User
 from survey.views.aggregates import *
 from survey.tests.base_test import BaseTest
 
-
 class AggregatesPageTest(BaseTest):
 
     def setUp(self):

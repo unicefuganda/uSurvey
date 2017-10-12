@@ -19,9 +19,7 @@ class UploadLocationWeightsFormTest(BaseTest):
 
     def test_should_know_fields(self):
         upload_location_form = UploadWeightsForm()
-
         fields = ['file', 'survey']
-
         [self.assertIn(field, upload_location_form.fields) for field in fields]
 
     def test_empty_survey(self):
@@ -39,7 +37,6 @@ class UploadLocationWeightsFormTest(BaseTest):
         data_file = {'file': SimpleUploadedFile(
             self.filename, open(self.filename, 'rb').close())}
         invalid_survey_id = '1121'
-
         upload_location_form = UploadWeightsForm(
             {'survey': invalid_survey_id}, data_file)
         self.assertEqual(False, upload_location_form.is_valid())

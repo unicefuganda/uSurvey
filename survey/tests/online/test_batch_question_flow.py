@@ -129,12 +129,3 @@ class OnlineFlowsTest(BaseTest):
         interviewer = mommy.make(Interviewer, name='test')
         mommy.make(ODKAccess, interviewer=interviewer, user_identifier='test12')
         survey_allocation = mommy.make(SurveyAllocation, survey=survey, allocation_ea=ea, interviewer=interviewer)
-
-        # award second and third to groups
-
-
-
-
-
-
-

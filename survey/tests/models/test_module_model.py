@@ -21,6 +21,7 @@ class QuestionModuleTest(BaseTest):
     def test_unicode_text(self):
         module = QuestionModule.objects.create(name="module name")
         self.assertEqual(module.name, str(module))
+    
     def setUp(self):
         QuestionModule.objects.create(name="test",description="sample")
 

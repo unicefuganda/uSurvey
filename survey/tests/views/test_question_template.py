@@ -6,9 +6,7 @@ from survey.models import (QuestionModule, Interviewer,  EnumerationArea, Questi
                            TextAnswer, MultiChoiceAnswer, DateAnswer, QuestionOption, Interview, ListingTemplate,
                            ODKAccess, Question, QuestionSet,Batch, ResponseValidation, Survey)
 from survey.models import QuestionTemplate, Survey, QuestionModule, Batch, ResponseValidation
-
 from survey.tests.base_test import BaseTest
-
 
 class QuestionsTemplateViewsTest(BaseTest):
 

@@ -43,7 +43,6 @@ class LocationFormTest(TestCase):
         self.district = LocationType.objects.create(
             name='District', slug='district', parent=self.country)
         self.uganda = Location.objects.create(name='Uganda', type=self.country)
-
         self.form_data = {
             'name': 'kampala',
             'type': self.district.pk,

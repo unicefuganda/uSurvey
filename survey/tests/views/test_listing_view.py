@@ -2,20 +2,13 @@ import json
 from django.core.urlresolvers import reverse
 from django.test.client import Client
 from mock import *
-
 from django.contrib.auth.models import User, Group
 from survey.models import ListingTemplate, QuestionSet
-
 from survey.forms.question_set import get_question_set_form
 from survey.forms.question import get_question_form
-
 from survey.tests.base_test import BaseTest
 
 questionSetForm = get_question_set_form(QuestionSet)
-
-
-
-
 
 class ListingViewTest(BaseTest):
 
@@ -28,8 +21,7 @@ class ListingViewTest(BaseTest):
         self.client.login(username='demo6', password='demo6')
         self.form_data = {
             'name': 'survey demo6',
-            'description': 'listing description demo6',
-            # 'access_channels': 'Odk Access'
+            'description': 'listing description demo6'
         }
         self.qset_list = QuestionSet.objects.create(
             name='qset name', description='qset descrpition')
@@ -39,15 +31,13 @@ class ListingViewTest(BaseTest):
         self.assertEqual(200, response.status_code)
         templates = [template.name for template in response.templates]
         self.assertIn('question_set/new.html', templates)
-        # self.assertIsInstance(response.context['question_set_form'], questionSetForm)
         self.assertIn('Create', response.context['button_label'])
         self.assertIn('add-question_set-form', response.context['id'])
-        self.assertIn('New Listing Form', response.context['title'])        
+        self.assertIn('New Listing Form', response.context['title'])
 
     def test_index(self):
         response = self.client.get(reverse('listing_template_home'))
         self.assertEqual(200, response.status_code)
-
 
     def test_view_Listing_list(self):
         list_1 = ListingTemplate.objects.create(name="List A")
@@ -68,16 +58,6 @@ class ListingViewTest(BaseTest):
         self.assertRedirects(response, expected_url=reverse('listing_template_home'), status_code=302, target_status_code=200,
                              msg_prefix='')
 
-    ## def test_new_should_not_create_listing_on_post_if_listing_with_same_name_exists(self):
-    ##     form_data = self.form_data
-    ##     ListingTemplate.objects.create(**form_data)
-    ##     response = self.client.post(reverse('new_listing_template_page'), data=form_data)
-    ##     error_message = "Listing with name %s already exist." % form_data.get('name')
-    ##     self.assertIn(error_message, response.context[
-    ##                   'question_set_form'].errors['name'])
-
-
-
     def test_edit_should_get_form_with_data_of_the_listing(self):
         listing = ListingTemplate.objects.create(**self.form_data)
         self.failUnless(listing)
@@ -85,10 +65,8 @@ class ListingViewTest(BaseTest):
         self.assertEqual(200, response.status_code)
         templates = [template.name for template in response.templates]
         self.assertIn('question_set/new.html', templates)
-        # self.assertIsInstance(response.context['question_set_form'], questionSetForm)
-        self.assertIn('edit-question-set-form', response.context['id'])        
+        self.assertIn('edit-question-set-form', response.context['id'])
         self.assertIn('name, description',response.context['placeholder'])
-        # self.assertIn(reverse('edit_listing_template_page', kwargs={'qset_id':listing.id}), response.context['action'])
 
     def test_edit_should_post_should_edit_the_listing(self):
         listing = ListingTemplate.objects.create(name="sudh",description="desc")
@@ -96,10 +74,8 @@ class ListingViewTest(BaseTest):
         form_data = self.form_data
         form_data['name'] = 'edited_name'
         form_data['description'] = 'edited_description'
-
         response = self.client.post(reverse('edit_listing_template_page', kwargs={'qset_id':listing.id}), data=form_data)
         self.failIf(ListingTemplate.objects.filter(name=listing.description))
-
         listing = ListingTemplate.objects.get(
             name='sudh', description='desc')
         self.failUnless(listing)
@@ -108,23 +84,12 @@ class ListingViewTest(BaseTest):
         success_message = "Listing Form successfully edited."
         self.assertIn(success_message, response.cookies['messages'].value)
 
-
     def test_delete_should_delete_the_listing(self):        
         listing = ListingTemplate.objects.create(name="listing_name", description="list_description")        
         self.failUnless(listing)
         response = self.client.get(reverse('delete_listing_template',kwargs={"qset_id":listing.id}))
         self.assertRedirects(
             response, reverse('listing_template_home'), status_code=302, target_status_code=200, msg_prefix='')
-
-    # def test_listing_does_not_exist(self):
-    #     message = "Listing Form does not exist."
-    #     response = self.client.get(reverse('edit_listing_template_page',kwargs={"qset_id":500}))
-    #     self.assertNotEquals(200, response.status_code)
-
-    # def test_should_throw_error_if_deleting_non_existing_listng(self):
-    #     message = "Listing Form does not exist."
-    #     self.assert_object_does_not_exist(reverse('delete_listing_template',kwargs={"qset_id":500}), message)
-
 
     def insert_qset_index(self):
         response = self.client.get(reverse('qset_questions_page'))
@@ -141,7 +106,6 @@ class ListingViewTest(BaseTest):
     #     url = reverse('delete_listing_template',kwargs={"qset_id":500})
     #     self.assert_restricted_permission_for(url)
 
-
     # def test_add_listing_question(self):
     #     list_1 = ListingTemplate.objects.create(name="List A1")
     #     response = self.client.get(reverse('new_qset_question_page', kwargs={'qset_id':list_1.id}))
@@ -157,10 +121,6 @@ class ListingViewTest(BaseTest):
     #     self.assertIn('question_set/new/', response.context['action'])
     #     self.assertIn(batch, response.context['batch'])
     #     self.assertIn('question-form', response.context['class'])
-
-
-
-
 
     # def test_new_should_create_listing_question_on_post(self):
     #     list_1 = ListingTemplate.objects.create(name="List A2")

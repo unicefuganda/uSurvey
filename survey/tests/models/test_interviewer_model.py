@@ -1,5 +1,4 @@
 from django.test import TestCase
-# from survey.models import EnumerationArea,SurveyAllocation
 from survey.models.enumeration_area import EnumerationArea
 from survey.models.batch import Batch
 from survey.models.interviewer import Interviewer, SurveyAllocation
@@ -37,16 +36,14 @@ class InterviewerTest(TestCase):
         name = Interviewer.objects.get(name="Dummy")
         self.assertEqual(name.name,'Dummy')
         self.assertEqual(len(name.name),5)
+
     def test_unicode_text(self):
         itr = Interviewer.objects.create(name="abcd name")
         self.assertEqual(itr.name, str(itr))
+
 class SurveyAllocationTest(TestCase):
 
-    # def test_unicode_text(self):
-    #     sua = SurveyAllocation.objects.create(allocation_ea="abcd name")
-    #     self.assertEqual(sua.allocation_ea.name, str(sua))
     def test_unicode_text(self):
-        # sua = SurveyAllocation.objects.create(allocation_ea="abcd name")
         self.survey = Survey.objects.create(name="sai",has_sampling=True,sample_size=1)
         self.interviewer = Interviewer.objects.create(name="raju",gender="male",is_blocked=True,weights=20)
         self.enumerationarea = EnumerationArea.objects.create(name="anushka")

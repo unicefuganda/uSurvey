@@ -63,6 +63,7 @@ class EATest(BaseTest):
         self.assertTrue(self.survey.is_open_for(self.kampala))
         self.assertEquals(self.batch.pk, ea_new.get_survey_openings(
             self.survey).values()[0]["batch_id"])
+    
     def test_unicode_text(self):
         ea = EnumerationArea.objects.create(name="abc name")
         self.assertEqual(ea.name, str(ea))

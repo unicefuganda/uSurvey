@@ -1,12 +1,10 @@
 import os
 from datetime import datetime, timedelta
 from django.core.files import File
-
 from survey.services.csv_uploader import CSVUploader, UploadService
 from survey.tests.base_test import BaseTest
 from survey.models import UploadErrorLog
 from django.utils.timezone import utc
-
 
 class CSVUploaderTest(BaseTest):
 
@@ -30,14 +28,12 @@ class CSVUploaderTest(BaseTest):
         self.assertEqual(self.headers, headers)
         self.assertEqual(self.data, data)
 
-
 class UploaderServiceTest(BaseTest):
 
     def setUp(self):
         self.data = [['RegionName', 'DistrictName', 'CountyName', 'Selection Probability'],
                      ['region1', 'district1', 'county1', '0.01'],
                      ['region2', 'district2', 'county2', '0.1']]
-
         self.write_to_csv('wb', self.data)
         self.filename = 'test.csv'
         self.file = open(self.filename, 'rb')
@@ -56,13 +52,10 @@ class UploaderServiceTest(BaseTest):
         two_months_old_error_log.created = datetime.utcnow().replace(tzinfo=utc) - \
             timedelta(days=31)
         two_months_old_error_log.save()
-
         UploadService(self.file)
-
         two_months_old_error_log = UploadErrorLog.objects.filter(
             filename=self.filename, error="Some different errors")
         self.failIf(two_months_old_error_log)
-
         error_location = UploadErrorLog.objects.filter(
             model='LOCATION', filename=self.filename, error="Some errors location")
         self.failUnless(error_location)
@@ -72,10 +65,8 @@ class UploaderServiceTest(BaseTest):
 
     def test_error_logging(self):
         UploadErrorLog.objects.all().delete()
-
         uploader_service = UploadService(self.file)
         uploader_service.log_error(row_number=1, error="hahaha")
-
         retrieved_log = UploadErrorLog.objects.filter(
             filename=self.file.name, row_number=1, error="hahaha")
         self.assertEqual(1, retrieved_log.count())
@@ -83,12 +74,9 @@ class UploaderServiceTest(BaseTest):
     def test_remove_trailing_name_in_headers(self):
         headers = ['heheName', 'somethingCode',
                    'hahaName', 'blablaCode', 'hihihi', 'hohoho']
-
         self.assertEqual(['hehe', 'somethingCode', 'haha', 'blablaCode', 'hihihi', 'hohoho'],
                          UploadService.remove_trailing('Name', in_array=headers))
-
         self.assertEqual(['hehe', 'haha', 'hihihi', 'hohoho'],
                          UploadService.remove_trailing('Name', in_array=headers, exclude='Code'))
-
         self.assertEqual(['hehe', 'haha', 'hihihi', 'hohoho'],
                          UploadService.remove_trailing('Name', headers, 'Code'))

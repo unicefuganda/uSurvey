@@ -6,7 +6,6 @@ from survey.models import EnumerationArea
 from survey.models import Interviewer
 from survey.models import Question
 from survey.models import QuestionModule
-# from survey.models.batch_question_order import BatchQuestionOrder
 from survey.models.batch import Batch, BatchLocationStatus
 from survey.models.surveys import Survey
 from django.db import IntegrityError
@@ -64,6 +63,7 @@ class BatchTest(TestCase):
         batch = Batch(survey=survey, name=batch_a.name,
                       description='something else')
         self.assertNotEqual(IntegrityError, batch.save)
+    
     def test_unicode_text(self):
         ts1 = Batch.objects.create(name="abc name")
         self.assertEqual(ts1.name, str(ts1)) 
