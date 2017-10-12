@@ -34,8 +34,10 @@ Quick Start
 * Run the setup script in the project directory and follow the instructions
 
         chmod +x docker_setup_linux.sh
+
         ./docker_setup_linux.sh
         
+
     * This step performs the following activities:
         1. Creates path where database files are stored on host machine
         2. Loads the necessary Permissions categories.
@@ -56,7 +58,7 @@ Customizing the country data
        
 * Before using the setup, you need to load data for administrative divisions of the required country.
 
-    * A sample of the required CSV file is available in the project directory ([administrative_divisions.csv.example](./administrative_divisions.csv.example))
+    * A sample of the required CSV file is available in the project directory ([administrative_divisions.csv.example](./administrative_divisions.csv.example) for Uganda and [administrative_divisions_india.csv.example](./administrative_divisions_india.csv.example) for India)
 
 * To load administrative divisions into the system, run the following commands from the project directory and follow the steps:    
 
