@@ -594,7 +594,7 @@ urlpatterns = patterns(
         'survey.views.question_set.view_survey_data',
         name='view_survey_data'),
     url(
-        r'^qset/view_data/(?P<qset_id>\d+)/$',
+        r'^listing_qset/view_data/(?P<qset_id>\d+)/$',
         'survey.views.question_set.listing_entries',
         name='listing_entries'),
     url(
