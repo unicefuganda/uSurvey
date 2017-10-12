@@ -388,6 +388,43 @@ class QuestionSetViewTest(BaseTest):
         url = reverse('view_survey_data')
         url = url + "?survey=%s&question_set=%s&page=1"%(survey_obj.id, qset.id)
         response = self.client.get(url)
+        self.assertIn(response.status_code, [200, 302])
+
+
+    def test_qset_view_survey_data(self):
+        listing_form = ListingTemplate.objects.create(name='l12', description='desc1')
+        kwargs = {'name': 'survey11', 'description': 'survey description demo12',
+                          'has_sampling': True, 'sample_size': 10,'listing_form_id':listing_form.id}
+        survey_obj = Survey.objects.create(**kwargs)
+        batch_obj = Batch.objects.create(name='b1',description='d1', survey=survey_obj)
+        qset = QuestionSet.get(id=batch_obj.id)
+        
+        investigator = Interviewer.objects.create(name="InvestigatorViewdata",
+                                                       ea=self.ea,
+                                                       gender='1', level_of_education='Primary',
+                                                       language='Eglish', weights=0,date_of_birth='1987-01-01')
+        interview_obj =  Interview.objects.create(
+            interviewer = investigator,
+            ea = self.ea,
+            survey = survey_obj,
+            question_set = qset,
+            )
+
+        surveyAllocation_obj = SurveyAllocation.objects.create(
+            interviewer = investigator,
+            survey = survey_obj,
+            allocation_ea = self.ea,
+            status = 1
+
+            )
+        url = reverse('view_listing_data')
+        url = url + "?survey=%s"%survey_obj.id
+        response = self.client.get(url)
+
+        url = reverse('view_listing_data')
+        url = url + "?survey=%s&question_set=%s&page=1"%(survey_obj.id, qset.id)
+        response = self.client.get(url)
+        self.assertIn(response.status_code, [200, 302])
         
 
 
