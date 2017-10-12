@@ -288,21 +288,18 @@ def _view_qset_data(request, model_class, interviews,title, disabled_fields=[]):
 @login_required
 @permission_required('auth.can_view_aggregates')
 def listing_entries(request, qset_id):
-    try:
-        listing_qset = ListingTemplate.get(pk=qset_id)
-        surveys = listing_qset.survey_settings.all()
-        request.breadcrumbs(listing_qset.edit_breadcrumbs(qset=listing_qset))
-        request.GET
-        search_fields = ['name', ]
-        if 'q' in request.GET:
-            surveys = get_filterset(surveys, request.GET['q'], search_fields)
-        context = {
-            'question_set': listing_qset,
-            'surveys': surveys,
-            'placeholder': 'name,'}
-        return render(request, 'question_set/listing_entries.html', context)
-    except ListingTemplate.DoesNotExist:
-        return HttpResponseNotFound()
+    listing_qset = get_object_or_404(ListingTemplate, pk=qset_id)
+    surveys = listing_qset.survey_settings.all()
+    request.breadcrumbs(listing_qset.edit_breadcrumbs(qset=listing_qset))
+    search_fields = ['name', ]
+    if 'q' in request.GET:
+        surveys = get_filterset(surveys, request.GET['q'], search_fields)
+    context = {
+        'question_set': listing_qset,
+        'surveys': surveys,
+        'placeholder': 'name,',
+        }
+    return render(request, 'question_set/listing_entries.html', context)
 
 
 @login_required
