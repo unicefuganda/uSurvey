@@ -292,6 +292,28 @@ class QuestionSetViewTest(BaseTest):
         response = self.client.get(url)
         self.assertEqual(response.content, '[]')
 
+        question2 = mommy.make(Question, qset=qset, answer_type=NumericalAnswer.choice_name())
+        QuestionOption.objects.create(
+            question=question1,
+            order=4,
+            text="q4"
+            )
+        QuestionFlow.objects.create(
+            name = 'a1',
+            desc = 'descq',
+            question = question2,
+            question_type = TextAnswer.choice_name(),
+            next_question = question1,
+            next_question_type = TextAnswer.choice_name()
+            )
+        QuestionLoop.objects.create(
+            loop_starter = question2,
+            loop_ender = question1
+            )
+        url = reverse('qset_identifiers')
+        url = url + "?id=%s&q_id=%s"%(question1.id, question2.id)
+        response = self.client.get(url)
+
     def test_listing_entries(self):
         listing_form = ListingTemplate.objects.create(name='l1', description='desc1')
         kwargs = {'name': 'survey9', 'description': 'survey description demo12',
@@ -332,6 +354,41 @@ class QuestionSetViewTest(BaseTest):
         url = reverse('listing_entries',kwargs={"qset_id":999})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 404)
+
+    def test_qset_view_survey_data(self):
+        listing_form = ListingTemplate.objects.create(name='l1', description='desc1')
+        kwargs = {'name': 'survey10', 'description': 'survey description demo12',
+                          'has_sampling': True, 'sample_size': 10,'listing_form_id':listing_form.id}
+        survey_obj = Survey.objects.create(**kwargs)
+        batch_obj = Batch.objects.create(name='b1',description='d1', survey=survey_obj)
+        qset = QuestionSet.get(id=batch_obj.id)
+        
+        investigator = Interviewer.objects.create(name="InvestigatorViewdata",
+                                                       ea=self.ea,
+                                                       gender='1', level_of_education='Primary',
+                                                       language='Eglish', weights=0,date_of_birth='1987-01-01')
+        interview_obj =  Interview.objects.create(
+            interviewer = investigator,
+            ea = self.ea,
+            survey = survey_obj,
+            question_set = qset,
+            )
+
+        surveyAllocation_obj = SurveyAllocation.objects.create(
+            interviewer = investigator,
+            survey = survey_obj,
+            allocation_ea = self.ea,
+            status = 1
+
+            )
+        url = reverse('view_survey_data')
+        url = url + "?survey=%s"%survey_obj.id
+        response = self.client.get(url)
+
+        url = reverse('view_survey_data')
+        url = url + "?survey=%s&question_set=%s&page=1"%(survey_obj.id, qset.id)
+        response = self.client.get(url)
+        
 
 
 
