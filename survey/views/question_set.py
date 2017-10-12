@@ -172,12 +172,11 @@ def delete(request, question_id, batch_id):
 
 
 def delete_qset_listingform(request, question_id):
-    qset = QuestionSet.get(pk=question_id)
+    qset = get_object_or_404(QuestionSet, pk=question_id)
     if qset.interviews.exists():
+        msg = "%s cannot be deleted because it already has interviews." %qset.verbose_name()
         messages.error(
-            request,
-            "%s cannot be deleted because it already has interviews." %
-            qset.verbose_name())
+            request,msg)
     else:
         try:
             qset.delete()
@@ -186,7 +185,7 @@ def delete_qset_listingform(request, question_id):
             print e
             messages.success(request, "You can't delete this because it's being used by another")
             pass
-    return HttpResponseRedirect(reverse('%s_home' % qset.resolve_tag()))
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 
 @login_required
