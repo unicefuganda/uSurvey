@@ -519,33 +519,34 @@ def update_orders(request, qset_id):
     if len(new_orders) > 0:
         # wipe off present inline flows
         inlines = batch.questions_inline()
-        start_question = inlines[0]
-        question = start_question
-        while len(inlines) > 0:
-            question = inlines.pop(0)
-            QuestionFlow.objects.filter(question=question).delete()
-        order_details = []
-        map(lambda order: order_details.append(order.split('-')), new_orders)
-        order_details = sorted(
-            order_details, key=lambda detail: int(detail[0]))
-        # recreate the flows
-        questions = batch.questions.all()
-        if questions:  # so all questions can be fetched once and cached
-            question_id = order_details.pop(0)[1]
-            start_question = questions.get(pk=question_id)
-            for order, next_question_id in order_details:
-                QuestionFlow.objects.create(
-                    question=questions.get(
-                        pk=question_id), next_question=questions.get(
-                        pk=next_question_id))
-                question_id = next_question_id
-            batch.start_question = start_question
-            batch.save()
-        # better to clear all loops tied to this qset for now
-        QuestionLoop.objects.filter(loop_starter__qset__pk=batch.pk).delete()
-        success_message = "Question orders successfully updated for batch:\
-             %s." % batch.name.capitalize()
-        messages.success(request, success_message)
+        if inlines:
+            start_question = inlines[0]
+            question = start_question
+            while len(inlines) > 0:
+                question = inlines.pop(0)
+                QuestionFlow.objects.filter(question=question).delete()
+            order_details = []
+            map(lambda order: order_details.append(order.split('-')), new_orders)
+            order_details = sorted(
+                order_details, key=lambda detail: int(detail[0]))
+            # recreate the flows
+            questions = batch.questions.all()
+            if questions:  # so all questions can be fetched once and cached
+                question_id = order_details.pop(0)[1]
+                start_question = questions.get(pk=question_id)
+                for order, next_question_id in order_details:
+                    QuestionFlow.objects.create(
+                        question=questions.get(
+                            pk=question_id), next_question=questions.get(
+                            pk=next_question_id))
+                    question_id = next_question_id
+                batch.start_question = start_question
+                batch.save()
+            # better to clear all loops tied to this qset for now
+            QuestionLoop.objects.filter(loop_starter__qset__pk=batch.pk).delete()
+            success_message = "Question orders successfully updated for batch:\
+                 %s." % batch.name.capitalize()
+            messages.success(request, success_message)
     else:
         messages.error(request, 'No questions orders were updated.')
     return HttpResponseRedirect(
@@ -612,10 +613,6 @@ def _remove(request, question_id):
         question.flows.all().delete()
         question.delete()
     return HttpResponseRedirect(redirect_url)
-
-
-def export_all_questions(request):
-    pass
 
 
 def export_batch_questions(request, qset_id):
