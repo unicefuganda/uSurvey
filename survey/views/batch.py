@@ -155,8 +155,8 @@ def delete(request, survey_id, batch_id):
     try:
         batch = Batch.get(id=batch_id)
         QuestionSetView(model_class=Batch).delete(request, batch)
-    except Batch.DoesNotExist:
-        pass
+    except Exception as e:
+        messages.warning(request, str(e))
     return HttpResponseRedirect(
         reverse(
             'batch_index_page',
@@ -172,34 +172,35 @@ def update_orders(request, batch_id):
     if len(new_orders) > 0:
         # wipe off present inline flows
         inlines = batch.questions_inline()
-        start_question = inlines.pop(0)
-        question = start_question
-        for next_question in inlines:
-            QuestionFlow.objects.filter(
-                question=question, next_question=next_question).delete()
-            question = next_question
-        order_details = []
-        map(lambda order: order_details.append(order.split('-')), new_orders)
-        order_details = sorted(
-            order_details, key=lambda detail: int(detail[0]))
-        # recreate the flows
-        questions = batch.questions.all()
-        if questions:  # so all questions can be fetched once and cached
-            question_id = order_details.pop(0)[1]
-            start_question = questions.get(pk=question_id)
-            for order, next_question_id in order_details:
-                QuestionFlow.objects.create(
-                    question=questions.get(
-                        pk=question_id), next_question=questions.get(
-                        pk=next_question_id))
-                question_id = next_question_id
-            batch.start_question = start_question
-            batch.save()
-        # now remove any loop associated with this batch
-        QuestionLoop.objects.filter(loop_starter__qset__id=batch_id).delete()
-        success_message = "Question orders successfully\
-        updated for batch: %s." % batch.name.capitalize()
-        messages.success(request, success_message)
+        if inlines:
+            start_question = inlines.pop(0)
+            question = start_question
+            for next_question in inlines:
+                QuestionFlow.objects.filter(
+                    question=question, next_question=next_question).delete()
+                question = next_question
+            order_details = []
+            map(lambda order: order_details.append(order.split('-')), new_orders)
+            order_details = sorted(
+                order_details, key=lambda detail: int(detail[0]))
+            # recreate the flows
+            questions = batch.questions.all()
+            if questions:  # so all questions can be fetched once and cached
+                question_id = order_details.pop(0)[1]
+                start_question = questions.get(pk=question_id)
+                for order, next_question_id in order_details:
+                    QuestionFlow.objects.create(
+                        question=questions.get(
+                            pk=question_id), next_question=questions.get(
+                            pk=next_question_id))
+                    question_id = next_question_id
+                batch.start_question = start_question
+                batch.save()
+            # now remove any loop associated with this batch
+            QuestionLoop.objects.filter(loop_starter__qset__id=batch_id).delete()
+            success_message = "Question orders successfully\
+            updated for batch: %s." % batch.name.capitalize()
+            messages.success(request, success_message)
     else:
         messages.error(request, 'No questions orders were updated.')
     return HttpResponseRedirect("/batches/%s/questions/" % batch_id)
@@ -236,12 +237,12 @@ def list_all_questions(request):
         [{'id': q.id, 'identifier': q.identifier}
             for q in batch.all_questions], cls=DjangoJSONEncoder)
     return HttpResponse(json_dump, content_type='application/json')
-    return HttpResponseRedirect(
-        reverse(
-            'batch_index_page',
-            args=(
-                batch.survey.pk,
-            )))
+    # return HttpResponseRedirect(
+    #     reverse(
+    #         'batch_index_page',
+    #         args=(
+    #             batch.survey.pk,
+    #         )))
 
 
 @permission_required('auth.can_view_batches')
