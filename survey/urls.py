@@ -371,7 +371,7 @@ urlpatterns = patterns(
         name='remove_question_loop_page'),
     url(
         r'^batches/$',
-        'survey.views.batch.list_batches'),
+        'survey.views.batch.list_batches', name="list_batches"),
     url(
         r'^qsets/$',
         'survey.views.question_set.list_qsets',
@@ -517,7 +517,7 @@ urlpatterns = patterns(
         name='delete_listing_criterion'),
     url(
         r'^surveys/(?P<survey_id>\d+)/batches/check_name/$',
-        'survey.views.batch.check_name'),
+        'survey.views.batch.check_name', name="check_batches_name"),
     url(
         r'^question_library/$',
         'survey.views.question_template.index',
