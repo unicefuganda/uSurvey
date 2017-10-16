@@ -24,6 +24,7 @@ services:
       - MAP_ZOOM_LEVEL
       - COUNTRY
       - TIME_ZONE
+      - USURVEY_SECRET_KEY
 
     image: antsmc2/usurvey
     command: gunicorn -b 0.0.0.0:3691 --workers=$USURVEY_APP_WORKERS  --max-requests $USURVEY_APP_MAX_REQUESTS --timeout $USURVEY_APP_TIMEOUT mics.wsgi

@@ -5,7 +5,7 @@ django-nose==1.4
 sure==1.2.3
 lettuce==0.2.21
 splinter==0.5.2
-django-extensions==1.1.1
+django-extensions==1.9.1
 #RapidSMS>=0.20.0
 django-mptt>=0.8.0
 Werkzeug==0.8.3
