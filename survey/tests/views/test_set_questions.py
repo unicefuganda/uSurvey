@@ -5,9 +5,7 @@ from model_mommy import mommy
 from django.test.client import Client
 from django.core.urlresolvers import reverse
 from survey.forms.question_module_form import QuestionModuleForm
-from survey.models import (QuestionModule, Interviewer,  EnumerationArea, QuestionTemplate, NumericalAnswer,
-                           TextAnswer, MultiChoiceAnswer, DateAnswer, QuestionOption, Interview, ListingTemplate,
-                           ODKAccess, Question, QuestionSet,Batch, ResponseValidation, Survey)
+from survey.models import *
 from survey.utils.query_helper import get_filterset
 from survey.tests.base_test import BaseTest
 
@@ -41,6 +39,21 @@ class SetQuestionViewTest(BaseTest):
             'text' : "dummss",
             'answer_type' : "Text Answer"
         }
+        self.country = LocationType.objects.create(
+            name='Country', slug='country')
+        self.district = LocationType.objects.create(
+            name='District', parent=self.country, slug='district')
+        self.city = LocationType.objects.create(
+            name='City', parent=self.district, slug='city')
+        self.village = LocationType.objects.create(
+            name='village', parent=self.city, slug='village')
+        self.uganda = Location.objects.create(name='Uganda', type=self.country)
+
+        self.kampala = Location.objects.create(
+            name='Kampala', parent=self.uganda, type=self.district)
+        self.kampala_city = Location.objects.create(
+            name='Kampala City', parent=self.kampala, type=self.city)
+        self.ea = EnumerationArea.objects.create(name="BUBEMBE", code="11-BUBEMBE")
     
     def test_add_subquestion(self):
         l_qset = ListingTemplate.objects.create(**self.listing_form_data)
@@ -262,3 +275,193 @@ class SetQuestionViewTest(BaseTest):
                                                   qset_id=qset.id, response_validation_id=1)
         response = self.client.get(reverse('remove_qset_question_page', kwargs={"question_id" : list_1.id}))
         self.assertIn(response.status_code,[200,302])
+
+
+    def test_export_questions_in_qset(self):
+        survey_obj = mommy.make(Survey)
+        batch = Batch.objects.create(order=1, name="b21abc", survey=survey_obj)
+        qset =  QuestionSet.get(pk=batch.id)
+        url = reverse('export_questions_in_qset', kwargs={"qset_id":qset.id})
+        response = self.client.get(url)
+        self.assertIn(response.status_code, [200, 302])
+
+    def test_remove_question_loop_page(self):
+        listing_form = ListingTemplate.objects.create(name='l121a', description='desc1')
+        kwargs = {'name': 'survey121a', 'description': 'survey description demo12',
+                          'has_sampling': True, 'sample_size': 10,'listing_form_id':listing_form.id}
+        survey_obj = Survey.objects.create(**kwargs)
+        batch_obj = Batch.objects.create(name='b1aaaa',description='d1', survey=survey_obj)
+        qset = QuestionSet.get(id=batch_obj.id)
+        
+        investigator = Interviewer.objects.create(name="InvestigatorViewdata",
+                                                       ea=self.ea,
+                                                       gender='1', level_of_education='Primary',
+                                                       language='Eglish', weights=0,date_of_birth='1987-01-01')
+        interview_obj =  Interview.objects.create(
+            interviewer = investigator,
+            ea = self.ea,
+            survey = survey_obj,
+            question_set = qset,
+            )
+
+        surveyAllocation_obj = SurveyAllocation.objects.create(
+            interviewer = investigator,
+            survey = survey_obj,
+            allocation_ea = self.ea,
+            status = 1
+
+            )
+
+        question1 = mommy.make(Question, qset=qset, answer_type=NumericalAnswer.choice_name())
+        QuestionOption.objects.create(
+            question=question1,
+            order=1,
+            text="q7"
+            ) 
+        question2 = mommy.make(Question, qset=qset, answer_type=NumericalAnswer.choice_name())
+        QuestionOption.objects.create(
+            question=question1,
+            order=4,
+            text="q4"
+            )
+        QuestionFlow.objects.create(
+            name = 'a1',
+            desc = 'descq',
+            question = question2,
+            question_type = TextAnswer.choice_name(),
+            next_question = question1,
+            next_question_type = TextAnswer.choice_name()
+            )
+        loop_obj = QuestionLoop.objects.create(
+            loop_starter = question2,
+            loop_ender = question1
+            )
+        url = reverse('remove_question_loop_page', kwargs={"loop_id":loop_obj.id})
+        response = self.client.get(url)
+        self.assertIn(response.status_code, [200, 302])
+        self.assertRedirects(response, expected_url= reverse('qset_questions_page', kwargs={"qset_id" : qset.id}), msg_prefix='')
+
+    def test_update_question_order_page_on_empty(self):
+        listing_form = ListingTemplate.objects.create(name='l12', description='desc1')
+        kwargs = {'name': 'survey11', 'description': 'survey description demo12',
+                          'has_sampling': True, 'sample_size': 10,'listing_form_id':listing_form.id}
+        survey_obj = Survey.objects.create(**kwargs)
+        batch_obj = Batch.objects.create(name='b1',description='d1', survey=survey_obj)
+        qset = QuestionSet.get(id=batch_obj.id)
+        
+        url = reverse('qset_update_question_order_page', kwargs={"qset_id" : qset.id})
+        response = self.client.post(url,data={"order_information": []})
+        self.assertIn(response.status_code, [200, 302])
+        self.assertIn("No questions orders were updated.", response.cookies['messages'].__str__())
+        self.assertRedirects(response, expected_url= reverse('qset_questions_page', kwargs={"qset_id" : qset.id}), msg_prefix='')
+
+    def test_update_question_order_page(self):
+        listing_form = ListingTemplate.objects.create(name='l12xa', description='desc1')
+        kwargs = {'name': 'survey11uz', 'description': 'survey description demo12',
+                          'has_sampling': True, 'sample_size': 10,'listing_form_id':listing_form.id}
+        survey_obj = Survey.objects.create(**kwargs)
+        batch_obj = Batch.objects.create(name='b190000',description='d1', survey=survey_obj)
+        qset = QuestionSet.get(id=batch_obj.id)
+        
+        question1 = mommy.make(Question, qset=qset, answer_type=NumericalAnswer.choice_name())
+        QuestionOption.objects.create(
+            question=question1,
+            order=1,
+            text="q7"
+            ) 
+        question2 = mommy.make(Question, qset=qset, answer_type=NumericalAnswer.choice_name())
+        QuestionOption.objects.create(
+            question=question1,
+            order=4,
+            text="q4"
+            )
+        QuestionFlow.objects.create(
+            name = 'a1',
+            desc = 'descq',
+            question = question2,
+            question_type = TextAnswer.choice_name(),
+            next_question = question1,
+            next_question_type = TextAnswer.choice_name()
+            )
+        loop_obj = QuestionLoop.objects.create(
+            loop_starter = question2,
+            loop_ender = question1
+            )
+        url = reverse('qset_update_question_order_page', kwargs={"qset_id" : qset.id})
+        response = self.client.post(url,data={"order_information": [batch_obj.id]})
+        self.assertIn(response.status_code, [200, 302])
+        self.assertRedirects(response, expected_url= reverse('qset_questions_page', kwargs={"qset_id" : qset.id}), msg_prefix='')
+
+    def test_qset_assign_questions_page_assign(self):
+        listing_form = ListingTemplate.objects.create(name='l12xa11', description='desc1')
+        kwargs = {'name': 'survey11uz11ww', 'description': 'survey description demo12',
+                          'has_sampling': True, 'sample_size': 10,'listing_form_id':listing_form.id}
+        survey_obj = Survey.objects.create(**kwargs)
+        batch_obj = Batch.objects.create(name='b1900010w',description='d1', survey=survey_obj)
+        qset = QuestionSet.get(id=batch_obj.id)
+        
+        question1 = mommy.make(Question, qset=qset, answer_type=NumericalAnswer.choice_name())
+        investigator = Interviewer.objects.create(name="Investigator1",
+                                                       ea=self.ea,
+                                                       gender='1', level_of_education='Primary',
+                                                       language='Eglish', weights=0,date_of_birth='1987-01-01')
+        interview_obj =  Interview.objects.create(
+            interviewer = investigator,
+            ea = self.ea,
+            survey = survey_obj,
+            question_set = qset,
+            )
+        ans_data = {
+        "question_type" : "qt1",
+        "interview" : interview_obj,
+        "question": question1,
+        "identifier" : "identifier",
+        "as_text" : "as_text",
+        "as_value" : 1
+        }
+        ans_obj = Answer.objects.create(**ans_data)
+        QuestionOption.objects.create(
+            question=question1,
+            order=1,
+            text="q7"
+            ) 
+        question2 = mommy.make(Question, qset=qset, answer_type=NumericalAnswer.choice_name())
+        QuestionOption.objects.create(
+            question=question1,
+            order=4,
+            text="q4"
+            )
+        QuestionFlow.objects.create(
+            name = 'a1',
+            desc = 'descq',
+            question = question2,
+            question_type = TextAnswer.choice_name(),
+            next_question = question1,
+            next_question_type = TextAnswer.choice_name()
+            )
+        loop_obj = QuestionLoop.objects.create(
+            loop_starter = question2,
+            loop_ender = question1
+            )
+        url = reverse('qset_assign_questions_page', kwargs={"qset_id" : qset.id})
+        response = self.client.get(url)
+        self.assertIn(response.status_code, [200, 302])
+        self.assertRedirects(response, expected_url= reverse('qset_questions_page', kwargs={"qset_id" : qset.id}), msg_prefix='')
+        # self.assertIn("Questions cannot be assigned \
+        #     interviews has already been conducted: %s."%batch_obj.name, response.cookies['messages'].__str__())
+
+        
+        batch_obj = Batch.objects.create(name='b1900010w11',description='d1', survey=survey_obj)
+        qset = QuestionSet.get(id=batch_obj.id)
+        
+        question1 = mommy.make(Question, qset=qset, answer_type=NumericalAnswer.choice_name())
+        url = reverse('qset_assign_questions_page', kwargs={"qset_id" : qset.id})
+        response = self.client.post(url, data={"identifier" : "identifier_demo"})
+        self.assertRedirects(response, expected_url= reverse('qset_questions_page', kwargs={"qset_id" : qset.id}), msg_prefix='')
+        self.assertIn("Questions successfully assigned to Batch: %s."%batch_obj.name, response.cookies['messages'].__str__())
+        self.assertRedirects(response, expected_url= reverse('qset_questions_page', kwargs={"qset_id" : qset.id}), msg_prefix='')
+        
+
+
+
+
