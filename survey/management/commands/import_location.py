@@ -35,7 +35,6 @@ class Command(BaseCommand):
         for row in csv_file:
             parent = None
             if len(row) < total_divisions:
-                print 'skiping entry... ', row
                 continue
             else:
                 if len(row) > total_divisions:
@@ -55,12 +54,12 @@ class Command(BaseCommand):
                             if created:
                                 ea.locations.add(parent)
             count = count + 1
-            if count % 1000 == 0:
-                print 'loaded up to entry...', row
+            # if count % 1000 == 0:
+            #     print 'loaded up to entry...', row
         # clean up... delete locations and types having no name
         Location.tree.rebuild()
         LocationType.objects.filter(name='').delete()
         Location.objects.filter(name='').delete()
         EnumerationArea.objects.filter(name='').delete()
-        print datetime.datetime.now(), "completed"
+        #print datetime.datetime.now(), "completed"
         self.stdout.write('Successfully imported!')

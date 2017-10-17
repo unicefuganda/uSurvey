@@ -27,7 +27,6 @@ class UploadLocation(UploadService):
         for index, row in enumerate(csv_rows):
             location = country
             for x_index, cell_value in enumerate(row):
-                print "try"
                 try:
                     if x_index == self.EA_INDEX:
                         ea, _ = EnumerationArea.objects.get_or_create(
@@ -35,17 +34,15 @@ class UploadLocation(UploadService):
                             total_households=row[x_index + 1].strip() or
                             settings.DEFAULT_TOTAL_HOUSEHOLDS_IN_EA)
                         ea.locations.add(location)
-                        print "b4 save"
                         ea.save()
                         break
-                    print cell_value.strip(), location_types[x_index], "type"
                     location, _ = Location.objects.get_or_create(
                         name=cell_value.strip(),
                         type=location_types[x_index],
                         parent=location)
                 except Exception as ex:
-                    print 'could not load entry: \
-                        ', x_index, ' reason ', str(ex)
+                    #print 'could not load entry: #', x_index, ' reason ', str(ex)
+                    pass
 
     def upload(self):
         headers, rows = self.csv_uploader.split_content()

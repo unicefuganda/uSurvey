@@ -162,7 +162,7 @@ def survey_indicators(request):
 
 
 @login_required
-@permission_required('survey.view_completed_survey')
+@permission_required('auth.view_completed_survey')
 def show_interviewer_completion_summary(request):
     params = request.GET
     selected_location = None
