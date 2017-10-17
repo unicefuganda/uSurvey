@@ -618,7 +618,7 @@ urlpatterns = patterns(
         'survey.views.survey_listing.edit',
         name='edit_%s_page' % ListingTemplate.resolve_tag()),
     url(
-        r'^listing_form/delete/(?P<id>\d+)/$',
+        r'^listing_form/delete/(?P<qset_id>\d+)/$',
         'survey.views.survey_listing.delete',
         name='delete_%s' % ListingTemplate.resolve_tag()),
     url(

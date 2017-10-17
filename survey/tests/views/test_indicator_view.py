@@ -76,9 +76,12 @@ class IndicatorViewTest(BaseTest):
 
         self.failUnless(Indicator.objects.filter(
             name='ITN2', description='bla'))
-        self.assertRedirects(response, expected_url=reverse('list_indicator_page'))
-        success_message = "Indicator successfully edited."
-        self.assertIn(success_message, response.cookies['messages'].value)
+
+        self.assertIn('Indicator successfully edited.', response.cookies['messages'].__str__())
+        self.assertRedirects(response, expected_url= reverse('list_indicator_page', kwargs={"indicator_id" : indicator.id}), msg_prefix='')
+        # self.assertRedirects(response, expected_url=reverse('list_indicator_page'))
+        # success_message = "Indicator successfully edited."
+        # self.assertIn(success_message, response.cookies['messages'].value)
 
     def test_post_edit_indicator_updates_and_returns_error(self):
         survey = Survey.objects.create(name='survey')
