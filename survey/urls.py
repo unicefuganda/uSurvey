@@ -491,10 +491,10 @@ urlpatterns = patterns(
         r'^survey/survey_indicators/json/$',
         'survey.views.survey_completion.indicators_json',
         name='survey_indicators'),
-    url(
-        r'^survey/survey_parameters/json/$',
-        'survey.views.survey_completion.survey_parameters',
-        name='survey_parameters'),
+    # url(
+    #     r'^survey/survey_parameters/json/$',
+    #     'survey.views.survey_completion.survey_parameters',
+    #     name='survey_parameters'),
     url(
         r'^surveys/(?P<survey_id>\d+)/batches/(?P<batch_id>\d+)/delete/$',
         'survey.views.batch.delete',
