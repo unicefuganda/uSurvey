@@ -81,7 +81,7 @@ def completion_json(request, survey_id):
         For listing or census data collection, just show count
         :return:
         """
-        survey = Survey.objects.get(id=survey_id)
+        survey = get_object_or_404(Survey, pk=survey_id)
         country_type = LocationType.objects.get(parent__isnull=True)
         hierachy_count = country_type.get_descendant_count()
         if hasattr(settings, 'MAP_ADMIN_LEVEL'):
@@ -102,7 +102,7 @@ def completion_json(request, survey_id):
                                                                    ).annotate(total=Count('id', distinct=True)))
         active_eas = dict(Interview.objects.filter(**{'survey': survey,
                                                       }).values_list('ea__%s__name' % parent_loc
-                                                                     ).annotate(total=Count('ea', distinct=True)))
+                                                           ).annotate(total=Count('ea', distinct=True)))
         # basically get interviews count
         for location in location_type.locations.all():
             type_total_eas = total_eas.get(location.name, 0)
@@ -133,10 +133,13 @@ def json_summary(request):
 @login_required
 @permission_required('auth.can_view_aggregates')
 def survey_parameters(request):
-    indicator = Indicator.get(id=request.GET['indicator'])
+    indicator = get_object_or_404(Indicator, pk=request.GET['indicator'])
     parameters = []
-    map(lambda opt: parameters.append(
+    try:
+        map(lambda opt: parameters.append(
         {'id': opt.id, 'name': opt.text}), indicator.parameter.options.all())
+    except Exception as e:
+        pass
     return HttpResponse(json.dumps(parameters),
                         content_type='application/json')
 
@@ -144,7 +147,7 @@ def survey_parameters(request):
 @login_required
 @permission_required('auth.can_view_aggregates')
 def survey_indicators(request):
-    survey = Survey.get(id=request.GET['survey'])
+    survey = get_object_or_404(Survey, pk=request.GET['survey'])
     indicators = []
     for batch in survey.batches.all():
         for question in batch.questions.all():
