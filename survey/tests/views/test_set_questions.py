@@ -114,7 +114,7 @@ class SetQuestionViewTest(BaseTest):
         qset = QuestionSet.get(pk=list_1.id)
         response = self.client.get(reverse('add_qset_subquestion_page', kwargs={"batch_id" : qset.id}))
         self.assertIn(response.status_code, [200, 302])
-        templates = [ template.name for template in response.templates ]
+        templates = [ template.name for template in response.templates ]        
         self.assertIn('set_questions/_add_question.html', templates)
         module_obj = QuestionModule.objects.create(name='test')
         qset_obj = QuestionSet.objects.create(name="Females")
@@ -230,7 +230,7 @@ class SetQuestionViewTest(BaseTest):
     def test_get_prev_questions_for_question(self):
         self.qset = QuestionSet.objects.create(name="Females")
         self.rsp = ResponseValidation.objects.create(validation_test="validationtest", constraint_message="message")        
-        self.question_1 = Question.objects.create(identifier='id_1', text="This is a question 1111.1",
+        self.question_1 = Question.objects.create(identifier='id_10', text="This is a question 1111.1",
                                                   answer_type='Numerical Answer',
                                                   qset_id=self.qset.id, response_validation_id=1)
         response = self.client.get(reverse('prev_inline_questions_json_page', kwargs={"question_id" : self.question_1.id}))
@@ -256,6 +256,18 @@ class SetQuestionViewTest(BaseTest):
         response = self.client.get(reverse('edit_batch_subquestion_page', kwargs={"batch_id" : batch_obj.id,"question_id":q_obj.id}))
         self.assertIn(response.status_code,[200,302])
     
+    def test_edit(self):
+        survey_obj = Survey.objects.create(
+            name='survey name20', description='survey descrpition20')
+        batch_obj = Batch.objects.create(
+            order=1, name="Batch A20", survey=survey_obj) 
+        list_1 = ListingTemplate.objects.create(name="List b50")        
+        batch = QuestionSet.get(pk=list_1.id)
+        response = self.client.get(reverse('edit_question_page', kwargs={"question_id" : list_1.id}))
+        self.assertIn(response.status_code, [200,302])
+
+
+    
     def test_get_questions_for_batch(self):
         survey_obj = Survey.objects.create(
             name='survey name1', description='survey descrpition1')
@@ -269,6 +281,10 @@ class SetQuestionViewTest(BaseTest):
         self.assertIn(response.status_code,[200,302])
 
     def test_remove(self):
+        survey_obj = Survey.objects.create(
+            name='survey name10', description='survey descrpition10')
+        batch_obj = Batch.objects.create(
+            order=1, name="Batch A10", survey=survey_obj)
         list_1 = ListingTemplate.objects.create(name="List b4")
         qset = QuestionSet.get(pk=list_1.id)
         q_obj = Question.objects.create(identifier='id_3', text="This is a question123.7", answer_type='Numerical Answer',
@@ -460,8 +476,3 @@ class SetQuestionViewTest(BaseTest):
         self.assertRedirects(response, expected_url= reverse('qset_questions_page', kwargs={"qset_id" : qset.id}), msg_prefix='')
         self.assertIn("Questions successfully assigned to Batch: %s."%batch_obj.name, response.cookies['messages'].__str__())
         self.assertRedirects(response, expected_url= reverse('qset_questions_page', kwargs={"qset_id" : qset.id}), msg_prefix='')
-        
-
-
-
-
