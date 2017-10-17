@@ -19,11 +19,8 @@ class Interview(BaseModel):
         "Interviewer",
         null=True,
         related_name="interviews")  # nullable for simulation & backend load
-    ea = models.ForeignKey(
-        'EnumerationArea',
-        related_name='interviews',
-        db_index=True,
-        null=True)  # repeated here for easy reporting
+    ea = models.ForeignKey('EnumerationArea', related_name='interviews',
+                           db_index=True, null=True)  # repeated here for easy reporting
     survey = models.ForeignKey(
         'Survey',
         related_name='interviews',
@@ -45,11 +42,10 @@ class Interview(BaseModel):
     uploaded_by = models.ForeignKey(User, null=True, blank=True)
     test_data = models.BooleanField(default=False)
     #instance_id = models.CharField(max_length=200, null=True, blank=True)
-    last_question = models.ForeignKey(
-        "Question", related_name='ongoing', null=True, blank=True)
+    last_question = models.ForeignKey("Question", related_name='ongoing', null=True, blank=True)
 
     def __unicode__(self):
-        return '%s: %s' % (self.id, self.batch.name)
+        return '%s: %s' % (self.id, self.question_set.name)
 
     def is_closed(self):
         return self.closure_date is not None
@@ -64,7 +60,8 @@ class Interview(BaseModel):
         return self.last_question is not None
 
     def get_answer(self, question, capwords=True):
-        answers = Answer.objects.filter(interview=self, question=question)
+        answer_class = Answer.get_class(question.answer_type)
+        answers = answer_class.objects.filter(interview=self, question=question)
         if answers.exists():
             reply = unicode(answers[0].to_text())
             if capwords:
@@ -80,21 +77,23 @@ class Interview(BaseModel):
         :param survey:
         :param ea:
         :param access_channel:
-        :param question_map:
-        :param answers:
-        :param survey_parameters:
-        :param reference_interview:
-        :param media_files:
+        :param question_map: For convinence, a dictionary containing ID to question instance {1: quest1, 2: quest2... }
+        :param answers: list of dictionaries each contains the [{quest_id: answer, quest_id2: answer2, ...}, ]
+        :param survey_parameters: This is a dictionary of group paramaters
+        :param reference_interview: Reference interview if any
+        :param media_files: Any media files available. Required for file related answers (Image, audio and video)
         :return:
         """
         interviewer = access_channel.interviewer
         interviews = []
+        if reference_interview and (issubclass(reference_interview, Interview) is False):
+            reference_interview = Interview.get(id=reference_interview)
 
         def _save_record(record):
             interview = Interview.objects.create(survey=survey, question_set=qset,
                                                  ea=ea, interviewer=interviewer, interview_channel=access_channel,
                                                  closure_date=record.get('completion_date', timezone.now()),
-                                                 interview_reference_id=reference_interview)
+                                                 interview_reference=reference_interview)
             interviews.append(interview)
             map(lambda (q_id, answer): _save_answer(interview, q_id, answer), record.items())
             if survey_parameters:
@@ -117,9 +116,10 @@ class Interview(BaseModel):
         map(_save_record, answers)
         return interviews
 
-    def respond(self, reply=None, channel=ODKAccess.choice_name()):
+    def respond(self, reply=None, channel=ODKAccess.choice_name(), answers_context={}):
         """
-            Respond to given reply for specified channel.
+            Respond to given reply for specified channel. Irrespective to group.
+            Might be depreciating group in the near future
             This method is volatile.Raises exception if some error happens in the process
         :param reply:
         :param channel:
@@ -127,10 +127,10 @@ class Interview(BaseModel):
         """
         if self.is_closed():
             return
-        if self.last_question and reply is None:
-            return self.householdmember.get_composed(
-                self.last_question.display_text(
-                    USSDAccess.choice_name()))
+        if self.last_question is None or (self.last_question and reply is None):
+            self.last_question = self.question_set.start_question
+            self.save()
+            return self.last_question.display_text(channel=channel, context=answers_context)
         next_question = None
         if self.has_started:
             # save reply
@@ -139,73 +139,29 @@ class Interview(BaseModel):
             # compute nnext
             next_question = self.last_question.next_question(reply)
         else:
-            next_question = self.batch.start_question
+            next_question = self.question_set.start_question
         # now confirm the question is applicable
-        if next_question and (
-            self.householdmember.belongs_to(
-                next_question.group) and AnswerAccessDefinition.is_valid(
-                channel,
-                next_question.answer_type)) is False:
-            next_question = self.batch.next_inline(
-                self.last_question,
-                groups=self.householdmember.groups,
-                channel=channel)  # if not get next line question
+        if next_question and AnswerAccessDefinition.is_valid(channel, next_question.answer_type) is False:
+            # if not get next line question
+            next_question = self.question_set.next_inline(self.last_question, channel=channel)
         response_text = None
         if next_question:
             self.last_question = next_question
-            response_text = self.householdmember.get_composed(
-                next_question.display_text(USSDAccess.choice_name()))
+            response_text = self.last_question.display_text(channel=channel, context=answers_context)
         else:
-            print 'interview batch ', self.batch.name
-            # if self.batch.name == 'Test5':
-            #     import pdb; pdb.set_trace()
-            # no more questions to ask. capture this time as closure
-            self.closure_date = datetime.now()
+            self.closure_date = timezone.now()
         self.save()
         return response_text
 
-    # @property
-    # def has_pending_questions(self):
-    # return self.last_question is not None and
-    # self.last_question.flows.filter(next_question__isnull=False).exists()
-
     @classmethod
-    def pending_batches(cls, house_member, ea, survey, available_batches):
-        if available_batches is None:
-            available_batches = ea.open_batches(survey)
-        print 'available batches: ', available_batches
-        completed_interviews = Interview.objects.filter(
-            householdmember=house_member,
-            batch__in=available_batches,
-            closure_date__isnull=False)
-        completed_batches = [
-            interview.batch for interview in completed_interviews]
-        return [
-            batch for batch in available_batches if batch.start_question and batch not in completed_batches]
-
-    @classmethod
-    def interviews(cls, house_member, interviewer, survey):
-        available_batches = interviewer.ea.open_batches(survey, house_member)
-        interviews = Interview.objects.filter(
-            householdmember=house_member, batch__in=available_batches)
-        # return (completed_interviews, pending_interviews)
-        return (
-            interviews.filter(
-                closure_date__isnull=False), interviews.filter(
-                closure_date__isnull=True))
-#         completed_batches = [interview.batch for interview in completed_interviews]
-# return [batch for batch in available_batches if batch not in
-# completed_batches]
-
-    def members_with_open_batches(self):
-        pass
-
-    @classmethod
-    def interviews_in(cls, location, survey=None):
-        left = location.lft + 1
-        right = location.rght - 1
+    def interviews_in(cls, location, survey=None, include_self=False):
+        left = location.lft
+        right = location.rght
+        if include_self is False:
+            left = left + 1
+            right = right - 1
         kwargs = {'ea__locations__lft__gte': left, 'ea__locations__lft__lte': right,
-                  'ea__locations__level__gt': location.level}
+                  'ea__locations__level__gte': location.level}
         if survey:
             kwargs['survey'] = survey
         return Interview.objects.filter(**kwargs)
@@ -299,7 +255,10 @@ class Answer(BaseModel):
         raise ValueError('unknown class')
 
     def to_text(self):
-        return self.value
+        return self.as_text
+
+    def to_label(self):
+        return self.as_value
 
     def pretty_print(self, as_label=False):
         return self.to_text()
@@ -488,6 +447,7 @@ class Answer(BaseModel):
 
 
 class NumericalTypeAnswer(Answer):
+    STRING_FILL_LENGTH = 10
 
     @classmethod
     def validators(cls):
@@ -499,12 +459,12 @@ class NumericalTypeAnswer(Answer):
         ]
 
     @classmethod
-    def prep_value(cls, val):
-        return str(val).zfill(9)
+    def prep_text(cls, val):
+        return str(val).zfill(cls.STRING_FILL_LENGTH)
 
     @classmethod
     def prep_value(cls, val):
-        return str(val).zfill(9)
+        return str(val).zfill(cls.STRING_FILL_LENGTH)
 
     @classmethod
     def greater_than(cls, answer, value):

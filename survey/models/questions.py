@@ -7,6 +7,7 @@ from django_cloneable import CloneableMixin
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.core.urlresolvers import reverse
+from django.template import Context, Template
 from model_utils.managers import InheritanceManager
 from survey.models.interviews import Answer, MultiChoiceAnswer, MultiSelectAnswer, NumericalAnswer, AutoResponse
 from survey.models.access_channels import USSDAccess, InterviewerAccess
@@ -67,7 +68,7 @@ class Question(CloneableMixin, GenericQuestion):
         answer_class.objects.filter(question=self).delete()
         return super(Question, self).delete(using=using)
 
-    def display_text(self, channel=None):
+    def display_text(self, channel=None, context={}):
         text = self.text
         if channel and channel == USSDAccess.choice_name(
         ) and self.answer_type == MultiChoiceAnswer.choice_name():
@@ -76,7 +77,7 @@ class Question(CloneableMixin, GenericQuestion):
             for option in self.options.all().order_by('order'):
                 extras.append(option.to_text)
             text = '%s\n%s' % (text, '\n'.join(extras))
-        return text
+        return Template(text).render(Context(context))
 
     def next_question(self, reply):
         flows = self.flows.all()
@@ -263,9 +264,7 @@ class QuestionOption(CloneableMixin, BaseModel):
 
 class QuestionSet(CloneableMixin, BaseModel):   # can be qset, listing, respondent personal
     objects = InheritanceManager()
-    name = models.CharField(
-        max_length=100,
-        db_index=True, default='')          # dummy default for smooth migrate
+    name = models.CharField(max_length=100, db_index=True, default='')          # dummy default for smooth migrate
     description = models.CharField(max_length=300, blank=True, null=True)
     start_question = models.OneToOneField(
         Question,
@@ -574,10 +573,6 @@ class QuestionSet(CloneableMixin, BaseModel):   # can be qset, listing, responde
                     attrs={'qset': batch})
                 batch.save()
         return batch
-
-# @job
-# def refresh_loop_story(qset):
-#     for
 
 
 def next_inline_question(question, flows, answer_types=ALL_ANSWERS):

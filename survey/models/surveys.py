@@ -7,12 +7,10 @@ from survey.models.users import UserProfile
 class Survey(CloneableMixin, BaseModel):
     name = models.CharField(max_length=100, unique=True, default='')     # dummy default for smooth migrate
     description = models.CharField(max_length=300, blank=False, null=True)
-    has_sampling = models.BooleanField(
-        default=True, verbose_name='Survey Type')
+    has_sampling = models.BooleanField(default=True, verbose_name='Survey Type')
     # next three are only relevant for listing data. I believe it saves
     # unnecessary extra tables to refer to them here
-    sample_size = models.PositiveIntegerField(
-        null=False, blank=False, default=10)
+    sample_size = models.PositiveIntegerField(null=False, blank=False, default=10)
     listing_form = models.ForeignKey(
         'ListingTemplate',
         related_name='survey_settings',

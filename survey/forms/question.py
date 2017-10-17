@@ -236,8 +236,6 @@ def get_question_form(model_class):
                     # create a inline flow with current qset
                     qset = question.qset
                     # qset = QuestionSet.get(id=qset.id)
-                    if hasattr(qset, 'survey'):     # basicallyy check for Batch scenario
-                        SurveyParameterList.update_parameter_list(qset)
                     if self.prev_question:
                         last_question = self.prev_question
                     else:
@@ -259,6 +257,8 @@ def get_question_form(model_class):
                         qset.save()
                 else:
                     question.save()
+                if hasattr(qset, 'survey'):     # basicallyy check for Batch scenario
+                    SurveyParameterList.update_parameter_list(qset)
 
                 # self.qset.questions_inline.invalidate()
             if self.options_supplied(commit):

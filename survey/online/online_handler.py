@@ -109,7 +109,7 @@ class OnlineHandler(object):
 
     def init_responses(self, request, interview, session_data):
         #interview.save()
-        session_data[INTERVIEW] = deepcopy(interview)       # This interview is only used for question navigation purposes
+        session_data[INTERVIEW] = deepcopy(interview)    # This interview is only used for question navigation purposes
         session_data[LAST_QUESTION] = None
         session_data[PREVIOUS_QUESTIONS] = []
         session_data[ANSWERS] = [{}, ]
