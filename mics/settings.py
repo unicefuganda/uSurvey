@@ -116,7 +116,7 @@ STATICFILES_FINDERS = (
 STATICFILES_STORAGE = 'contrib.storage.my_whitenoise.WhitenoiseErrorSquashingStorage'
 
 # Make this unique, and don't share it with anybody.
-SECRET_KEY = '6-bycz-+xpv@9+u8b^)#$-l&3cheum3i4cb_6$u6s%j6uu6s91'
+SECRET_KEY = os.getenv('USURVEY_SECRET_KEY', '@#D&@*')
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
