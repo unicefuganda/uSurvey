@@ -113,7 +113,8 @@ class Interview(BaseModel):
                 except answer_class.DoesNotExist:
                     answer_class.create(interview, question, answer)
                 except Exception, ex:
-                    print 'exception: %s' % str(ex)
+                    #print 'exception: %s' % str(ex)
+                    pass
         map(_save_record, answers)
         return interviews
 
@@ -156,7 +157,7 @@ class Interview(BaseModel):
             response_text = self.householdmember.get_composed(
                 next_question.display_text(USSDAccess.choice_name()))
         else:
-            print 'interview batch ', self.batch.name
+            #print 'interview batch ', self.batch.name
             # if self.batch.name == 'Test5':
             #     import pdb; pdb.set_trace()
             # no more questions to ask. capture this time as closure
@@ -173,7 +174,6 @@ class Interview(BaseModel):
     def pending_batches(cls, house_member, ea, survey, available_batches):
         if available_batches is None:
             available_batches = ea.open_batches(survey)
-        print 'available batches: ', available_batches
         completed_interviews = Interview.objects.filter(
             householdmember=house_member,
             batch__in=available_batches,

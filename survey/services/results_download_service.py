@@ -34,7 +34,6 @@ class ResultComposer:
         subject = 'Completion report for %s' % attachment_name
         text = 'Completion report for %s. Date: %s' % (
             attachment_name, datetime.now())
-        print 'commencing...'
         try:
             mail = EmailMessage(subject, text, settings.DEFAULT_EMAIL_SENDER, [
                                 self.user.email, ])
@@ -46,9 +45,9 @@ class ResultComposer:
             mail.attach(attachment_name, f.read(), 'text/csv')
             f.close()
             sent = mail.send()
-            print 'Emailed!! ', sent
         except Exception as ex:
-            print 'error while sending mail: %s', str(ex)
+            #print 'error while sending mail: %s', str(ex)
+            pass
 
 
 class ResultsDownloadService(object):

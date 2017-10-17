@@ -8,7 +8,6 @@ class ExportQuestionsService:
 
     def __init__(self, batch=None):
         self.questions = self._get_questions(batch)
-        print self.questions
 
     def _get_questions(self, batch):
         if batch:
