@@ -101,12 +101,11 @@ def edit_group(request, group_id):
 def delete_group(request, group_id):
     try:
         member_group = RespondentGroup.objects.get(id=group_id)
-        print member_group, "membergroup"
         # member_group.remove_related_questions()
         member_group.delete()
         messages.success(request, "Group successfully deleted.")
     except Exception as err:
-        print err
+        pass
         messages.success(request, "Group does not exist.")
     return HttpResponseRedirect("/groups/")
 
@@ -119,7 +118,7 @@ def delete_condition(request, condition_id):
         respondent_group_condition[0][0]
         RespondentGroupCondition.objects.get(id=condition_id).delete()
     except Exception as err:
-        print err
+        pass
     messages.success(request, "Criteria successfully deleted.")
     # return HttpResponseRedirect("/conditions/")
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))

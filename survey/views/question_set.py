@@ -182,7 +182,7 @@ def delete_qset_listingform(request, question_id):
             qset.delete()
             messages.success(request, "Listing form successfully deleted.")
         except ProtectedError as e:
-            print e
+            pass
             messages.success(request, "You can't delete this because it's being used by another")
             pass
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
