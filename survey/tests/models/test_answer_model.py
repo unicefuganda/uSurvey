@@ -192,6 +192,64 @@ class AnswersTest(TestCase):
         for answer_class in [VideoAnswer, AudioAnswer, ImageAnswer]:
             self.assertEquals(len(answer_class.validators()), 0)
 
+    def test_create_answers(self):
+        qset = self.qset
+        self._create_test_non_group_questions(qset)
+        geo_question = Question.objects.filter(answer_type=GeopointAnswer.choice_name()).first()
+        latitude = '23.2'
+        longitiude = '-30.34'
+        altitude = '100'
+        precision = '5'
+        # Test ODK Geopoint
+        GeopointAnswer.create(self.interview, geo_question, ' '.join([latitude, longitiude, altitude, precision]))
+        self.assertEquals(GeopointAnswer.objects.count(), 1)
+
+    def test_update_multichoice_answer(self):
+        qset = self.qset
+        self._create_test_non_group_questions(qset)
+        multichoice_question = Question.objects.filter(answer_type=MultiChoiceAnswer.choice_name()).first()
+        options = multichoice_question.options.all()
+        MultiChoiceAnswer.create(self.interview, multichoice_question, options.first().text)
+        self.assertEquals(MultiChoiceAnswer.objects.count(), 1)
+        multichoice_answer = MultiChoiceAnswer.objects.first()
+        self.assertEquals(multichoice_answer.as_text, options.first().text)
+        self.assertEquals(int(multichoice_answer.as_value), options.first().order)
+        # confirm using value instead yields ame result
+        MultiChoiceAnswer.create(self.interview, multichoice_question, options.first().order)
+        self.assertEquals(MultiChoiceAnswer.objects.count(), 2)
+        multichoice_answer = MultiChoiceAnswer.objects.last()
+        self.assertEquals(multichoice_answer.as_text, options.first().text)
+        self.assertEquals(int(multichoice_answer.as_value), options.first().order)
+        # confirm update now
+        multichoice_answer.update(options.last().text)
+        multichoice_answer.refresh_from_db()
+        self.assertEquals(int(multichoice_answer.as_value), options.last().order)
+        # update back to original option
+        multichoice_answer.update(options.first().order)
+        multichoice_answer.refresh_from_db()
+        self.assertEquals(int(multichoice_answer.as_value), options.first().order)
+
+    def test_update_multiselect_answer(self):
+        qset = self.qset
+        self._create_test_non_group_questions(qset)
+        multiselect_question = Question.objects.filter(answer_type=MultiSelectAnswer.choice_name()).first()
+        options = multiselect_question.options.all()
+        raw_answer = ' '.join([options.first().text, options.last().text])
+        MultiSelectAnswer.create(self.interview, multiselect_question, raw_answer)
+        self.assertEquals(MultiSelectAnswer.objects.count(), 1)
+        multichoice_answer = MultiSelectAnswer.objects.first()
+        self.assertEquals(multichoice_answer.as_text, raw_answer)
+        self.assertEquals(multichoice_answer.as_value, raw_answer)
+        # not save all options as queryset
+        MultiSelectAnswer.create(self.interview, multiselect_question, multiselect_question.options.all())
+        self.assertEquals(MultiSelectAnswer.objects.count(), 2)
+        multichoice_answer = MultiSelectAnswer.objects.last()
+        self.assertEquals(multichoice_answer.as_text,
+                          ' '.join(multiselect_question.options.values_list('text', flat=True)))
+        self.assertEquals(multichoice_answer.as_value,
+                          ' '.join(multiselect_question.options.values_list('text', flat=True)))
+
+
     def test_prep_values(self):
         # test base answer. For base answer just return value and text values
         answer = 'Test1'
@@ -202,16 +260,16 @@ class AnswersTest(TestCase):
         self.assertEquals(NumericalAnswer.prep_text(answer), str(answer).zfill(NumericalAnswer.STRING_FILL_LENGTH))
         self.assertEquals(NumericalAnswer.prep_value(answer), str(answer).zfill(NumericalAnswer.STRING_FILL_LENGTH))
         # Confirm the auto response verbose_name (sorry I'm just throwing it in here)'
-        self.assertEquals(AutoResponse.verbose_name(), 'Auto Generated')
+        self.assertEquals(AutoResponse.choice_name(), 'Auto Generated')
 
     def test_contains(self):
         # test on base class. Just test with text
-        answer = 'Hey'
-        self.assertTrue(Answer.contains(answer.lower(), 'Say %s' % answer))
+        answer = 'Say Hey'
+        self.assertTrue(Answer.contains(answer, 'hey'))
         self.assertFalse(Answer.contains(answer, 'somethign else'))
         # Test Text
         answer = 'Hey'
-        self.assertTrue(TextAnswer.contains(answer.lower(), 'Say %s' % answer))
+        self.assertTrue(TextAnswer.contains(answer, 'hey'))
         self.assertFalse(TextAnswer.contains(answer, 'somethign else'))
 
 

@@ -627,9 +627,9 @@ class MultiChoiceAnswer(Answer):
         try:
             if str(answer).isdigit():
                 answer = int(answer)
-                answer = self.options.get(order=answer)
+                answer = self.question.options.get(order=answer)
             else:
-                answer = self.options.get(text__iexact=answer)
+                answer = self.question.options.get(text__iexact=answer)
         except BaseException:
             pass
         self.as_text = answer.text
@@ -675,6 +675,7 @@ class MultiSelectAnswer(Answer):
             selected = question.options.filter(pk__in=chosen)
         else:
             selected = answer
+            raw_answer = ' '.join(answer.values_list('text', flat=True))
         ans = cls.objects.create(
             question=question,
             question_type=question.__class__.type_name(),
