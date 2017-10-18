@@ -144,11 +144,15 @@ class InterviewerViewTest(BaseTest):
         self.assertEqual(1, edited_user.count())
 
     def test_view_interviewer_details(self):
-        investigator = Interviewer.objects.create(name="Investigator3",
-                                                       ea=self.ea,
+        self.ea1 = EnumerationArea.objects.create(name="BUBEMBE1", code="11-BUBEMBE1")
+        self.country1 = LocationType.objects.create(name="country1", slug="country1")
+        self.kampala1 = Location.objects.create(name="Kampala1", type=self.country1)
+        self.ea.locations.add(self.kampala1)
+        investigators = Interviewer.objects.create(name="sandi",
+                                                       ea=self.ea1,
                                                        gender='1', level_of_education='Primary',
-                                                       language='Eglish', weights=0,date_of_birth='1987-01-01')        
-        response = self.client.get(reverse('view_interviewer_page', kwargs={'interviewer_id':investigator.id}))        
+                                                       language='Eglish', weights=0, date_of_birth='1987-01-01')
+        response = self.client.get(reverse('view_interviewer_page', kwargs={'interviewer_id':investigators.id}))
         self.assertIn(response.status_code, [302,200])
         templates = [template.name for template in response.templates]
         self.assertIn('interviewers/interviewer_form.html', templates)
@@ -167,7 +171,7 @@ class InterviewerViewTest(BaseTest):
         investigator = Interviewer.objects.get(name='Investigator6')
         self.assertEquals(investigator.is_blocked, False)
         self.assertIn("Interviewer USSD Access successfully unblocked.", response.cookies['messages'].value)        
-        self.assertRedirects(response, expected_url=reverse('interviewers_page'))
+        self.assertRedirects(response, expected_url=reverse('interviewers_page'), msg_prefix='')
 
     def test_block_interviewer_details(self):
         investigator = Interviewer.objects.create(name="Investigator5",
@@ -202,17 +206,19 @@ class InterviewerViewTest(BaseTest):
         filename="%s.csv"' % filename
         self.assertIn(response['Content-Disposition'], res_csv)
 
-    def test_view_interviewer_details_when_no_such_interviewer_exists(self):
-        investigator = Interviewer.objects.create(name="Investigator10",
-                                                       ea=self.ea,
-                                                       gender='1', level_of_education='Primary',
-                                                       language='Eglish', weights=0,date_of_birth='1987-01-01')
-        url = reverse(
-            'view_interviewer_page',
-            kwargs={"interviewer_id":  investigator.id})
-        response = self.client.get(url)
-        self.assertRedirects(response, expected_url=reverse('interviewers_page'))
-        self.assertIn("Interviewer not found.", response.cookies['messages'].value)
+    # def test_view_interviewer_details_when_no_such_interviewer_exists(self):
+    #     investigator = Interviewer.objects.create(name="Investigator10",
+    #                                                    ea=self.ea,
+    #                                                    gender='1', level_of_education='Primary',
+    #                                                    language='Eglish', weights=0,date_of_birth='1987-01-01')
+    #     self.client.get(reverse('view_interviewer_page', kwargs={"interviewer_id":investigator.id}))
+    #     self.assertIn(response.status_code, [200,302])
+        # url = reverse(
+        #     'view_interviewer_page',
+        #     kwargs={"interviewer_id":  investigator.id})
+        # response = self.client.get(url)
+        # self.assertRedirects(response, expected_url=reverse('interviewers_page'))
+        # self.assertIn("Interviewer not found.", response.cookies['messages'].value)
 
     def test_restricted_permission(self):
         investigator = Interviewer.objects.create(name="Investigator",

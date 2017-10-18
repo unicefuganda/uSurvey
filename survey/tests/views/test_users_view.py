@@ -256,10 +256,7 @@ class UsersViewTest(BaseTest):
         #self.failIfUnless(edited_user)
         original_user = User.objects.filter(
             username=form_data['username'], email=form_data['email'])
-        # self.failUnless(original_user)
-        # self.assertEqual(1, len(response.context['messages']._loaded_messages))
-        # self.assertIn("User not edited. See errors below.", response.context[
-        #               'messages']._loaded_messages[0].message)
+
 
     def test_current_user_edits_his_own_profile(self):
         form_data = {

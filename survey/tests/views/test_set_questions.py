@@ -113,6 +113,7 @@ class SetQuestionViewTest(BaseTest):
         batch_obj = Batch.objects.create(
             order=1, name="Baaatchff Abcrrr", survey=survey_obj)
         list_1 = ListingTemplate.objects.create(name="List A9")
+
         qset = QuestionSet.get(pk=batch_obj.id)
         response = self.client.get(reverse('add_qset_subquestion_page', kwargs={"batch_id" : batch_obj.id}))
         #print response.content
@@ -128,6 +129,22 @@ class SetQuestionViewTest(BaseTest):
         # self.assertIn(response.status_code, [200, 302])
         # self.client.post(reverse('add_qset_subquestion_page', kwargs={"batch_id" : batch_obj.id}),data={})
         # self.assertIn(response.status_code, [200, 302])
+
+        qset = QuestionSet.get(pk=list_1.id)
+        response = self.client.get(reverse('add_qset_subquestion_page', kwargs={"batch_id" : qset.id}))
+        self.assertIn(response.status_code, [200, 302])
+        # templates = [ template.name for template in response.templates ]
+        # self.assertIn('set_questions/_add_question.html', templates)
+        module_obj = QuestionModule.objects.create(name='test')
+        qset_obj = QuestionSet.objects.create(name="Females")
+        rsp_obj = ResponseValidation.objects.create(validation_test="validationtest",constraint_message="message")
+        data = {"qset_id" :qset_obj.id,  "identifier" : '', "text": "hello","answer_type":'',
+                "response_validation_id": self.rsp.id }
+        response = self.client.post(reverse('add_qset_subquestion_page', kwargs={"batch_id" : qset.id}),data=data)
+        self.assertIn(response.status_code, [200, 302])
+        self.client.post(reverse('add_qset_subquestion_page', kwargs={"batch_id" : batch_obj.id}),data={})
+        self.assertIn(response.status_code, [200, 302])
+
 
     def test_get_sub_questions_for_question(self):
         list_1 = ListingTemplate.objects.create(name="List A2")

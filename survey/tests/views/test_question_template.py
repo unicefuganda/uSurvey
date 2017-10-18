@@ -39,9 +39,9 @@ class QuestionsTemplateViewsTest(BaseTest):
         response = self.client.get(reverse('filter_question_list'))
         self.failUnlessEqual(response.status_code, 200)
 
-    def test_qt_does_not_exist(self):
-        message = "Question Template does not exist."
-        self.assert_object_does_not_exist(reverse('edit_question_library',kwargs={"question_id":500}), message)
+    # def test_qt_does_not_exist(self):
+    #     message = "Question Template does not exist."
+    #     self.assert_object_does_not_exist(reverse('edit_question_library',kwargs={"question_id":500}), message)
 
     def test_should_throw_error_if_deleting_non_existing_qt(self):
         message = "Question Template does not exist."
