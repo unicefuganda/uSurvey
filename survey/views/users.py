@@ -178,8 +178,9 @@ def activate(request, user_id):
 @login_required
 @permission_required('auth.can_view_users')
 def download_users(request):
+    kwargs = request.GET
     filename = 'all_admin_users'
-    reports_df = get_model_as_dump(User)
+    reports_df = get_model_as_dump(User, **kwargs)
     response = HttpResponse(content_type='text/csv')
     reports_df.to_csv(response, index=False)
     response['Content-Disposition'] = 'attachment; \
