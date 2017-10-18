@@ -1,16 +1,17 @@
 from django.test import TestCase
 from survey.forms.indicator import IndicatorForm
-from survey.models import QuestionModule, Batch, Survey
+from survey.models import QuestionModule, Batch, Survey, QuestionSet
 
 class IndicatorFormTest(TestCase):
 
     def setUp(self):
         self.survey = Survey.objects.create(name="Health survey")
-        self.batch = Batch.objects.create(name="Health", survey=self.survey)
+        # self.batch = Batch.objects.create(name="Health", survey=self.survey)
+        self.qset = QuestionSet.objects.create(name="qset",description="blahblah")
         self.form_data = {
                           'name': 'Health',
                           'description': 'some description',
-                          'question_set': self.batch.id,
+                          'question_set' : self.qset,
                           'survey': self.survey.id
                           }
 
