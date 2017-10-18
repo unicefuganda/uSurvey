@@ -133,7 +133,7 @@ def _save_subquestion(request, batch_id, instance=None):
 
 def get_sub_questions_for_question(request, question_id):
     question = Question.objects.get(id=question_id)
-    return _create_question_hash_response(Question.zombies(question.batch))
+    return _create_question_hash_response(Question.zombies(question.qset))
 
 
 def get_prev_questions_for_question(request, question_id):
@@ -168,8 +168,8 @@ def edit_subquestion(request, question_id, batch_id=None):
 
 
 @permission_required('auth.can_view_batches')
-def delete(request, question_id, batch_id=None):
-    return _remove(request, batch_id, question_id)
+def delete(request, question_id):
+    return _remove(request, question_id)
 
 
 @permission_required('auth.can_view_batches')
