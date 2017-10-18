@@ -1,7 +1,8 @@
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from django.test.client import Client
 from survey.forms.aboutus_form import AboutUsForm
-from survey.models import Survey, AboutUs, SuccessStories
+from survey.models import *
+from model_mommy import mommy
 from survey.tests.base_test import BaseTest
 from django.core.urlresolvers import reverse
 
@@ -17,10 +18,14 @@ class HomepageViewTest(BaseTest):
                 'demo3@kant.com',
                 'demo3'),
             'can_view_users')
+        self.assign_permission_to(raj, 'can_have_super_powers')
         self.client.login(username='demo3', password='demo3')
 
     def test_home_page(self):
-        response = self.client.get('/')
+        survey_obj = mommy.make(Survey)
+        url = reverse('main_page')
+        url = url+'?survey%s'%survey_obj.id
+        response = self.client.get(url)
         self.failUnlessEqual(response.status_code, 200)
         templates = [template.name for template in response.templates]
         self.assertIn('main/index.html', templates)
@@ -74,3 +79,25 @@ class HomepageViewTest(BaseTest):
         templates = [template.name for template in response.templates]
         self.assertIn('main/home_success_story_list.html', templates)
         self.assertIn(ss_content, response.context['ss_list'])
+    def test_activate_super_powers(self):
+        some_group = Group.objects.create(name='Administrator')
+        form_data = {
+            'username': 'knight111hpppl',
+            'password': 'mk',
+            'first_name': 'demo',
+            'last_name': 'knight',
+            'mobile_number': '123456789',
+            'email': 'mm@mm.mm',
+            'groups': some_group.id,
+        }
+
+        user = User.objects.create(
+            username=form_data['username'],
+            email=form_data['email'],
+            password=form_data['password'],
+            first_name=form_data['first_name'],
+            last_name=form_data['last_name'])
+        UserProfile.objects.create(
+            user=user, mobile_number=form_data['mobile_number'])
+        url = reverse('activate_super_powers_page')
+        response = self.client.get(url)
