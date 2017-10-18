@@ -11,7 +11,7 @@ class Command(BaseCommand):
     help = 'Creates default parameters'
 
     def handle(self, *args, **kwargs):
-        self.stdout.write('Creating permissions....')
+        #self.stdout.write('Creating permissions....')
         content_type = ContentType.objects.get_for_model(User)
         can_enter_data, _ = Permission.objects.get_or_create(
             codename='can_enter_data', name='Can enter data', content_type=content_type)
@@ -34,8 +34,8 @@ class Command(BaseCommand):
         can_have_super_powers, _ = Permission.objects.get_or_create(
             codename='can_have_super_powers', name='Can Have Super Powers', content_type=content_type)
 
-        self.stdout.write('Permissions created.')
-        self.stdout.write('Creating some groups...')
+        #self.stdout.write('Permissions created.')
+        #self.stdout.write('Creating some groups...')
         group, _ = Group.objects.get_or_create(name='Administrator')
         group.permissions.add(can_enter_data)
         group.permissions.add(can_view_aggregates)
@@ -73,8 +73,8 @@ class Command(BaseCommand):
         group.permissions.add(can_receive_email)
         group, _ = Group.objects.get_or_create(name='Data Email Reports')
         group.permissions.add(can_receive_email)
-        self.stdout.write('Created groups.')
-        self.stdout.write('Creating answer definition... ')
+        #self.stdout.write('Created groups.')
+        #self.stdout.write('Creating answer definition... ')
         # ussd definition
         AnswerAccessDefinition.reload_answer_categories()
-        self.stdout.write('Successfully imported!')
+        #self.stdout.write('Successfully imported!')
