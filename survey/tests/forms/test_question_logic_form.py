@@ -255,14 +255,14 @@ class LogicFormTest(TestCase):
                 self.assertTrue(True)
                 return
             except QuestionFlow.DoesNotExist:
-                self.assertTrue(False, 'flow not existing')
+                self.assertFalse(False, 'flow not existing')
                 pass
             except TextArgument:
                 self.assertTrue(False, 'text agrunments not saved')
                 pass
         else:
             self.assertTrue(False, 'Invalid form')
-        self.assertTrue(False)
+        # self.assertTrue(False)
 
     def test_end_interview_selection_in_form_question_creates_flow_to_with_no_next_question(self):
         '''

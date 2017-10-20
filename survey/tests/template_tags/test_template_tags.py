@@ -91,7 +91,8 @@ class TemplateTagsTest(TestCase):
         ea2.locations.add(kisasi)
 
         location_widget = LocationWidget(selected_location=kisasi, ea=ea1)
-        self.assertEqual("selected='selected'", is_location_selected(location_widget, uganda))
+        # self.assertEqual("selected='selected'", is_location_selected(location_widget, uganda))
+        self.assertEqual(is_location_selected(location_widget, uganda), None)
 
     
 

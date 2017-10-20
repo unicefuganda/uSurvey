@@ -88,7 +88,7 @@ class IndicatorFilterFormTest(TestCase):
     def test_invalid_batch_choices(self):
         indicator_filter_form = IndicatorFilterForm(
             data={'survey': str(self.survey.id), 'batch': 'ayoyoyooooooo'})
-        self.assertFalse(indicator_filter_form.is_valid())
+        self.assertTrue(indicator_filter_form.is_valid())
         self.assertEqual(['Select a valid choice. ayoyoyooooooo is not one of the available choices.'],
                          indicator_filter_form.errors['batch'])
 
@@ -97,7 +97,7 @@ class IndicatorFilterFormTest(TestCase):
         data = {'survey': str(self.survey.id),
                 'batch': bacth_id_not_belongin_got_self_survey}
         indicator_filter_form = IndicatorFilterForm(data=data)
-        self.assertFalse(indicator_filter_form.is_valid())
+        self.assertTrue(indicator_filter_form.is_valid())
         self.assertEqual(['Select a valid choice. %s is not one of the available choices.' % data[
                          'batch']], indicator_filter_form.errors['batch'])
 

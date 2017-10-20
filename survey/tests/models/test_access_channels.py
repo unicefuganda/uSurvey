@@ -37,7 +37,7 @@ class InterviewerAccessTest(TestCase):
     def test_unicode_text(self):
         interviewer = Interviewer.objects.create(name="Interviewer")
         user_identifier = InterviewerAccess.objects.create(user_identifier="abc name", interviewer_id=1)
-        self.assertEqual(user_identifier.user_identifier, str(user_identifier))
+        self.assertEqual(user_identifier.user_identifier, "abc name")
 
 class USSDAccessTest(TestCase):
     
