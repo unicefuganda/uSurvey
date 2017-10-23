@@ -24,8 +24,10 @@ class SimpleIndicatorChartViewTest(BaseTest):
             name='Country', slug='country')
         self.district = LocationType.objects.create(
             name='District', parent=self.country, slug='district')
+        self.city = LocationType.objects.create(
+            name='City', parent=self.district, slug='city')
         self.village = LocationType.objects.create(
-            name='Village', parent=self.district, slug='village')
+            name='village', parent=self.city, slug='village')
         self.uganda = Location.objects.create(name="Uganda", type=self.country)
         # LocationType.objects.create(
         #     location_type=self.country, country=self.uganda)
