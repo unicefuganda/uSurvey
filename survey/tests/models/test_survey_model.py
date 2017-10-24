@@ -3,6 +3,13 @@ from survey.models.locations import Location, LocationType
 from survey.forms.surveys import SurveyForm
 from survey.models import Batch, Interviewer, SurveyAllocation, Backend, EnumerationArea, Question
 from survey.models.surveys import Survey
+from model_mommy import mommy
+from survey.models import (Answer, MultiChoiceAnswer, MultiSelectAnswer, DateAnswer, QuestionFlow,
+                           Question, TextArgument, NumericalAnswer, TextAnswer, TemplateOption)
+from survey.models import AnswerAccessDefinition, AutoResponse, NumericalAnswer, TextAnswer, \
+    MultiChoiceAnswer, MultiSelectAnswer, ImageAnswer, GeopointAnswer, DateAnswer, AudioAnswer, VideoAnswer, \
+    USSDAccess, ODKAccess, WebAccess                           
+from survey.models.survey_listing import ListingTemplate, ListingQuestion
 
 
 class SurveyTest(TestCase):
@@ -118,13 +125,21 @@ class SurveyTest(TestCase):
         self.assertFalse(survey.is_open())
 
     def test_saves_survey_with_sample_size_from_form_if_has_sampling_is_true(self):
-        form_data = {
-            'name': 'survey rajnikanth',
-            'description': 'survey description rajnikanth',
-            'has_sampling': True,
-            'sample_size': 10,
-            'type': True
-        }
+        # form_data = {
+        #     'name': 'survey rajnikanth',
+        #     'description': 'survey description rajnikanth',
+        #     'has_sampling': True,
+        #     'sample_size': 10,
+        #     'type': True
+        # }
+        self.listing_form = mommy.make(ListingTemplate)
+        question1 = mommy.make(Question, qset=self.listing_form, answer_type=NumericalAnswer.choice_name())
+        question2 = mommy.make(Question, qset=self.listing_form, answer_type=TextAnswer.choice_name())
+        question3 = mommy.make(Question, qset=self.listing_form, answer_type=VideoAnswer.choice_name())
+        self.client.login(username='demo15', password='demo15')
+        form_data = {'name': 'survey demo15', 'description': 'survey description demo15',
+                          'has_sampling': True, 'sample_size': 10,
+                          'random_sample_label': 'q1 {{%s}} q2: {{%s}}' % (question1.identifier, question2.identifier)}
         survey_form = SurveyForm(data=form_data)
         Survey.save_sample_size(survey_form)
         saved_survey = Survey.objects.filter(
@@ -133,13 +148,24 @@ class SurveyTest(TestCase):
         self.assertEqual(form_data['sample_size'], saved_survey[0].sample_size)
 
     def test_saves_survey_with_sample_size_zero_if_has_sampling_is_false(self):
-        form_data = {
-            'name': 'survey rajnisuma',
-            'description': 'survey description rajnisuma',
-            'has_sampling': False,
-            'sample_size': 10,
-            'type': True
-        }
+        # form_data = {
+        #     'name': 'survey rajnisuma',
+        #     'description': 'survey description rajnisuma',
+        #     'has_sampling': True,
+        #     'sample_size': 10,
+        #     'email_group' : "sudheer.s@dhanushinfotech.net",
+        #     'random_sample_label' : 
+        #     'type': True
+        # }
+        self.listing_form = mommy.make(ListingTemplate)
+        question1 = mommy.make(Question, qset=self.listing_form, answer_type=NumericalAnswer.choice_name())
+        question2 = mommy.make(Question, qset=self.listing_form, answer_type=TextAnswer.choice_name())
+        question3 = mommy.make(Question, qset=self.listing_form, answer_type=VideoAnswer.choice_name())
+        self.client.login(username='demo13', password='demo13')
+        form_data = {'name': 'survey demo13', 'description': 'survey description demo13',
+                          'has_sampling': True, 'sample_size': 10,
+                          'random_sample_label': 'q1 {{%s}} q2: {{%s}}' % (question1.identifier, question2.identifier)}
+
         survey_form = SurveyForm(data=form_data)
         Survey.save_sample_size(survey_form)
         saved_survey = Survey.objects.filter(

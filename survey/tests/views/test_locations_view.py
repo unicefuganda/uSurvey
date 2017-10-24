@@ -49,8 +49,8 @@ class LocationTest(BaseTest):
 
     def test_login_required(self):
         country_obj = LocationType.objects.create(
-            name='Country2', slug='country2')
-        uganda_obj = Location.objects.create(name='Ugandaddd', type=country_obj)
+            name='Country10', slug='country10')
+        uganda_obj = Location.objects.create(name='Ugandadsdfdd', type=country_obj)
         self.assert_login_required(reverse('get_enumeration_areas',kwargs={'location_id':uganda_obj.id}))
 
     def test_view_location_list(self):
