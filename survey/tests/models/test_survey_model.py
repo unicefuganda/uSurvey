@@ -119,11 +119,11 @@ class SurveyTest(TestCase):
 
     def test_saves_survey_with_sample_size_from_form_if_has_sampling_is_true(self):
         form_data = {
-            'name': 'survey rajni',
-            'description': 'survey description rajni',
+            'name': 'survey rajnikanth',
+            'description': 'survey description rajnikanth',
             'has_sampling': True,
             'sample_size': 10,
-            'type': True,
+            'type': True
         }
         survey_form = SurveyForm(data=form_data)
         Survey.save_sample_size(survey_form)
@@ -134,11 +134,11 @@ class SurveyTest(TestCase):
 
     def test_saves_survey_with_sample_size_zero_if_has_sampling_is_false(self):
         form_data = {
-            'name': 'survey rajni',
-            'description': 'survey description rajni',
+            'name': 'survey rajnisuma',
+            'description': 'survey description rajnisuma',
             'has_sampling': False,
             'sample_size': 10,
-            'type': True,
+            'type': True
         }
         survey_form = SurveyForm(data=form_data)
         Survey.save_sample_size(survey_form)

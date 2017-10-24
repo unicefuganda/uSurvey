@@ -122,7 +122,8 @@ class OnlineFlowsTest(BaseTest):
     def test_flow_with_group(self):
         # create listing and questions
         self.test_add_questions_to_batch()
-        survey = mommy.make(Survey)
+        survey = Survey.objects.create(name="sudrvey_namse",description="survey_descipdtiosn")
+        # survey = mommy.make(Survey)
         batch = Batch.objects.first()
         ea = EnumerationArea.objects.first()
         questions = batch.all_questions

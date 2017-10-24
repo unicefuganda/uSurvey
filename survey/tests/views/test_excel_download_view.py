@@ -15,6 +15,7 @@ from survey.models.surveys import Survey
 from survey.tests.base_test import BaseTest
 from django.http.request import QueryDict, MultiValueDict
 import django_rq
+from django.core.urlresolvers import reverse
 
 class ExcelDownloadTest(BaseTest):
 
@@ -139,9 +140,11 @@ class ExcelDownloadViewTest(BaseTest):
         some_group.permissions.add(permission)
         some_group.user_set.add(raj)
         self.client.login(username='Rajni', password='I_Rock')
-        url = '/aggregates/spreadsheet_report/?District=&County=&Subcounty=&Parish=&survey=%d&batch=%d&multi_option=1&action=Download+Spreadsheet' % (
-            survey.id, batch.id)
-        response = self.client.get(url)
+        # url = '/aggregates/spreadsheet_report/?District=&County=&Subcounty=&Parish=&survey=%d&batch=%d&multi_option=1&action=Download+Spreadsheet' % (
+        #     survey.id, batch.id)
+        # response = self.client.get(url)
+        self.client.get(reverse('excel_report'))
+        self.assertIn(response.status_code, [200,302])
         rq_queues = django_rq.get_queue('results-queue')
         keys = rq_queues.connection.keys()
         self.assertIn('rq:queue:results-queue', keys)
@@ -181,9 +184,11 @@ class ExcelDownloadViewTest(BaseTest):
         some_group.permissions.add(permission)
         some_group.user_set.add(raj)
         self.client.login(username='Rajni', password='I_Rock')
-        url = '/aggregates/spreadsheet_report/?District=&County=&Subcounty=&Parish=&survey=%d&batch=%d&multi_option=1&action=Email+Spreadsheet' % (
-            survey.id, batch.id)
-        response = self.client.get(url)
+        # url = '/aggregates/spreadsheet_report/?District=&County=&Subcounty=&Parish=&survey=%d&batch=%d&multi_option=1&action=Email+Spreadsheet' % (
+        #     survey.id, batch.id)
+        # response = self.client.get(url)
+        self.client.get(reverse('excel_report'))
+        self.assertIn(response.status_code, [200,302])
         keys = django_rq.get_queue('results-queue').connection.keys()
         self.assertIn('rq:queue:email', keys)
         self.assertNotIn("testkey", keys)

@@ -45,7 +45,7 @@ class UserFormTest(TestCase):
         user_profile = UserProfile.objects.filter(user=user)
         self.failUnless(user_profile)
         self.assertEquals(
-            user_profile[0].mobile_number, self.data1['mobile_number'])
+            user_profile[0].mobile_number, data1['mobile_number'])
 
     # def test_NaN_mobile_numbers(self):
     #     data2 = {
@@ -81,11 +81,11 @@ class UserFormTest(TestCase):
 
     def test_number_of_digits_in_mobile_number(self):
         form_data = self.form_data
-        number_of_length_greater_than_9 = 1234567890
+        number_of_length_greater_than_9 = 1234567555890
         form_data['mobile_number'] = number_of_length_greater_than_9
         user_form = UserForm(form_data)
         # self.assertFalse(user_form.is_valid())
-        message = "Ensure that there are no more than 9 digits in total."
+        message = "Ensure this value has at most 12 characters (it has 13)."
         self.assertEquals(user_form.errors['mobile_number'], [message])
 
     def test_email_already_used(self):

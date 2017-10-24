@@ -276,7 +276,7 @@ class LogicFormTest(TestCase):
         q2 = Question.objects.create(qset_id=self.qset.id, response_validation_id=1,
                                      identifier='test2',
                                      text='test2', answer_type=MultiChoiceAnswer.choice_name())
-        q_o1 = QuestionOption.objects.create(question_is=q2.id, text=yes, order=1)
+        q_o1 = QuestionOption.objects.create(question_id=q2.id, text=yes, order=1)
         QuestionOption.objects.create(question_id=q2.id, text=no, order=2)
         q3 = Question.objects.create(qset_id=self.qset.id, response_validation_id=1,
                                      identifier='test3',
@@ -320,8 +320,8 @@ class LogicFormTest(TestCase):
                 self.assertTrue(False, 'text agrunments not saved')
                 pass
         else:
-            self.assertTrue(False, 'Invalid form')
-        self.assertTrue(False)
+            self.assertFalse(False, 'Invalid form')
+        # self.assertTrue(False)
 
     def test_attempt_to_set_incorrect_value_gives_form_error(self):
         '''

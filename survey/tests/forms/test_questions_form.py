@@ -14,7 +14,7 @@ class QuestionFormTest(TestCase):
         self.batch = Batch.objects.create(name="Health", survey=self.survey)
 
     def test_question_form_fields(self):
-        question_form = QuestionForm()
+        question_form = QuestionForm(self.batch)
         fields = ['text', 'answer_type']
         [self.assertIn(field, question_form.fields) for field in fields]
 

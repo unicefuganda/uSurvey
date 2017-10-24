@@ -37,7 +37,9 @@ class LocationTest(BaseTest):
         abim = Location.objects.create(
             name='Abim', parent=uganda_obj, type=self.city)
         kampala_city = Location.objects.create(
-            name='Kampala City', parent=kampala, type=self.village)
+            name='Kampala City', parent=kampala, type=self.village)        
+        response = self.client.get(reverse('get_location_children',kwargs={'location_id':uganda_obj.id}))
+        self.assertIn(response.status_code, [200,302])
         content = json.loads(response.content)
         self.assertEquals(len(content), 2)
         self.assertEquals(content[0]['id'], abim.pk)

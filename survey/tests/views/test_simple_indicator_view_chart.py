@@ -31,8 +31,8 @@ class SimpleIndicatorChartViewTest(BaseTest):
         self.uganda = Location.objects.create(name="Uganda", type=self.country)
         # LocationType.objects.create(
         #     location_type=self.country, country=self.uganda)
-        LocationType.objects.create(
-            location_type=self.district, country=self.uganda)
+        # LocationType.objects.create(
+        #     location_type=self.district, country=self.uganda)
         LocationType.objects.create(
             location_type=self.village, country=self.uganda)
         self.west = Location.objects.create(
@@ -49,14 +49,14 @@ class SimpleIndicatorChartViewTest(BaseTest):
         self.ea.locations.add(self.kampala)
         mbarara_ea = EnumerationArea.objects.create(name="EA3")
         mbarara_ea.locations.add(self.mbarara)
-        self.investigator = Interviewer.objects.create(name="Investigator",
-                                                       ea=self.ea,
-                                                       gender='1', level_of_education='Primary',
-                                                       language='Eglish', weights=0)
-        self.investigator_2 = Interviewer.objects.create(name="Investigator1",
-                                                         ea=self.ea,
-                                                         gender='1', level_of_education='Primary',
-                                                         language='Eglish', weights=0)
+        # self.investigator = Interviewer.objects.create(name="Investigator",
+        #                                                ea=self.ea,
+        #                                                gender='1', level_of_education='Primary',
+        #                                                language='Eglish', weights=0)
+        # self.investigator_2 = Interviewer.objects.create(name="Investigator1",
+        #                                                  ea=self.ea,
+        #                                                  gender='1', level_of_education='Primary',
+        #                                                  language='Eglish', weights=0)
         self.health_module = QuestionModule.objects.create(name="Health")
         self.survey = Survey.objects.create(name='survey name', description='survey descrpition',
                                             sample_size=10)
