@@ -40,7 +40,7 @@ class TestArgumentTest(TestCase):
     
     def test_store(self):
         self.respval = ResponseValidation.objects.create(validation_test="test",constraint_message="message")
-        ta = TestArgument.objects.create(validation_id=self.respval.id,position=1)
+        ta = TestArgument.object.create(validation_id=self.respval.id,position=1)
         self.failUnless(ta.id)
         self.failUnless(ta.validation_id)
         self.failUnless(ta.position)

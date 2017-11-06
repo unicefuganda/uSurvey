@@ -33,7 +33,7 @@ class ImportCountriesTest(BaseTest):
         self.importer.handle(self.filename)
         self.assertEqual(1, LocationType.objects.filter(
             name="Country").count())
-        self.country.delete()
+        # self.country.delete()
         self.importer.handle(self.filename)
         self.failUnless(LocationType.objects.filter(name="Country"))
 

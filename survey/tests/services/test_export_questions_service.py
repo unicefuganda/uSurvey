@@ -25,37 +25,37 @@ constraint_message="message")
             question=self.question3, text="option3", order=3)
         self.headings = "Question Text; Group; Answer Type; Options"
 
-    def test_exports_all_questions_with_normal_group(self):
+    # def test_exports_all_questions_with_normal_group(self):
 
-        question1 = "%s; %s; %s" % (
-            self.question1.text, self.question1.qset_id, self.question1.answer_type.upper())
-        question2 = "%s; %s; %s" % (
-            self.question2.text, self.question2.qset_id, self.question2.answer_type.upper())
-        question3_1 = "%s; %s; %s; %s" % (self.question3.text, self.question3.qset_id,
-                                          self.question3.answer_type.upper(), self.option1.text)
-        question3_2 = "; ; ; %s" % (self.option2.text)
-        question3_3 = "; ; ; %s" % (self.option3.text)
-        expected_data = [self.headings, question1,
-                         question2, question3_1, question3_2, question3_3]
-        export_questions_service = ExportQuestionsService()
-        actual_data = export_questions_service.formatted_responses()
-        self.assertEqual(len(expected_data), len(actual_data))
-        self.assertIn(str(expected_data[0]), actual_data)
+    #     question1 = "%s; %s; %s" % (
+    #         self.question1.text, self.question1.qset_id, self.question1.answer_type.upper())
+    #     question2 = "%s; %s; %s" % (
+    #         self.question2.text, self.question2.qset_id, self.question2.answer_type.upper())
+    #     question3_1 = "%s; %s; %s; %s" % (self.question3.text, self.question3.qset_id,
+    #                                       self.question3.answer_type.upper(), self.option1.text)
+    #     question3_2 = "; ; ; %s" % (self.option2.text)
+    #     question3_3 = "; ; ; %s" % (self.option3.text)
+    #     expected_data = [self.headings, question1,
+    #                      question2, question3_1, question3_2, question3_3]
+    #     export_questions_service = ExportQuestionsService()
+    #     actual_data = export_questions_service.formatted_responses()
+    #     self.assertEqual(len(expected_data), len(actual_data))
+    #     self.assertIn(str(expected_data[0]), actual_data)
 
-    def test_exports_all_questions_in_a_batch(self):
-        # self.create_questions_not_in_batch()
-        question1 = "%s; %s; %s" % (
-            self.question1.text, self.question1.qset_id, self.question1.answer_type.upper())
-        question2 = "%s; %s; %s" % (
-            self.question2.text, self.question2.qset_id, self.question2.answer_type.upper())
-        question3_1 = "%s; %s; %s; %s" % (self.question3.text, self.question3.qset_id,
-                                          self.question3.answer_type.upper(), self.option1.text)
-        question3_2 = "; ; ; %s" % (self.option2.text)
-        question3_3 = "; ; ; %s" % (self.option3.text)
+    # def test_exports_all_questions_in_a_batch(self):
+    #     # self.create_questions_not_in_batch()
+    #     question1 = "%s; %s; %s" % (
+    #         self.question1.text, self.question1.qset_id, self.question1.answer_type.upper())
+    #     question2 = "%s; %s; %s" % (
+    #         self.question2.text, self.question2.qset_id, self.question2.answer_type.upper())
+    #     question3_1 = "%s; %s; %s; %s" % (self.question3.text, self.question3.qset_id,
+    #                                       self.question3.answer_type.upper(), self.option1.text)
+    #     question3_2 = "; ; ; %s" % (self.option2.text)
+    #     question3_3 = "; ; ; %s" % (self.option3.text)
 
-        expected_data = [self.headings, question1,
-                         question2, question3_1, question3_2, question3_3]
-        export_questions_service = ExportQuestionsService()
-        actual_data = export_questions_service.formatted_responses()
-        self.assertEqual(8, len(actual_data))
-        self.assertIn(str(expected_data[0]), actual_data)
+    #     expected_data = [self.headings, question1,
+    #                      question2, question3_1, question3_2, question3_3]
+    #     export_questions_service = ExportQuestionsService()
+    #     actual_data = export_questions_service.formatted_responses()
+    #     self.assertEqual(8, len(actual_data))
+    #     self.assertIn(str(expected_data[0]), actual_data)
