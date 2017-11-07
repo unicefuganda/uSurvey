@@ -1,17 +1,51 @@
 from datetime import date
+from django.test.client import Client
+from django.contrib.auth.models import User
+from django.db.models import Q
+from django.core.urlresolvers import reverse
+from model_mommy import mommy
 from django.test import TestCase
-from survey.models import Batch
-from survey.models import EnumerationArea
-from survey.models import QuestionModule
-from survey.models import Survey
+from survey.models import *
+from survey.models.locations import *
 from survey.templatetags.template_tags import *
 from survey.views.location_widget import LocationWidget
-from survey.models.locations import *
 from survey.models.questions import *
 from survey.models.respondents import RespondentGroupCondition,GroupTestArgument,ParameterQuestion,SurveyParameterList,RespondentGroup,ParameterTemplate
 
 
 class TemplateTagsTest(TestCase):
+
+    def setUp(self):
+        # self.client = Client()
+        # user_without_permission = User.objects.create_user(username='useless', email='demo12@kant.com',
+        #                                                    password='I_Suck')
+        # raj = self.assign_permission_to(User.objects.create_user('demo12', 'demo12@kant.com', 'demo12'),
+        #                                 'can_view_batches')
+        # self.client.login(username='demo12', password='demo12')
+        self.survey = mommy.make(Survey)
+        self.batch = mommy.make(Batch, survey=self.survey)
+        self.qset = QuestionSet.get(pk=self.batch.id)
+        self.question = mommy.make(Question, qset=self.qset, answer_type=NumericalAnswer.choice_name())
+        self.ea = EnumerationArea.objects.create(name="BUBEMBE", code="11-BUBEMBE")
+        self.investigator = Interviewer.objects.create(name="InvestigatorViewdata",
+                                                       ea=self.ea,
+                                                       gender='1', level_of_education='Primary',
+                                                       language='Eglish', weights=0,date_of_birth='1987-01-01')
+
+        self.surveyAllocation_obj = SurveyAllocation.objects.create(
+            interviewer = self.investigator,
+            survey = self.survey,
+            allocation_ea = self.ea,
+            status = 1
+
+            )
+        self.interview =  Interview.objects.create(
+            interviewer = self.investigator,
+            ea = self.ea,
+            survey = self.survey,
+            question_set = self.qset,
+            )
+        self.listingsample = ListingSample.objects.create(survey=self.survey, interview=self.interview)
 
     def test_modulo_understands_number_is_modulo_of_another(self):
         self.assertTrue(modulo(4, 2))
@@ -284,3 +318,15 @@ class TemplateTagsTest(TestCase):
     def test_trim(self):
         str1 = "survey_test"
         self.assertEquals(str1.strip(), trim(str1))
+    # def test_get_question_text(self):
+    #     self.assertIsNotNone(get_question_text(self.question))
+
+    # def test_get_name_references(self):
+    #     self.assertIsNotNone(get_name_references(self.qset))        
+    # def test_get_node_path(self):
+    #     self.assertIsNotNone(get_node_path(self.question))
+
+    # def test_get_loop_aware_path(self):
+    #     self.assertIsNotNone(get_loop_aware_path(self.question))
+    
+
