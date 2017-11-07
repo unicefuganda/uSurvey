@@ -1,6 +1,7 @@
 from django.test import TestCase
 from django.conf import settings
 
+
 class SessionsTest(TestCase):
 
     def test_django_sessions_is_loaded(self):

@@ -8,120 +8,10 @@ from survey.forms.question import get_question_form
 # import all question types
 from survey.models import (Answer, NumericalAnswer, TextAnswer, MultiChoiceAnswer, MultiSelectAnswer, GeopointAnswer,
                            ImageAnswer, AudioAnswer, VideoAnswer, DateAnswer, AutoResponse)
+from .survey_base_test import SurveyBaseTest
 
 
-class AnswersTest(TestCase):
-
-    fixtures = ['enumeration_area', 'locations', 'location_types']
-
-    def setUp(self):
-        # locad parameters required
-        call_command('load_parameters')
-        self.ea = EnumerationArea.objects.first()
-        self.survey = mommy.make(Survey, has_sampling=False)        # just focus on non sampled survey here
-        self.interviewer = mommy.make(Interviewer)
-        self.survey_allocation = mommy.make(SurveyAllocation, survey=self.survey,
-                                            allocation_ea=self.ea, interviewer=self.interviewer)
-        self.qset = mommy.make(Batch, name='Test', survey=self.survey)
-        self.qset1 = mommy.make(Batch, name='Test1', survey=self.survey)
-        self.access_channel = mommy.make(ODKAccess, interviewer=self.interviewer)
-        # create the access channel
-        self.qset_channels = mommy.make(QuestionSetChannel, qset=self.qset, channel=self.access_channel.choice_name())
-        self.interview = mommy.make(Interview, interviewer=self.interviewer, survey=self.survey, ea=self.ea,
-                                    interview_channel=self.access_channel, question_set=self.qset)
-
-    def _create_ussd_non_group_questions(self, qset):
-        # numeric answer
-        data = {
-            'answer_type': NumericalAnswer.choice_name(),
-            'text': 'num text',
-            'identifier': 'num_identifier',
-            'qset': qset.id
-        }
-        question = self._save_question(qset, data)
-        qset.refresh_from_db()  # qset is updated by question (start_question attribute is updated)
-        # since it's the first question saved it must reflect as first question of the question set
-        self.assertEquals(qset.start_question.id, question.id)
-        # text answer
-        data = {
-            'answer_type': TextAnswer.choice_name(),
-            'text': 'texts text',
-            'identifier': 'text_identifier',
-            'qset': qset.id
-        }
-        self._save_question(qset, data)
-        # Multichoice questions
-        data = {
-            'answer_type': MultiChoiceAnswer.choice_name(),
-            'text': 'multichoice answer text',
-            'identifier': 'multi_choice_identifier',
-            'qset': qset.id,
-            'options': ['Y', 'N']
-        }
-        self._save_question(qset, data)
-        self.qset.refresh_from_db()
-
-    def _create_test_non_group_questions(self, qset):
-        # Basically create questions for this question set which is not having groups
-        self._create_ussd_non_group_questions(qset)
-        # Multiselect questions
-        data = {
-            'answer_type': MultiSelectAnswer.choice_name(),
-            'text': 'multi select answer text',
-            'identifier': 'multi_select_identifier',
-            'qset': qset.id,
-            'options': ['Y', 'N', 'MB']
-        }
-        self._save_question(qset, data)
-        # Date answer
-        data = {
-            'answer_type': DateAnswer.choice_name(),
-            'text': 'date answer text',
-            'identifier': 'date_identifier',
-            'qset': qset.id,
-        }
-        self._save_question(qset, data)
-        # Geopoint answer
-        data = {
-            'answer_type': GeopointAnswer.choice_name(),
-            'text': 'geo point text',
-            'identifier': 'geo_identifier',
-            'qset': qset.id
-        }
-        self._save_question(qset, data)
-        # Image answer
-        data = {
-            'answer_type': ImageAnswer.choice_name(),
-            'text': 'image answer text',
-            'identifier': 'image_identifier',
-            'qset': qset.id
-        }
-        self._save_question(qset, data)
-        # Audio answer
-        data = {
-            'answer_type': AudioAnswer.choice_name(),
-            'text': 'audio answer text',
-            'identifier': 'audio_identifier',
-            'qset': qset.id
-        }
-        self._save_question(qset, data)
-        # Video answer
-        data = {
-            'answer_type': VideoAnswer.choice_name(),
-            'text': 'video answer text',
-            'identifier': 'video_identifier',
-            'qset': qset.id
-        }
-        self._save_question(qset, data)
-        self.qset.refresh_from_db()
-
-    def _save_question(self, qset, data):
-        current_count = Question.objects.count()
-        QuestionForm = get_question_form(BatchQuestion)
-        question_form = QuestionForm(qset, data=data)
-        question = question_form.save()
-        self.assertEquals(Question.objects.count(), current_count + 1)
-        return question
+class AnswersTest(SurveyBaseTest):
 
     def test_answer_types_available(self):
         known_answer_types = [NumericalAnswer, AutoResponse, MultiSelectAnswer, TextAnswer, MultiChoiceAnswer,
@@ -212,13 +102,13 @@ class AnswersTest(TestCase):
         MultiChoiceAnswer.create(self.interview, multichoice_question, options.first().text)
         self.assertEquals(MultiChoiceAnswer.objects.count(), 1)
         multichoice_answer = MultiChoiceAnswer.objects.first()
-        self.assertEquals(multichoice_answer.as_text, options.first().text)
+        self.assertEquals(multichoice_answer.as_text.lower(), options.first().text.lower())
         self.assertEquals(int(multichoice_answer.as_value), options.first().order)
         # confirm using value instead yields ame result
         MultiChoiceAnswer.create(self.interview, multichoice_question, options.first().order)
         self.assertEquals(MultiChoiceAnswer.objects.count(), 2)
         multichoice_answer = MultiChoiceAnswer.objects.last()
-        self.assertEquals(multichoice_answer.as_text, options.first().text)
+        self.assertEquals(multichoice_answer.as_text.lower(), options.first().text.lower())
         self.assertEquals(int(multichoice_answer.as_value), options.first().order)
         # confirm update now
         multichoice_answer.update(options.last().text)
@@ -249,12 +139,11 @@ class AnswersTest(TestCase):
         self.assertEquals(multichoice_answer.as_value,
                           ' '.join(multiselect_question.options.values_list('text', flat=True)))
 
-
     def test_prep_values(self):
         # test base answer. For base answer just return value and text values
         answer = 'Test1'
-        self.assertEquals(Answer.prep_value(answer), answer)
-        self.assertEquals(Answer.prep_text(answer), answer)
+        self.assertEquals(Answer.prep_value(answer).lower(), answer.lower())
+        self.assertEquals(Answer.prep_text(answer).lower(), answer.lower())
         # test numerial answer. Confirm zfill normalization
         answer = 1
         self.assertEquals(NumericalAnswer.prep_text(answer), str(answer).zfill(NumericalAnswer.STRING_FILL_LENGTH))
@@ -271,6 +160,40 @@ class AnswersTest(TestCase):
         answer = 'Hey'
         self.assertTrue(TextAnswer.contains(answer, 'hey'))
         self.assertFalse(TextAnswer.contains(answer, 'somethign else'))
+
+    def test_fetch_methods(self):
+        qset = self.qset
+        self._create_test_non_group_questions(qset)
+        date_question = Question.objects.filter(answer_type=DateAnswer.choice_name()).first()
+        smallest = '2017-01-20'
+        medium = '2017-05-12'
+        largest = '2017-10-20'
+        answer1 = DateAnswer.create(self.interview, date_question, medium)
+        answer2 = DateAnswer.create(self.interview, date_question, smallest)
+        answer3 = DateAnswer.create(self.interview, date_question, largest)
+        self.assertEquals(DateAnswer.fetch_greater_than('as_value',
+                                                        '2017-01-21').filter(as_text__in=[medium, largest]).count(), 2)
+        self.assertEquals(DateAnswer.fetch_less_than('as_value', '2017-01-21').count(), 1)
+        self.assertEquals(DateAnswer.fetch_less_than('as_value', '2017-01-21').first().as_text, smallest)
+        fetched_inbetween = DateAnswer.fetch_between('as_value', '2017-01-21', '2017-05-13')
+        self.assertEquals(fetched_inbetween.count(), 1)
+        self.assertEquals(fetched_inbetween.first().as_text, medium)
+        fetched_inbetween = DateAnswer.fetch_between('as_value', '2017-01-21', '2017-05-13')
+        self.assertEquals(fetched_inbetween.count(), 1)
+        self.assertEquals(fetched_inbetween.first().as_text, medium)
+        self.assertEquals(DateAnswer.fetch_equals('as_value', medium).count(), 1)
+        self.assertEquals(DateAnswer.fetch_equals('as_value', medium).first().as_text, medium)
+
+    def test_answers_attribute_of_question_returns_answers_belonging_to_question_answer_type(self):
+        self.test_fetch_methods()       # this creates 3 answers belonging to date type
+        self.test_create_answers()      # this creates a single geop point answer
+        date_question = Question.objects.filter(answer_type=DateAnswer.choice_name()).first()
+        self.assertEquals(date_question.answers().first().__class__, DateAnswer)
+        # confirm only answers belonging to this question are present
+        self.assertEquals(date_question.answers().exclude(question=date_question), 0)
+
+
+
 
 
 

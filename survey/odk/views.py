@@ -57,43 +57,6 @@ from survey.interviewer_configs import LEVEL_OF_EDUCATION,\
 from collections import OrderedDict
 
 
-def get_survey_xform(allocation):
-    interviewer, survey = allocation.interviewer, allocation.survey
-    template_file = "odk/survey_form-no-repeat.xml"
-    if BatchLocationStatus.objects.filter(
-            batch__survey=survey,
-            non_response=True).exists():
-        template_file = 'odk/non-response-no-repeat.xml'
-    registered_households = interviewer.generate_survey_households(survey)
-    batches = interviewer.ea.open_batches(survey)
-    # batches_map =
-    loop_starters = set()
-    map(lambda batch: loop_starters.update(batch.loop_starters()), batches)
-    loop_enders = set()
-    map(lambda batch: loop_enders.update(batch.loop_enders()), batches)
-    loop_boundaries = OrderedDict()
-    map(lambda batch: loop_boundaries.update(
-        batch.loop_back_boundaries()), batches)
-    return render_to_string(template_file, {
-        'interviewer': interviewer,
-        # interviewer.households.filter(
-        #survey=survey,
-        #ea=interviewer.ea).all(),
-        'registered_households': registered_households,
-        'title': '%s - %s' % (
-            survey, ', '.join([batch.name for batch in batches])),
-        'survey': survey,
-        'allocation': allocation,
-        'survey_batches': batches,
-        'loop_starters': loop_starters,
-        'loop_enders': loop_enders,
-        'loop_boundaries': loop_boundaries,
-        'answer_types': dict([(
-            cls.__name__.lower(),
-            cls.choice_name()) for cls in Answer.supported_answers()])
-    })
-
-
 def get_qset_xform(interviewer, allocations, qset, ea_samples={}):
     return render_to_string("odk/question_set.xml",
                             {'interviewer': interviewer,
@@ -314,8 +277,7 @@ def submission(request):
             return OpenRosaResponseBadRequest(
                 u"There should be a single XML submission file.")
         media_files = request.FILES
-        submission_report = process_submission(
-            interviewer, xml_file_list[0], media_files=media_files)
+        submission_report = process_submission(interviewer, xml_file_list[0], media_files=media_files)
         logger.info(submission_report)
         context = Context({
             'message': settings.ODK_SUBMISSION_SUCCESS_MSG,

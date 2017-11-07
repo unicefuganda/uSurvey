@@ -1,4 +1,5 @@
 import string
+import time
 from datetime import datetime
 from django_rq import job
 from django.contrib.auth.models import User
@@ -90,9 +91,11 @@ class Interview(BaseModel):
             reference_interview = Interview.get(id=reference_interview)
 
         def _save_record(record):
+            now = timezone.now()
+            closure_date = record.get('completion_date', now).replace(tzinfo=now.tzinfo)
             interview = Interview.objects.create(survey=survey, question_set=qset,
                                                  ea=ea, interviewer=interviewer, interview_channel=access_channel,
-                                                 closure_date=record.get('completion_date', timezone.now()),
+                                                 closure_date=closure_date,
                                                  interview_reference=reference_interview)
             interviews.append(interview)
             map(lambda (q_id, answer): _save_answer(interview, q_id, answer), record.items())
@@ -112,7 +115,7 @@ class Interview(BaseModel):
                 except answer_class.DoesNotExist:
                     answer_class.create(interview, question, answer)
                 except Exception, ex:
-                    print 'exception: %s' % str(ex)
+                    print 'exception: %s' % unicode(ex)
         map(_save_record, answers)
         return interviews
 
@@ -175,6 +178,7 @@ class Interview(BaseModel):
 
 
 class Answer(BaseModel):
+    STRING_FILL_LENGTH = 20
     # now question_type is used to store the exact question we are answering
     # (Listing, Batch, personal info)
     # I think using generic models is an overkill since they're all
@@ -201,9 +205,9 @@ class Answer(BaseModel):
     def create(cls, interview, question, answer, as_text=None, as_value=None):
         try:  # check if text and value is convertable to strings
             if as_text is None:
-                as_text = str(answer)[:200]
+                as_text = cls.prep_text(unicode(answer)[:200])
             if as_value is None:
-                as_value = str(answer)[:200]
+                as_value = cls.prep_value(unicode(answer)[:200])
         except BaseException:
             pass
         return cls.objects.create(
@@ -212,19 +216,19 @@ class Answer(BaseModel):
             question_type=question.__class__.type_name(),
             interview=interview,
             identifier=question.identifier,
-            as_text=cls.prep_text(as_text),
-            as_value=cls.prep_value(as_value))
+            as_text=as_text,
+            as_value=as_value)
 
     def __unicode__(self):
         return unicode(self.as_text)
 
     @classmethod
     def prep_value(cls, val):
-        return val
+        return unicode(val).lower()
 
     @classmethod
     def prep_text(cls, text):
-        return text
+        return unicode(text).lower()
 
     def update(self, answer):
         self.as_text = answer
@@ -278,6 +282,7 @@ class Answer(BaseModel):
 
     @classmethod
     def fetch_contains(cls, answer_key, txt, qs=None):
+        txt = cls.prep_value(txt)
         if qs is None:
             qs = cls.objects
         return qs.filter(**{'%s__icontains' % answer_key: txt})
@@ -288,13 +293,14 @@ class Answer(BaseModel):
 
     @classmethod
     def equals(cls, answer, value):
-        return str(answer).lower() == str(value).lower()
+        return unicode(answer).lower() == unicode(value).lower()
 
     @classmethod
     def fetch_equals(cls, answer_key, value, qs=None):
+        value = cls.prep_value(value)
         if qs is None:
             qs = cls.objects
-        return qs.filter(**{'%s__iexact' % answer_key: str(value)})
+        return qs.filter(**{'%s__iexact' % answer_key: unicode(value)})
 
     @classmethod
     def odk_equals(cls, node_path, value):
@@ -308,9 +314,10 @@ class Answer(BaseModel):
 
     @classmethod
     def fetch_starts_with(cls, answer_key, txt, qs=None):
+        txt = cls.prep_value(txt)
         if qs is None:
             qs = cls.objects
-        return qs.filter(**{'%s__istartswith' % answer_key: str(txt)})
+        return qs.filter(**{'%s__istartswith' % answer_key: unicode(txt)})
 
     @classmethod
     def odk_starts_with(cls, node_path, value):
@@ -324,9 +331,10 @@ class Answer(BaseModel):
 
     @classmethod
     def fetch_ends_with(cls, answer_key, txt, qs=None):
+        txt = cls.prep_value(txt)
         if qs is None:
             qs = cls.objects
-        return qs.filter(**{'%s__iendswith' % answer_key: str(txt)})
+        return qs.filter(**{'%s__iendswith' % answer_key: unicode(txt)})
 
     @classmethod
     def odk_ends_with(cls, node_path, value):
@@ -338,6 +346,7 @@ class Answer(BaseModel):
 
     @classmethod
     def fetch_greater_than(cls, answer_key, value, qs=None):
+        value = cls.prep_value(value)
         if qs is None:
             qs = cls.objects
         return qs.filter(**{'%s__gt' % answer_key: value})
@@ -352,6 +361,7 @@ class Answer(BaseModel):
 
     @classmethod
     def fetch_less_than(cls, answer_key, value, qs=None):
+        value = cls.prep_value(value)
         if qs is None:
             qs = cls.objects
         return qs.filter(**{'%s__lt' % answer_key: value})
@@ -364,52 +374,51 @@ class Answer(BaseModel):
     def between(cls, answer, lowerlmt, upperlmt):
         return upperlmt > answer >= lowerlmt
 
-    @classmethod
-    def get_validation_query_params(cls):
-        return {cls.greater_than.__name__: 'gt', cls.less_than.__name__: 'lt',
-                cls.starts_with.__name__: 'istartswith', cls.ends_with.__name__: 'iendswith',
-                cls.contains.__name__: 'icontains', cls.equals.__name__: 'iexact'}
+    # @classmethod
+    # def get_validation_query_params(cls):
+    #     return {cls.greater_than.__name__: 'gt', cls.less_than.__name__: 'lt',
+    #             cls.starts_with.__name__: 'istartswith', cls.ends_with.__name__: 'iendswith',
+    #             cls.contains.__name__: 'icontains', cls.equals.__name__: 'iexact'}
 
-    @classmethod
-    def get_validation_queries(cls, method_name, answer_key, *test_args, **kwargs):
-        namespace = kwargs.pop('namespace', '')
-        validation_queries = cls.get_validation_query_params()
-        if method_name == cls.between.__name__:         # only between takes two arguments
-            query_args = []
-            return {'%s%s__%s' % (namespace, answer_key, validation_queries[cls.less_than.__name__]): test_args[1],
-                    '%s%s__%s' % (namespace, answer_key,
-                                  validation_queries[cls.greater_than.__name__]): test_args[0]
-                    }
-        else:
-            return {'%s%s__%s' % (namespace, answer_key, validation_queries[method_name]): test_args[0],}
-
-    @classmethod
-    def __getattr__(cls, name):
-        """Shall be used to implement all fetch_validation function methods.
-        This is required instead of implementing individual code for each. This function results in db call
-        :param name:
-        :return:
-        """
-        if name.startswith('fetch_'):
-            method_name = name[6:]
-
-            def wrapper(answer_key, qs=cls.objects, *test_args):
-                return qs.filter(**cls.get_validation_queries(method_name, answer_key, *test_args))
-            return wrapper
-        raise AttributeError
+    # @classmethod
+    # def get_validation_queries(cls, method_name, answer_key, *test_args, **kwargs):
+    #     namespace = kwargs.pop('namespace', '')
+    #     validation_queries = cls.get_validation_query_params()
+    #     if method_name == cls.between.__name__:         # only between takes two arguments
+    #         query_args = []
+    #         return {'%s%s__%s' % (namespace, answer_key, validation_queries[cls.less_than.__name__]): test_args[1],
+    #                 '%s%s__%s' % (namespace, answer_key,
+    #                               validation_queries[cls.greater_than.__name__]): test_args[0]
+    #                 }
+    #     else:
+    #         return {'%s%s__%s' % (namespace, answer_key, validation_queries[method_name]): test_args[0],}
+    # 
+    # @classmethod
+    # def __getattr__(cls, name):
+    #     """Shall be used to implement all fetch_validation function methods.
+    #     This is required instead of implementing individual code for each. This function results in db call
+    #     :param name:
+    #     :return:
+    #     """
+    #     if name.startswith('fetch_'):
+    #         method_name = name[6:]
+    # 
+    #         def wrapper(answer_key, qs=cls.objects, *test_args):
+    #             return qs.filter(**cls.get_validation_queries(method_name, answer_key, *test_args))
+    #         return wrapper
+    #     raise AttributeError
 
     @classmethod
     def fetch_between(cls, answer_key, lowerlmt, upperlmt, qs=None):
+        upperlmt = cls.prep_value(upperlmt)
+        lowerlmt = cls.prep_value(lowerlmt)
         if qs is None:
             qs = cls.objects
-        return qs.filter(**{'%s__lt' %
-                            answer_key: upperlmt, '%s__gte' %
-                            answer_key: lowerlmt})
+        return qs.filter(**{'%s__lt' % answer_key: upperlmt, '%s__gte' % answer_key: lowerlmt})
 
     @classmethod
     def odk_between(cls, node_path, lowerlmt, upperlmt):
-        return "(%s &gt; '%s') and (%s &lt;= '%s')" % (
-            node_path, lowerlmt, node_path, upperlmt)
+        return "(%s &gt; '%s') and (%s &lt;= '%s')" % (node_path, lowerlmt, node_path, upperlmt)
 
     @classmethod
     def print_odk_validation(cls, node_path, validator_name, *args):
@@ -447,7 +456,6 @@ class Answer(BaseModel):
 
 
 class NumericalTypeAnswer(Answer):
-    STRING_FILL_LENGTH = 10
 
     @classmethod
     def validators(cls):
@@ -460,11 +468,11 @@ class NumericalTypeAnswer(Answer):
 
     @classmethod
     def prep_text(cls, val):
-        return str(val).zfill(cls.STRING_FILL_LENGTH)
+        return unicode(val).zfill(cls.STRING_FILL_LENGTH)
 
     @classmethod
     def prep_value(cls, val):
-        return str(val).zfill(cls.STRING_FILL_LENGTH)
+        return unicode(val).zfill(cls.STRING_FILL_LENGTH)
 
     @classmethod
     def greater_than(cls, answer, value):
@@ -607,7 +615,7 @@ class MultiChoiceAnswer(Answer):
     @classmethod
     def create(cls, interview, question, answer):
         try:
-            if str(answer).isdigit():
+            if unicode(answer).isdigit():
                 answer = int(answer)
                 answer = question.options.get(order=answer)
             else:
@@ -625,7 +633,7 @@ class MultiChoiceAnswer(Answer):
 
     def update(self, answer):
         try:
-            if str(answer).isdigit():
+            if unicode(answer).isdigit():
                 answer = int(answer)
                 answer = self.question.options.get(order=answer)
             else:
@@ -698,7 +706,7 @@ class MultiSelectAnswer(Answer):
 
     def to_label(self):
         texts = []
-        map(lambda opt: texts.append(str(opt.order)), self.value.all())
+        map(lambda opt: texts.append(unicode(opt.order)), self.value.all())
         return ' and '.join(texts)
 
     def pretty_print(self, as_label=False):
@@ -720,18 +728,22 @@ class DateAnswer(Answer):
     value = models.DateField(null=True)
 
     @classmethod
+    def prep_value(cls, val):
+        if isinstance(val, basestring):
+            val = extract_date(val, dayfirst=False)
+        # prepare as integer. for saving
+        date_value = int(time.mktime(val.timetuple()))
+        return unicode(date_value).zfill(cls.STRING_FILL_LENGTH)
+
+    @classmethod
     def create(cls, interview, question, answer):
         raw_answer = answer
         if isinstance(answer, basestring):
             answer = extract_date(answer, dayfirst=False)
-        return super(
-            DateAnswer,
-            cls).create(
-            interview,
-            question,
-            answer,
-            as_text=raw_answer,
-            as_value=raw_answer)
+        # use zfill to normalize the string for comparism
+        return super(DateAnswer, cls).create(interview, question, answer, as_text=raw_answer,
+                                             as_value=cls.prep_value(answer)
+                                             )
 
     class Meta:
         app_label = 'survey'

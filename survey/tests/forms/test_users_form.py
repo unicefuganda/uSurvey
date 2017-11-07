@@ -1,7 +1,6 @@
 from django.test import TestCase
 from django.contrib.auth.models import User, Group, Permission
 from django.contrib.contenttypes.models import ContentType
-
 from survey.forms.users import *
 from survey.models.users import UserProfile
 

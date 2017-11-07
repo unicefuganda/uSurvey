@@ -133,14 +133,13 @@ def process_answers(xml, qset, access_channel, question_map, survey_allocation, 
 
 def save_non_response(survey_tree, qset, survey, survey_allocation, access_channel, answer, reference_interview):
     interviewer = survey_allocation.interviewer
+    extracted_date = extract_date(_get_nodes(CREATION_DATE_PATH, tree=survey_tree)[0].text, dayfirst=False)
+    closure_date = extracted_date.replace(tzinfo=timezone.now().tzinfo)
     interview = Interview.objects.create(survey=survey, question_set=qset, ea=survey_allocation.allocation_ea,
                                          interviewer=interviewer, interview_channel=access_channel,
-                                         closure_date=extract_date(_get_nodes(CREATION_DATE_PATH,
-                                                                              tree=survey_tree)[0].text,
-                                                                   dayfirst=False),
+                                         closure_date=closure_date,
                                          interview_reference_id=reference_interview)
     return NonResponseAnswer.objects.create(interview=interview, value=answer, interviewer=interviewer)
-
 
 
 def get_answers(node, qset, question_map, completion_date):
@@ -253,9 +252,9 @@ def process_xml(interviewer, xml_blob, media_files={}, request=None):
                                                   form_id=form_id, xml=xml_blob, instance_id=instance_id,
                                                   instance_name=instance_name)
     question_map = dict([(str(q.pk), q) for q in qset.flow_questions])
-    access_channel = ODKAccess.objects.get(interviewer=interviewer)
-    #>process_answers.delay(xml_blob, qset, access_channel, question_map, survey_allocation, submission, media_files)
-    process_answers(xml_blob, qset, access_channel, question_map, survey_allocation, submission, media_files)
+    access_channel = ODKAccess.objects.filter(interviewer=interviewer).first()
+    process_answers.delay(xml_blob, qset, access_channel, question_map, survey_allocation, submission, media_files)
+    # process_answers(xml_blob, qset, access_channel, question_map, survey_allocation, submission, media_files)
     return submission
 
 
@@ -365,27 +364,6 @@ class OpenRosaRequestConflict(OpenRosaResponse):
 
 class OpenRosaServerError(OpenRosaResponse):
     status_code = 500
-
-
-def http_basic_interviewer_auth(func):
-    @wraps(func)
-    def _decorator(request, *args, **kwargs):
-        if request.META.has_key('HTTP_AUTHORIZATION'):
-            authmeth, auth = request.META['HTTP_AUTHORIZATION'].split(' ', 1)
-            logger.debug('request meta: %s' %
-                         request.META['HTTP_AUTHORIZATION'])
-            if authmeth.lower() == 'basic':
-                auth = auth.strip().decode('base64')
-                username, password = auth.split(':', 1)
-                try:
-                    request.user = ODKAccess.objects.get(
-                        user_identifier=username, odk_token=password, is_active=True).interviewer
-                    #Interviewer.objects.get(mobile_number=username, odk_token=password)
-                    return func(request, *args, **kwargs)
-                except ODKAccess.DoesNotExist:
-                    return OpenRosaResponseNotFound()
-        return HttpResponseNotAuthorized()
-    return _decorator
 
 
 def http_digest_interviewer_auth(func):

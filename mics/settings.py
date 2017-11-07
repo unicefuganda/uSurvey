@@ -497,14 +497,7 @@ except ImportError:
     pass
 
 
-TESTING = False
-
-
 if 'test' in sys.argv:
-    TESTING = True
-
-
-if TESTING:
     DATABASES = {
        "default": {
            "ENGINE": "django.db.backends.sqlite3",
