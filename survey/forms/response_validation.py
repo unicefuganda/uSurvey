@@ -32,7 +32,11 @@ class ResponseValidationForm(forms.ModelForm, FormOrderMixin):
     def clean(self):
         validation_test = self.cleaned_data.get('validation_test', None)
         answer_type = self.cleaned_data.get('answer_type', None)
-        method = getattr(Answer, validation_test, None)
+        try:
+            method = getattr(Answer, validation_test, None)
+        except Exception as e:
+            method = None
+            pass
         if method is None:
             raise forms.ValidationError('unsupported validator defined on test question')
         if validation_test == 'between':
