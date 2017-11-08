@@ -729,6 +729,90 @@ class SetQuestionViewTest(BaseTest):
     #     self.assertIn("Questions successfully assigned to Batch: %s.\\"%batch_obj.name, response.cookies['messages'].__str__())
     #     self.assertRedirects(response, expected_url= reverse('qset_questions_page', kwargs={"qset_id" : qset.id}), msg_prefix='')
 
+    def test_add_question_logic_page(self):
+        listing_form = ListingTemplate.objects.create(name='lz1', description='desc1')
+        kwargs = {'name': 'sz1', 'description': 'survey description demo12',
+                          'has_sampling': True, 'sample_size': 10,'listing_form_id':listing_form.id}
+        survey_obj = Survey.objects.create(**kwargs)
+        batch_obj = Batch.objects.create(name='bz1',description='d1', survey=survey_obj)
+        qset = QuestionSet.get(id=batch_obj.id)
+        question1 = mommy.make(Question, qset=qset, answer_type=NumericalAnswer.choice_name())
+        question2 = mommy.make(Question, qset=qset, answer_type=NumericalAnswer.choice_name())
+        url = reverse('add_question_logic_page', kwargs = {"qset_id" : qset.id, "question_id": question1.id})
+        response = self.client.get(url)
+        self.assertIn(response.status_code, [200, 302])
+        templates = [ template.name for template in response.templates ]
+        self.assertIn('set_questions/logic.html', templates)
+        self.assertEquals(response.context['class'], 'question-form')
+        self.assertEquals(response.context['batch'], batch_obj)
+        self.assertEquals(response.context['batch_id'], "%s"%batch_obj.id)
+        logic_form = {
+        "condition" : "equals",
+        "attribute" : "value",
+        "value" :3,
+        "min_value" :1,
+        "max_value" : 3,
+        "action" : "END_INTERVIEW",
+        "next_question" : question2.id
+        }
+        response = self.client.post(url, data=logic_form)
+    def test_remove_question_loop_page(self):
+        listing_form = ListingTemplate.objects.create(name='lz2', description='desc1')
+        kwargs = {'name': 'sz2', 'description': 'survey description demo12',
+                          'has_sampling': True, 'sample_size': 10,'listing_form_id':listing_form.id}
+        survey_obj = Survey.objects.create(**kwargs)
+        batch_obj = Batch.objects.create(name='bz2',description='d1', survey=survey_obj)
+        qset = QuestionSet.get(id=batch_obj.id)
+        question1 = mommy.make(Question, qset=qset, answer_type=NumericalAnswer.choice_name())
+        question2 = mommy.make(Question, qset=qset, answer_type=NumericalAnswer.choice_name())
+        ql_obj = QuestionLoop.objects.create(
+            loop_starter = question1,
+            repeat_logic = '',
+            loop_ender = question2,
+            loop_prompt = 'loop_prompt1'
+            )
+        url = reverse('remove_question_loop_page', kwargs = {"loop_id" : ql_obj.id})
+        response = self.client.get(url)
+        self.assertIn(response.status_code, [200, 302])
+
+        url = reverse('remove_question_loop_page', kwargs = {"loop_id" : 9999})
+        response = self.client.get(url)
+        self.assertIn(response.status_code, [404])
+
+
+    def test_delete_logic(self):
+        listing_form = ListingTemplate.objects.create(name='lz3', description='desc1')
+        kwargs = {'name': 'sz3', 'description': 'survey description demo12',
+                          'has_sampling': True, 'sample_size': 10,'listing_form_id':listing_form.id}
+        survey_obj = Survey.objects.create(**kwargs)
+        batch_obj = Batch.objects.create(name='bz3',description='d1', survey=survey_obj)
+        qset = QuestionSet.get(id=batch_obj.id)
+        question1 = mommy.make(Question, qset=qset, answer_type=NumericalAnswer.choice_name())
+        question2 = mommy.make(Question, qset=qset, answer_type=NumericalAnswer.choice_name())
+
+        qf_obj =  QuestionFlow.objects.create(
+            name = 'a1',
+            desc = 'descq',
+            question = question1,
+            question_type = TextAnswer.choice_name(),
+            next_question = question2,
+            next_question_type = TextAnswer.choice_name()
+            )
+        
+        url = reverse('delete_qset_question_logic_page', kwargs = {"flow_id" : qf_obj.id})
+        response = self.client.get(url)
+        self.assertIn(response.status_code, [200, 302])
+
+        url = reverse('delete_qset_question_logic_page', kwargs = {"flow_id" : 9999})
+        response = self.client.get(url)
+        self.assertIn(response.status_code, [404])
+
+
+
+
+
+
+
 
 
 

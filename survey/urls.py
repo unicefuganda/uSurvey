@@ -290,7 +290,7 @@ urlpatterns = patterns(
         'survey.views.batch.close',
         name='batch_close_page'),
     url(
-        r'^batches/(?P<batch_id>\d+)/questions/(?P<question_id>\d+)/add_logic/$',
+        r'^batches/(?P<qset_id>\d+)/questions/(?P<question_id>\d+)/add_logic/$',
         'survey.views.set_questions.add_logic',
         name='add_question_logic_page'),
     url(
