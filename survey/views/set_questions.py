@@ -180,7 +180,6 @@ def add_logic(request, qset_id, question_id):
     response = None
     cancel_url = '../'
     logic_form = LogicForm(question)
-    print logic_form
     question_rules_for_batch = {}
 #     question_rules_for_batch[question] = question.rules_for_batch(batch)
     if request.method == "POST":
@@ -263,7 +262,7 @@ def remove_loop(request, loop_id):
 
 @permission_required('auth.can_view_batches')
 def delete_logic(request, flow_id):
-    flow = QuestionFlow.get(id=flow_id)
+    flow = get_object_or_404(QuestionFlow, pk=flow_id)
     batch = flow.question.qset
     flow.delete()
     _kill_zombies(batch.zombie_questions())
