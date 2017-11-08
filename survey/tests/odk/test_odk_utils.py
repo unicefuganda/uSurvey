@@ -10,6 +10,7 @@ from django.test import TestCase
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
 from django.test.client import Client
+from django.contrib.auth.models import User
 from survey.models import (InterviewerAccess, ODKAccess, USSDAccess, Interview, Interviewer, QuestionSetChannel,
                            EnumerationArea, Survey, SurveyAllocation, Question, QuestionSet, Batch, BatchQuestion,
                            QuestionOption, ODKSubmission)
@@ -140,9 +141,51 @@ class ODKTest(SurveyBaseTest):
         self.assertEquals(ODKSubmission.objects.count(), 1)
         # not confirm that 4 responses were given
         self.assertEquals(Answer.objects.count(), 4)
+        # now test the instances listpage
+        url = reverse('odk_submission_list')
+        # check all the if the
+        raj = self.assign_permission_to(User.objects.create_user('Rajni', 'rajni@kant.com', 'I_Rock'),
+                                        'can_view_aggregates')
+        client = Client()
+        client.login(username='Rajni', password='I_Rock')
+        response = client.get(url)
+        templates = [template.name for template in response.templates]
+        self.assertIn('odk/submission_list.html', templates)
+        self.assertEquals(response.context['submissions'].count(), 1)
+        # check instances list on ODK
+        url = reverse('instances_form_list')
+        response = self._make_odk_request(url=url)
+        templates = [template.name for template in response.templates]
+        self.assertIn("odk/instances_xformsList.xml", templates)
+        self.assertEquals(response.context['submissions'].count(), 1)
+        self.assertEquals(response.context['submissions'].filter(status=ODKSubmission.COMPLETED).count(), 1)
+        submission = response.context['submissions'].first()
+        # try to download the previously submitted form
+        url = reverse('download_odk_submission', args=(submission.pk, ))
+        response = self._make_odk_request(url=url)
+        self.assertTrue( 300 > response.status_code and response.status_code >= 200)
+        self.assertEquals(submission.xml.strip(), response.content.strip())
+        tree = etree.fromstring(submission.xml)
+        dates_nodes = tree.xpath('//qset/submissions/dates/lastModified')
+        # this field is only included when updating instances
+        self.assertEquals(len([d.text for d in dates_nodes if d.text]), 1)
+        self.assertEquals(tree.xpath('//qset/submissions/id')[0].text, str(submission.id))
+        # now submit modified form
+        f = SimpleUploadedFile("surveyfile.xml", submission.xml.encode('utf8'))
+        url = reverse('odk_submit_forms')
+        response = self._make_odk_request(url=url, data={'xml_submission_file': f}, raw=True)
+        self.assertTrue(300 > response.status_code and response.status_code >= 200)
+        self.assertEquals(ODKSubmission.objects.count(), 1)
+        self.assertEquals(Answer.objects.count(), 4)        # note: update only doesn't increase answer or subs count
+        submission = ODKSubmission.objects.order_by('created').last()
+        tree = etree.fromstring(submission.xml)
+        # this field is only included when updating instances
+        self.assertEquals(tree.xpath('//qset/submissions/id')[0].text, str(submission.id))
 
 
 
 
-    # def test_(self):
-    #     pass
+
+
+
+

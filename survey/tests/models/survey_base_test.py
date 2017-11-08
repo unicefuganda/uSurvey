@@ -24,8 +24,8 @@ class SurveyBaseTest(BaseTest):
         self.interviewer = mommy.make(Interviewer)
         self.survey_allocation = mommy.make(SurveyAllocation, survey=self.survey,
                                             allocation_ea=self.ea, interviewer=self.interviewer)
-        self.qset = mommy.make(Batch, name='Test', survey=self.survey)
-        self.qset1 = mommy.make(Batch, name='Test1', survey=self.survey)
+        self.qset = mommy.make(Batch, name='TestQset', survey=self.survey)
+        self.qset1 = mommy.make(Batch, name='TestNewQset', survey=self.survey)
         self.access_channel = mommy.make(ODKAccess, interviewer=self.interviewer)
         # create the access channel
         self.qset_channels = mommy.make(QuestionSetChannel, qset=self.qset, channel=self.access_channel.choice_name())
