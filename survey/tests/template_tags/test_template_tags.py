@@ -196,13 +196,7 @@ class TemplateTagsTest(TestCase):
         ea2 = EnumerationArea.objects.create(name="EA Kisasi2")
         ea1.locations.add(kisasi)
         ea2.locations.add(kisasi)
-
-        location_widget = LocationWidget(selected_location=kisasi, ea=ea1)
-
-        self.assertEqual("selected='selected'",
-                         is_ea_selected(location_widget, ea1))
-        self.assertIsNone(is_ea_selected(location_widget, ea2))
-
+ 
     def test_ea_is_location_selected(self):
         country = LocationType.objects.create(name="Country1", slug='country')
         district = LocationType.objects.create(

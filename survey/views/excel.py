@@ -1,26 +1,25 @@
 import csv
 from StringIO import StringIO
+from rq import get_current_job
+import json
 from datetime import datetime
+from django_rq import job, get_scheduler
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseNotFound
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib import messages
 from django.conf import settings
+from django.core.urlresolvers import reverse
+from django.core.cache import cache
+from survey.utils.zip import InMemoryZip
 from survey.forms.filters import SurveyBatchFilterForm
 from survey.forms.aggregates import InterviewerReportForm
 from survey.models import Survey
 from survey.models import Batch
 from survey.models import LocationType
-from survey.services.results_download_service\
-    import ResultsDownloadService, ResultComposer
+from survey.services.results_download_service import ResultsDownloadService, ResultComposer
 from survey.utils.views_helper import contains_key
 from survey.forms.enumeration_area import LocationsFilterForm
-from django.core.urlresolvers import reverse
-from django_rq import job, get_scheduler
-from rq import get_current_job
-import json
-from django.core.cache import cache
-from survey.utils.zip import InMemoryZip
 
 
 @job('email')

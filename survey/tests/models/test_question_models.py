@@ -21,7 +21,7 @@ class QuestionModelTest(SurveyBaseTest):
         super(QuestionModelTest, self).setUp()
         self.listing_form = mommy.make(ListingTemplate)
         self.listing_question = mommy.make(Question, qset=self.listing_form)
-        self.sampling_survey = mommy.make(Survey, listing_form=self.listing_form, has_sampling=True)
+        self.sampling_survey = mommy.make(Survey, listing_form=self.listing_form, has_sampling=True, name='sample test survey')
         self.batch = mommy.make(Batch, survey=self.sampling_survey)
         # self.parameter_question =
 

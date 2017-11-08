@@ -24,6 +24,7 @@ INDICATOR_DOES_NOT_EXIST_MSG = "The indicator requested does not exist."
 @login_required
 @permission_required('auth.can_view_batches')
 def new(request):
+    """Creates new indicator. HTML uses with ajax to create variables on same screen with popups"""
     indicator_form = IndicatorForm()
     if request.method == 'POST':
         indicator_form = IndicatorForm(data=request.POST)

@@ -223,13 +223,10 @@
                     </li>
                     {% if perms.auth.can_view_batches or perms.auth.view_completed_survey %}
                     <li>
-                        <a href='#' class="new_indicator_page validate_formulae add_formula_page delete_indicator_variable delete_indicator_criteria add_indicator_variable view_indicator_variables add_formula_page indicator_variables list_indicator_page  edit_indicator_page delete_indicator_page simple_indicator_chart_page edit_indicator_variable download_indicator_analysis list_weights_page upload_weights weights_error_logs_page get_location_children get_enumeration_areas submenu-button1"><i class="fa fa-line-chart"></i> ANALYSE</a>
+                        <a href='#' class="new_indicator_page validate_formulae add_formula_page delete_indicator_variable delete_indicator_criteria add_indicator_variable view_indicator_variables add_formula_page indicator_variables list_indicator_page  edit_indicator_page delete_indicator_page simple_indicator_chart_page edit_indicator_variable download_indicator_analysis get_location_children get_enumeration_areas submenu-button1"><i class="fa fa-line-chart"></i> ANALYSE</a>
                         <ul>
                             <li>
                                 <a href="{% url 'list_indicator_page' %}" class="new_indicator_page validate_formulae add_formula_page delete_indicator_variable delete_indicator_criteria add_indicator_variable view_indicator_variables add_formula_page indicator_variables list_indicator_page  edit_indicator_page delete_indicator_page simple_indicator_chart_page edit_indicator_variable download_indicator_analysis">Indicators</a>
-                            </li>
-                            <li>
-                                <a href="{% url 'list_weights_page' %}" class="list_weights_page upload_weights weights_error_logs_page get_location_children get_enumeration_areas">Location Weights</a>
                             </li>
                             {% endif %}    
                         </ul>

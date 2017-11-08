@@ -2,15 +2,14 @@ from django.contrib.auth.models import User
 from django.test import Client
 from mock import patch
 from survey.models.locations import *
-from survey.forms.upload_csv_file import UploadEAForm
 from survey.models import Survey, EnumerationArea, Batch
-from survey.services.ea_upload import UploadEACSVLayoutHelper
 from survey.tests.base_test import BaseTest
 from survey.views.enumeration_area import _process_form
 from django.utils.timezone import utc
 from django.core.urlresolvers import reverse
 
-class UploadWeightsTest(BaseTest):
+
+class EAViewTest(BaseTest):
 
     def setUp(self):
         self.client = Client()

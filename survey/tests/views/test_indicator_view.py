@@ -6,6 +6,7 @@ from survey.models import QuestionModule, Batch, Indicator, Survey, Question, Qu
 from survey.tests.base_test import BaseTest
 from django.core.urlresolvers import reverse
 
+
 class IndicatorViewTest(BaseTest):
 
     def setUp(self):
@@ -15,7 +16,7 @@ class IndicatorViewTest(BaseTest):
         self.form_data = {
                           'name': 'Health',
                           'description': 'some description',
-                          'question_set' : self.qset,
+                          'question_set': self.qset.id,
                           'survey': self.survey.id}
         User.objects.create_user(
             username='useless', email='demo4@kant.com', password='I_Suck')
@@ -36,7 +37,17 @@ class IndicatorViewTest(BaseTest):
         self.assertIn(response.context['button_label'], "Create")
         self.assertIn(response.context['action'], reverse('new_indicator_page'))
 
-    def test_post_indicator_creates_an_indicator_and_returns_success(self):
+    def test_post_indicator_with_incomplete_params_does_not_create(self):
+        data = self.form_data.copy()
+        del data['survey']
+        self.failIf(Indicator.objects.filter(**data))
+        another_survey = Survey.objects.create(name="Education survey")
+        data['survey'] = another_survey.id
+        response = self.client.post(reverse('new_indicator_page'), data=data)
+        error_message = "Indicator was not created."
+        self.assertIn(error_message, response.content)
+
+    def test_post_indicator_with_incomplete_params_does_not_create(self):
         data = self.form_data.copy()
         del data['survey']
         self.failIf(Indicator.objects.filter(**data))

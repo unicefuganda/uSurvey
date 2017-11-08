@@ -5,9 +5,7 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.shortcuts import render, get_object_or_404
 from django.core.urlresolvers import reverse
 from survey.models import EnumerationArea, LocationType, Location
-from survey.forms.enumeration_area import EnumerationAreaForm,\
-    LocationsFilterForm
-from survey.services.ea_upload import UploadEACSVLayoutHelper
+from survey.forms.enumeration_area import EnumerationAreaForm, LocationsFilterForm
 from django_rq import job
 import json
 from survey.utils.query_helper import get_filterset

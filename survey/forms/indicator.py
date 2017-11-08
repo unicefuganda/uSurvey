@@ -83,8 +83,7 @@ class IndicatorForm(ModelForm, FormOrderMixin):
         return self.cleaned_data
 
     def clean_formulae(self):
-        variable_ids = self.data.getlist(
-            'variables') or self.data.getlist('variables[]')
+        variable_ids = self.data.getlist('variables') or self.data.getlist('variables[]')
         selected_vars = IndicatorVariable.objects.filter(id__in=variable_ids)
         try:
             _validate_formulae(self.cleaned_data['formulae'], selected_vars)

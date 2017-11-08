@@ -52,28 +52,6 @@ urlpatterns = patterns(
         r'^success-story/delete/(?P<id>\d+)/$',
         'survey.views.home_page.success_story_delete',
         name='success_story_delete'),
-    # """
-    # url(
-    #     r'^locations/hierarchy/add/$',
-    #     'survey.views.location_hierarchy.add',
-    #     name='add_location_hierarchy'),
-    # url(
-    #     r'^locations/upload/$',
-    #     'survey.views.location_hierarchy.upload',
-    #     name='upload_locations'),
-    # """
-    url(
-        r'^locations/weights/upload/$',
-        'survey.views.location_weights.upload',
-        name='upload_weights'),
-    url(
-        r'^locations/weights/$',
-        'survey.views.location_weights.list_weights',
-        name='list_weights_page'),
-    url(
-        r'^locations/weights/error_logs/$',
-        'survey.views.location_weights.error_logs',
-        name='weights_error_logs_page'),
     url(
         r'^locations/(?P<location_id>\d+)/children',
         'survey.views.locations.children',

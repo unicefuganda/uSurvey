@@ -20,7 +20,7 @@ from survey.models.access_channels import InterviewerAccess, ODKAccess, USSDAcce
 from survey.models.location_weight import LocationWeight
 # from survey.models.locations import LocationAutoComplete, LocationCode
 from survey.models.surveys import Survey, BatchCommencement
-from survey.models.upload_error_logs import UploadErrorLog
+#from survey.models.upload_error_logs import UploadErrorLog
 from survey.models.users import UserProfile
 from survey.models.question_module import QuestionModule
 from survey.models.indicators import Indicator, IndicatorVariableCriteria, IndicatorVariable

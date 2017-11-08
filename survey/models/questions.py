@@ -85,6 +85,7 @@ class Question(CloneableMixin, GenericQuestion):
         resulting_flow = None
         for flow in flows:
             if flow.validation_test:
+
                 test_values = [arg.param for arg in flow.text_arguments]
                 if getattr(
                         answer_class,

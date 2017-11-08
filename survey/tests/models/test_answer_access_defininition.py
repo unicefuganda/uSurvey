@@ -5,6 +5,7 @@ from survey.tests.base_test import BaseTest
 class TestAnswerAccessDefinition(BaseTest):
 
     def test_reload_answer_access(self):
+        AnswerAccessDefinition.objects.all().delete()
         self.assertEquals(AnswerAccessDefinition.objects.count(), 0)
         AnswerAccessDefinition.reload_answer_categories()
         self.assertTrue(AnswerAccessDefinition.objects.count() > 0)
