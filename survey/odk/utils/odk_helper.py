@@ -278,30 +278,14 @@ def disposition_ext_and_date(name, extension, show_date=True):
 
 
 def response_with_mimetype_and_name(
-        mimetype, name, extension=None, show_date=True, file_path=None,
+        mimetype, name, extension=None, show_date=True,
         use_local_filesystem=False, full_mime=False):
     if extension is None:
         extension = mimetype
     if not full_mime:
         mimetype = "application/%s" % mimetype
-    if file_path:
-        try:
-            if not use_local_filesystem:
-                default_storage = get_storage_class()()
-                wrapper = FileWrapper(default_storage.open(file_path))
-                response = StreamingHttpResponse(wrapper, mimetype=mimetype)
-                response['Content-Length'] = default_storage.size(file_path)
-            else:
-                wrapper = FileWrapper(open(file_path))
-                response = StreamingHttpResponse(wrapper, mimetype=mimetype)
-                response['Content-Length'] = os.path.getsize(file_path)
-        except IOError:
-            response = HttpResponseNotFound(
-                _(u"The requested file could not be found."))
-    else:
-        response = HttpResponse(content_type=mimetype)
-    response['Content-Disposition'] = disposition_ext_and_date(
-        name, extension, show_date)
+    response = HttpResponse(content_type=mimetype)
+    response['Content-Disposition'] = disposition_ext_and_date(name, extension, show_date)
     return response
 
 
@@ -393,7 +377,7 @@ def http_digest_interviewer_auth(func):
                         return func(request, *args, **kwargs)
             except ODKAccess.DoesNotExist:
                 return OpenRosaResponseNotFound()
-            except ValueError, err:
+            except Exception, err:
                 return OpenRosaResponseBadRequest()
         response = HttpResponseNotAuthorized()
         response['www-authenticate'] = digestor.get_digest_challenge()

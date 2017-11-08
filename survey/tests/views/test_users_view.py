@@ -7,6 +7,7 @@ from survey.models.users import UserProfile
 from survey.tests.base_test import BaseTest
 from survey.forms.users import UserForm, EditUserForm
 
+
 class UsersViewTest(BaseTest):
 
     def setUp(self):

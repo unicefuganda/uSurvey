@@ -517,8 +517,6 @@ class QuestionSet(CloneableMixin, BaseModel):   # can be qset, listing, responde
             if flows.exists():
                 # now clone all flows for this batch.
                 treated = {}
-                flows = QuestionFlow.objects.filter(
-                    question__qset__id=old_batch.id)
                 for flow in flows:
                     # except for the first question, every other is a next
                     # question
@@ -526,10 +524,7 @@ class QuestionSet(CloneableMixin, BaseModel):   # can be qset, listing, responde
                     old_question_id = question.id
                     question = treated.get(question.identifier, None)
                     if question is None:
-                        question = Question.get(
-                            pk=flow.question.pk).clone(
-                            attrs={
-                                'qset': batch})
+                        question = Question.get(pk=flow.question.pk).clone(attrs={'qset': batch})
                         for option in flow.question.options.all():
                             # to do, appearantly clone question_opt not workng
                             QuestionOption.objects.create(
@@ -599,20 +594,6 @@ def last_inline(question, flows):
         return last_inline(qflow.next_question, flows)
     except QuestionFlow.DoesNotExist:
         return question
-
-
-def first_inline_flow_with_desc(question, desc):
-    try:
-        if question.flows.filter(desc=desc).exists():
-            return question.flows.get(desc=desc)
-        if question.connecting_flows.filter(desc=desc).exists():
-            return None
-        iflow = question.flows.get(
-            validation__isnull=True,
-            next_question__isnull=False)
-        return first_inline_flow_with_desc(iflow.next_question, desc)
-    except QuestionFlow.DoesNotExist:
-        return None
 
 
 def inline_questions(question, flows):

@@ -814,16 +814,3 @@ urlpatterns = patterns(
         name='empty_page')
     )
 
-"""
-if not settings.PRODUCTION:
-    urlpatterns += (
-        url(
-            r'^api/create_interviewer',
-            'survey.views.api.create_interviewer',
-            name='create_interviewer'),
-        url(
-            r'^api/delete_interviewer',
-            'survey.views.api.delete_interviewer',
-            name='delete_interviewer'),
-    )
-"""

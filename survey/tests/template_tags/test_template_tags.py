@@ -8,9 +8,10 @@ from django.test import TestCase
 from survey.models import *
 from survey.models.locations import *
 from survey.templatetags.template_tags import *
-from survey.views.location_widget import LocationWidget
 from survey.models.questions import *
-from survey.models.respondents import RespondentGroupCondition,GroupTestArgument,ParameterQuestion,SurveyParameterList,RespondentGroup,ParameterTemplate
+from survey.models.respondents import (RespondentGroupCondition, GroupTestArgument,
+                                       ParameterQuestion, SurveyParameterList, RespondentGroup,
+                                       ParameterTemplate)
 
 
 class TemplateTagsTest(TestCase):
@@ -109,26 +110,6 @@ class TemplateTagsTest(TestCase):
     def test_replace(self):
         str = " world"
         self.assertEqual("helloworld", replace_space(str, "hello"))
-
-    def test_is_location_selected(self):        
-        country = LocationType.objects.create(name="Country2", slug='country2')
-        district = LocationType.objects.create(
-            name="District2", parent=country, slug='district2')
-        uganda = Location.objects.create(name="Uganda1", type=country)
-
-        kisasi = Location.objects.create(
-            name='Kisaasi2', type=district, parent=uganda)
-
-        ea1 = EnumerationArea.objects.create(name="EA Kisasi112")
-        ea2 = EnumerationArea.objects.create(name="EA Kisasi122")
-        ea1.locations.add(kisasi)
-        ea2.locations.add(kisasi)
-
-        location_widget = LocationWidget(selected_location=kisasi, ea=ea1)
-        # self.assertEqual("selected='selected'", is_location_selected(location_widget, uganda))
-        self.assertEqual(is_location_selected(location_widget, uganda), None)
-
-    
 
     def test_should_return_concatenated_ints_in_a_single_string(self):
         self.assertEqual('1, 2', add_string(1, 2))

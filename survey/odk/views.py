@@ -52,8 +52,6 @@ from django.utils.translation import ugettext as _
 from django.contrib.sites.models import Site
 from survey.utils.query_helper import get_filterset
 from survey.models import BatchLocationStatus
-from survey.interviewer_configs import LEVEL_OF_EDUCATION,\
-    NUMBER_OF_HOUSEHOLD_PER_INTERVIEWER
 from collections import OrderedDict
 
 
@@ -140,7 +138,6 @@ def download_odk_submissions(request, submission_id):
         pk=submission_id,
         ea__in=[a.allocation_ea for a in interviewer.unfinished_assignments],
     )
-
     response = BaseOpenRosaResponse(submission.xml)
     response.status_code = 200
     return response
@@ -250,12 +247,8 @@ def _get_qset_response(request, interviewer, assignments, qset, ea_samples={}):
                 "id_string": form_id},
             audit,
             request)
-        response = response_with_mimetype_and_name(
-            'xml', '-'.join([
-                qset.verbose_name(),
-                str(survey.pk)]),
-            show_date=False,
-            full_mime='text/xml')
+        response = response_with_mimetype_and_name('xml', '-'.join([qset.verbose_name(), str(survey.pk)]),
+                                                   show_date=False, full_mime='text/xml')
         response.content = qset_xform
     return response
 
