@@ -180,6 +180,7 @@ def add_logic(request, qset_id, question_id):
     response = None
     cancel_url = '../'
     logic_form = LogicForm(question)
+    print logic_form
     question_rules_for_batch = {}
 #     question_rules_for_batch[question] = question.rules_for_batch(batch)
     if request.method == "POST":
