@@ -36,6 +36,7 @@ services:
     volumes:
       - ._docker_mapf:/src/survey/static/map_resources
 
+
   db:
     environment:
       # pls replace with your own values

@@ -620,8 +620,8 @@ class MultiChoiceAnswer(Answer):
                 answer = question.options.get(order=answer)
             else:
                 answer = question.options.get(text__iexact=answer)
-        except BaseException:
-            pass
+        except BaseException, ex:
+            raise ex
         return super(
             MultiChoiceAnswer,
             cls).create(

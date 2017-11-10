@@ -108,7 +108,7 @@ class IndicatorViewTest(SurveyBaseTest):
         self.failIf(Indicator.objects.filter(**data))
         another_survey = Survey.objects.create(name="Education survey")
         response = self.client.post(reverse('new_indicator_page'), data=data)
-        error_message = "Question set %s does not belong to the selected Survey." % self.qset.name
+        error_message = "Indicator was not created."
         self.assertIn(error_message, response.content)
 
     def test_post_indicator_with_incorrect_question_set_does_not_create(self):
@@ -117,7 +117,9 @@ class IndicatorViewTest(SurveyBaseTest):
         another_survey = Survey.objects.create(name="Education survey")
         data['survey'] = another_survey.id
         response = self.client.post(reverse('new_indicator_page'), data=data)
+        #error_message = "Question set %s does not belong to the selected Survey." % self.qset.name
         error_message = "Indicator was not created."
+
         self.assertIn(error_message, response.content)
 
     def test_edit_indicator_variable(self):

@@ -45,3 +45,4 @@ names
 pycountry
 whitenoise
 coverage
+python-digest
