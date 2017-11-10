@@ -807,6 +807,50 @@ class SetQuestionViewTest(BaseTest):
         response = self.client.get(url)
         self.assertIn(response.status_code, [404])
 
+    def test_qset_edit_question_page(self):
+        listing_form = ListingTemplate.objects.create(name='lz3', description='desc1')
+        kwargs = {'name': 'sz3', 'description': 'survey description demo12',
+                          'has_sampling': True, 'sample_size': 10,'listing_form_id':listing_form.id}
+        survey_obj = Survey.objects.create(**kwargs)
+        batch_obj = Batch.objects.create(name='bz3',description='d1', survey=survey_obj)
+        qset = QuestionSet.get(id=batch_obj.id)
+        question1 = mommy.make(Question, qset=qset, answer_type=NumericalAnswer.choice_name())
+        question2 = mommy.make(Question, qset=qset, answer_type=NumericalAnswer.choice_name())
+        url = reverse('qset_edit_question_page', kwargs={"question_id":question1.id})
+        response = self.client.get(url)
+        templates = [ template.name for template in response.templates ]
+        self.assertIn('set_questions/new.html', templates)
+
+    def test_json_create_response_validation(self):
+        rsp_form = {
+            "min" :2,
+            "max" :3,
+            "value":3,
+            "validation_test" : 'equals'
+        }
+        url = reverse('json_create_response_validation')
+        response = self.client.post(url, data=rsp_form)
+        self.assertIn(response.status_code, [200, 302])
+        expcted_ouput = {"success": True, "created": {"text": "equals: 3", "id": 2}}
+        self.assertEquals(json.loads(response.content), expcted_ouput)
+        rsp_form = {
+            "min" :'fd',
+            "max" :'esdfds',
+            "value":3,
+            "validation_test" : '0'
+        }
+
+        url = reverse('json_create_response_validation')
+        expcted_ouput= {"success": False, "error": {"__all__": ["unsupported validator defined on test question"], "validation_test": ["Select a valid choice. 0 is not one of the available choices."]}}
+        response = self.client.post(url, data=rsp_form)
+        self.assertIn(response.status_code, [200, 302])
+        self.assertEquals(json.loads(response.content), expcted_ouput)
+
+        url = reverse('json_create_response_validation')
+        response = self.client.get(url)
+        self.assertIn(response.status_code, [200, 302])
+        expcted_ouput = {}
+        self.assertEquals(json.loads(response.content), expcted_ouput)
 
 
 

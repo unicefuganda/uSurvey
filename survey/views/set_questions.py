@@ -315,8 +315,8 @@ def json_create_response_validation(request):
             response_validation = response_validation_form.save()
             return JsonResponse({'success': True, 'created': {'id': response_validation.id,
                                                               'text': str(response_validation)}})
-        elif response_validation_form.errors:
-            return JsonResponse({'success': False, 'error': response_validation_form.errors[0]})
+        else:
+            return JsonResponse({'success': False, 'error': response_validation_form.errors})
     return JsonResponse({})
 
 
