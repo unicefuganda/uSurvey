@@ -15,12 +15,8 @@ from survey.forms.form_helper import Icons
 
 
 class IndicatorForm(ModelForm, FormOrderMixin):
-    survey = forms.ModelChoiceField(
-        queryset=Survey.objects.all(),
-        empty_label='Select Survey')
-    question_set = forms.ModelChoiceField(
-        queryset=QuestionSet.objects.none(),
-        empty_label='Select Question set')
+    survey = forms.ModelChoiceField(queryset=Survey.objects.all(), empty_label='Select Survey')
+    question_set = forms.ModelChoiceField(queryset=QuestionSet.objects.none(), empty_label='Select Question set')
     variables = forms.ModelMultipleChoiceField(queryset=IndicatorVariable.objects.none())
 
     def __init__(self, *args, **kwargs):
@@ -50,8 +46,7 @@ class IndicatorForm(ModelForm, FormOrderMixin):
                     'data-target': "#remove-selected-variable",
                     'id': 'delete_variable',
                     'title': 'Delete Variable'}}
-        self.fields['formulae'].icons = {
-            'check': {'id': 'validate', 'title': 'Validate'}, }
+        self.fields['formulae'].icons = {'check': {'id': 'validate', 'title': 'Validate'}, }
         if self.data.get('survey'):
             self.fields['question_set'].queryset = Survey.get(
                 pk=self.data['survey']).qsets
@@ -217,93 +212,6 @@ class IndicatorVariableForm(ModelForm, FormOrderMixin):
         return variable
 
 
-# to do: tidy this up later
-class IndicatorCriteriaForm(ModelForm, FormOrderMixin):
-    min = forms.IntegerField(required=False)
-    max = forms.IntegerField(required=False)
-    value = forms.CharField(required=False)
-    options = forms.ChoiceField(choices=[], required=False)
-    CHOICES = [('', '---- Select ----')]
-    CHOICES.extend(IndicatorVariableCriteria.VALIDATION_TESTS)
-    validation_test = forms.ChoiceField(choices=CHOICES,
-                                        label='Operator')
-    test_question = forms.ModelChoiceField(queryset=Question.objects.none())
-
-    def __init__(self, variable, *args, **kwargs):
-        super(IndicatorCriteriaForm, self).__init__(*args, **kwargs)
-        self.variable = variable
-        self.order_fields(['description',
-                           'test_question',
-                           'validation_test',
-                           'options',
-                           'value',
-                           'min',
-                           'max'])
-        if variable.indicator:
-            self.fields['test_question'].queryset = Question.objects.filter(
-                pk__in=[q.pk for q in variable.indicator.batch.all_questions])
-        if self.data.get('test_question', []):
-            options = QuestionOption.objects.filter(
-                question__pk=self.data['test_question'])
-            self.fields['options'].choices = [
-                (opt.order, opt.text) for opt in options]
-
-    class Meta:
-        model = IndicatorVariableCriteria
-        exclude = ['variable', ]
-        widgets = {
-            'description': forms.Textarea(
-                attrs={
-                    "rows": 2,
-                    "cols": 100}),
-        }
-
-    def clean(self):
-        validation_test = self.cleaned_data.get('validation_test', None)
-        test_question = self.cleaned_data.get('test_question', None)
-        if validation_test is None or test_question is None:
-            return self.cleaned_data
-        answer_class = Answer.get_class(test_question.answer_type)
-        method = getattr(answer_class, validation_test, None)
-        if method is None:
-            raise forms.ValidationError(
-                'unsupported validator defined on test question')
-        if validation_test == 'between':
-            if self.cleaned_data.get(
-                    'min', False) is False or self.cleaned_data.get(
-                    'max', False) is False:
-                raise forms.ValidationError(
-                    'min and max values required for between condition')
-        elif self.cleaned_data.get('value', False) is False:
-            raise forms.ValidationError(
-                'Value is required for %s' %
-                validation_test)
-        if test_question.answer_type in [
-                MultiChoiceAnswer.choice_name(),
-                MultiSelectAnswer]:
-            if self.cleaned_data.get('options', False) is False:
-                raise forms.ValidationError(
-                    'No option selected for %s' %
-                    test_question.identifier)
-            self.cleaned_data['value'] = self.cleaned_data['options']
-        return self.cleaned_data
-
-    def save(self, *args, **kwargs):
-        criteria = super(IndicatorCriteriaForm, self).save(commit=False)
-        criteria.variable = self.variable
-        criteria.save()
-        validation_test = self.cleaned_data.get('validation_test', None)
-        if validation_test == 'between':
-            criteria.arguments.create(
-                position=0, param=self.cleaned_data['min'])
-            criteria.arguments.create(
-                position=1, param=self.cleaned_data['max'])
-        else:
-            criteria.arguments.create(
-                position=0, param=self.cleaned_data['value'])
-        return criteria
-
-
 class IndicatorFormulaeForm(forms.ModelForm):
 
     class Meta:
@@ -311,8 +219,7 @@ class IndicatorFormulaeForm(forms.ModelForm):
         fields = ['formulae', ]
 
     def clean_formulae(self):
-        variable_ids = self.data.getlist(
-            'variables') or self.data.getlist('variables[]')
+        variable_ids = self.data.getlist('variables') or self.data.getlist('variables[]')
         selected_vars = IndicatorVariable.objects.filter(id__in=variable_ids)
         try:
             _validate_formulae(self.cleaned_data['formulae'], selected_vars)

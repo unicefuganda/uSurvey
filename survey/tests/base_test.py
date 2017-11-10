@@ -29,6 +29,7 @@ class Base(TestCase):
     def tearDown(self):
         """Added to guarantee that the redis caches are refreshed between tests.
         Care should be taken when running on production box not to affect production keys."""
+        super(Base, self).tearDown()
         cache.clear()
 
     def mock_date_today(self, target, real_date_class=datetime.date):

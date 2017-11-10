@@ -86,9 +86,9 @@ def _process_form(indicator_filter_form, indicators):
 @permission_required('auth.can_view_batches')
 def index(request):
     indicators = Indicator.objects.all()
-    indicator_filter_form = IndicatorFilterForm(data=request.GET)
+    data = request.GET or request.POST
+    indicator_filter_form = IndicatorFilterForm(data=data)
     indicators = _process_form(indicator_filter_form, indicators)
-
     return render(request,
                   'indicator/index.html',
                   {'indicators': indicators,
@@ -99,7 +99,7 @@ def index(request):
 @permission_required('auth.can_view_batches')
 def delete(request, indicator_id):
     indicator = Indicator.objects.get(id=indicator_id)
-    indicator.indicator_criteria.all().delete()
+    indicator.variables.all().delete()
     indicator.delete()
     messages.success(request, 'Indicator successfully deleted.')
     return HttpResponseRedirect('/indicators/')
@@ -107,8 +107,7 @@ def delete(request, indicator_id):
 
 def validate_formulae(request):
     request_data = request.GET if request.method == 'GET' else request.POST
-    return JsonResponse(
-        {'valid': IndicatorFormulaeForm(data=request_data).is_valid()})
+    return JsonResponse({'valid': IndicatorFormulaeForm(data=request_data).is_valid()})
 
 
 @login_required
@@ -140,8 +139,7 @@ def _add_variable(request, indicator=None):
             if request.is_ajax() is False:
                 messages.success(request, 'Variable successfully saved.')
             return HttpResponseRedirect(
-                reverse(
-                    'edit_indicator_variable',
+                reverse('edit_indicator_variable',
                     args=(
                         variable.pk,
                     )))
@@ -166,8 +164,9 @@ def add_variable(request):
 
 
 def ajax_edit_indicator_variable(request):
+    data = request.GET or request.POST
     if request.is_ajax():
-        variable_id = request.GET.get('id')
+        variable_id = data.get('id')
         return edit_indicator_variable(request, variable_id)
 
 

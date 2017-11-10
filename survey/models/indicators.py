@@ -5,7 +5,6 @@ from asteval import Interpreter
 from django.template import Template, Context
 from django.db import models
 from django.db.models import Count
-from django.utils.datastructures import SortedDict
 from survey.models.base import BaseModel
 from survey.models.interviews import MultiChoiceAnswer, Answer
 from survey.models.surveys import Survey
@@ -88,7 +87,6 @@ class Indicator(BaseModel):
 
         @cached_as(self, base_location, extra=(report_level, ))
         def _get_data():
-            SortedDict()
             variable_names = self.active_variables()
             # options = self.parameter.options.order_by('order')
             # answer_class = Answer.get_class(self.parameter.answer_type)
@@ -203,10 +201,7 @@ class IndicatorVariableCriteria(BaseModel):
         Question,
         related_name='indicator_criteria',
         verbose_name='Filter')
-    validation_test = models.CharField(
-        max_length=200,
-        choices=VALIDATION_TESTS,
-        verbose_name='Condition')
+    validation_test = models.CharField(max_length=200, choices=VALIDATION_TESTS, verbose_name='Condition')
 
     class Meta:
         app_label = 'survey'

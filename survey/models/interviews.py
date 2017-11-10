@@ -374,24 +374,24 @@ class Answer(BaseModel):
     def between(cls, answer, lowerlmt, upperlmt):
         return upperlmt > answer >= lowerlmt
 
-    # @classmethod
-    # def get_validation_query_params(cls):
-    #     return {cls.greater_than.__name__: 'gt', cls.less_than.__name__: 'lt',
-    #             cls.starts_with.__name__: 'istartswith', cls.ends_with.__name__: 'iendswith',
-    #             cls.contains.__name__: 'icontains', cls.equals.__name__: 'iexact'}
+    @classmethod
+    def get_validation_query_params(cls):
+        return {cls.greater_than.__name__: 'gt', cls.less_than.__name__: 'lt',
+                cls.starts_with.__name__: 'istartswith', cls.ends_with.__name__: 'iendswith',
+                cls.contains.__name__: 'icontains', cls.equals.__name__: 'iexact'}
 
-    # @classmethod
-    # def get_validation_queries(cls, method_name, answer_key, *test_args, **kwargs):
-    #     namespace = kwargs.pop('namespace', '')
-    #     validation_queries = cls.get_validation_query_params()
-    #     if method_name == cls.between.__name__:         # only between takes two arguments
-    #         query_args = []
-    #         return {'%s%s__%s' % (namespace, answer_key, validation_queries[cls.less_than.__name__]): test_args[1],
-    #                 '%s%s__%s' % (namespace, answer_key,
-    #                               validation_queries[cls.greater_than.__name__]): test_args[0]
-    #                 }
-    #     else:
-    #         return {'%s%s__%s' % (namespace, answer_key, validation_queries[method_name]): test_args[0],}
+    @classmethod
+    def get_validation_queries(cls, method_name, answer_key, *test_args, **kwargs):
+        namespace = kwargs.pop('namespace', '')
+        validation_queries = cls.get_validation_query_params()
+        if method_name == cls.between.__name__:         # only between takes two arguments
+            query_args = []
+            return {'%s%s__%s' % (namespace, answer_key, validation_queries[cls.less_than.__name__]): test_args[1],
+                    '%s%s__%s' % (namespace, answer_key,
+                                  validation_queries[cls.greater_than.__name__]): test_args[0]
+                    }
+        else:
+            return {'%s%s__%s' % (namespace, answer_key, validation_queries[method_name]): test_args[0],}
     # 
     # @classmethod
     # def __getattr__(cls, name):
