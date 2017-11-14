@@ -17,12 +17,6 @@ from survey.models.respondents import (RespondentGroupCondition, GroupTestArgume
 class TemplateTagsTest(TestCase):
 
     def setUp(self):
-        # self.client = Client()
-        # user_without_permission = User.objects.create_user(username='useless', email='demo12@kant.com',
-        #                                                    password='I_Suck')
-        # raj = self.assign_permission_to(User.objects.create_user('demo12', 'demo12@kant.com', 'demo12'),
-        #                                 'can_view_batches')
-        # self.client.login(username='demo12', password='demo12')
         self.survey = mommy.make(Survey)
         self.batch = mommy.make(Batch, survey=self.survey)
         self.qset = QuestionSet.get(pk=self.batch.id)
@@ -34,19 +28,35 @@ class TemplateTagsTest(TestCase):
                                                        language='Eglish', weights=0,date_of_birth='1987-01-01')
 
         self.surveyAllocation_obj = SurveyAllocation.objects.create(
-            interviewer = self.investigator,
-            survey = self.survey,
-            allocation_ea = self.ea,
-            status = 1
-
+            interviewer=self.investigator,
+            survey=self.survey,
+            allocation_ea=self.ea,
+            status=1
             )
-        self.interview =  Interview.objects.create(
-            interviewer = self.investigator,
-            ea = self.ea,
-            survey = self.survey,
-            question_set = self.qset,
+        self.interview = Interview.objects.create(
+            interviewer=self.investigator,
+            ea=self.ea,
+            survey=self.survey,
+            question_set=self.qset,
             )
         self.listingsample = ListingSample.objects.create(survey=self.survey, interview=self.interview)
+
+    def test_get_value(self):
+        class A(object):
+            b = 5
+        a = A()
+        self.assertEquals(get_value(a, 'b'), 5)
+        a = {'c': 7}
+        self.assertEquals(get_value(a, 'b'), 7)
+
+    def test_show_flow_condition(self):
+        # flow without validation
+        flow = mommy.make(QuestionFlow, question=self.question)
+        self.assertEquals(show_condition(flow), '')
+        validation = mommy.make(ResponseValidation, validation_test=NumericalAnswer.equals.__name__)
+        text_argument = mommy.make(TextArgument, validation=validation, position=1, param=1)
+        flow.validation = validation
+        self.assertIn(flow.validation.validation_test, show_condition(flow))
 
     def test_modulo_understands_number_is_modulo_of_another(self):
         self.assertTrue(modulo(4, 2))
@@ -102,11 +112,11 @@ class TemplateTagsTest(TestCase):
         self.assertEqual('/surveys/1/batches/2/',
                          get_url_with_ids("1, 2", 'batch_show_page'))
 
-    
     def test_current(self):
         l= [1,2]
         self.assertEqual(1,current(l,0))
         self.assertEqual(None,current(l,10))
+
     def test_replace(self):
         str = " world"
         self.assertEqual("helloworld", replace_space(str, "hello"))
@@ -118,6 +128,7 @@ class TemplateTagsTest(TestCase):
     def test_concat_strings(self):
         arg = "abc"
         self.assertEqual('abc', arg)
+
     def test_condition_text(self):        
         self.assertEqual('EQUALS', condition_text('EQUALS'))
         self.assertEqual('', condition_text('abv'))
@@ -180,9 +191,6 @@ class TemplateTagsTest(TestCase):
         self.assertEqual(None, non_response_is_activefor(
             all_open_locations, kampala))
 
-    def setUp(self):
-        LocationType.objects.create()
-
     def test_knows_ea_is_selected_given_location_data(self):
         country = LocationType.objects.create(name="Country", slug='country')
         district = LocationType.objects.create(
@@ -210,9 +218,6 @@ class TemplateTagsTest(TestCase):
         ea2 = EnumerationArea.objects.create(name="EA Kisasi12")
         ea1.locations.add(kisasi)
         ea2.locations.add(kisasi)
-
-        location_widget = LocationWidget(selected_location=kisasi, ea=ea1)
-        self.assertIsNone(is_location_selected(location_widget, ea1))
 
     def test_batch_is_selected(self):
         batch = Batch.objects.create(order=1, name="Batch name")
@@ -242,12 +247,15 @@ class TemplateTagsTest(TestCase):
                          is_batch_open_for_location(open_locations, kampala))
 
     def test_condition(self):
-        condition = RespondentGroupCondition.objects.create(validation_test="EQUALS",respondent_group_id   =1,test_question_id=1)
+        condition = RespondentGroupCondition.objects.create(validation_test="EQUALS",
+                                                            respondent_group_id=1,test_question_id=1)
         self.assertEqual("EQUALS", condition.validation_test)
 
     def test_quest_validation_opts(self):
         batch = Batch.objects.create(order=1, name="Batch name")        
-        condition = RespondentGroupCondition.objects.create(validation_test="EQUALS",respondent_group_id   =1,test_question_id=1)
+        condition = RespondentGroupCondition.objects.create(validation_test="EQUALS",
+                                                            respondent_group_id=1,
+                                                            test_question_id=1)
 
     def test_ancestors_reversed_reversed(self):
         country = LocationType.objects.create(name='Country', slug='country')
@@ -257,31 +265,22 @@ class TemplateTagsTest(TestCase):
         village = LocationType.objects.create(name='Village', slug='village')
         subcounty = LocationType.objects.create(
             name='Subcounty', slug='subcounty')
-
         africa = Location.objects.create(name='Africa', type=country)
-        
-
         uganda = Location.objects.create(
             name='Uganda', type=region, parent=africa)
-
         abim = Location.objects.create(name='ABIM', parent=uganda, type=city)
-
         abim_son = Location.objects.create(
             name='LABWOR', parent=abim, type=parish)
-
         abim_son_son = Location.objects.create(
             name='KALAKALA', parent=abim_son, type=village)
         abim_son_daughter = Location.objects.create(
             name='OYARO', parent=abim_son, type=village)
-
         abim_son_daughter_daughter = Location.objects.create(
             name='WIAWER', parent=abim_son_daughter, type=subcounty)
-
         abim_son_son_daughter = Location.objects.create(
             name='ATUNGA', parent=abim_son_son, type=subcounty)
         abim_son_son_son = Location.objects.create(
             name='WICERE', parent=abim_son_son, type=subcounty)
-
         self.assertEqual([], ancestors_reversed(africa))
         self.assertEqual([africa], ancestors_reversed(uganda))
         self.assertEqual([africa, uganda], ancestors_reversed(abim))
@@ -290,6 +289,7 @@ class TemplateTagsTest(TestCase):
                          ancestors_reversed(abim_son_son))
         self.assertEqual([africa, uganda, abim, abim_son,
                           abim_son_son], ancestors_reversed(abim_son_son_son))
+
     def test_trim(self):
         str1 = "survey_test"
         self.assertEquals(str1.strip(), trim(str1))

@@ -30,9 +30,9 @@ class QuestionModelTest(SurveyBaseTest):
         self.assertEquals(QuestionSet.get(pk=self.batch.pk).__class__, Batch)
         self.assertEquals(QuestionSet.get(pk=self.survey.listing_form.pk).__class__, ListingTemplate)
 
-    def test_e_qset_gets_correct_questionset_type(self):
-        self.assertEquals(self.batch_question.e_qset.__class__, Batch)
-        self.assertEquals(self.listing_question.e_qset.__class__, ListingTemplate)
+ #   def test_e_qset_gets_correct_questionset_type(self):
+ #       self.assertEquals(self.batch_question.e_qset.__class__, Batch)
+ #       self.assertEquals(self.listing_question.e_qset.__class__, ListingTemplate)
 
     # def test_
 
