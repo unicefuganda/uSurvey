@@ -229,6 +229,7 @@ def get_question_form(model_class):
 
         def save(self, commit=True, zombie=False, **kwargs):
             question = super(QuestionForm, self).save(commit=False)
+            qset = question.qset
             if commit:
                 if question.pk is None:
                     question.save()
