@@ -1,5 +1,7 @@
 __author__ = 'antsmc2'
 import time
+from zipfile import ZipFile
+from StringIO import StringIO
 from django.core.files.uploadedfile import SimpleUploadedFile
 from lxml import etree
 import python_digest
@@ -17,7 +19,7 @@ from survey.models import (InterviewerAccess, ODKAccess, USSDAccess, Interview, 
 from survey.forms.question import get_question_form
 # import all question types
 from survey.models import (Answer, NumericalAnswer, TextAnswer, MultiChoiceAnswer, MultiSelectAnswer, GeopointAnswer,
-                           ImageAnswer, AudioAnswer, VideoAnswer, DateAnswer, AutoResponse)
+                           ImageAnswer, AudioAnswer, VideoAnswer, DateAnswer, AutoResponse, Attachment)
 from survey.tests.models.survey_base_test import SurveyBaseTest
 
 
@@ -131,9 +133,45 @@ class ODKTest(SurveyBaseTest):
                    'answer1': answer1, 'answer2': answer2, 'answer3': answer3, 'answer4': answer4}
         return completed % context
 
+    def _get_completed_xform2(self, answer1, answer2, answer3, answer4, answer5, answer6, answer7,
+                              answer8, answer9, answer10):
+        completed = b'''<qset id="%(qset)s" >
+                         <meta>
+                            <instanceID>%(instance_id)s</instanceID>
+                            <instanceName>%(instance_id)s-Name</instanceName>
+                        <creationDate />
+                        <locked />
+                         </meta>
+                         <submissions>
+                             <id />
+                             <dates>
+                                 <lastModified />
+                             </dates>
+                         </submissions>
+                           <surveyAllocation>%(survey_allocation)s</surveyAllocation>
+                           <qset1>
+                            <questions>
+                                <groupQuestions></groupQuestions>
+                                <surveyQuestions>
+                                    <q1>%(answer1)s</q1><q2>%(answer2)s</q2><q3>%(answer3)s</q3><q4>%(answer4)s</q4>
+                                    <q5>%(answer5)s</q5><q6>%(answer6)s</q6><q7>%(answer7)s</q7><q8>%(answer8)s</q8>
+                                    <q9>%(answer9)s</q9><q10>%(answer10)s</q10>
+                                </surveyQuestions>
+                            </questions>
+                           </qset1>
+                       </qset>
+                       '''
+        context = {'qset': self.qset.id, 'instance_id': random.randint(0, 1000),
+                   'survey_allocation': self.survey_allocation.allocation_ea.name.encode('utf8'),
+                   'answer1': answer1, 'answer2': answer2, 'answer3': answer3, 'answer4': answer4,
+                   'answer5': answer5, 'answer6': answer6, 'answer7': answer7, 'answer8': answer8,
+                   'answer9': answer9, 'answer10': answer10, }
+        return completed % context
+
     def test_submit_xform(self):
-        self._save_ussd_compatible_questions()
+        self._create_ussd_non_group_questions(self.qset)
         xml = self._get_completed_xform('2', 'James', 'Y', '1')
+        # import pdb; pdb.set_trace()
         f = SimpleUploadedFile("surveyfile.xml", xml)
         url = reverse('odk_submit_forms')
         response = self._make_odk_request(url=url, data={'xml_submission_file': f}, raw=True)
@@ -182,10 +220,58 @@ class ODKTest(SurveyBaseTest):
         # this field is only included when updating instances
         self.assertEquals(tree.xpath('//qset/submissions/id')[0].text, str(submission.id))
 
+    def test_submit_xform_with_file_form(self):
+        import os
+        self._create_test_non_group_questions(self.qset)
+        BASE_DIR = os.path.dirname(__file__)
+        image_path = os.path.join(BASE_DIR, 'testimage')
+        video_path = os.path.join(BASE_DIR, 'testvideo')
+        audio_path = os.path.join(BASE_DIR, 'testaudio')
+        with open(image_path) as fi, open(video_path) as fv, open(audio_path) as fa:
+            fi_name = os.path.basename(fi.name)
+            fa_name = os.path.basename(fa.name)
+            fv_name = os.path.basename(fv.name)
+            fi_content = fi.read()
+            fa_content = fa.read()
+            fv_content = fv.read()
+            answers = ('2', 'James', 'Y', '1', ['Y', 'MB'], '31-08-2017', '12.8 8.0 8 7', fi_name, fa_name, fv_name)
+            xml = self._get_completed_xform2(*answers)
+            f = SimpleUploadedFile("surveyfile.xml", xml)
+            sfi = SimpleUploadedFile(fi_name, fi_content)
+            sfa = SimpleUploadedFile(fa_name, fa_content)
+            sfv = SimpleUploadedFile(fv_name, fv_content)
+            url = reverse('odk_submit_forms')
+            response = self._make_odk_request(url=url, data={'xml_submission_file': f,
+                                                             fi_name: sfi, fa_name: sfa,
+                                                             fv_name: sfv}, raw=True)
+            self.assertTrue(300 > response.status_code and response.status_code >= 200)
+            self.assertEquals(ODKSubmission.objects.count(), 1)
+            self.assertEquals(Attachment.objects.count(), 3)
+            # not confirm that 4 responses were given
+            self.assertEquals(Answer.objects.count(), len(answers))
+            # now test the instances listpage
+            submission = ODKSubmission.objects.first()
+            url = reverse('download_submission_attachment', args=(submission.pk,))
+            # check all the if the
+            raj = self.assign_permission_to(User.objects.create_user('Rajni', 'rajni@kant.com', 'I_Rock'),
+                                            'can_view_aggregates')
+            client = Client()
+            client.login(username='Rajni', password='I_Rock')
+            response = client.get(url)
+            self.assertEquals(response._headers['content-type'][1], 'application/zip')
+            extracted = self._extract_zip(response.content)
+            # check instances list on ODK
+            for key, extracted_content in extracted.items():
+                # doing checks this way because we're compressing entire directory
+                # filename may have a random pre/appender to it
+                if fi_name in key:
+                    self.assertEquals(extracted_content, fi_content)   # fake image
+                if fa_name in key:
+                    self.assertEquals(extracted_content, fa_content)   # fake audio
+                if fv_name in key:
+                    self.assertEquals(extracted_content, fv_content)   # fake video
 
-
-
-
-
-
-
+    def _extract_zip(self, input_content):
+        input_zip = StringIO(input_content)
+        input_zip = ZipFile(input_zip)
+        return {name: input_zip.read(name) for name in input_zip.namelist()}

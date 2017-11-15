@@ -1,34 +1,33 @@
 <?xml version='1.0' encoding='UTF-8' ?>
 <xforms xmlns="http://openrosa.org/xforms/xformsList">
-    {% if survey.is_open %}
-        {% load template_tags %}
-        {% can_start_survey interviewer as can_start %}
-        {% if can_start  %}
-          {% for batch in open_batches %}
-            {% get_download_url request 'download_odk_batch_form' batch as download_url %}
-              <xform>
-                <formID>{{ batch.pk }}</formID>
-                <name>{{ survey.name }} - {{ batch.name }}</name>
-                <majorMinorVersion/>
-                <version/>
-                <hash />
-                <descriptionText>{{ survey.description }} - {{ batch.description }}</descriptionText>
-                <downloadUrl>{{ download_url }}</downloadUrl>
-                <manifestUrl></manifestUrl>
-              </xform>
-          {% endfor %}
-        {% else %}
-        <xform>
-            {% get_download_url request 'download_odk_listing_form'  as listing_download_url %}
-            <formID>{{ survey.listing_form.pk }}</formID>
-            <name>{{ survey.name }} - {{ survey.listing_form.name }}</name>
+
+    {% load template_tags %}
+    {% can_start_survey interviewer as can_start %}
+    {% if survey.is_open and can_start  %}
+      {% for batch in open_batches %}
+        {% get_download_url request 'download_odk_batch_form' batch as download_url %}
+          <xform>
+            <formID>{{ batch.pk }}</formID>
+            <name>{{ survey.name }} - {{ batch.name }}</name>
             <majorMinorVersion/>
             <version/>
             <hash />
-            <descriptionText>{{ survey.description }} - {{ survey.listing_form.description }}</descriptionText>
-            <downloadUrl>{{ listing_download_url }} </downloadUrl>
+            <descriptionText>{{ survey.description }} - {{ batch.description }}</descriptionText>
+            <downloadUrl>{{ download_url }}</downloadUrl>
             <manifestUrl></manifestUrl>
-        </xform>
-        {% endif %}
+          </xform>
+      {% endfor %}
+    {% elif survey.has_sampling %} {% comment %} Enable listing regardless of open batch {% endcomment %}
+    <xform>
+        {% get_download_url request 'download_odk_listing_form'  as listing_download_url %}
+        <formID>{{ survey.listing_form.pk }}</formID>
+        <name>{{ survey.name }} - {{ survey.listing_form.name }}</name>
+        <majorMinorVersion/>
+        <version/>
+        <hash />
+        <descriptionText>{{ survey.description }} - {{ survey.listing_form.description }}</descriptionText>
+        <downloadUrl>{{ listing_download_url }} </downloadUrl>
+        <manifestUrl></manifestUrl>
+    </xform>
     {% endif %}
 </xforms>

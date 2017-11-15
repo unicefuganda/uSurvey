@@ -51,9 +51,9 @@ class ODKSubmission(BaseModel):
 
     def save_attachments(self, media_files):
         for name, f in media_files.items():
-            content_type = f.content_type if hasattr(f, 'content_type') else ''
-            attach, created = Attachment.objects.get_or_create(
-                upload_field_name=name, submission=self, media_file=f, mimetype=content_type)
+            content_type = getattr(f, 'content_type', '')
+            attach, created = Attachment.objects.get_or_create(upload_field_name=name, submission=self,
+                                                               media_file=f, mimetype=content_type)
 
     def update_submission(self):
         tree = etree.fromstring(self.xml)
@@ -96,11 +96,11 @@ class ODKSubmission(BaseModel):
 
 
 def upload_to(attachment, filename):
-    return os.path.join(
-        settings.SUBMISSION_UPLOAD_BASE,
-        attachment.submission.pk,
-        'attachments',
-        os.path.basename(filename))
+    return os.path.join(get_upload_dir(attachment.submission), os.path.basename(filename))
+
+
+def get_upload_dir(submission):
+    return os.path.join(settings.SUBMISSION_UPLOAD_BASE, str(submission.pk), 'attachments')
 
 
 class Attachment(BaseModel):

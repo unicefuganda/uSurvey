@@ -37,6 +37,7 @@ from .utils.odk_helper import (
     HttpResponseNotAuthorized,
     http_digest_interviewer_auth,
     NotEnoughData)
+from survey.models.odk_submission import get_upload_dir
 from survey.models import (
     Survey,
     Interviewer,
@@ -75,10 +76,9 @@ def get_qset_xform(interviewer, allocations, qset, ea_samples={}):
 def download_submission_attachment(request, submission_id):
     odk_submission = ODKSubmission.objects.get(pk=submission_id)
     filename = '%s-%s-%s.zip' % (odk_submission.survey.name,
-                                 odk_submission.household_member.pk,
-                                 odk_submission.interviewer.pk)
-    attachment_dir = os.path.join(
-        settings.SUBMISSION_UPLOAD_BASE, str(odk_submission.pk), 'attachments')
+                                 odk_submission.ea.name,
+                                 odk_submission.question_set.name)
+    attachment_dir = get_upload_dir(odk_submission)
     response = HttpResponse(content_type='application/zip')
     response['Content-Disposition'] = 'attachment; filename="%s"' % filename
     response.write(get_zipped_dir(attachment_dir))
@@ -305,16 +305,7 @@ def submission(request):
                       "desc": desc
                   }, {'desc': desc}, request, logging.WARNING)
         return OpenRosaRequestForbidden(desc)
-    except ValueError as err:
-        desc = str(err)
-        audit_log(Actions.SUBMISSION_REQUESTED, request.user, interviewer,
-                  _("Failed attempted to submit XML for form for interviewer: \
-                        '%(interviewer)s'. desc: '%(desc)s'") % {
-                      "interviewer": interviewer.name,
-                      "desc": desc
-                  }, {'desc': desc}, request, logging.WARNING)
-        return OpenRosaRequestForbidden(desc)
-    except Exception as ex:
+    except Exception, ex:
         audit_log(Actions.SUBMISSION_REQUESTED, request.user, interviewer,
                   _("Failed attempted to submit XML for form for interviewer:\
                         '%(interviewer)s'. desc: '%(desc)s'") % {

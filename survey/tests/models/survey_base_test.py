@@ -1,4 +1,5 @@
 from model_mommy import mommy
+import random
 from django.core.management import call_command
 from survey.tests.base_test import BaseTest
 from survey.models import (InterviewerAccess, ODKAccess, USSDAccess, Interview, Interviewer, QuestionSetChannel,
@@ -39,7 +40,7 @@ class SurveyBaseTest(BaseTest):
         data = {
             'answer_type': NumericalAnswer.choice_name(),
             'text': 'num text',
-            'identifier': 'num_identifier',
+            'identifier': 'num_identifier_%s' % random.randint(1, 100),
             'qset': qset.id
         }
         question = self._save_question(qset, data)
@@ -50,7 +51,7 @@ class SurveyBaseTest(BaseTest):
         data = {
             'answer_type': TextAnswer.choice_name(),
             'text': 'texts text',
-            'identifier': 'text_identifier',
+            'identifier': 'text_identifier_%s' % random.randint(1, 100),
             'qset': qset.id
         }
         self._save_question(qset, data)
@@ -58,7 +59,7 @@ class SurveyBaseTest(BaseTest):
         data = {
             'answer_type': MultiChoiceAnswer.choice_name(),
             'text': 'multichoice answer text',
-            'identifier': 'multi_choice_identifier',
+            'identifier': 'multi_choice_identifier_%s' % random.randint(1, 100),
             'qset': qset.id,
             'options': ['Y', 'N']
         }
@@ -67,7 +68,7 @@ class SurveyBaseTest(BaseTest):
         data = {
             'answer_type': AutoResponse.choice_name(),
             'text': 'auto answer text',
-            'identifier': 'auto_identifier',
+            'identifier': 'auto_identifier_%s' % random.randint(1, 100),
             'qset': qset.id,
         }
         self._save_question(qset, data)
@@ -80,7 +81,7 @@ class SurveyBaseTest(BaseTest):
         data = {
             'answer_type': MultiSelectAnswer.choice_name(),
             'text': 'multi select answer text',
-            'identifier': 'multi_select_identifier',
+            'identifier': 'multi_select_identifier_%s' % random.randint(1, 100),
             'qset': qset.id,
             'options': ['Y', 'N', 'MB']
         }
@@ -89,7 +90,7 @@ class SurveyBaseTest(BaseTest):
         data = {
             'answer_type': DateAnswer.choice_name(),
             'text': 'date answer text',
-            'identifier': 'date_identifier',
+            'identifier': 'date_identifier_%s' % random.randint(1, 100),
             'qset': qset.id,
         }
         self._save_question(qset, data)
@@ -97,7 +98,7 @@ class SurveyBaseTest(BaseTest):
         data = {
             'answer_type': GeopointAnswer.choice_name(),
             'text': 'geo point text',
-            'identifier': 'geo_identifier',
+            'identifier': 'geo_identifier_%s' % random.randint(1, 100),
             'qset': qset.id
         }
         self._save_question(qset, data)
@@ -105,7 +106,7 @@ class SurveyBaseTest(BaseTest):
         data = {
             'answer_type': ImageAnswer.choice_name(),
             'text': 'image answer text',
-            'identifier': 'image_identifier',
+            'identifier': 'image_identifier_%s' % random.randint(1, 100),
             'qset': qset.id
         }
         self._save_question(qset, data)
@@ -113,7 +114,7 @@ class SurveyBaseTest(BaseTest):
         data = {
             'answer_type': AudioAnswer.choice_name(),
             'text': 'audio answer text',
-            'identifier': 'audio_identifier',
+            'identifier': 'audio_identifier_%s' % random.randint(1, 100),
             'qset': qset.id
         }
         self._save_question(qset, data)
@@ -121,7 +122,7 @@ class SurveyBaseTest(BaseTest):
         data = {
             'answer_type': VideoAnswer.choice_name(),
             'text': 'video answer text',
-            'identifier': 'video_identifier',
+            'identifier': 'video_identifier_%s' % random.randint(1, 100),
             'qset': qset.id
         }
         self._save_question(qset, data)
@@ -131,6 +132,9 @@ class SurveyBaseTest(BaseTest):
         current_count = Question.objects.count()
         QuestionForm = get_question_form(BatchQuestion)
         question_form = QuestionForm(qset, data=data)
+        if question_form.is_valid() is False:
+            import pdb; pdb.set_trace()
+        self.assertTrue(question_form.is_valid())
         question = question_form.save()
         self.assertEquals(Question.objects.count(), current_count + 1)
         return question
