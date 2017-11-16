@@ -29,6 +29,9 @@ RUN mkdir /src/
 WORKDIR /src/
 ADD . /src/
 
+# create directory for odk files
+RUN mkdir /src/submissions/
+
 # setup the project
 RUN cp survey/interviewer_configs.py.example survey/interviewer_configs.py
 
