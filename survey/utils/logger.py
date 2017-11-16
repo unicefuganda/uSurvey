@@ -5,7 +5,7 @@ from django.conf import settings
 from logging import handlers
 
 LOG_ROTATE = 'midnight'
-BASE_DIR = settings.BASE_DIR
+BASE_DIR = settings.LOG_DIR
 formatter = logging.Formatter('[%(asctime)s] %(levelname)s %(message)s')
 log_level = logging.DEBUG if settings.DEBUG else logging.INFO
 

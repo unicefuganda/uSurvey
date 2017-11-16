@@ -17,7 +17,7 @@ from survey.models import (Survey, Interviewer, Interview, SurveyAllocation, ODK
                            Question, Batch, ODKSubmission, ODKGeoPoint, TextAnswer, Answer, NonResponseAnswer,
                            VideoAnswer, AudioAnswer, ImageAnswer, MultiSelectAnswer, MultiChoiceAnswer, DateAnswer,
                            GeopointAnswer, ListingSample)
-from survey.odk.utils.log import logger
+from survey.utils.logger import glogger as logger
 from functools import wraps
 from survey.utils.zip import InMemoryZip
 from django.contrib.sites.models import Site

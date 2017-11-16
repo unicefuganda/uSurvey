@@ -19,7 +19,8 @@ from django.core.urlresolvers import reverse
 from django.core.exceptions import PermissionDenied
 from django.conf import settings
 from django.template import RequestContext, loader, Context
-from .utils.log import audit_log, Actions, logger
+from .utils.log import audit_log, Actions
+from survey.utils.logger import glogger as logger
 from .utils.odk_helper import (
     get_survey_allocation,
     process_submission,
@@ -270,6 +271,7 @@ def submission(request):
             return OpenRosaResponseBadRequest(
                 u"There should be a single XML submission file.")
         media_files = request.FILES
+        logger.info('submission from: %s-%s' % (interviewer.name, interviewer.id))
         submission_report = process_submission(interviewer, xml_file_list[0], media_files=media_files)
         logger.info(submission_report)
         context = Context({
@@ -295,6 +297,7 @@ def submission(request):
         response = BaseOpenRosaResponse(t.render(context))
         response.status_code = 201
         response['Location'] = request.build_absolute_uri(request.path)
+        logger.debug('sending: ')
         return response
     except NotEnoughData:
         desc = settings.ODK_UPLOADED_DATA_BELOW_SAMPLE_SIZE

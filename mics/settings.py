@@ -487,7 +487,7 @@ NON_RESPONSE_REASONS = {
     'Other': 'Other'
 }
 
-
+LOG_DIR = os.path.join(BASE_DIR, 'logs')
 
 ##end USSD config ##
 # Importing server specific settings

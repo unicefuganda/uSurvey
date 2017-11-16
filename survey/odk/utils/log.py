@@ -2,7 +2,7 @@ import logging
 import os
 from django.conf import settings
 
-APP_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+APP_DIR = settings.LOG_DIR
 LOG_FILE = os.path.join(APP_DIR, 'mics_odk.log')
 logger = logging.getLogger('audit_logger')
 handler = logging.FileHandler(LOG_FILE)
