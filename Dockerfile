@@ -32,6 +32,9 @@ ADD . /src/
 # create directory for odk files
 RUN mkdir /src/submissions/
 
+# create log dir
+RUN mkdir /src/logs
+
 # setup the project
 RUN cp survey/interviewer_configs.py.example survey/interviewer_configs.py
 
@@ -45,8 +48,7 @@ ENV DJANGO_SETTINGS_MODULE=mics.settings
 
 RUN DATABASE_URL=none python manage.py collectstatic --noinput
 
-# create log dir
-RUN mkdir /src/logs
+
 
 # Make entry point executable
 RUN chmod +x /src/docker_entrypoint.sh

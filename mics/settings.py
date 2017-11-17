@@ -498,6 +498,7 @@ except ImportError:
 
 
 if 'test' in sys.argv:
+    DEBUG = True
     from django.test.utils import setup_test_environment
     setup_test_environment()
     DATABASES = {
@@ -506,7 +507,6 @@ if 'test' in sys.argv:
            "NAME": "testdb",
        }
     }
-
     FLOWS_REDIS_PATH_FORMAT = '/test/%s' % FLOWS_REDIS_PATH_FORMAT
     for queueConfig in RQ_QUEUES.itervalues():
         queueConfig['ASYNC'] = False

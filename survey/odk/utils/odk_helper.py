@@ -128,7 +128,6 @@ def process_answers(xml, qset, access_channel, question_map, survey_allocation, 
     submission.interviews.all().delete()          # wipe off the old interviews for this submission
     map(lambda interview: submission.interviews.add(interview), created_interviews)    # update with present interviews
     submission.save()
-    submission.save_attachments(media_files)
 
 
 def save_non_response(survey_tree, qset, survey, survey_allocation, access_channel, answer, reference_interview):
@@ -253,7 +252,10 @@ def process_xml(interviewer, xml_blob, media_files={}, request=None):
                                                   instance_name=instance_name)
     question_map = dict([(str(q.pk), q) for q in qset.flow_questions])
     access_channel = ODKAccess.objects.filter(interviewer=interviewer).first()
-    process_answers.delay(xml_blob, qset, access_channel, question_map, survey_allocation, submission, media_files)
+    # refresh attachments
+    submission.attachments.all().delete()
+    submission.save_attachments(media_files)
+    process_answers.delay(xml_blob, qset, access_channel, question_map, survey_allocation, submission)
     # process_answers(xml_blob, qset, access_channel, question_map, survey_allocation, submission, media_files)
     return submission
 

@@ -10,9 +10,10 @@ formatter = logging.Formatter('[%(asctime)s] %(levelname)s %(message)s')
 handler.setFormatter(formatter)
 logger.addHandler(handler)
 if settings.DEBUG:
-    logger.setLevel(logging.DEBUG)
+    LOG_LEVEL = logging.DEBUG
 else:
-    logger.setLevel(logging.INFO)
+    LOG_LEVEL = logging.INFO
+logger.setLevel(LOG_LEVEL)
 
 
 class Enum(object):
@@ -85,7 +86,7 @@ def audit_log(
     message,
     audit,
     request,
-    level=logging.DEBUG
+    level=LOG_LEVEL
 ):
     """
     Create a log message based on these params
