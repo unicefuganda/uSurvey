@@ -9,6 +9,7 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Max
+from survey.utils.logger import glogger as logger
 from survey.models.base import BaseModel
 from survey.models.access_channels import InterviewerAccess, ODKAccess, USSDAccess
 from survey.models.locations import Point
@@ -103,19 +104,22 @@ class Interview(BaseModel):
                 map(lambda (q_id, answer): _save_answer(interview, q_id, answer), survey_parameters.items())
 
         def _save_answer(interview, q_id, answer):
-            question = question_map.get(q_id, None)
-            if question and answer:
-                answer_class = Answer.get_class(question.answer_type)
-                if question.answer_type in [AudioAnswer.choice_name(), ImageAnswer.choice_name(),
-                                            VideoAnswer.choice_name()]:
-                    answer = media_files.get(answer, None)
-                try:
-                    old_answer = answer_class.objects.get(interview=interview, question=question)
-                    old_answer.update(answer)
-                except answer_class.DoesNotExist:
-                    answer_class.create(interview, question, answer)
-                except Exception, ex:
-                    print 'exception: %s' % unicode(ex)
+            try:
+                question = question_map.get(q_id, None)
+                if question and answer:
+                    answer_class = Answer.get_class(question.answer_type)
+                    if question.answer_type in [AudioAnswer.choice_name(), ImageAnswer.choice_name(),
+                                                VideoAnswer.choice_name()]:
+                        answer = media_files.get(answer, None)
+                    try:
+                        old_answer = answer_class.objects.get(interview=interview, question=question)
+                        old_answer.update(answer)
+                    except answer_class.DoesNotExist:
+                        answer_class.create(interview, question, answer)
+                    except Exception, ex:
+                        logger.error('error saving %s, desc: %s' % (q_id, str(ex)))
+            except Exception, ex:
+                logger.error('error saving %s, desc: %s' % (q_id, str(ex)))
         map(_save_record, answers)
         return interviews
 
@@ -812,6 +816,25 @@ class DateAnswer(Answer):
 class AudioAnswer(Answer):
     value = models.FileField(upload_to=settings.ANSWER_UPLOADS, null=True)
 
+    @classmethod
+    def create(cls, interview, question, answer, as_text=None, as_value=None):
+        try:
+            # answer is a file object
+            as_value = answer.name
+            as_text = answer.name
+        except BaseException:
+            as_text = ''
+            as_value = ''
+            pass
+        return cls.objects.create(
+            question=question,
+            value=answer,
+            question_type=question.__class__.type_name(),
+            interview=interview,
+            identifier=question.identifier,
+            as_text=as_text,
+            as_value=as_value)
+
     class Meta:
         app_label = 'survey'
         abstract = False
@@ -827,6 +850,25 @@ class AudioAnswer(Answer):
 class VideoAnswer(Answer):
     value = models.FileField(upload_to=settings.ANSWER_UPLOADS, null=True)
 
+    @classmethod
+    def create(cls, interview, question, answer, as_text=None, as_value=None):
+        try:
+            # answer is a file object
+            as_value = answer.name
+            as_text = answer.name
+        except BaseException:
+            as_text = ''
+            as_value = ''
+            pass
+        return cls.objects.create(
+            question=question,
+            value=answer,
+            question_type=question.__class__.type_name(),
+            interview=interview,
+            identifier=question.identifier,
+            as_text=as_text,
+            as_value=as_value)
+
     class Meta:
         app_label = 'survey'
         abstract = False
@@ -841,6 +883,25 @@ class VideoAnswer(Answer):
 
 class ImageAnswer(Answer):
     value = models.FileField(upload_to=settings.ANSWER_UPLOADS, null=True)
+
+    @classmethod
+    def create(cls, interview, question, answer, as_text=None, as_value=None):
+        try:
+            # answer is a file object
+            as_value = answer.name
+            as_text = answer.name
+        except BaseException:
+            as_text = ''
+            as_value = ''
+            pass
+        return cls.objects.create(
+            question=question,
+            value=answer,
+            question_type=question.__class__.type_name(),
+            interview=interview,
+            identifier=question.identifier,
+            as_text=as_text,
+            as_value=as_value)
 
     class Meta:
         app_label = 'survey'
