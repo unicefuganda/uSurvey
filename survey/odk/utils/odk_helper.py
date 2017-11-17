@@ -69,7 +69,7 @@ def _get_nodes(search_path, tree=None, xml_string=None):
 
 
 @job('odk', connection=get_connection())
-def process_answers(xml, qset, access_channel, question_map, survey_allocation, submission):
+def process_answers(xml, qset, access_channel, question_map, survey_allocation, submission, media_files={}):
     """Process answers for this answers_node. It's supposed to handle for all question answers in this xform.
     :param answers_node:
     :param qset:
