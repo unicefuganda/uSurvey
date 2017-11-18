@@ -370,3 +370,16 @@ try:
     from localsettings import *
 except ImportError:
     pass
+
+
+if 'test' in sys.argv:
+    DEBUG = True
+    from django.test.utils import setup_test_environment
+    setup_test_environment()
+    for queueConfig in RQ_QUEUES.itervalues():
+        queueConfig['ASYNC'] = False
+    for key in CACHEOPS:
+        CACHE_REFRESH_DURATION = 0
+        CACHEOPS[key] = {'ops': (), 'timeout': CACHE_REFRESH_DURATION}
+
+
