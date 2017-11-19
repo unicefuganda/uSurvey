@@ -1,5 +1,6 @@
 import string
 import time
+from django.core.files.base import ContentFile
 from datetime import datetime
 from django_rq import job
 from django.contrib.auth.models import User
@@ -73,7 +74,7 @@ class Interview(BaseModel):
 
     @classmethod
     def save_answers(cls, qset, survey, ea, access_channel, question_map, answers, survey_parameters=None,
-                     reference_interview=None, media_files=None):
+                     reference_interview=None, media_files={}):
         """Used to save a dictionary list of answers. keys in each answer dict must be keys in the question map
         :param qset:
         :param survey:
@@ -110,7 +111,12 @@ class Interview(BaseModel):
                     answer_class = Answer.get_class(question.answer_type)
                     if question.answer_type in [AudioAnswer.choice_name(), ImageAnswer.choice_name(),
                                                 VideoAnswer.choice_name()]:
-                        answer = media_files.get(answer, None)
+                        media = media_files.get(answer, None)
+                        if hasattr(media, 'read'):
+                            answer = media
+                        else:
+                            # only file objects or the file contents
+                            answer = ContentFile(media, name=answer)
                     try:
                         old_answer = answer_class.objects.get(interview=interview, question=question)
                         old_answer.update(answer)
@@ -813,9 +819,7 @@ class DateAnswer(Answer):
             raise ValidationError([unicode(ex), ])
 
 
-class AudioAnswer(Answer):
-    value = models.FileField(upload_to=settings.ANSWER_UPLOADS, null=True)
-
+class FileAnswerMixin(object):
     @classmethod
     def create(cls, interview, question, answer, as_text=None, as_value=None):
         try:
@@ -834,6 +838,10 @@ class AudioAnswer(Answer):
             identifier=question.identifier,
             as_text=as_text,
             as_value=as_value)
+
+
+class AudioAnswer(Answer, FileAnswerMixin):
+    value = models.FileField(upload_to=settings.ANSWER_UPLOADS, null=True)
 
     class Meta:
         app_label = 'survey'
@@ -847,27 +855,8 @@ class AudioAnswer(Answer):
         return ''
 
 
-class VideoAnswer(Answer):
+class VideoAnswer(Answer, FileAnswerMixin):
     value = models.FileField(upload_to=settings.ANSWER_UPLOADS, null=True)
-
-    @classmethod
-    def create(cls, interview, question, answer, as_text=None, as_value=None):
-        try:
-            # answer is a file object
-            as_value = answer.name
-            as_text = answer.name
-        except BaseException:
-            as_text = ''
-            as_value = ''
-            pass
-        return cls.objects.create(
-            question=question,
-            value=answer,
-            question_type=question.__class__.type_name(),
-            interview=interview,
-            identifier=question.identifier,
-            as_text=as_text,
-            as_value=as_value)
 
     class Meta:
         app_label = 'survey'
@@ -881,27 +870,8 @@ class VideoAnswer(Answer):
         return ''
 
 
-class ImageAnswer(Answer):
+class ImageAnswer(Answer, FileAnswerMixin):
     value = models.FileField(upload_to=settings.ANSWER_UPLOADS, null=True)
-
-    @classmethod
-    def create(cls, interview, question, answer, as_text=None, as_value=None):
-        try:
-            # answer is a file object
-            as_value = answer.name
-            as_text = answer.name
-        except BaseException:
-            as_text = ''
-            as_value = ''
-            pass
-        return cls.objects.create(
-            question=question,
-            value=answer,
-            question_type=question.__class__.type_name(),
-            interview=interview,
-            identifier=question.identifier,
-            as_text=as_text,
-            as_value=as_value)
 
     class Meta:
         app_label = 'survey'

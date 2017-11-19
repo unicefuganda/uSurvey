@@ -1,7 +1,7 @@
 from model_mommy import mommy
 import random
 from django.core.management import call_command
-from survey.tests.base_test import BaseTest
+from survey.tests.base_test import BaseTest, Base
 from survey.models import (InterviewerAccess, ODKAccess, USSDAccess, Interview, Interviewer, QuestionSetChannel,
                            EnumerationArea, Survey, SurveyAllocation, Question, QuestionSet, Batch, BatchQuestion,
                            QuestionOption)
@@ -132,9 +132,11 @@ class SurveyBaseTest(BaseTest):
         current_count = Question.objects.count()
         QuestionForm = get_question_form(BatchQuestion)
         question_form = QuestionForm(qset, data=data)
-        if question_form.is_valid() is False:
-            import pdb; pdb.set_trace()
         self.assertTrue(question_form.is_valid())
         question = question_form.save()
         self.assertEquals(Question.objects.count(), current_count + 1)
         return question
+
+
+# class SurveyBaseTest(SurveyBase, BaseTest):
+#      pass

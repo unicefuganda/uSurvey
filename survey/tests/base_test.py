@@ -3,7 +3,7 @@ import redis
 from random import randint
 from urllib import quote
 from datetime import date
-from django.test import TestCase
+from django.test import TestCase, TransactionTestCase
 from django.core.cache import cache
 from django.contrib.auth.models import Group, Permission, User
 from django.contrib.contenttypes.models import ContentType

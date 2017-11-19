@@ -2,6 +2,7 @@ from datetime import date, datetime
 import os
 import pytz
 from lxml import etree
+from django.core.files.base import ContentFile
 from dateutil.parser import parse as extract_date
 from django.forms import ValidationError
 from django.http import HttpResponse, HttpResponseNotFound, StreamingHttpResponse
@@ -255,7 +256,8 @@ def process_xml(interviewer, xml_blob, media_files={}, request=None):
     # refresh attachments
     submission.attachments.all().delete()
     submission.save_attachments(media_files)
-    process_answers.delay(xml_blob, qset, access_channel, question_map, survey_allocation, submission)
+    smedia_files = {key: f.read() for key, f in media_files.items()}      # file objects don't serialize
+    process_answers.delay(xml_blob, qset, access_channel, question_map, survey_allocation, submission, smedia_files)
     # process_answers(xml_blob, qset, access_channel, question_map, survey_allocation, submission, media_files)
     return submission
 

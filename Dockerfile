@@ -30,7 +30,8 @@ WORKDIR /src/
 ADD . /src/
 
 # create directory for odk files
-RUN mkdir /src/submissions/
+RUN mkdir -p /src/files/submissions/
+RUN mkdir -p /src/files/answerFiles/
 
 # create log dir
 RUN mkdir /src/logs

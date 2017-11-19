@@ -3,6 +3,7 @@ import os
 import sys
 import phonenumbers
 import pycountry
+from collections import OrderedDict
 
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
@@ -314,8 +315,8 @@ DEFAULT_EMAIL_SENDER = os.getenv('DEFAULT_EMAIL_SENDER', EMAIL_HOST_USER)
 # odk settings
 TOKEN_DEFAULT_SIZE = 5
 ODK_DEFAULT_TOKEN = '12345'
-SUBMISSION_UPLOAD_BASE = os.path.join(BASE_DIR, 'submissions')
-ANSWER_UPLOADS = os.path.join(BASE_DIR, 'answerFiles')
+SUBMISSION_UPLOAD_BASE = os.path.join(BASE_DIR, 'files', 'submissions')
+ANSWER_UPLOADS = os.path.join(BASE_DIR, 'files', 'answerFiles')
 TEMP_DIR = os.path.join(BASE_DIR, 'tmp')
 ODK_SUBMISSION_SUCCESS_MSG = "Successful submission.\
     Your submission is been Processed"
@@ -327,19 +328,6 @@ INTERVIEWER_EXPORT_HEADERS = [
     'language',
     'mobile_numbers',
     'odk_id']
-from collections import OrderedDict
-HOUSEHOLD_EXPORT_HEADERS = OrderedDict([
-    ('HOUSE NUMBER', 'house_number'),
-    ('PHYSICAL ADDRESS', 'physical_address'),
-    ('HEAD MEMBER', 'head_desc'),
-    ('SEX', 'head_sex'),
-    ('ENUMERATION AREA', 'listing__ea__name'),
-    ('REGISTRAR', 'last_registrar__name'),
-    ('REGISTRATION_CHANNEL',
-     'registration_channel'),
-    ('SURVEY_LISTING',
-     'listing__initial_survey__name')
-])
 QUESTION_EXPORT_HEADERS = OrderedDict([
     ('identifier', 'Question Code'),
     ('text', 'Question Text'),
@@ -365,8 +353,8 @@ ODK_ERROR_OCCURED = 'An error occurred pls try again'
 
 AGGREGATORS = [('testAggregator', 'testAggregator'), ]
 DEFAULT_AGGREGATOR = 'testAggregator'
-TWITTER_URL = 'https://twitter.com/unicefuganda'
-TWITTER_TOKEN = '617036281340657664'
+TWITTER_URL = os.getenv('USURVEY_TWITTER_URL', 'https://twitter.com/unicefuganda')
+TWITTER_TOKEN = os.getenv('USURVEY_TWITTER_TOKEN', '')
 
 ###USSD config ##
 USSD_NEXT = '*'
