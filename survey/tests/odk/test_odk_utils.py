@@ -224,9 +224,9 @@ class ODKTest(SurveyBaseTest):
         import os
         self._create_test_non_group_questions(self.qset)
         BASE_DIR = os.path.dirname(__file__)
-        image_path = os.path.join(BASE_DIR, 'testimage')
-        video_path = os.path.join(BASE_DIR, 'testvideo')
-        audio_path = os.path.join(BASE_DIR, 'testaudio')
+        image_path = os.path.join(BASE_DIR, 'testimage.png')
+        video_path = os.path.join(BASE_DIR, 'testvideo.mov')
+        audio_path = os.path.join(BASE_DIR, 'testaudio.m4a')
         with open(image_path) as fi, open(video_path) as fv, open(audio_path) as fa:
             fi_name = os.path.basename(fi.name)
             fa_name = os.path.basename(fa.name)

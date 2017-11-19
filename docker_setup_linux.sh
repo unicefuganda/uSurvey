@@ -10,6 +10,8 @@ set -e
 #set -x
 
 POSTGRES_DATA_PATH=$1
+LOG_PATH=$2
+MEDIA_FILES_PATH=$3
 
 DEFAULT_PSQL_LOC=/opt/db/data/psql
 
@@ -23,6 +25,23 @@ else
 echo "creating directory $POSTGRES_DATA_PATH is not existing"
 sudo mkdir -p $POSTGRES_DATA_PATH
 sudo chown -R $USER:$USER $POSTGRES_DATA_PATH
+
+# create file directories
+echo "using log path ./logs"
+mkdir -p ./logs
+
+echo "creating media files in current directory"
+mkdir -p ./files/answerFiles
+mkdir -p ./files/submissions
+
+
+if [ -z "${LOG_PATH}" ]; then
+    echo "No Volume path set for postgres"
+    echo "Setting volume path to $DEFAULT_PSQL_LOC"
+    export POSTGRES_DATA_PATH=$DEFAULT_PSQL_LOC
+else
+    echo "Using '$POSTGRES_DATA_PATH'"; fi
+
 chmod +x loaders/*
 
 echo '#####                     '

@@ -230,7 +230,7 @@ def process_submission(interviewer, xml_file, media_files={}, request=None):
 def process_xml(interviewer, xml_blob, media_files={}, request=None):
     survey_tree = _get_tree_from_blob(xml_blob)
     form_id = _get_form_id(survey_tree)
-    submission_id = _get_submission_id(survey_tree)
+    submission_id = _get_submission_id(survey_tree) or None
     instance_id = _get_instance_id(survey_tree)
     instance_name = _get_instance_name(survey_tree)
     qset = _get_qset(survey_tree)
