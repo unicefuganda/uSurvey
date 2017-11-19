@@ -183,14 +183,10 @@ class AnswersTest(SurveyBaseTest):
         self.assertEquals(fetched_inbetween.first().as_text, medium)
         self.assertEquals(DateAnswer.fetch_equals('as_value', medium).count(), 1)
         self.assertEquals(DateAnswer.fetch_equals('as_value', medium).first().as_text, medium)
-
-    def test_answers_attribute_of_question_returns_answers_belonging_to_question_answer_type(self):
-        self.test_fetch_methods()       # this creates 3 answers belonging to date type
-        self.test_create_answers()      # this creates a single geop point answer
+        # check answers attribute is date class
         date_question = Question.objects.filter(answer_type=DateAnswer.choice_name()).first()
         self.assertEquals(date_question.answers().first().__class__, DateAnswer)
-        # confirm only answers belonging to this question are present
-        self.assertEquals(date_question.answers().exclude(question=date_question), 0)
+
 
 
 

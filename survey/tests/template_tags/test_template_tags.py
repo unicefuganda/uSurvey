@@ -47,7 +47,7 @@ class TemplateTagsTest(TestCase):
         a = A()
         self.assertEquals(get_value(a, 'b'), 5)
         a = {'c': 7}
-        self.assertEquals(get_value(a, 'b'), 7)
+        self.assertEquals(get_value(a, 'c'), 7)
 
     def test_show_flow_condition(self):
         # flow without validation

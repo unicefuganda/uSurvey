@@ -79,56 +79,60 @@ def process_answers(xml, qset, access_channel, question_map, survey_allocation, 
     :param survey_allocation:
     :return:
     """
-    survey_tree = _get_tree_from_blob(xml)
-    answers_nodes = _get_answer_nodes(survey_tree, qset)
-    created_interviews = []
-    for answers_node in answers_nodes:
-        # answers = []
-        survey_parameters = []
-        survey = survey_allocation.survey
-        reference_interview = None          # typically used if
-        if _get_nodes('./sampleData/selectedSample', answers_node):
-            # the following looks ugly but ./sampleData/selectedSample is calculated in xform by a concat of
-            # sampleData/iq{{ ea_id }} values with -. See question_set.xml binding for ./sampleData/selectedSample
-            # if for some reason more than one interview value is reflected, choose the first one
-            reference_interview = _get_nodes('./sampleData/selectedSample',
-                                             answers_node)[0].text.strip('-').split('-')[0]
-        # map(lambda node: answers.extend(get_answers(node, qset, question_map)), question_answers_node.getchildren())
-        # map(lambda node: survey_parameters.extend(get_answers(node, qset, question_map)),
-        #     survey_parameters_node.getchildren())
-        # now check if non response exists and is selected
-        if _get_nodes(NON_RESPONSE_CONFIRMATION_PATH,
-                      survey_tree) and int(_get_nodes(NON_RESPONSE_CONFIRMATION_PATH, survey_tree)[0].text) > 0:
-            answer = _get_nodes(NON_RESPONSE_PATH, survey_tree)[0].text
-            if answer.upper() == 'OTHER':        # user selected non respons
-                answer = _get_nodes(NON_RESPONSE_OTHERS_PATH, survey_tree)[0].text
-            non_response = save_non_response(survey_tree, qset, survey, survey_allocation,
-                                             access_channel, answer, reference_interview)
-            created_interviews.append(non_response.interview)
-        else:
-            question_answers_node = _get_nodes('./questions/surveyQuestions', answers_node)[0]
-            answers = get_answers(question_answers_node, qset, question_map, _get_default_date_created(survey_tree))
-            survey_parameters = None
-            if hasattr(qset, 'parameter_list'):
-                survey_parameters_node = _get_nodes('./questions/groupQuestions', answers_node)[0]
-                # survey paramaters does not have any single repeat
-                survey_parameters = get_answers(survey_parameters_node, qset, question_map,
-                                                _get_default_date_created(survey_tree))[0]
-            if survey_allocation.stage in [None, SurveyAllocation.LISTING] and \
-                    survey.has_sampling and survey.sample_size > len(answers):
-                raise NotEnoughData()
-            created_interviews.extend(Interview.save_answers(qset, survey, survey_allocation.allocation_ea,
-                                                             access_channel, question_map, answers,
-                                                             survey_parameters=survey_parameters,
-                                                             reference_interview=reference_interview,
-                                                             media_files=media_files))
-        if survey.has_sampling:
-            survey_allocation.stage = SurveyAllocation.SURVEY
-            survey_allocation.save()
-    submission.status = ODKSubmission.COMPLETED
-    submission.interviews.all().delete()          # wipe off the old interviews for this submission
-    map(lambda interview: submission.interviews.add(interview), created_interviews)    # update with present interviews
-    submission.save()
+    try:
+        survey_tree = _get_tree_from_blob(xml)
+        answers_nodes = _get_answer_nodes(survey_tree, qset)
+        created_interviews = []
+        for answers_node in answers_nodes:
+            # answers = []
+            survey_parameters = []
+            survey = survey_allocation.survey
+            reference_interview = None          # typically used if
+            if _get_nodes('./sampleData/selectedSample', answers_node):
+                # the following looks ugly but ./sampleData/selectedSample is calculated in xform by a concat of
+                # sampleData/iq{{ ea_id }} values with -. See question_set.xml binding for ./sampleData/selectedSample
+                # if for some reason more than one interview value is reflected, choose the first one
+                reference_interview = _get_nodes('./sampleData/selectedSample',
+                                                 answers_node)[0].text.strip('-').split('-')[0]
+            # map(lambda node: answers.extend(get_answers(node, qset, question_map)), question_answers_node.getchildren())
+            # map(lambda node: survey_parameters.extend(get_answers(node, qset, question_map)),
+            #     survey_parameters_node.getchildren())
+            # now check if non response exists and is selected
+            if _get_nodes(NON_RESPONSE_CONFIRMATION_PATH,
+                          survey_tree) and int(_get_nodes(NON_RESPONSE_CONFIRMATION_PATH, survey_tree)[0].text) > 0:
+                answer = _get_nodes(NON_RESPONSE_PATH, survey_tree)[0].text
+                if answer.upper() == 'OTHER':        # user selected non respons
+                    answer = _get_nodes(NON_RESPONSE_OTHERS_PATH, survey_tree)[0].text
+                non_response = save_non_response(survey_tree, qset, survey, survey_allocation,
+                                                 access_channel, answer, reference_interview)
+                created_interviews.append(non_response.interview)
+            else:
+                question_answers_node = _get_nodes('./questions/surveyQuestions', answers_node)[0]
+                answers = get_answers(question_answers_node, qset, question_map, _get_default_date_created(survey_tree))
+                survey_parameters = None
+                if hasattr(qset, 'parameter_list'):
+                    survey_parameters_node = _get_nodes('./questions/groupQuestions', answers_node)[0]
+                    # survey paramaters does not have any single repeat
+                    survey_parameters = get_answers(survey_parameters_node, qset, question_map,
+                                                    _get_default_date_created(survey_tree))[0]
+                if survey_allocation.stage in [None, SurveyAllocation.LISTING] and \
+                        survey.has_sampling and survey.sample_size > len(answers):
+                    raise NotEnoughData()
+                created_interviews.extend(Interview.save_answers(qset, survey, survey_allocation.allocation_ea,
+                                                                 access_channel, question_map, answers,
+                                                                 survey_parameters=survey_parameters,
+                                                                 reference_interview=reference_interview,
+                                                                 media_files=media_files))
+            if survey.has_sampling:
+                survey_allocation.stage = SurveyAllocation.SURVEY
+                survey_allocation.save()
+        submission.status = ODKSubmission.COMPLETED
+        submission.interviews.all().delete()          # wipe off the old interviews for this submission
+        map(lambda interview: submission.interviews.add(interview), created_interviews)    # update with present interviews
+        submission.save()
+    except Exception, ex:
+        # Let me confirm here. Capture if there is a failure for some reason
+        logger.error('Error saving answer: %s' % str(ex))
 
 
 def save_non_response(survey_tree, qset, survey, survey_allocation, access_channel, answer, reference_interview):

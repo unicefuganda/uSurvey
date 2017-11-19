@@ -213,7 +213,7 @@ def ancestors_reversed(location):
 @register.filter
 def show_condition(flow):
     if flow.validation_test:
-        return '%s ( %s )' % (flow.validation_test, ' and '.join(flow.test_arguments))
+        return '%s ( %s )' % (flow.validation_test, ' and '.join([str(param) for param in flow.test_params]))
     return ""
 
 

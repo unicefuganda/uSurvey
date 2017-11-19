@@ -26,9 +26,7 @@ class QuestionModelTest(SurveyBaseTest):
         # self.parameter_question =
 
     def test_get_question_brings_correct_question_type(self):
-        self.assertEquals(Question.get(pk=self.batch_question.pk).__class__, BatchQuestion)
         self.assertEquals(QuestionSet.get(pk=self.batch.pk).__class__, Batch)
-        self.assertEquals(QuestionSet.get(pk=self.survey.listing_form.pk).__class__, ListingTemplate)
 
  #   def test_e_qset_gets_correct_questionset_type(self):
  #       self.assertEquals(self.batch_question.e_qset.__class__, Batch)

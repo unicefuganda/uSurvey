@@ -967,13 +967,11 @@ class AnswerAccessDefinition(BaseModel):
 
     @classmethod
     def access_channels(cls, answer_type):
-        return set(
-            AnswerAccessDefinition.objects.filter(
-                answer_type=answer_type).values_list(
-                'channel', flat=True))
+        return set(AnswerAccessDefinition.objects.filter(answer_type=answer_type).values_list('channel', flat=True))
 
     @classmethod
     def answer_types(cls, channel):
+        """Returns the answer type compatible with this channel"""
         return set(
             AnswerAccessDefinition.objects.filter(
                 channel=channel).values_list(

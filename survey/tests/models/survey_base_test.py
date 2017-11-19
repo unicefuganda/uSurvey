@@ -40,7 +40,7 @@ class SurveyBaseTest(BaseTest):
         data = {
             'answer_type': NumericalAnswer.choice_name(),
             'text': 'num text',
-            'identifier': 'num_identifier_%s' % random.randint(1, 100),
+            'identifier': 'num1_identifier_%s' % random.randint(1, 100),
             'qset': qset.id
         }
         question = self._save_question(qset, data)
@@ -51,7 +51,7 @@ class SurveyBaseTest(BaseTest):
         data = {
             'answer_type': TextAnswer.choice_name(),
             'text': 'texts text',
-            'identifier': 'text_identifier_%s' % random.randint(1, 100),
+            'identifier': 'text1_identifier_%s' % random.randint(1, 100),
             'qset': qset.id
         }
         self._save_question(qset, data)
@@ -59,7 +59,7 @@ class SurveyBaseTest(BaseTest):
         data = {
             'answer_type': MultiChoiceAnswer.choice_name(),
             'text': 'multichoice answer text',
-            'identifier': 'multi_choice_identifier_%s' % random.randint(1, 100),
+            'identifier': 'multi1_choice_identifier_%s' % random.randint(1, 100),
             'qset': qset.id,
             'options': ['Y', 'N']
         }
@@ -68,7 +68,7 @@ class SurveyBaseTest(BaseTest):
         data = {
             'answer_type': AutoResponse.choice_name(),
             'text': 'auto answer text',
-            'identifier': 'auto_identifier_%s' % random.randint(1, 100),
+            'identifier': 'auto1_identifier_%s' % random.randint(1, 100),
             'qset': qset.id,
         }
         self._save_question(qset, data)
@@ -81,7 +81,7 @@ class SurveyBaseTest(BaseTest):
         data = {
             'answer_type': MultiSelectAnswer.choice_name(),
             'text': 'multi select answer text',
-            'identifier': 'multi_select_identifier_%s' % random.randint(1, 100),
+            'identifier': 'multi2_select_identifier_%s' % random.randint(1, 100),
             'qset': qset.id,
             'options': ['Y', 'N', 'MB']
         }
@@ -90,7 +90,7 @@ class SurveyBaseTest(BaseTest):
         data = {
             'answer_type': DateAnswer.choice_name(),
             'text': 'date answer text',
-            'identifier': 'date_identifier_%s' % random.randint(1, 100),
+            'identifier': 'date2_identifier_%s' % random.randint(1, 100),
             'qset': qset.id,
         }
         self._save_question(qset, data)
@@ -98,7 +98,7 @@ class SurveyBaseTest(BaseTest):
         data = {
             'answer_type': GeopointAnswer.choice_name(),
             'text': 'geo point text',
-            'identifier': 'geo_identifier_%s' % random.randint(1, 100),
+            'identifier': 'geo2_identifier_%s' % random.randint(1, 100),
             'qset': qset.id
         }
         self._save_question(qset, data)
@@ -106,7 +106,7 @@ class SurveyBaseTest(BaseTest):
         data = {
             'answer_type': ImageAnswer.choice_name(),
             'text': 'image answer text',
-            'identifier': 'image_identifier_%s' % random.randint(1, 100),
+            'identifier': 'image2_identifier_%s' % random.randint(1, 100),
             'qset': qset.id
         }
         self._save_question(qset, data)
@@ -114,7 +114,7 @@ class SurveyBaseTest(BaseTest):
         data = {
             'answer_type': AudioAnswer.choice_name(),
             'text': 'audio answer text',
-            'identifier': 'audio_identifier_%s' % random.randint(1, 100),
+            'identifier': 'audio2_identifier_%s' % random.randint(1, 100),
             'qset': qset.id
         }
         self._save_question(qset, data)
@@ -122,7 +122,7 @@ class SurveyBaseTest(BaseTest):
         data = {
             'answer_type': VideoAnswer.choice_name(),
             'text': 'video answer text',
-            'identifier': 'video_identifier_%s' % random.randint(1, 100),
+            'identifier': 'video2_identifier_%s' % random.randint(1, 100),
             'qset': qset.id
         }
         self._save_question(qset, data)

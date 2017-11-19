@@ -1,7 +1,10 @@
 import json
+import pycountry
+import phonenumbers
+from mock import *
 from django.test.client import Client
 from django.core.urlresolvers import reverse
-from mock import *
+from django.conf import settings
 from django.contrib.auth.models import User, Group
 from survey.models.users import UserProfile
 from survey.tests.base_test import BaseTest
@@ -17,6 +20,8 @@ class UsersViewTest(BaseTest):
         self.raj = self.assign_permission_to(User.objects.create_user(
             'demo13', 'demo13@kant.com', 'demo13'), 'can_view_users')
         self.client.login(username='demo13', password='demo13')
+        country_code = pycountry.countries.lookup(settings.COUNTRY).alpha_2
+        self.country_phone_code = '+%s' % phonenumbers.country_code_for_region(country_code)
 
     def test_new(self):
         response = self.client.get(reverse('new_user_page'))
@@ -28,7 +33,7 @@ class UsersViewTest(BaseTest):
         self.assertEquals(response.context['class'], 'user-form')
         self.assertEquals(response.context['button_label'], 'Create')
         self.assertEquals(response.context['loading_text'], 'Creating...')
-        self.assertEquals(response.context['country_phone_code'], '+256')
+        self.assertEquals(response.context['country_phone_code'], self.country_phone_code)
         self.assertIsInstance(response.context['userform'], UserForm)
         self.assertEqual(response.context['title'], 'New User')
 
@@ -191,7 +196,7 @@ class UsersViewTest(BaseTest):
         self.assertEquals(response.context['title'], 'Edit User')
         self.assertEquals(response.context['button_label'], 'Save')
         self.assertEquals(response.context['loading_text'], 'Saving...')
-        self.assertEquals(response.context['country_phone_code'], '+256')
+        self.assertEquals(response.context['country_phone_code'], self.country_phone_code)
         self.assertIsInstance(response.context['userform'], EditUserForm)
 
     def test_edit_user_updates_user_information(self):
