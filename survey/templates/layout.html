@@ -1,441 +1,508 @@
-<!DOCTYPE HTML>
-<html>
-<head>
-    <title>
-        {{ PROJECT_TITLE }}
-    </title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- style type="text/css">
-     #loader-wrapper {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 100000;
-}
-#loader {
-    display: block;
-    position: relative;
-    left: 50%;
-    top: 50%;
-    width: 150px;
-    height: 150px;
-    margin: -75px 0 0 -75px;
-    border-radius: 50%;
-    border: 3px solid transparent;
-    border-top-color: #3498db;
+{% load repeatedblocks %}
+{% load template_tags %}
+<!DOCTYPE html>
+<html class=" js csstransitions" lang="en-US">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+        <meta charset="UTF-8" />
+        <link rel="icon" type="{{ STATIC_URL }}image/png" href="{{ STATIC_URL }}images/favicon.png" />
+        <title>{% repeated_block title %}uSurvey – Data Matters{% endblock %}</title>
+        <link rel="stylesheet" href="{{ STATIC_URL }}assets/usur.css" />
+        <link rel="stylesheet" href="{{ STATIC_URL }}toassets/menstyle.css" />
+        <style>
+            .modal-body{
+            padding-top: 0px !important;
+            padding-bottom: 40px !important;
+            }
+            @media only screen and (max-width:1920px) {
+            #cssmenu {
+            width: 100%
+            }
+            .datepicker{z-index:1151 !important;}
+            .search {
+            float: right;
+            margin-right: 5px;
+            /*margin-top: 26px;*/
+            }
+            div.table-header a {
+            color: #0f0;
+            }
+            .span6 .dataTables_length > label > select{width:55px !important;}
+            .searchTerm {
+            float: left;
+            width: 177px;
+            border: 2px solid #0099ff !important;
+            padding-left: 5px;
+            padding-bottom: 2px;
+            height: 25px;
+            border-radius: 5px;
+            outline: none;
+            color: #0099ff;
+            }
+            .searchTerm:focus{
+            color: #0099ff;
+            }
+            .searchButton {
+            position: relative;          
+            right: 11px;
+            height: 25px;
+            border: 6px solid #0099ff !important;
+            background: #0099ff;
+            text-align: center;
+            color: #fff;
+            border-radius: 5px;
+            cursor: pointer;
+            }
+            .search-wrapper{
+            margin-right: -18px !important;
+            }
+            span.help {
+            font-size: 13px !important;
+            color: #09f;
+            }
+            .modal-header {
+            background-color: #3498DB;border-top: 1px solid #70B6E5;border-bottom: 5px solid #2372A7;
+            }
+            #nav-mydd a {
+            background: inherit !important;
+            }
+            #xyz-breadcrumbs {
+            z-index: 1;
+            }
+            .ms-container {
+            margin-right: 10px !important;
+            }
+            .qtips {
+                background:#cdf7c1; colorL#000; border-color:1px solid  #799c4b;
+            }
+            .error{
+                color: red;
+            }
+            .r-row{
+                background: none !important;
+                border: none !important
+            }
+        </style>
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" >
+        <link href="https://fonts.googleapis.com/css?family=Dosis" rel="stylesheet" >
+        <link rel="stylesheet" href="{{ STATIC_URL }}toassets/bootstrap.css" type="text/css" media="all" >
+        <link id="theme_css" rel="stylesheet" href="{{ STATIC_URL }}toassets/light.css">
+        <link rel="stylesheet" href="{{ STATIC_URL }}toassets/animate.css" type="text/css" media="all" >
+        <link rel="stylesheet" href="{{ STATIC_URL }}toassets/preset.css" type="text/css" media="all" >
+        <link rel="stylesheet" href="{{ STATIC_URL }}toassets/style_002.css" type="text/css" media="all" >
+        <link rel="stylesheet" href="{{ STATIC_URL }}toassets/responsive.css" type="text/css" media="all" >
+        <link rel="stylesheet" href="{{ STATIC_URL }}toassets/font-awesome.css" type="text/css" media="all"  >
+        <link href="{{ STATIC_URL }}css/jquery-ui.css" rel="stylesheet" type="text/css">
+        <link href="{{ STATIC_URL }}chosen/chosen.css" rel="stylesheet" type="text/css">
+        <link href="{{ STATIC_URL }}css/formset-extra.css" rel="stylesheet" type="text/css">
+        <link rel="stylesheet" href="{{ STATIC_URL }}bootstrap-switch/bootstrap-switch.css">
+        <link rel="stylesheet" href="{{ STATIC_URL }}multi-select/multi-select.css">
+        <link rel="stylesheet" href="{{ STATIC_URL }}css/loader.css">
+        <link href="{{STATIC_URL}}css/select2.css" rel="stylesheet">
+        <link href="http://cdn.jsdelivr.net/qtip2/3.0.3/jquery.qtip.min.css" rel="stylesheet" type="text/css"/>
+        <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+        <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+        <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+        <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+        <![endif]-->
+         <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+        {% block extra_head %}
+        {% endblock %}
+        <style>
+            .headerFix {
+            background: #0099ff;
+            border-bottom:6px solid #0073bf;         
+            }         
+            li.select2-results__option {
+            -moz-user-select: none;
+            background-color: #fefefe;
+            border-bottom: 1px solid #d5d5d5;
+            padding: 6px;
+            }
+            li.select2-results__option:nth(odd) {
+            background-color: #f3f3f3;
+            }
+            li.select2-results__option:nth-child(even) {
+            background-color: #d3e7f5
+            }
+             #cssmenu > ul > li .{{request.resolver_match.url_name}} {
+            color: yellow;}
+             .pagination {
+            display: inline-block;
+            width: 55%;
+            margin: auto;
+            border-radius: 4px;
+            margin-top: 15px;}
+            .select2-container .selection .select2-selection{border-left: 3px solid #0577e0;}
+            .paginate_msg{font-size: 14px;margin-top: 20px;color: #555;}
+        </style>
 
-    -webkit-animation: spin 2s linear infinite; /* Chrome, Opera 15+, Safari 5+ */
-    animation: spin 2s linear infinite; /* Chrome, Firefox 16+, IE 10+, Opera */
-
-    z-index: 1001;
-}
-
-    #loader:before {
-        content: "";
-        position: absolute;
-        top: 5px;
-        left: 5px;
-        right: 5px;
-        bottom: 5px;
-        border-radius: 50%;
-        border: 3px solid transparent;
-        border-top-color: #e74c3c;
-
-        -webkit-animation: spin 3s linear infinite; /* Chrome, Opera 15+, Safari 5+ */
-        animation: spin 3s linear infinite; /* Chrome, Firefox 16+, IE 10+, Opera */
-    }
-
-    #loader:after {
-        content: "";
-        position: absolute;
-        top: 15px;
-        left: 15px;
-        right: 15px;
-        bottom: 15px;
-        border-radius: 50%;
-        border: 3px solid transparent;
-        border-top-color: #f9c922;
-
-        -webkit-animation: spin 1.5s linear infinite; /* Chrome, Opera 15+, Safari 5+ */
-          animation: spin 1.5s linear infinite; /* Chrome, Firefox 16+, IE 10+, Opera */
-    }
-
-    @-webkit-keyframes spin {
-        0%   {
-            -webkit-transform: rotate(0deg);  /* Chrome, Opera 15+, Safari 3.1+ */
-            -ms-transform: rotate(0deg);  /* IE 9 */
-            transform: rotate(0deg);  /* Firefox 16+, IE 10+, Opera */
-        }
-        100% {
-            -webkit-transform: rotate(360deg);  /* Chrome, Opera 15+, Safari 3.1+ */
-            -ms-transform: rotate(360deg);  /* IE 9 */
-            transform: rotate(360deg);  /* Firefox 16+, IE 10+, Opera */
-        }
-    }
-    @keyframes spin {
-        0%   {
-            -webkit-transform: rotate(0deg);  /* Chrome, Opera 15+, Safari 3.1+ */
-            -ms-transform: rotate(0deg);  /* IE 9 */
-            transform: rotate(0deg);  /* Firefox 16+, IE 10+, Opera */
-        }
-        100% {
-            -webkit-transform: rotate(360deg);  /* Chrome, Opera 15+, Safari 3.1+ */
-            -ms-transform: rotate(360deg);  /* IE 9 */
-            transform: rotate(360deg);  /* Firefox 16+, IE 10+, Opera */
-        }
-    }
-
-    #loader-wrapper .loader-section {
-        position: fixed;
-        top: 0;
-        width: 51%;
-        height: 100%;
-        background: #FFFFFF;
-        z-index: 1000;
-        -webkit-transform: translateX(0);  /* Chrome, Opera 15+, Safari 3.1+ */
-        -ms-transform: translateX(0);  /* IE 9 */
-        transform: translateX(0);  /* Firefox 16+, IE 10+, Opera */
-    }
-
-    #loader-wrapper .loader-section.section-left {
-        left: 0;
-    }
-
-    #loader-wrapper .loader-section.section-right {
-        right: 0;
-    }
-
-    /* Loaded */
-    .loaded #loader-wrapper .loader-section.section-left {
-        -webkit-transform: translateX(-100%);  /* Chrome, Opera 15+, Safari 3.1+ */
-            -ms-transform: translateX(-100%);  /* IE 9 */
-                transform: translateX(-100%);  /* Firefox 16+, IE 10+, Opera */
-
-        -webkit-transition: all 0.4s 0.3s cubic-bezier(0.645, 0.045, 0.355, 1.000);
-                transition: all 0.4s 0.3s cubic-bezier(0.645, 0.045, 0.355, 1.000);
-    }
-
-    .loaded #loader-wrapper .loader-section.section-right {
-        -webkit-transform: translateX(100%);  /* Chrome, Opera 15+, Safari 3.1+ */
-            -ms-transform: translateX(100%);  /* IE 9 */
-                transform: translateX(100%);  /* Firefox 16+, IE 10+, Opera */
-
--webkit-transition: all 0.4s 0.3s cubic-bezier(0.645, 0.045, 0.355, 1.000);
-        transition: all 0.4s 0.3s cubic-bezier(0.645, 0.045, 0.355, 1.000);
-    }
-
-    .loaded #loader {
-        opacity: 0;
-        -webkit-transition: all 0.3s ease-out;
-                transition: all 0.3s ease-out;
-    }
-    .loaded #loader-wrapper {
-        visibility: hidden;
-
-        -webkit-transform: translateY(-100%);  /* Chrome, Opera 15+, Safari 3.1+ */
-            -ms-transform: translateY(-100%);  /* IE 9 */
-                transform: translateY(-100%);  /* Firefox 16+, IE 10+, Opera */
-
-        -webkit-transition: all 0.3s 1s ease-out;
-                transition: all 0.3s 1s ease-out;
-    }
-
-    /* JavaScript Turned Off */
-    .no-js #loader-wrapper {
-        display: none;
-    }
-
-    #contentx {
-        margin: 0 auto;
-    }
-
-
-    </style -->
-    <style type="text/css">
-
-        body {
-    background-image: url("{{ STATIC_URL }}img/uniceflogo.png");
-    background-repeat: no-repeat;
-    background-attachment: fixed;
-    background-position: center;
-}
-        .alert {
-            padding: 0;
-        }
-
-        .alert ul {
-            height: 10px;
-            size: 8px;
-            padding: 4px;
-        }
-        .row-fluid {
-            display: none;
-        }
-    </style>
-<link rel="stylesheet" href="{{ STATIC_URL }}css/Bread.css" type="text/css" media="screen"
-          charset="utf-8">
-    <link rel="stylesheet" href="{{ STATIC_URL }}bootstrap/css/bootstrap.css" type="text/css" media="screen"
-          charset="utf-8">
-    <link rel="stylesheet" href="{{ STATIC_URL }}bootstrap/css/bootstrap-responsive.css" type="text/css" media="screen"
-          charset="utf-8">
-    <link href="{{ STATIC_URL }}css/jquery-ui.css" rel="stylesheet" type="text/css"/>
-    <link rel="stylesheet" href="{{ STATIC_URL }}chosen/chosen.css"/>
-    <link rel="stylesheet" href="{{ STATIC_URL }}multi-select/multi-select.css"/>
-    <link rel="stylesheet" href="{{ STATIC_URL }}bootstrap-switch/bootstrap-switch.css"/>
-	<link href="{{ STATIC_URL }}css/instyle.css" rel="stylesheet" type="text/css" />
-    <!-- link rel="stylesheet" href="{{ STATIC_URL }}css/dataTables.bootstrap.css" / -->
-	<link rel="stylesheet" href="//cdn.datatables.net/plug-ins/be7019ee387/integration/bootstrap/2/dataTables.bootstrap.css" />
-    <link href="{{ STATIC_URL }}css/formset-extra.css" rel="stylesheet" type="text/css" />
-
-    {% block extra_css %}{% endblock %}
-<script type="text/javascript" src="{{ STATIC_URL }}js/jquery.min.js"></script>
-<script type="text/javascript" src="{{ STATIC_URL }}js/background.cycle.js"></script>
-    <link rel="stylesheet/less" type="text/css" href="{{ STATIC_URL }}css/application.less"/>
-    <link rel="stylesheet" href="{{ STATIC_URL }}css/jquery-ui2.css"/>
-    <script src="{{ STATIC_URL }}js/less.js" type="text/javascript" charset="utf-8"></script>
-    {% if perms.auth.can_view_aggregates %}
-    <link rel="stylesheet" href="{{ STATIC_URL }}css/mprogress.min.css"/>
-    <script src="{{ STATIC_URL }}js/mprogress.min.js"></script>
-    <script type="text/javascript" src="{{ STATIC_URL }}js/reconnecting-websocket.min.js"></script>
-    <script>
-        var myHostname = window.location.hostname;
-        var myPort = window.location.port;
-        var scheme = "ws";
-        if(document.location.protocol === "https:") {
-              scheme += "s";
-          }
-        ws_uri = scheme + "://" + myHostname + ':' + myPort + "{{ WEBSOCKET_URL }}";
-    </script>
-    <script type="text/javascript" src="{{ STATIC_URL }}js/statusbar.js"></script>
-    {% endif %}
-</head>
-<body>
-<div id="loader-wrapper">
-			<div id="loader"></div>
-
-			<div class="loader-section section-left"></div>
-            <div class="loader-section section-right"></div>
-
-		</div>
-		<div id="contentx">
-<header class="tbanner">
-    <div class="navbar navbar-fixed-top">
-        <div>
-            <div class="container">
-                <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse" id="fold-menu">
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-{% if user.is_authenticated %}
-{% else %}
-<a class="logopad" href="{% url 'main_page' %}"><img src="{{ STATIC_URL }}img/uSurvey.png" /></a>
-{% endif%} 
-
-
-<div class="nav-collapse collapse">
-                    <ul class="nav">
-                        {% if perms.auth.can_view_interviewers %}
-                        <li>
-                            <a id="about" class="dropdown-toggle" role="button" href="{% url 'main_page' %}">Home</a>
-                        </li>
-                        <li>
-                            <a id="about" class="dropdown-toggle" role="button" href="{% url 'about_page' %}">About</a>
-                        </li>
-
-                            <li class="dropdown">
-                                <a data-toggle="dropdown" id="drop-survey-admin-tab" class="dropdown-toggle"
-                                   role="button" href="#">Survey Administration<b class="caret"></b></a>
-                                <ul aria-labelledby="drop-survey-admin-tab" role="menu" class="dropdown-menu">
-                                    <li role="presentation"><a href="{% url 'interviewers_page' %}">Interviewers</a>
-                                    </li>
-                                    {% if perms.auth.can_enter_data %}
-                                    <li role="presentation"><a href="{% url 'list_household_page' %}">Households</a>
-                                    </li>
-                                    {% endif %}
-
-                                    {% if perms.auth.can_view_batches %}
-                                        <li role="presentation"><a href="{% url 'show_question_library' %}">Question
-                                            Bank</a></li>
-                                        <li role="presentation"><a href="{% url 'survey_list_page' %}">Surveys</a></li>
-                                        <li role="presentation"><a href="{% url 'question_module_listing_page' %}">Modules</a>
-                                        </li>
-                                        <li role="presentation"><a href="{% url 'household_member_groups_page' %}">Groups</a>
-                                        </li>
-                                        <li role="presentation"><a href="{% url 'bulk_sms' %}">Notifications</a></li>
-
-                                        <!--  li role="presentation"><a href="{% url 'upload_ea' %}">Upload EAs</a></li -->
-                                        <li role="presentation"><a href="{% url 'enumeration_area_home' %}">Enumeration Areas</a></li>
-                                    {% endif %}
-
-                                    {% if perms.auth.can_enter_data %}
-                                    <li role="presentation"><a href="{% url 'simulator_page' %}">Data Entry</a></li>
-                                    {% endif %}
-                                </ul>
-                            </li>
-                        {% endif %}
-
-                        {% if perms.auth.can_view_aggregates %}
-                            <li class="dropdown">
-                                <a data-toggle="dropdown" id="drop-downloads-tab" class="dropdown-toggle" role="button"
-                                   href="#">Downloads<b class="caret"></b></a>
-                                <ul aria-labelledby="drop-downloads-tab" role="menu" class="dropdown-menu">
-                                    <li role="presentation"><a href="{% url 'download_excel' %}">Download
-                                        Data Sheet</a></li>
-                                    <li role="presentation"><a href="{% url 'interviewer_report_page' %}">Mobile Money
-                                        Sheet</a></li>
-                                </ul>
-                            </li>
-                        {% endif %}
-
-                        {% if perms.auth.can_view_batches or perms.auth.view_completed_survey %}
-                            <li class="dropdown">
-                                <a data-toggle="dropdown" id="drop-analysis-tab" class="dropdown-toggle" role="button"
-                                   href="#">Analysis<b class="caret"></b></a>
-                                <ul aria-labelledby="drop-analysis-tab" role="menu" class="dropdown-menu">
-                                   <li role="presentation"><a href="{% url 'odk_submission_list' %}">View ODK submissions</a></li>
-                                    <li role="presentation"><a href="{% url 'list_indicator_page' %}">Indicators</a>
-                                    </li>
-                                    <li role="presentation"><a href="{% url 'survey_completion_rates' %}">Completion
-                                        Rates</a></li>
- {% if perms.auth.view_completed_survey %}
-                                    <li role="presentation"><a href="{% url 'show_interviewer_completion_summary' %}">Interviewer Completion
-                                        Summary</a></li>
- {% endif %}
-                                    <li role="presentation"><a href="{% url 'list_weights_page' %}">Location Weights</a>
-                                    </li>
-                                </ul>
-                            </li>
-                        {% endif %}
-
-                        {% if perms.auth.can_view_users %}
-                            <li class="dropdown">
-                                <a data-toggle="dropdown" id="drop-settings-tab" class="dropdown-toggle" role="button"
-                                   href="#">Settings<b class="caret"></b></a>
-                                <ul aria-labelledby="drop-settings-tab" role="menu" class="dropdown-menu">
-                                    <li role="presentation"><a href="{% url 'users_index' %}">Users</a></li>
-                                {% comment "Left to set up script" %}
-                                    <li role="presentation"><a href="{% url  'upload_locations' %}">Upload Locations CSV</a></li>
-                                {% endcomment %}
-                                </ul>
-                            </li>
-                        {% endif %}
-                    </ul>
-
-                    <!-- login/profile link on the right side -->
-
-                    {% if user.is_authenticated %}
-                        <ul role="navigation" class="nav pull-right">
-                            <li class="dropdown">
-                                <a data-toggle="dropdown" id="drop-user-settings" class="dropdown-toggle2" role="button"
-                                   href="#">{{ user.get_full_name }} <b class="caret"></b></a>
-                                <ul aria-labelledby="drop-user-settings" role="menu" class="dropdown-menu">
-                                    {% if user.is_superuser == False %}
-                                    <li role="presentation"><a href="{% url 'users_edit' user.id %}" id="edit_user"><i
-                                            class="icon-pencil"></i> Edit Profile</a></li>
-                                    {% endif %}
-                                    <li role="presentation"><a href="{% url 'password_change' %}"><i
-                                            class="icon-pencil"></i> Change Password</a></li>
-                                    <li role="presentation"><a href="{% url 'logout_page' %}"><i class="icon-off"></i>
-                                        Logout</a></li>
-                                </ul>
-                            </li>
-                        </ul>
-                    {% else %}
-                        <ul role="navigation" class="nav pull-right">
-                            <li>
-                                <a class="dropdown-toggle" role="button" href="{% url 'login_page' %}">LOGIN</a>
-                            </li>
-                        </ul>
-                    {% endif %}
-                </div>
-                <!--/.nav-collapse -->
+        {% block extra_inline %}
+        {% endblock %}
+    </head>
+    <body class="home page page-id-146 page-template page-template-page_templates page-template-home bgOne ">
+        <div class="loader"></div>
+        <script type="text/javascript">
+            $(window).load(function() {
+                $(".loader").fadeOut("slow");
+            })
+            </script>
+        <div class="loaderWrap" style="display: none;">
+            <div class="loader-inner sk-folding-cube">
+                <div class="sk-cube1 sk-cube"></div>
+                <div class="sk-cube2 sk-cube"></div>
+                <div class="sk-cube4 sk-cube"></div>
+                <div class="sk-cube3 sk-cube"></div>
             </div>
         </div>
-    </div>
-</header>
-<div class="breadnavbar">
-    <div class="container">
-<a href="{% url 'main_page' %}" style="background: 000;">Home</a> &raquo;
-{% for breadcrumb in request.breadcrumbs %} 
-<a href="{{ breadcrumb.url }}">{{ breadcrumb.name }}</a> &raquo;
-{% endfor %}
-<span class="breadnavbarblue">{% block title %}{% endblock %}</span>
-<div id="status-bar" class="status-bar right">
-    <span id="status-msg">...</span>
-</div>
-</div>
-</div>
-<br />
-<div id="content" class="container">
-    <div class="container">
-        {% if messages %}
-            {% for message in messages %}
-                <div class="alert alert-{{ message.tags }}">
-                    <ul>
-                        {{ message }}
-                    </ul>
+        <header class="headerFix">
+            {% if user.is_authenticated %}
+            <div class="logo pull-left">
+                <div class="logoImg">
+                    <a href="{% url 'main_page' %}"><img src="{{ STATIC_URL }}toassets/Logo_Main.png" alt="uSurvey"></a>
                 </div>
-            {% endfor %}
-        {% endif %}
-
-        {% block content %}
-        {% endblock %}
-    </div>
-<div id="push"></div>
-</div>
-<br class="clear" />
-<br class="clear" />
-<div class="footer">&copy; UNICEF &amp; UBOS 2013 - <script language="JavaScript" type="text/javascript">
-
-var now = new Date();
-
-var dayNames = new Array("Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday");
-
-var monNames = new Array("January","February","March","April","May","June","July","August","September","October","November","December");
-
-document.write(" "+ now.getFullYear());
-
-      </script></div>
-         
-<script src="{{ STATIC_URL }}/js/jquery-2.0.0.min.js" type="text/javascript" charset="utf-8"></script>
-<script src="{{ STATIC_URL }}/js/jquery-ui.min.js" type="text/javascript" charset="utf-8"></script>
-<script src="{{ STATIC_URL }}/js/highcharts.js" type="text/javascript" charset="utf-8"></script>
-<script src="{{ STATIC_URL }}/js/exporting.js" type="text/javascript" charset="utf-8"></script>
-<script src="{{ STATIC_URL }}bootstrap/js/bootstrap.js" type="text/javascript" charset="utf-8"></script>
-<script src="{{ STATIC_URL }}/js/jquery.dataTables.js"></script>
-<script src="{{ STATIC_URL }}/js/dataTables.bootstrap.js" type="text/javascript" charset="utf-8"></script>
-<script src="{{ STATIC_URL }}js/underscore.js" type="text/javascript" charset="utf-8"></script>
-<script src="{{ STATIC_URL }}/js/jquery.validate.js" type="text/javascript" charset="utf-8"></script>
-<script src="{{ STATIC_URL }}/js/question_options.js" type="text/javascript" charset="utf-8"></script>
-<script src="{{ STATIC_URL }}/chosen/chosen.jquery.js" type="text/javascript" charset="utf-8"></script>
-<script src="{{ STATIC_URL }}/multi-select/jquery.multi-select.js" type="text/javascript" charset="utf-8"></script>
-<script src="{{ STATIC_URL }}/bootstrap-switch/bootstrap-switch.js" type="text/javascript" charset="utf-8"></script>
-<script src="{{ STATIC_URL }}/js/application.js" type="text/javascript" charset="utf-8"></script>
-<script src="{{ STATIC_URL }}/js/location-widget.js" type="text/javascript" charset="utf-8"></script>
-<script src="{{ STATIC_URL }}/js/numerical-bar-chart.js" type="text/javascript" charset="utf-8"></script>
-<script src="{{ STATIC_URL }}/js/multichoice-bar-chart.js" type="text/javascript" charset="utf-8"></script>
-<script src="{{ STATIC_URL }}/js/multichoice-stacked-bar-chart.js" type="text/javascript" charset="utf-8"></script>
-<script src="{{ STATIC_URL }}js/simple_indicator_bar_chart.js" type="text/javascript" charset="utf-8"></script>
-<script src="{{ STATIC_URL }}/js/jquery-ui.js" type="text/javascript" charset="utf-8"></script>
-<script src="{{ STATIC_URL }}js/household_member_group.js" type="text/javascript" charset="utf-8"></script>
-<script src="{{ STATIC_URL }}js/jquery.formset.js" type="text/javascript" charset="utf-8"></script>
-{% block javascripts %}
-{% endblock %}
-<script type="text/javascript">
-     $('.datepicker').datepicker({
-     changeMonth: true,
-     changeYear: true,
-     dateFormat: 'dd-mm-yy',
-     yearRange: "-120:+nn"
-     });
-</script>
-
             </div>
+            <nav id='cssmenu'>
+                <div id="head-mobile"></div>
+                <div class="button"></div>
+                <ul>
+                    <li id="menu-item-120" class="menu-item menu-item-type-custom menu-item-object-custom menu-ancestor menu-parent menu-item-has-children menu-item-120"><a href="{% url 'home_page' %}" class="home_page"><i class="fa fa-dashboard"></i> DASHBOARD</a>
+                    </li>
+                    <li>
+                        <a href='#' class="survey_list_page new_survey_page edit_survey_page clone_survey_page delete_survey batch_index_page survey_batches_page new_batch_page batch_show_page  delete_batch listing_criteria_page delete_listing_criterion clone_qset_page  listing_template_home  new_listing_template_page  edit_listing_template_page  delete_listing_template_page  sampling_criteria new_question_module_page  question_module_listing_page  edit_question_module_page  delete_question_module_page respondent_groups_page new_respondent_groups_page  respondent_groups_edit  respondent_groups_delete show_question_library new_question_library edit_show_question_library  delete_question_template_page export_question_template_page filter_question_list show_parameter_template new_parameter_template edit_parameter_template export_parameter_template submenu-button1"><i class="fa fa-file-picture-o"></i> DESIGN</a>
+                        <ul>
+                            {% if perms.auth.can_view_batches %}
+                            <li><a href="{% url 'survey_list_page' %}" class="survey_list_page new_survey_page edit_survey_page clone_survey_page delete_survey batch_index_page survey_batches_page new_batch_page batch_show_page  delete_batch listing_criteria_page delete_listing_criterion" >Surveys</a></li>
+                            {% endif%}
+                            {% if perms.auth.can_enter_data %}
+                            <li><a href="{% url 'listing_template_home' %}" class="clone_qset_page  listing_template_home  new_listing_template_page  edit_listing_template_page  delete_listing_template_page  sampling_criteria">Listing Form</a></li>
+                            {% endif%}
+                            {% if perms.auth.can_enter_data %}
+                            <li><a href="{% url 'question_module_listing_page' %}" class="new_question_module_page  question_module_listing_page  edit_question_module_page  delete_question_module_page">Modules</a></li>
+                            <li><a href="{% url 'respondent_groups_page' %}" class="respondent_groups_page new_respondent_groups_page  respondent_groups_edit  respondent_groups_delete show_parameter_template new_parameter_template new_parameter_template edit_parameter_template export_parameter_template">Groups</a></li>
+                            <li><a href="{% url 'show_question_library' %}" class="show_question_library new_question_library edit_show_question_library  delete_question_template_page export_question_template_page filter_question_list">Question
+                                Library</a>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </li>
+                    <li>
+                        <a href='#' class="interviewers_page  new_interviewer_page  show_interviewer_page  block_interviewer_page check_mobile_number edit_interviewer_page view_interviewer_page  unblock_interviewer_page  unblock_interviewer_ussd  unblock_interviewer_odk block_interviewer_ussd block_interviewer_odk bulk_sms  send_bulk_sms online_interviewer_view submenu-button1"><i class="fa fa-user-md"></i> ADMINISTRATION</a>
+                        <ul>
+                            <li>
+                                <a href="{% url 'interviewers_page' %}" class="interviewers_page  new_interviewer_page  show_interviewer_page  block_interviewer_page check_mobile_number edit_interviewer_page view_interviewer_page  unblock_interviewer_page  unblock_interviewer_ussd  unblock_interviewer_odk block_interviewer_ussd block_interviewer_odk">Interviewers</a>
+                            </li>
+                            <li>
+                                <a href="{% url 'bulk_sms' %}" class="bulk_sms  send_bulk_sms">Notifications</a>
+                            </li>
+                            <li>
+                                <a href="{% url 'online_interviewer_view' %}" class="online_interviewer_view">Data Entry</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href='#' class="show_interviewer_completion_summary view_listing_data view_survey_data odk_submission_list submenu-button1"><i class="fa fa-desktop"></i> MONITOR</a>
+                        <ul>
+                            {% if perms.auth.view_completed_survey %}
+                            <li>
+                                <a href="{% url 'view_listing_data' %}" class="view_listing_data">Listing Data</a>
+                            </li>
+                            <li>
+                                <a href="{% url 'view_survey_data' %}" class="view_survey_data">Survey Data</a>
+                            </li>
+                            <li>
+                                <a href="{% url 'show_interviewer_completion_summary' %}" class="show_interviewer_completion_summary"> Completion
+                                Summary</a>
+                            </li>
+                            {% endif %}
+                            <li><a href="{% url 'odk_submission_list' %}" class="odk_submission_list">ODK submissions</a>
+                            </li>
+                        </ul>
+                    </li>
+                    {% if perms.auth.can_view_batches or perms.auth.view_completed_survey %}
+                    <li>
+                        <a href='#' class="new_indicator_page validate_formulae add_formula_page delete_indicator_variable delete_indicator_criteria add_indicator_variable view_indicator_variables add_formula_page indicator_variables list_indicator_page  edit_indicator_page delete_indicator_page simple_indicator_chart_page edit_indicator_variable download_indicator_analysis get_location_children get_enumeration_areas submenu-button1"><i class="fa fa-line-chart"></i> ANALYSE</a>
+                        <ul>
+                            <li>
+                                <a href="{% url 'list_indicator_page' %}" class="new_indicator_page validate_formulae add_formula_page delete_indicator_variable delete_indicator_criteria add_indicator_variable view_indicator_variables add_formula_page indicator_variables list_indicator_page  edit_indicator_page delete_indicator_page simple_indicator_chart_page edit_indicator_variable download_indicator_analysis">Indicators</a>
+                            </li>
+                            {% endif %}    
+                        </ul>
+                    </li>
+                    {% if perms.auth.can_view_aggregates %}
+                    <li>
+                        <a href='#' class="download_excel interviewer_report_page excel_report download_export_results submenu-button1"><i class="fa fa-download"></i> DOWNLOADS</a>
+                        <ul>
+                            <li>
+                                <a href="{% url 'download_excel' %}" class="download_excel excel_report download_export_results">Survey Data</a>
+                            </li>
+                            <li>
+                                <a href="{% url 'interviewer_report_page' %}" class="interviewer_report_page">Mobile Money Sheet</a>
+                            </li>
+                            {% endif %}    
+                        </ul>
+                    </li>
+                    {% if user.is_authenticated %}
+                    <li>
+                        <a href='#' class="new_user_page users_index  users_show_details activate_user deactivate_user users_edit new_user_page enumeration_area_home submenu-button1"><i class="fa fa-cog"></i> SETTINGS</a>
+                        <ul>
+                            {% if perms.auth.can_view_users %}
+                            <li>
+                                <a href="{% url 'users_index' %}" class="new_user_page users_index  users_show_details activate_user deactivate_user users_edit new_user_page">Users</a>
+                            </li>
+                            <li>
+                                <a href="{% url 'enumeration_area_home' %}" class="enumeration_area_home">Locations</a>
+                            </li>
+                            <li>
+                                <a href="#">Setup</a>
+                            </li>
+                            {% elif user.id %}
+                            <li>
+                                <a href="{% url 'users_edit_profile' user.id %}">Edit Profile</a>
+                            </li>
+                            {% endif %}    
+                        </ul>
+                    </li>
+                    {% endif %}
+                    <li>
+                        <a href="#" class="submenu-button1 last">
+                        {% has_super_powers request as has_powers %}
+                        {% if user.is_authenticated %}
+                        <span class="dropdown-toggle" data-toggle="dropdown" data-position="auto" style="background:  none !important; border: none !important;">
+                        {% if has_powers %}
+                        <img src="{{ STATIC_URL }}images/userICON_admin.png" width="40px;" height="40px;" style="margin-left: 150px;margin-top: 10px;" title="Super Powers Activated">
+                        {% else %}
+                        <img src="{{ STATIC_URL }}images/userICON.png" width="40px;" height="40px;" style="margin-left: 150px;margin-top: 10px;">
+                        {% endif %}
+                        </span>
+                        </a>
+                        <ul>
+                            <!-- <li>
+                                <a href="{% url 'users_edit' request.user.id 'view' %}">Profile</a>
+                            </li> -->
+                            <li>
+                                <a href="{% url 'users_edit' request.user.id 'view' %}" >{% if user.first_name %}{{ user.first_name }} {% else %} Settings {% endif %}</a>
+                            </li>
 
-	<script>window.jQuery || document.write('<script src="{{ STATIC_URL }}js/vendor/jquery-1.9.1.min.js"><\/script>')</script>
-	<script src="{{ STATIC_URL }}js/main.js"></script>
-</body>
+                            {% if perms.auth.can_have_super_powers %}
+                            {% if has_powers %}
+                            <li>
+                                <a href="{% url 'deactivate_super_powers_page' %}" class="activate_super_powers_page">Deactivate Power Mode</a>
+                            </li>
+                            {% else %}
+                            <li>
+                                <a href="{% url 'activate_super_powers_page' %}" class="activate_super_powers_page">Active Power Mode</a>
+                            </li>
+                            {% endif %}
+                            {% endif %}                            
+                            <li>
+                                <a href="{% url 'password_change' %}" class="password_reset_done password_change">Change Password</a>
+                            </li>
+                            <li>
+                                <a href="{% url 'logout_page' %}">Logout</a>
+                            </li>
+                            {% else %}
+                            <a href="{% url 'login_page' %}">Login</a>
+                            {% endif %}
+                        </ul>
+                    </li>
+                </ul>
+            </nav>
+            {%endif%}
+            <div class="clearfix"></div>
+        </header>
+        <div class="fw-page-builder-content">
+            <div class="container-fluid">
+                <div class="fw-row col-md-12" >
+                    <div class="fw-col-xs-12 fw-col-xs-12 col-sm-12  col-md-12  wow none animated" style="text-align: left ! important; padding-left: 0px; padding-right: 0px; visibility: visible;margin-top: 15px;">
+                    </div>
+                    <div class="row" id="xyz-breadcrumbs">
+                        <h5 style="color:#09F; font-weight:none; max-width: 80%;line-height: 2em;">
+                            <a href="{% url 'home_page' %}">Home</a> &raquo;
+                            {% for breadcrumb in request.breadcrumbs %}
+                            <a href="{{ breadcrumb.url }}">{{ breadcrumb.name }}</a> &raquo;
+                            {% endfor %}{% block current_page %}{% repeat title %}{% endblock %}
+                        </h5>
+                    </div>
+                    <div>
+                        <div class="dataTables_filter row" id="xyz-page-actions">
+                            {% block page_actions %}
+                            {% endblock %}
+                        </div>
+                    </div>
+                    <div class="tp-fullwidth-forcer" style="width: 100%; min-height:auto; height: 500px;">
+                        <div class="main-container">
+                            <div>
+                                {% if messages %}
+                                {% for message in messages %}
+                                <ul class="row alert alert-{{ message.tags }} col-md-12"  id="alert_tag" style="background: #def0d8 none repeat scroll 0 0;
+                                    border: 1px solid #cfdaca;
+                                    margin-top: 7px;
+                                    padding: 8px;
+                                    text-align: center;">
+                                    <button type="button" class="close" data-dismiss="alert">&times;</button>
+                                    {{ message }}
+                                </ul>
+                                {% endfor %}
+                                {% endif %}
+                            </div>
+                            <div class="">
+                                <div class="main-content-inner">
+                                    <div class="page-content">
+                                        <div class="usur-settings-container">
+                                            <div class="usur-settings-box clearfix">
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-xs-12">
+                                                <div class="row">
+                                                    <div class="col-xs-16">
+                                                        <div class="clearfix">
+                                                            <div class="pull-right tableTools-container"></div>
+                                                        </div>
+                                                        <div class="table-header" style="z-index:1; text-align:center;">
+                                                            {% block page_title %}{% repeat title %}{% endblock %}
+                                                        </div>
+                                                        <!-- div.table-responsive -->
+                                                        <!-- div.dataTables_borderWrap -->
+                                                        <div>
+                                                            <div id="dynamic-table_wrapper" class="dataTables_wrapper form-inline no-footer">
+                                                                <div class="row">
+                                                                    <div class="">
+                                                                        <div class="dataTables_length "  id="dynamic-table_length">
+                                                                            {% block search %}
+                                                                            {% endblock %}
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-xs-6">
+                                                                    </div>
+                                                                </div>
+                                                                <div id="content-search">
+                                                                    {% block content_search %}
+                                                                    {% endblock %}
+                                                                </div>
+                                                                <div>
+                                                                    {% block content %}
+                                                                {% endblock %}
+                                                                </div>
+                                                                
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                    </div>
+                                </div>
+                                <a href="#" id="btn-scroll-up" class="btn-scroll-up btn btn-sm btn-inverse">
+                                <i class="usur-icon fa fa-angle-double-up icon-only bigger-110"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="secTriangle" style="background-image: url({{ STATIC_URL }}images/slider3.png); background-reapet: no-reapet; background-position: center center; "></div>
+        <script src='http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+        <script type="text/javascript" src="{{ STATIC_URL }}toassets/menjs.js"></script>
+        <script type="text/javascript" src="http://cdn.jsdelivr.net/qtip2/3.0.3/jquery.qtip.min.js"></script>
+        <script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+        <script src="http://danml.com/js/download.js" type="text/javascript" charset="utf-8"></script>
+        <script type="text/javascript" src="{{ STATIC_URL }}toassets/modernizr.js"></script>
+        <script src="{{STATIC_URL}}js/jquery.validate.js" type="text/javascript" charset="utf-8"></script>
+        <script type="text/javascript" src="{{ STATIC_URL }}chosen/chosen.jquery.js"></script>
+        <script src="{{ STATIC_URL }}bootstrap-switch/bootstrap-switch.js" type="text/javascript" charset="utf-8"></script>
+        <script type="text/javascript" src="{{ STATIC_URL }}toassets/theme.js"></script>
+        <script src="{{ STATIC_URL }}multi-select/jquery.multi-select.js" type="text/javascript" charset="utf-8"></script>
+        <script src="{{ STATIC_URL }}js/question_options.js" type="text/javascript" charset="utf-8"></script>
+        <script>
+            $(document).ready(function() {
+
+                try { 
+                $('.multi-select').multiSelect();
+
+                }
+                catch(err) {
+                //err;
+                }
+
+                try { 
+                    $(".chzn-select").chosen();
+                 }
+                catch(err) {
+                    //alert(err);
+                }
+                var currentTime = new Date()
+                var year = currentTime.getFullYear();
+                try {
+                        datePickerSettings = {
+                                             changeMonth: true,
+                                             changeYear: true,
+                                             dateFormat: 'dd-mm-yy',
+                                             yearRange: "-120:+nn",
+                                             {% if request.resolver_match.url_name == 'new_interviewer_page' or request.resolver_match.url_name == 'edit_interviewer_page'%}
+                                               maxDate: new Date(year-18, 1 - 1, 28)
+                                               {%endif%}
+
+                                           }
+                        $(".datepicker").datepicker(datePickerSettings);
+                     }
+                catch(err) {
+                    //alert(err);
+                }
+                
+                
+                try { 
+                        $('form span[title]').qtip({
+                            style: { classes: 'qtips' },
+                        });
+                    }
+                catch(err) {
+                    //alert(err);
+                }
+
+            });
+            
+        </script>
+        <script src="{{STATIC_URL}}js/select2.full.js"></script>
+        {% block javascripts %}
+        {% endblock %}
+        <script type="text/javascript">
+            // clear all input elements on cancel
+            $('.modal').on('hidden.bs.modal', function (e) {
+                  $(this)
+                    .find("input[type=text],input[type=number],input[type=email],textarea,select")
+                       .val('')
+                       .end();
+                       $(".chzn-select").val("").trigger('chosen:updated');
+                       $("#id_random_sample_label-control-group").hide();
+                       $("#id_preferred_listing-control-group").show();
+                       $("#id_listing_form-control-group").show();
+
+                });
+        </script>
+        
+        <script type="text/javascript">
+            if('ontouchstart' in document.documentElement) document.write("<script src='assets/js/jquery.mobile.custom.min.js'>"+"<"+"/script>");
+        </script>
+        <style type="text/css">
+            .form-search textarea, .form-inline textarea, .form-horizontal textarea{margin-left: 4px !important}
+            div.dataTables_info {
+            padding-top: 15px;
+            display: none;
+            }
+            .dataTables_scrollBody {
+            height: 330px !important;
+            padding-bottom: 10px;
+            }
+            .dataTables_length {margin-top: 10px;}
+            .dataTables_wrapper input[type='text'],input[type='number'],input[type='password'], select, textarea{color: #000 !important;}
+        </style>
+    </body>
 </html>
+

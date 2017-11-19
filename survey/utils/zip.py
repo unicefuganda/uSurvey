@@ -9,7 +9,7 @@ class InMemoryZip(object):
         self.in_memory_zip = StringIO.StringIO()
 
     def append(self, filename_in_zip, file_contents):
-        '''Appends a file with name filename_in_zip and contents of 
+        '''Appends a file with name filename_in_zip and contents of
         file_contents to the in-memory zip.'''
         # Get a handle to the in-memory zip in append mode
         zf = zipfile.ZipFile(self.in_memory_zip, "a",
@@ -22,7 +22,7 @@ class InMemoryZip(object):
         # Unix permissions are not inferred as 0000
         for zfile in zf.filelist:
             zfile.create_system = 0
-
+        zf.close()
         return self
 
     def read(self):

@@ -40,7 +40,7 @@
 	}
 /* stupid Android 2 doesn't understand "max-width: none" properly */
 .leaflet-container img.leaflet-image-layer {
-	max-width: 15000px !important;
+	max-width: 1400px !important;
 	}
 .leaflet-tile {
 	filter: inherit;
@@ -106,6 +106,7 @@
 	}
 .leaflet-left .leaflet-control {
 	margin-left: 10px;
+	margin-top: 85px;
 	}
 .leaflet-right .leaflet-control {
 	margin-right: 10px;

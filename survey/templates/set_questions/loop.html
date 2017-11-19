@@ -1,0 +1,124 @@
+    {% extends "form.html" %}
+
+{% block title %}
+    Loop Start
+{% endblock %}
+{% block extra_head %}
+<link href="{{STATIC_URL}}css/select2.css" rel="stylesheet"/>
+<script src="{{STATIC_URL}}js/select2.full.js"></script>
+<style type="text/css">
+#id_previous_numeric_values{
+    width: 450px !important;
+}
+    #id_previous_numeric_values {
+        width: 50%;
+    }
+    #id_loop_prompt{
+    margin-left: -2px !important;
+    width: 550px !important;
+    height: 30px !important;
+    }
+    #id_repeat_count{
+         padding-bottom: 2px !important;
+         padding-top: 2px !important;
+         width: 450px !important;
+    }
+    .dataTables_wrapper select {    margin-bottom: 0 !important;    margin-left: 4px!important;    margin-right: 4px!important;    margin-top: 0px !important;    padding: 3px !important;    width: 450px!important;}
+</style>
+{% endblock %}
+{% block pre_form_content %}
+     <h4> Loop label: {{question.text}} </h4>
+         <br />
+{% endblock%}
+{% block display_form_fields %}
+
+{% include "naked_form.html" with a_form=loop_form %}
+
+{% endblock %}
+    {% block buttons %}
+  <div class="form-actions">
+    <button id="button" type="submit" class="btn btn-primary submit" name="save_button" data-disabled-text="{{ loading_text }}">Save</button>
+
+    {% if cancel_url %}
+      <a href="{{ cancel_url }}" class="btn btn-primary" name="cancel_button" class="cancel" style=" padding-right: 5px; padding-left: 5px; padding-bottom: 1px;">Cancel</a>
+    {% else %}
+      <a href="#" class="btn btn-primary" name="cancel_button" id="cancel_{{ id }}" class="cancel">Cancel</a>
+    {% endif %}
+  </div>
+    {% endblock %}
+
+{% block javascripts %}
+        <script type="text/javascript">
+            $(function(){
+                 if(!$('#id_previous_numeric_values').val()) {
+                     $('#id_previous_numeric_values-control-group').hide();
+                     $('#id_previous_numeric_values').prop('disabled', true);
+                 }
+                 if(!$('#id_repeat_count').val()){
+                     $('#id_repeat_count-control-group').hide();
+                     $('#id_repeat_count').prop('disabled', true);
+                 }
+                 if($('#id_repeat_logic').val()){
+                    $('#id_loop_prompt-control-group').hide();
+                    $('#id_loop_prompt').prop('disabled', true);
+                 }
+                 else{
+                    $('#id_loop_prompt-control-group').show();
+                    $('#id_loop_prompt').prop('disabled', false);
+                 }
+
+                 $('#id_repeat_logic').change(function(){
+                    $('#id_repeat_count').val('');
+                    $('#id_previous_numeric_values').val('');
+                     if($('#id_repeat_logic').val()){
+                        $('#id_loop_prompt-control-group').hide();
+                        $('#id_loop_prompt').prop('disabled', true);
+                     }
+                     else{
+                        $('#id_loop_prompt-control-group').show();
+                        $('#id_loop_prompt').prop('disabled', false);
+                     }
+                    switch($(this).val()) {
+                        case('{{loop_form.FIXED_COUNT}}'):
+                            $('#id_repeat_count-control-group').show();
+                            $('#id_previous_numeric_values-control-group').hide();
+                            $('#id_previous_numeric_values').prop("disabled", true);
+                            $('#id_repeat_count').prop("disabled", false);
+                            break;
+                        case('{{loop_form.PREVIOUS_ANSWER_COUNT}}'):
+                            $('#id_repeat_count-control-group').hide();
+                            $('#id_previous_numeric_values-control-group').show();
+                            $('#id_previous_numeric_values').prop("disabled", false);;
+                            $('#id_repeat_count').prop("disabled", true);
+                            break;
+                        default:
+                            $('#id_repeat_count-control-group').hide();
+                            $('#id_previous_numeric_values-control-group').hide();
+                            $('#id_previous_numeric_values').prop('disabled', true);
+                            $('#id_repeat_count').prop('disabled', true);
+                    }
+                });
+            });
+        </script>
+        <script src="{{STATIC_URL}}js/logic.js" type="text/javascript" charset="utf-8"></script>
+        <script type="text/javascript">
+    $("#id_loop_ender").attr("style","width:450px;");
+    $("#id_repeat_logic").attr("class","id_repeat_logic");
+    </script>
+        <script type="text/javascript">
+            id_text_delim = '-';
+            change_to_select2( $('#id_previous_numeric_values'));
+            change_to_select2( $('#id_loop_ender'));
+        </script>
+
+
+        <style type="text/css">
+            .control-group {margin-bottom: 2px !important;}
+            .control-label{margin-right: 12px;}
+            .dataTables_wrapper .id_repeat_logic{width: 550px !important;}
+            .select2-container--classic{width: 550px !important;}
+            .select2-container .selection .select2-selection{border-left: 3px solid #0577e0;
+            }
+        
+        </style>
+{% endblock %}

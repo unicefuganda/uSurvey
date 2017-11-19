@@ -44,8 +44,8 @@ class LocationType(MPTTModel, BaseModel):
     def smallest_unit(cls):
         try:
             root_node = cls.objects.get(parent=None)
-            return root_node.get_leafnodes(False)[0]
-        except cls.DoesNotExist, IndexError:
+            return root_node.get_leafnodes(False).get(parent__isnull=False)
+        except cls.DoesNotExist as IndexError:
             return None
 
     @classmethod
@@ -53,21 +53,23 @@ class LocationType(MPTTModel, BaseModel):
         try:
             root_node = cls.objects.get(parent=None)
             return root_node.get_children()[0]
-        except cls.DoesNotExist, IndexError:
+        except cls.DoesNotExist as IndexError:
             return None
 
     @classmethod
     def in_between(cls):
         if cls.objects.exists():
-            return cls.objects.exclude(pk=LocationType.smallest_unit().pk).exclude(parent__isnull=True)
+            return cls.objects.exclude(
+                pk=LocationType.smallest_unit().pk).exclude(
+                parent__isnull=True)
         else:
             return cls.objects.none()
 
 
 class Location(MPTTModel, BaseModel):
-    name = models.CharField(max_length=50)
+    name = models.CharField(max_length=200, db_index=True)
     type = models.ForeignKey(LocationType, related_name='locations')
-    code = models.CharField(max_length=100, null=True, blank=True)
+    code = models.CharField(max_length=200, null=True, blank=True)
     parent = TreeForeignKey('self', null=True, blank=True,
                             related_name='sub_locations', db_index=True)
     # would use this in the future. But ignore for now
@@ -86,6 +88,13 @@ class Location(MPTTModel, BaseModel):
     @property
     def tree_parent(self):
         return self.parent
+
+    @classmethod
+    def country(cls):
+        try:
+            return Location.objects.get(parent__isnull=True)
+        except Location.DoesNotExist:
+            return None
 
     def is_sub_location(self, location):
         return location.is_ancestor_of(self)

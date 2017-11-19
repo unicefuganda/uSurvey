@@ -1,13 +1,13 @@
 ;
 jQuery(function($){
-    var batch = $("#id_batch");
-
+    var batch = $("#id_question_set");
+    var parameter = $("#id_parameter");
     $("#id_filter_survey").on('change', updateBatchSelectField);
     $('#id_survey').on('change', updateBatchSelectField);
 
     function updateBatchSelectField () {
        batch.find('option').remove();
-        batch.append($('<option />').val('').text('Select Batch'));
+        batch.append($('<option />').val('').text('--Select Batch--'));
         populate_choices.call(this);
     }
 
@@ -26,7 +26,8 @@ jQuery(function($){
             });
         });
     }
-    if(batch && batch.val().length == 0)
-        $('#id_survey').trigger("change");
+    if(batch)
+        if ($("#id_question_set").val.length == 0)
+            $('#id_survey').trigger("change");
 
 });

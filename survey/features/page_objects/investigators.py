@@ -1,5 +1,4 @@
 # vim: ai ts=4 sts=4 et sw=4 encoding=utf-8
-from time import sleep
 from survey.features.page_objects.base import PageObject
 from survey.investigator_configs import COUNTRY_PHONE_CODE
 from rapidsms.contrib.locations.models import Location

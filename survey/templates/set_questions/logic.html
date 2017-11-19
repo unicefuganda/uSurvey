@@ -1,0 +1,111 @@
+{% extends "form.html"%}
+
+{% load template_tags %}
+
+{% block extra_head %}
+<link href="{{STATIC_URL}}css/select2.css" rel="stylesheet"/>
+<script src="{{STATIC_URL}}js/select2.full.js"></script>
+<style type="text/css">
+    #id_next_question {
+        width: 50%;
+    }
+    .form-horizontal {
+        margin-top: 5px;
+    }
+    .form-horizontal .control-label-2 {
+    padding-top: 7px !important;
+    margin-bottom: 0;
+    text-align: right;
+}
+</style>
+{% endblock %}
+
+{% block title %}
+    Add/Edit Logic
+{% endblock %}
+{% block search %}
+    <h4>&nbsp;&nbsp;Question: {{ question }}</h4>
+{% endblock %}
+
+{% block display_form_fields %}
+    {% for field in logic_form.visible_fields %}
+        {% if field.label != '' %}
+            {% if forloop.counter > 1 %}
+                </div>
+                </div>
+            {% endif %}
+            <div class="control-group">
+            <label class="control-label-2 col-md-3" for="{{field.auto_id}}">{{field.label}}</label>
+            <div class="controls {{ field|is_radio }} col-md-9">
+        {% endif %}
+        {% include 'shared/_standard_field.html' with field=field %}
+    {% endfor %}
+    
+    </div>
+    </div>
+
+    <input type="hidden" value='{{ question.id }}' id='id_question' >
+    <input type="hidden" value='{{ batch_id }}' id='id_batch' >
+    {% for hidden in a_form.hidden_fields %}
+        {{ hidden }}
+    {% endfor %}
+{% endblock %}
+
+{% block non_form_content %}
+    <div class="modal fade" id="add_sub_question_modal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true" id="close_modal">&times;</button>
+                    <h4 class="modal-title">New Sub Question</h4>
+                </div>
+                <div class="modal-body">
+                     {% include 'set_questions/_add_question.html' with title="" button_label="Save" id="add-question-form" class="sub_question_modal question-form" %}
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+    <h4>Existing Logic</h4>
+    {% include 'questions/_view_question_logic.html' %}
+{% endblock %}
+
+
+
+{% block javascripts %}
+<script type="text/javascript">
+    $("#id_next_question").attr("style","width:500px;")
+    </script>
+    <script type="text/javascript">
+        QUES_VALIDATION_OPTS = {{ batch | quest_validation_opts }}
+        QUES_VALIDATION_PARAMS = {{ batch | validation_args }}
+    </script>
+    <script src="{{STATIC_URL}}js/logic.js" type="text/javascript" charset="utf-8"></script>
+    <script src="{{STATIC_URL}}js/questions.js" type="text/javascript" charset="utf-8"></script>
+
+    <script type="text/javascript">
+   $(document).ready(function(){
+     $('.controls textarea ').after($('<span id="text-counter"></span>'));
+     });
+</script>
+
+<style type="text/css">
+ #id_value{width: 220px !important;
+   height: 25px !important;
+margin-left: 0px !important;
+ }
+
+ #id_next_question, .select2-container .selection .select2-selection{border-left: 3px solid #0577e0;}
+
+  #text-counter{
+      margin-left: 10px !important;font-size: 11px;
+   }
+   #id_answer_type{margin-left: 4px !important;}
+</style>
+
+
+
+
+
+
+
+{% endblock %}

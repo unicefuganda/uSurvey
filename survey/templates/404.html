@@ -1,5 +1,28 @@
-{% extends "layout.html" %}
-{% block content %}
-    <h1 style="font-size: 40px;"> 404</h1>
-    <h1>Not Found!</h1>
+{% extends "base.html" %}
+{% block title %}404
 {% endblock %}
+
+{% block extra_content %}
+<section class="commonSection " style="background-color: #ffffff; background-repeat: no-repeat; " > 
+    <div class="container">
+        <div class="fw-row usurvey-static-content" style="min-height: 600px;">
+            <div class="col-md-7 col-md-offset-2">
+                <p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p>
+                <div class="static-content text-center" style="border: 1px #eee solid;padding: 20px;">
+                    <h1 class="text-danger"><i class="fa fa-warning"></i> Page Not Found <small>(404)</small></h1>
+                        <hr/>
+                        {% if user.is_authenticated %}
+                        	<p style="font-size: 15px;" >Head back to the dashbaord page </p><br/>
+                        	<a href="{% if request.META.HTTP_REFERER %} {{ request.META.HTTP_REFERER }}
+                        	        {% else %}{% url 'home_page' %}{% endif %}" class="btn btn-primary btn-submit"><i class="glyphicon glyphicon-arrow-left"></i> Go Back</a>
+                         {%else%}
+                         	<p style="font-size: 15px;" >Head back to the Home page </p><br/>
+                            <a href="{{ request.META.HTTP_REFERER|default:'/' }}" class="btn btn-primary btn-submit"><i class="glyphicon glyphicon-arrow-left"></i> Go Back</a>
+                        {%endif%}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{%endblock%}
+

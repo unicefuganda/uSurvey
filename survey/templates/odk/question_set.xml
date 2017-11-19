@@ -1,0 +1,227 @@
+<h:html xmlns="http://www.w3.org/2002/xforms"
+xmlns:h="http://www.w3.org/1999/xhtml"
+xmlns:ev="http://www.w3.org/2001/xml-events"
+xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+xmlns:jr="http://openrosa.org/javarosa">
+{% load template_tags %}
+<h:head>
+<h:title>
+	{% if title %}
+		{{ title }}
+	{% else %}
+	  {{qset.name}}
+	{% endif %}
+
+</h:title>
+  <model>
+  <instance>
+   <qset id="{{ qset.pk }}" >
+     <meta>
+       <instanceID />
+       <instanceName />
+		<creationDate />
+		<locked />
+     </meta>
+	 <submissions>
+		 <id />
+		 <dates>
+			 <lastModified />
+		 </dates>
+	 </submissions>
+	   {% comment %}<type>{{ stage }}</type>  basically tells if it's listing or survey data. status may change {% endcomment %}
+	   <surveyAllocation locked="true()" />
+
+		{% if interviewer.non_response_eas %}
+			<nqrc>0</nqrc>		{% comment %}Non response confirmation. Just used to  {% endcomment %}
+			<nqr />			{% comment %}Non response confirmation {% endcomment %}
+			<nqr_other />
+	   {%  endif %}
+
+	   <qset{{ qset.pk }}>
+
+	   {% if ea_samples %}
+	     <sampleData>
+			 <selectedSample />
+		   {% for ea_id, samples in ea_samples.items %}
+				<iq{{ ea_id }} />
+			{% endfor %}
+		</sampleData>
+	   {% endif %}
+
+			<questions>
+				{% if qset.parameter_list %}
+				   <groupQuestions>
+					   {% for question in qset.parameter_list.questions.all %}
+							<q{{question.pk}} />
+					   {% endfor %}
+				   </groupQuestions>
+				   {% endif %}
+				<surveyQuestions>
+					{% for question in qset.questions_inline %}
+					   {% if question.loop_started %}
+						   <q{{question.pk}}q{{question.loop_started.loop_ender.pk}}>
+							<id{{ question.loop_started.pk }} />
+							<creationDate />
+					   {% endif %}
+								<q{{question.pk}} />
+								{% for sub_question in question.direct_sub_questions %}
+								<q{{sub_question.pk}} />
+								{% endfor %}
+					   {% if question.loop_ended %}
+						   </q{{question.loop_ended.loop_starter.pk}}q{{question.pk}}>
+					   {% endif %}
+					{% endfor %}
+				</surveyQuestions>
+			</questions>
+	   </qset{{ qset.pk }}>
+   </qset>
+  </instance>
+
+  <!-- bindings -->
+  <bind nodeset="/qset/meta/instanceID" type="string" 
+           readonly="true()" calculate="concat('uuid:',uuid())" />
+  <bind nodeset="/qset/meta/creationDate" type="dateTime" readonly="true()" calculate="today()" />
+  <bind nodeset="/qset/meta/instanceName" type="string" 
+           readonly="true()" calculate="concat('{{ qset.name}}', /qset/surveyAllocation{% if ea_samples %}, '-', /qset/qset{{qset.pk}}/sampleData/selectedSample{% endif %})" />
+  <bind nodeset="/qset/surveyAllocation" type="select1" required="true()" />
+	{% if ea_samples %}
+		<bind nodeset="/qset/qset{{qset.pk}}/sampleData/selectedSample" type="string" readonly="true()"
+				calculate="concat({% for ea_id in ea_samples %}/qset/qset{{qset.pk}}/sampleData/iq{{ ea_id }},{% if not forloop.last %}'-',{% endif %}{% endfor %}'')"/>
+		{% for ea_id, samples in ea_samples.items %}
+			{% is_relevant_sample ea_id assignments as  relevant_sample_context %}
+			<bind nodeset="/qset/qset{{qset.pk}}/sampleData/iq{{ ea_id }}" type="select1" required="true()"  relevant="{{ relevant_sample_context }}"/>
+		{% endfor %}
+	{% endif %}
+	{% if interviewer.non_response_eas %}
+		<bind nodeset="/qset/nqrc" type="select1" relevant="selected({% for ea in interviewer.non_response_eas %}'{{ea.name}}' {% endfor %}, string(/qset/surveyAllocation))" />
+		<bind nodeset="/qset/nqr" type="select1" relevant="int(/qset/nqrc) &gt; 0" />
+		<bind nodeset="/qset/nqr_other" type="string" relevant="string(/qset/nqr) = 'OTHER'" />
+		<bind nodeset="/qset/qset{{qset.pk}}/questions" relevant="int(/qset/nqrc) = 0" />
+	{% endif %}
+	{% if qset.parameter_list %}
+		{% for question in qset.parameter_list.questions.all %}
+			<bind nodeset="/qset/qset{{qset.pk}}/questions/groupQuestions/q{{question.pk}}"
+				type="{% if question.answer_type == answer_types.numericalanswer %}int{% elif question.answer_type == answer_types.multichoiceanswer %}select1{% elif question.answer_type == answer_types.multiselectanswer %}select{% elif question.answer_type == answer_types.dateanswer %}date{% elif question.answer_type == answer_types.audioanswer or answer_type == answer_types.imageanswer or answer_type == answer_types.videoanswer %}binary{% elif question.answer_type == answer_types.geopointanswer %}geopoint{% else %}string{% endif %}"
+				required="{% if question.mandatory %}true(){% else %}false(){% endif %}"
+				relevant="true()" {% if question.odk_constraint %}constraint="{{question.odk_constraint}}" jr:constraintMsg="{{question.odk_constraint_msg}}" {% endif %}/>
+		{% endfor %}
+	{% endif %}
+
+	{% for question in qset.flow_questions  %}
+		{% is_relevant_odk question interviewer as relevance_context %}
+	    {% get_loop_aware_path question  as path %}
+	       {% if question.loop_started %}
+	           <bind nodeset="/qset/qset{{qset.pk}}/questions/surveyQuestions{{ path }}"
+				required="true()"
+				relevant="true() and {{ relevance_context }}"/>
+	            <bind nodeset="/qset/qset{{qset.pk}}/questions/surveyQuestions{{ path }}/creationDate"
+				required="true()"
+				relevant="true() and {{ relevance_context }}" readonly="true()" calculate="today()"/>
+			{% endif %}
+			{% if question.autoresponse %}
+				<bind nodeset="/qset/qset{{qset.pk}}/questions/surveyQuestions{{ path }}/q{{question.pk}}"
+				required="true()"
+				relevant="true() and {{ relevance_context }}" readonly="true()" calculate="position(..)" {% if question.odk_constraint %}constraint="{{question.odk_constraint}}" jr:constraintMsg="{{question.odk_constraint_msg}}" {% endif %}/>
+	       {% else %}
+				<bind nodeset="/qset/qset{{qset.pk}}/questions/surveyQuestions{{ path }}/q{{question.pk}}"
+					type="{% if question.answer_type == answer_types.numericalanswer or question.answer_type == answer_types.autoresponse %}int{% elif question.answer_type == answer_types.multichoiceanswer %}select1{% elif question.answer_type == answer_types.multiselectanswer %}select{% elif question.answer_type == answer_types.dateanswer %}date{% elif question.answer_type == answer_types.audioanswer or answer_type == answer_types.imageanswer or answer_type == answer_types.videoanswer %}binary{% elif question.answer_type == answer_types.geopointanswer %}geopoint{% else %}string{% endif %}"
+					required="{% if question.mandatory %}true(){% else %}false(){% endif %}"
+					relevant="true() and {{ relevance_context }}" {% if question.odk_constraint %}constraint="{{question.odk_constraint}}" jr:constraintMsg="{{question.odk_constraint_msg}}" {% endif %}/>
+	      {% endif %}
+	{% endfor %}
+
+  </model>
+</h:head>
+<h:body>
+    <select1 ref="/qset/surveyAllocation">
+		<label>Select EnumerationArea</label>
+		{% for assignment in assignments %}
+		<item>
+			<label>{{assignment.allocation_ea.name}}</label>
+			<value>{{ assignment.allocation_ea.name }}</value>
+		</item>
+		{% endfor %}
+	</select1>
+	{% if ea_samples %}
+		<group>
+			{% for ea_id, samples in ea_samples.items %}
+			   {% if samples %}
+					<select1 ref="/qset/qset{{qset.pk}}/sampleData/iq{{ ea_id }}">
+						<label>Select Sample</label>
+						{% for sample in samples %}
+						<item>
+							<label>{{ sample.get_display_label|default:qset.name }}</label>
+							<value>{{ sample.interview.pk }}</value>
+						</item>
+						{% endfor %}
+					</select1>
+				{% endif %}
+			{% endfor %}
+		</group>
+	{% endif %}
+	{% if interviewer.non_response_eas %}
+		<select1 ref="/qset/nqrc">
+			<label>Record Non-Response?</label>
+			<item>
+				<label>Yes</label>
+				<value>1</value>
+			</item>
+			<item>
+				<label>No</label>
+				<value>0</value>
+			</item>
+		</select1>
+		<select1 ref="/qset/nqr">
+			<label>Select Reason</label>
+			{% for key, value in non_response_reasons.items %}
+				<item>
+					<label>​{{value}}</label>
+					<value>{{key.upper}}</value>
+				</item>
+			{% endfor %}
+		</select1>
+		<input ref="/qset/nqr_other">
+			<label>Please specify</label>
+		</input>
+	{% endif %}
+	{% if qset.parameter_list %}
+		<group>
+			{% for question in qset.parameter_list.questions.all %}
+				{% concat_strings '/qset/qset' qset.pk '/questions/groupQuestions' path '/q' question.pk as ref %}
+				{% include "odk/_question_body.xml" with question=question answer_types=answer_types qref=ref %}
+			{% endfor %}
+		</group>
+	{% endif %}
+	<group>
+		<label>{{ qset.name }}</label>
+		<hint>{{ qset.description }}</hint>
+		{% for question in qset.questions_inline %}
+		   {% get_loop_aware_path question  as path %}
+		   {% if question.loop_started %}
+		       <group {% if question.loop_started.loop_prompt %}prompt="{{question.loop_started.loop_prompt}}"{% endif %}>
+					<label>{{question.text}}</label>
+	           		<repeat nodeset="/qset/qset{{qset.pk}}/questions/surveyQuestions{{ path }}" {% if question.loop_started.repeat_logic == question.loop_started.PREVIOUS_QUESTION %}
+													{% get_loop_aware_path question.loop_started.previousanswercount.value  as counter_path %}
+													jr:count="/qset/qset{{qset.pk}}/questions{{counter_path}}/q{{question.loop_started.previousanswercount.value.pk}}"
+												{% elif question.loop_started.repeat_logic == question.loop_started.FIXED_REPEATS %}
+													jr:count="{{question.loop_started.fixedloopcount.value}}"
+												{% endif %}>
+
+	       {% endif %}
+		   {% if not question.autoresponse %}
+					{% concat_strings '/qset/qset' qset.pk '/questions/surveyQuestions' path '/q' question.pk as ref %}
+					{% include "odk/_question_body.xml" with question=question answer_types=answer_types qref=ref %}
+					 {% for sub_question in question.direct_sub_questions %}
+						{% concat_strings '/qset/qset' qset.pk '/questions/surveyQuestions' path '/q' sub_question.pk as ref %}
+	                	{% include "odk/_question_body.xml" with question=sub_question answer_types=answer_types qref=ref %}
+					{% endfor %}
+		   {% endif %}
+				{% if question.loop_ended %}
+		      		</repeat>
+			 </group>
+	       {% endif %}
+		{% endfor %}
+	</group>
+
+</h:body>
+</h:html>

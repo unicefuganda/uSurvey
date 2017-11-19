@@ -1,0 +1,35 @@
+{% extends "horizontal_filter_form.html"%}
+{% block postfilter %}
+    <script type="text/javascript">
+    $(function(){
+        {% for location_type in location_filter_types %}
+            $('#id_{{ location_type }}').on('change', function () {
+            params = { 'parent_loc' : $('#id_{{ location_type }}').val(), 'type' : '{{ location_type.pk }}'};
+            url = "{% url 'location_sub_types' %}";
+            $.getJSON(url, params, function (data) {
+                $('#id_' + data.sub_type).find('option').remove().end()
+                .append('<option value="">Select ' + data.sub_type + '</option>').val('');
+                $.each(data.locations, function () {
+                    $('#id_' + data.sub_type).append('<option value='+this.id+'>'+this.name+'</option>');
+                });
+                if($('#id_ea')) {
+                    $('#id_ea').empty();
+                    $(data.eas).each(function () {
+                            $("<option />", {
+                                val: this.id,
+                                text: this.name
+                            }).appendTo($('#id_ea'));
+                        });
+                        $('.chzn-select').trigger("chosen:updated");
+                        if($('#id_ea').hasClass('multi-select'))
+                            $('#id_ea').multiSelect("destroy").multiSelect();
+                 }
+                $('.chzn-select').trigger("chosen:updated");
+
+            });
+
+            });
+  	    {% endfor %}
+        });
+    </script>
+{% endblock %}

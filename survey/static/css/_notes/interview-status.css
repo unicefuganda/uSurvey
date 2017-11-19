@@ -1,0 +1,99 @@
+.label-sm.arrowed-in::before {
+
+    border-width: 9px 4px;
+
+    left: -4px;
+
+}
+
+.label.arrowed-in::before {
+
+   /* border-width: 10px 5px;*/
+
+    left: -5px;
+
+}
+
+
+
+
+
+.label.arrowed-in::before, .label.arrowed::before {
+
+    -moz-border-bottom-colors: none;
+
+    -moz-border-left-colors: none;
+
+    -moz-border-right-colors: none;
+
+    -moz-border-top-colors: none;
+
+    border-color: transparent #82af6f transparent transparent;
+
+    border-image: none;
+
+    border-style: solid;
+
+   /* border-width: 1px;*/
+
+    content: "";
+
+    display: inline-block;
+
+    position: absolute;
+
+    top: 0;
+
+    z-index: -1;
+
+}
+
+.badge-inverse, .badge.badge-inverse, .label-inverse, .label.label-inverse {
+
+    background-color: #82af6f;
+
+}
+
+.label-inverse.arrowed-in::before {
+
+    border-color: #82af6f #82af6f #82af6f transparent;
+
+}
+
+.label.arrowed, .label.arrowed-in {
+
+    position: relative;
+
+    z-index: 1;
+
+}
+
+
+
+.label-sm {
+
+    font-size: 11px;
+
+    height: 18px;
+
+    line-height: 1;
+
+    padding: 0.2em 0.2em 0.14em;
+
+	color:#fff;
+
+	font-family:"Trebuchet MS", Arial, Helvetica, sans-serif;
+
+}
+
+.completed {
+    background-color: #f89406 !important;
+}
+
+.ongoing {
+    background-color: #87b87f !important;
+}
+
+.not-completed {
+    background-color: #6fb3e0 !important;
+}

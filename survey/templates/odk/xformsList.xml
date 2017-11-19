@@ -1,29 +1,33 @@
 <?xml version='1.0' encoding='UTF-8' ?>
 <xforms xmlns="http://openrosa.org/xforms/xformsList">
+
     {% load template_tags %}
-    {% if survey.has_sampling and allocation.stage != '2' %}
+    {% can_start_survey interviewer as can_start %}
+    {% if survey.is_open and can_start  %}
+      {% for batch in open_batches %}
+        {% get_download_url request 'download_odk_batch_form' batch as download_url %}
+          <xform>
+            <formID>{{ batch.pk }}</formID>
+            <name>{{ survey.name }} - {{ batch.name }}</name>
+            <majorMinorVersion/>
+            <version/>
+            <hash />
+            <descriptionText>{{ survey.description }} - {{ batch.description }}</descriptionText>
+            <downloadUrl>{{ download_url }}</downloadUrl>
+            <manifestUrl></manifestUrl>
+          </xform>
+      {% endfor %}
+    {% elif survey.has_sampling %} {% comment %} Enable listing regardless of open batch {% endcomment %}
     <xform>
-        {% get_download_url request 'download_odk_householdlist_form'  as household_download_url %}
-        <formID>{{ allocation.pk }}</formID>
-        <name>Household List Form - {{ allocation.survey.name }} - {{ allocation.allocation_ea.name }}</name>
+        {% get_download_url request 'download_odk_listing_form'  as listing_download_url %}
+        <formID>{{ survey.listing_form.pk }}</formID>
+        <name>{{ survey.name }} - {{ survey.listing_form.name }}</name>
         <majorMinorVersion/>
         <version/>
         <hash />
-        <descriptionText> {{ allocation.survey.description }}</descriptionText>
-        <downloadUrl> {{ household_download_url }} </downloadUrl>
+        <descriptionText>{{ survey.description }} - {{ survey.listing_form.description }}</descriptionText>
+        <downloadUrl>{{ listing_download_url }} </downloadUrl>
         <manifestUrl></manifestUrl>
     </xform>
-  {% else %}
-     {% get_download_url request 'download_odk_survey_form' survey as download_url %}
-      <xform>
-        <formID>{{ allocation.pk }}</formID>
-        <name>{{ survey.name }} - {{ allocation.allocation_ea.name }}</name>
-        <majorMinorVersion/>
-        <version/>
-        <hash />
-        <descriptionText> {{ survey.description }}</descriptionText>
-        <downloadUrl>{{ download_url }}</downloadUrl>
-        <manifestUrl></manifestUrl>
-      </xform>
- {% endif %}
+    {% endif %}
 </xforms>

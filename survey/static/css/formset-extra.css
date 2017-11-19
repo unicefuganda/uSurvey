@@ -11,12 +11,13 @@ fieldset .add-m-text {
     display: block;
     width: 500px;
     margin-left: 18px;
+    margin-top: 7px;
 }
 
 fieldset  .delete-row {
       display:block;
       background: url(/static/img/delete-icon.png) no-repeat center center;
-      width:16px;
+      /*width:16px;*/
       height:16px;
   }
 
@@ -26,9 +27,15 @@ fieldset span.add-on {
 
 fieldset td.horizontal-formset {
     background-color: #fff;
+    text-align: center;
   }
 
  .horititle {
+      /*width: 150px;*/
+      padding: 10px;
       text-align: center;
+      /*margin-bottom: 10px;*/
+      font-weight: bold;
+      /*color: #000;*/
   }
 

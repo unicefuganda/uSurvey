@@ -1,0 +1,85 @@
+<script type="text/javascript">
+
+function getURLParameter(name) {
+        return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search)||[,""])[1].replace(/\+/g, '%20'))||null;
+    }
+
+function changeUrlParam (param, value) {
+        var currentURL = window.location.href+'&';
+        var change = new RegExp('('+param+')=(.*)&', 'g');
+        var newURL = currentURL.replace(change, '$1='+value+'&');
+
+        if (getURLParameter(param) !== null){
+            try {
+                window.history.replaceState('', '', newURL.slice(0, - 1) );
+            } catch (e) {
+                console.log(e);
+            }
+        } else {
+            var currURL = window.location.href;
+            if (currURL.indexOf("?") !== -1){
+                window.history.replaceState('', '', currentURL.slice(0, - 1) + '&' + param + '=' + value);
+            } else {
+                window.history.replaceState('', '', currentURL.slice(0, - 1) + '?' + param + '=' + value);
+            }
+        }
+        location.reload();
+    }
+$(document).ready(function() {  
+          $('.dataTable').DataTable( {
+                  "scrollY":        "250px",
+                  "scrollX":        '100%',
+                  "scrollCollapse": true,
+                  "paging":         true,
+                  "searching": false,
+                  "aaSorting": [],
+                  "iDisplayLength": {{max_display_per_page}},
+                  'aoColumnDefs': [{
+                  'bSortable': false,
+                  "bPaginate": false,
+                  'aTargets': [-1] /* 1st one, start by the right */
+              }]
+              
+              });
+		// on change load page
+        $('#ea_length').on('change', function() {
+            var url = window.location.href;
+            var ea_length = $('#ea_length :selected').text();
+            var str = url.slice(-1);
+            if (str == '/')
+            {
+              window.location = url+"?max_display_per_page="+ea_length;
+            }else{
+             changeUrlParam('max_display_per_page', ea_length);
+            }
+        });
+        
+    	$("select[name='datatables_length']").change(function(){
+            var url = window.location.href;
+            var ea_length = $("select[name='datatables_length'] :selected").val();
+            var str = url.slice(-1);
+            if (str == '/')
+            {
+              window.location = url+"?max_display_per_page="+ea_length;
+            }else{
+             changeUrlParam('max_display_per_page', ea_length);
+            }
+        });
+        $("select[name='DataTables_Table_0_length']").change(function(){
+            var url = window.location.href;
+            var ea_length = $("select[name='DataTables_Table_0_length'] :selected").val();
+            var str = url.slice(-1);
+            if (str == '/')
+            {
+              window.location = url+"?max_display_per_page="+ea_length;
+            }else{
+              changeUrlParam('max_display_per_page', ea_length);
+            }
+        });
+        
+        
+        $("#ea_info").empty();
+
+    
+    });
+</script>

@@ -1,0 +1,15 @@
+<h3>
+  {% block title %} {{ title }} {% endblock %}
+</h3>
+<form action="{{ action }}" method="post" accept-charset="utf-8" id="{{ id }}" class="form-horizontal {{ class }}">
+  {% csrf_token %}
+  {% include "naked_form.html" with a_form=question_set_form %}
+  <div class="form-actions">
+    <button type="submit" class="btn btn-primary submit btnforall" name="save_button"  data-disabled-text="{{ loading_text }}"><i class="fa fa-save"></i> {{ button_label }}</button>
+        {% if cancel_url %}
+            <a href="{{cancel_url}}" class="btn btn-primary" name="cancel_button"><i class="fa fa-close"></i> Cancel</a>
+        {% else %}
+            <button class="btn btn-primary btnforall" data-dismiss="modal"><i class="fa fa-close"></i> Cancel</button>
+        {% endif %}
+  </div>
+</form>

@@ -1,83 +1,200 @@
 {% extends "layout.html" %}
+{% load template_tags %}
 {% block title %}
     {{ interviewer.name|capfirst }}'s Details
+<link href="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css" rel="stylesheet">
 {% endblock %}
 {% block content %}
-{% load template_tags %}
-   <table width="70%" border="0" cellspacing="0" align="center" cellpadding="0">
-  <tr>
-    <td align="right" valign="top">Name</td>
-    <td align="left" valign="top" class="showdetails">{{ interviewer.name|capfirst }}</td>
-  </tr>
-{% for access in interviewer.ussd_access %}
-  <tr>
-    <td align="right" valign="top">Mobile Number</td>
-    <td align="left" valign="top" class="showdetails">{{ access.user_identifier }}</td>
-  </tr>
-{% endfor %}
-{% for access in interviewer.odk_access %}
-  <tr>
-    <td align="right" valign="top">ODK ID</td>
-    <td align="left" valign="top" class="showdetails">{{ access.user_identifier }}</td>
-  </tr>
-  <tr>
-    <td align="right" valign="top">ODK Token</td>
-    <td align="left" valign="top" class="showdetails">{{ access.odk_token }}</td>
-  </tr>
-{% endfor %}
-  <tr>
-    <td align="right" valign="top">Date Of Birth</td>
-    <td align="left" valign="top" class="showdetails">{{ interviewer.date_of_birth |format_date }}</td>
-  </tr>
-  <tr>
-    <td align="right" valign="top">Sex</td>
-    <td align="left" valign="top" class="showdetails">{% if interviewer.gender %}
+<style type="text/css">
+  .control-label{
+    font-weight: bold;
+  }
+  .btn-yellow{display: none !important;}
+  ._heading_color{
+  color: #034b94;
+  }
+  </style>
+
+<div class="container">
+  <div class="row-fluid">
+      <form class="form-horizontal">
+        <fieldset>
+        <div id="legend">
+            <legend class="_heading_color">Interviewer Details</legend>
+          </div>
+
+
+          <div class="control-group">
+            <label class="control-label"  for="username">Name</label>
+            <div class="controls">
+              {{ interviewer.name|capfirst }}
+            </div>
+          </div>
+
+         
+          <div class="control-group">
+            <label class="control-label"  for="username">Date Of Birth</label>
+            <div class="controls">
+              {{ interviewer.date_of_birth |format_date }}
+            </div>
+          </div>
+
+          <div class="control-group">
+            <label class="control-label"  for="username">Sex</label>
+            <div class="controls">
+              {% if interviewer.gender %}
                 Male
             {% else %}
                 Female
-            {% endif %}</td>
-  </tr>
-  <tr>
-    <td align="right" valign="top">Highest Level of Education</td>
-    <td align="left" valign="top" class="showdetails">{{ interviewer.level_of_education }}</td>
-  </tr>
-  <tr>
-    <td align="right" valign="top">Preferred Language of Communication</td>
-    <td align="left" valign="top" class="showdetails">{{ interviewer.language }}</td>
-  </tr>
+            {% endif %}
+            </div>
+          </div>
+
+          <div class="control-group">
+            <label class="control-label"  for="username">Education</label>
+            <div class="controls">
+              {{ interviewer.level_of_education }}
+            </div>
+          </div>
+
+          <div class="control-group">
+            <label class="control-label"  for="username">Language</label>
+            <div class="controls">
+              {{ interviewer.language }}
+            </div>
+          </div>
+
+          <div id="legend">
+            <legend class="_heading_color">Survey Details</legend>
+          </div>
 {% for loc in interviewer.ea.parent_locations %}
-  <tr>
-    <td align="right" valign="top">{{ loc.type.name}}</td>
-    <td align="left" valign="top" class="showdetails">{{ loc.name}}</td>
-  </tr>
-{% endfor %}
-  <tr>
-    <td align="right" valign="top">Enumeration Area</td>
-    <td align="left" valign="top" class="showdetails">{{ interviewer.ea }}</td>
-  </tr>
-  <tr>
-    <td align="right" valign="top">Allocated Surveys</td>
-    <td align="left" valign="top" class="showdetails">{{ interviewer.allocated_surveys | display_list }}</td>
-  </tr>
-  <tr>
-    <td align="right" valign="top">Total Households</td>
-    <td align="left" valign="top" class="showdetails">{{ interviewer.ea.total_households }}</td>
-  </tr>
-       <tr>
-    <td align="right" valign="top">&nbsp;</td>
-    <td align="left" valign="top">&nbsp;</td>
-  </tr>
-  <tr>
-    <td align="right" valign="top">&nbsp;</td>
-    <td align="left" valign="top">
+          <div class="control-group">
+            <label class="control-label"  for="username">{{ loc.type.name }}</label>
+            <div class="controls">
+              {{ loc.name}}
+            </div>
+          </div>
+{% endfor %}          
+          <div class="control-group">
+            <label class="control-label"  for="username">Enumeration Area</label>
+            <div class="controls">
+              {{ interviewer.ea }}
+            </div>
+          </div>
+          <div class="control-group">
+            <label class="control-label"  for="username">Allocated Surveys</label>
+            <div class="controls">
+              {{ interviewer.survey_name }}
+            </div>
+          </div>
+        {% if interviewer.odk_access %}
+          <div id="legend">
+            <legend class="_heading_color">ODK Access</legend>
+          </div>
+     {% for access in interviewer.odk_access %}
+          <table>
+            <tr>
+              <td>
+                <div class="control-group">
+                  <label class="control-label"  for="username">ODK ID</label>
+                  <div class="controls">
+                    {{ access.user_identifier }}
+                  </div>
+                </div>
+                
+              </td>
+              <td>
+                <div class="control-group">
+                  <label class="control-label"  for="username">ODK Token</label>
+                  <div class="controls">
+                    {{ access.odk_token }}
+                  </div>
+                </div>
+                
+              </td>
+            </tr>
+          </table>        
+          
+
+          
+     {% endfor %}
+     {% endif %}
+     <div id="legend">
+            <legend class="_heading_color">USSD Access</legend>
+          </div>
+            {% for access in interviewer.ussd_access %}
+          <div class="control-group">
+            <label class="control-label"  for="username">Mobile Number</label>
+            <div class="controls">
+              {{ access.user_identifier }}
+            </div>
+          </div>
+          {% endfor %} 
+
+          
+          
+        </fieldset>
+      </form>
+      <form class="form-horizontal">
+        <fieldset>          
+          <div class="cancel-btn" style="text-align: center;">
+          <a href="{% url 'edit_interviewer_page' interviewer.id %}" class="btn btn-primary"> Edit</a>
         {% if cancel_url %}
-            <a href="{{ cancel_url }}" class="btn btn-inverse"><i class="icon-chevron-left icon-white"></i> Back</a>
+            <a href="{{ cancel_url }}" class="btn btn-primary"> Back</a>
         {% else %}
             <a href="javascript:window.history.back()" class="btn btn-inverse"><i
-                    class="icon-chevron-left icon-white"></i> Back</a>
+                    class="icon-chevron-left icon-white" style="background-color: #307ecc"></i> Back</a>
         {% endif %}
         {% include 'interviewers/_action_button.html' with button_size="" interviewer=interviewer %}
+
+</div>    
+        </fieldset>
+      </form>
+      </div>
+    </div>
+
+
+
+
+
+<style type="text/css">
+  .control-group {
+    margin-bottom: 10px !important;
+}
+.form-horizontal .control-label{
+  padding-top: 0px !important;
+}
+legend {
+    -moz-border-bottom-colors: none;
+    -moz-border-left-colors: none;
+    -moz-border-right-colors: none;
+    -moz-border-top-colors: none;
+    border-color: currentcolor currentcolor #c3a0d9;
+    border-image: none;
+    border-style: none none solid;
+    border-width: 0 0 1px;
+    color: #333333;
+    display: block;
+    font-size: 21px;
+    line-height: 40px;
+    margin-bottom: 20px;
+    padding: 0;
+    width: 100%;
+}
+</style>
+
+
+
+<!--     <div class="cancel-btn">
+        {% if cancel_url %}
+            <a href="{{ cancel_url }}" class="btn btn-primary"><i class="icon-chevron-left icon-white"></i> Back</a>
+        {% else %}
+            <a href="javascript:window.history.back()" class="btn btn-inverse"><i
+                    class="icon-chevron-left icon-white" style="background-color: #307ecc"></i> Back</a>
+        {% endif %}
+        {% include 'interviewers/_action_button.html' with button_size="" interviewer=interviewer %}
+
+</div>
+<br />
+<br /> -->
 {% endblock %}
-</td>
-  </tr>
-</table>

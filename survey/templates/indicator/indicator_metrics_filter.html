@@ -1,0 +1,22 @@
+{% extends "horizontal_filter_form.html" %}
+{% block postfilter %}
+    <table class="{{ class }} horizontal-filter">
+        <tr id="control-group">
+            {% for field in b_form.visible_fields %}
+                <td valign="top">
+                  <label for="{{field.auto_id}}" class="horititle">{{ field.label }}</label>
+                   <span class="horiselect">{{field}}</span>
+                </td>
+            {% endfor %}
+        </tr>
+</table>
+<script type="text/javascript">
+$(function(){
+    {% for field in b_form.visible_fields %}
+        $('#{{ field.auto_id }}').on('change', function () {
+            $('#{{ filter_id }}').submit();
+        });
+    {% endfor %}
+    });
+</script>
+{% endblock %}

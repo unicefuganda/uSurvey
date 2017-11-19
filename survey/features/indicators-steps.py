@@ -1,5 +1,3 @@
-from time import sleep
-from django.utils.datastructures import SortedDict
 from lettuce import step, world
 from survey.features.page_objects.indicators import NewIndicatorPage, ListIndicatorPage
 from survey.models import QuestionModule, Batch, Indicator
@@ -30,12 +28,18 @@ def then_i_should_see_that_the_indicator_was_successfully_added(step):
 def and_i_have_two_indicators(step):
     health_module = QuestionModule.objects.create(name="Health")
     batch = Batch.objects.create(name="Batch")
-    world.indicator_1 = Indicator.objects.create(name="indicator name", description="rajni indicator",
-                                                 measure='Percentage',
-                                                 module=health_module, batch=batch)
-    world.indicator_2 = Indicator.objects.create(name="indicator name 2", description="rajni indicator 2",
-                                                 measure='Percentage',
-                                                 module=health_module, batch=batch)
+    world.indicator_1 = Indicator.objects.create(
+        name="indicator name",
+        description="rajni indicator",
+        measure='Percentage',
+        module=health_module,
+        batch=batch)
+    world.indicator_2 = Indicator.objects.create(
+        name="indicator name 2",
+        description="rajni indicator 2",
+        measure='Percentage',
+        module=health_module,
+        batch=batch)
 
 
 @step(u'When I visit indicator listing page')
@@ -61,22 +65,34 @@ def and_i_have_three_batches(step):
 
 @step(u'And I have an indicator not in that survey')
 def and_i_have_an_indicator_not_in_that_survey(step):
-    world.indicator_3 = Indicator.objects.create(name="indicator name 3", description="rajni indicator 3",
-                                                 measure='Percentage',
-                                                 module=world.health_module_1, batch=world.batch_3)
+    world.indicator_3 = Indicator.objects.create(
+        name="indicator name 3",
+        description="rajni indicator 3",
+        measure='Percentage',
+        module=world.health_module_1,
+        batch=world.batch_3)
 
 
 @step(u'And I have indicator in each batch')
 def and_i_have_indicator_in_each_batch(step):
-    world.indicator_1 = Indicator.objects.create(name="indicator name 1", description="rajni indicator 1",
-                                                 measure='Percentage',
-                                                 module=world.health_module_1, batch=world.batch_1)
-    world.indicator_1b = Indicator.objects.create(name="indicator name with different module",
-                                                  description="rajni indicator 1", measure='Percentage',
-                                                  module=world.health_module_2, batch=world.batch_1)
-    world.indicator_2 = Indicator.objects.create(name="indicator name 2", description="rajni indicator 2",
-                                                 measure='Percentage',
-                                                 module=world.health_module_2, batch=world.batch_2)
+    world.indicator_1 = Indicator.objects.create(
+        name="indicator name 1",
+        description="rajni indicator 1",
+        measure='Percentage',
+        module=world.health_module_1,
+        batch=world.batch_1)
+    world.indicator_1b = Indicator.objects.create(
+        name="indicator name with different module",
+        description="rajni indicator 1",
+        measure='Percentage',
+        module=world.health_module_2,
+        batch=world.batch_1)
+    world.indicator_2 = Indicator.objects.create(
+        name="indicator name 2",
+        description="rajni indicator 2",
+        measure='Percentage',
+        module=world.health_module_2,
+        batch=world.batch_2)
 
 
 @step(u'When I select a survey')

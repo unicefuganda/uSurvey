@@ -6,7 +6,6 @@ from survey.models.locations import *
 from django.core.serializers.json import DjangoJSONEncoder
 from django.contrib.auth.decorators import login_required
 from survey.models import EnumerationArea
-from survey.views.location_widget import LocationWidget
 
 
 @login_required

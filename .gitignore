@@ -52,3 +52,9 @@ tags
 submissions/*
 answerFiles/*
 survey/static/admin/*
+*.log*
+
+#ignore whitenoise files
+_notes/*
+*.gz
+.docker_mapf

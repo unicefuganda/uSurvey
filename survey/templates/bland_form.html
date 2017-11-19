@@ -1,0 +1,16 @@
+{% for field in a_form.visible_fields %}
+ {% if field.label %}
+    <label  for="{{field.auto_id}}">{{field.label}}</label>
+ {% endif %}
+ {{ field }}
+ {% if field.errors %}
+   <label class="error" style="word-wrap: break-word;">
+       {% for error in field.errors %}
+           {{ error}}
+       {% endfor %}
+    </label>
+ {% endif %}
+{% endfor %}
+{% for hidden in a_form.hidden_fields %}
+{{ hidden }}
+{% endfor %}

@@ -29,5 +29,6 @@
     <script src="{{STATIC_URL}}ckeditor/ckeditor.js" type="text/javascript" charset="utf-8"></script>
     <script>
         CKEDITOR.replace( 'content-editor' );
+        CKEDITOR.config.allowedContent = true;
     </script>
 {% endblock %}

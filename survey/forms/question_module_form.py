@@ -9,7 +9,8 @@ class QuestionModuleForm(ModelForm):
         name = self.cleaned_data['name']
         creating_new_module = not self.instance.id
         editing_module = self.instance.name and self.instance.name != name
-        if (creating_new_module or editing_module) and QuestionModule.objects.filter(name=name):
+        if (creating_new_module or editing_module) and QuestionModule.objects.filter(
+                name=name):
             raise ValidationError("Module with name %s already exists." % name)
         return self.cleaned_data['name']
 
@@ -17,5 +18,5 @@ class QuestionModuleForm(ModelForm):
         model = QuestionModule
         exclude = []
         widgets = {
-            'description': forms.Textarea(attrs={"rows": 3, "cols": 30})
+            'description': forms.Textarea(attrs={"rows": 6, "cols": 30})
         }

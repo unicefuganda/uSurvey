@@ -745,3 +745,8 @@ list-style-type: none;
   color: #09F;
   font-size: 10px;
 }
+
+.help1{
+  color: #09F;
+  font-size: 12px; padding-top: 5px; text-align: center;
+}

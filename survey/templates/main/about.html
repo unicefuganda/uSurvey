@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% load repeatedblocks %}
+{% load template_tags %}
+
+{% block page_title %}About Us{%endblock%}
+
+{% block extra_slider %}
+    {% include 'slideshow.html' %}
+{% endblock %}
+
+{% block extra_content %}
+<section class="commonSection " style="background-color: #ffffff; background-repeat: no-repeat; " > 
+    <div class="container">
+        <div class="fw-row usurvey-static-content" style="min-height: 400px;">
+            <div class="col-md-12">
+                <p>&nbsp;</p>
+                <h3>About {% if user.is_authenticated %}<a class="btn btn-md" href="{% url 'edit_about_page' %}" ><i class="fa fa-edit"> </i></a>{%endif%}</h3>
+                <div class="static-content">
+                    {{about_content.content|safe}}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{%endblock%}
+
+{% block extra_css %}
+    <style type="text/css">
+    #cssmenu > ul > li .about {
+    color: yellow;}
+    .static-content, .static-content p {font-size: 14px;line-height: 24px;margin-bottom: 0px;margin-top: 8px;}
+    .static-content p b{line-height: 20px;margin-bottom: 0px;}
+    .static-content p, .static-content ul li{text-align: justify;}
+    .static-content ol li{font-size: 14px;}
+    .static-content h5{font-size: 16px;line-height: 30px;}
+     h3{font-size: 20px !important;}
+    .static-content h4{font-size: 15px;color: #f9520b !important;text-transform: capitalize !important;}
+     </style>
+    
+{%endblock%}
+
+{% block extra_js %}
+
+{%endblock%}
+   </body>
+</html>

@@ -1,146 +1,844 @@
 {% extends "layout.html" %}
-{% block extra_css %}
-    <link rel="stylesheet" href="{{ STATIC_URL }}leaflet/leaflet.css" />
+{% block extra_head %}
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.3/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js"></script>
+<style>
+      #id_survey_chosen {
+        margin-left: -3px;
+        width: 300px !important;
+      }
+
+      #id_survey_chosen, #id_survey {
+        z-index: 200;
+      }
+
+      .dataTables_wrapper .row:first-child {
+        padding-top: 0px !important;
+        padding-bottom: 0px !important;
+        background-color: #fff !important;
+    }
+      .indicator-name {
+
+        }
+     .indicator-value {
+
+        }
+     .indicator-desc {
+
+        }
+     .variable-name {
+            border-right: 2px #00f;
+        }
+    .variable-val {
+
+        }
+
+    #red_circle  {
+        /*background: #d12a09 none repeat scroll 0 0;
+        border-radius: 70px;
+        height: 10px;
+        margin-top: 5px;
+        width: 10px;*/
+        background: #a3a3a3 none repeat scroll 0 0;
+        border: 1px solid #000;
+        margin-top: 5px;
+        border-radius: 70px;
+        height: 10px;
+        width: 10px;
+        margin-left: 15px;
+    }
+    #green_circle {
+        background: #009948 none repeat scroll 0 0;
+        border-radius: 70px;
+        height: 10px;
+        margin-top: 5px;
+        text-align: center;
+        width: 10px;
+        margin-left: 15px;
+    }
+
+        .leaflet-container {
+            margin-bottom: 10px;
+            margin-left: 384px;
+            background-color:rgba(255,0,0,0.0);
+        }
+
+
+        .rop {
+         text-align:center;
+         }
+
+        .chzn-select {
+            width: 100% !important;
+        }
+
+        #survey_map {
+            border: none;
+            box-shadow: none;
+            min-height: 600px;
+            /*margin-bottom: 130px;*/
+            width: 100% !important;
+            margin-left: 80px;
+            margin-right: auto;
+            z-index: 10 !important;
+        }
+        @media only screen and (max-width:767px) {
+            #survey_map {
+               width: 100% !important;
+               margin-bottom: 10px;
+               min-height:380px;
+               margin-left: 10px;
+            }
+
+            .rat_h3_1{margin-top: 10px;}
+        }
+
+          .rathna_table>tbody>tr>td,
+            .rathna_table>tbody>tr>th,
+            .rathna_table>tfoot>tr>td,
+            .rathna_table>tfoot>tr>th,
+            .rathna_table>thead>tr>td,
+            .rathna_table>thead>tr>th {
+            padding:1px 8px !important;
+            line-height: 1.42857143;
+            vertical-align: top;
+            border-top: none !important;
+        }
+        #info-update{min-height: 230px;}
+        #info-update .rathna_table>thead>tr>th {
+            vertical-align: bottom;
+            border-bottom: none !important;
+        }
+        .info-count {
+            font-size: 2em !important;
+            padding-right: 10px !important;
+            padding-bottom: 5px !important;
+            line-height: 100% !important;
+            font-family: MontserratBold, Arial, Helvetica, sans-serif !important;
+        }
+        .rathna-nav> li, .nav-pills > li {
+            float:none;
+            display:inline-block;
+            *display:inline; /* ie7 fix */
+             zoom:1; /* hasLayout ie7 trigger */
+        }
+
+        .rathna-nav, .rathna-nav {
+            text-align:center;
+        }
+        .progress {
+          position: relative;
+        }
+
+        .progress span {
+            position: absolute;
+            display: block;
+            width: 100%;
+            color: black;
+        }
+        #map-legend {
+            line-height: 20px;
+            font-size: 13px;
+            font-weight: bold;
+            margin-left: 10px;
+
+        }
+        .map-legend {
+            width: 16px;
+            height: 16px;
+            display: inline-block;
+            border: 1px solid;
+            border-color: #1ba6e1;
+
+        }
+        .rathna-nav {
+        border-bottom:none !important;
+
+        }
+        .rathna-nav li a {
+         background:#3a6cbf;
+        }
+        .rathna-nav>li>a {
+            margin-right: 0px !important;
+            line-height: 1.42857143;
+            border: 1px solid transparent;
+            border-radius: 4px 4px 0 0;
+            color:#fff !important;
+        }
+        .rathna-nav>li.active>a, .nav-tabs>li.active>a:focus, .nav-tabs>li.active>a:hover {
+            color: #fff !important;
+            cursor: default;
+            background:#0099ff;
+            border: 1px solid #ddd;
+            border-bottom-color: transparent;
+        }
+        .rathna-nav>li>a {
+            position: relative;
+            display: block;
+            padding: 5px 15px;
+        }
+        .r_heading th{
+
+            font-size: 18px;
+            width: 50%;
+            position: relative;
+            top: 4px;
+        }
+        .r_heading td{
+        font-size: .9em;
+            padding-right: 10px;
+        }
+        .r_tab-content{
+            border: none !important;
+        }
+        .r-row{
+            background: none !important;
+            border: none !important
+        }
+        .rat_h3_3{font-size: 16px;color: #034b94;font-weight: bold;margin-bottom: 8px;}
+        .rat_h3_1{color:#FF8200; margin-bottom: 10px;font-size: 17px;}
+        .rat_h3_2{color:#034b94; margin-bottom: 10px;font-size: 17px;}
+        #id_survey{
+            margin-bottom: 25px !important;
+            margin-left: 0px !important;
+            padding: 6px !important;
+            margin-right: 4px !important;
+            width: 100% !important;
+            background: transparent !important;
+            border-left: 3px solid #0577e0;
+            z-index: 1000 !important;
+        }
+    <!--Indicators styles start-->
+     #home_display .row, #home_display .r-row {
+         padding: 0 !important;
+         /*margin: 0 !important;*/
+         margin-left: -8px !important;
+         margin-top: 10px !important;
+     }
+    #home_display .col-md-12 {
+        width: 100% !important;
+    }
+ /*   .nav > li > a:focus {
+  text-decoration: none;
+  background-color: red !important;
+}*/
+ .nav > li > a:hover, .nav > li > a:focus
+ {
+ background-color: #11bf7f !important; 
+ }
+
+    <!--Indicators styles start-->
+
+
+		  .indic-1{
+
+			  background:#D0E4F2 none repeat scroll 0 0;
+
+			   border: 1px solid #666;
+
+			   color: #000;
+
+			   font-size: 14px;
+
+			   font-weight: 600;
+
+			   height: auto;
+
+			   opacity: 0.8;
+
+			   padding: 10px;
+			   margin-bottom:10px;
+           }
+
+          .tite1
+
+          {
+
+              font-size:25px;
+
+              color:#30395C;
+
+              font-weight:bold;
+
+           }
+
+
+
+           .indic-2 {
+
+               background:#85A5CC none repeat scroll 0 0;
+
+               border: 1px solid #666;
+
+               color: #000;
+
+               font-size: 14px;
+
+               font-weight: 600;
+
+               height: auto;
+
+               opacity: 0.8;
+
+               padding: 10px;
+
+
+
+               margin-bottom:10px;
+
+           }
+
+
+
+           .tite2 {
+
+               font-size:25px;
+
+               color:#304a77;
+
+               font-weight:bold;
+
+            }
+
+
+
+           .indic-3 {
+
+                background:#4A6491 none repeat scroll 0 0;
+
+                border: 1px solid #666;
+
+                color: #000;
+
+                font-size: 14px;
+
+                font-weight: 600;
+
+                height: auto;
+
+                opacity: 0.8;
+
+                padding: 10px;
+                margin-bottom:10px;
+
+           }
+ }
+
+/*#displays{
+  margin-left: -50px;
+}*/
+
+           .tite3 {
+
+               font-size:25px;
+
+               color:#D0E4F2;
+
+               font-weight:bold;
+
+            }
+
+
+
+           .indic-4 {
+
+                    background:#5a6386 none repeat scroll 0 0;
+
+                    border: 1px solid #666;
+
+                    color: #000;
+
+                    font-size: 14px;
+
+                    font-weight: 600;
+
+                    height: auto;
+
+                    opacity: 0.8;
+
+                    padding: 10px;
+
+
+
+                    margin-bottom:10px;
+
+              }
+
+            .col-md-12 {
+                width: 100% !important;
+            }
+
+           .tite4 {
+
+               font-size:25px;
+
+               color:#D0E4F2;
+
+               font-weight:bold;
+
+            }
+
+    #loc-tab-stat-container {
+        position: relative;
+    }
+    #indicators-tab, #loc-stats-tab {
+           position: absolute;
+           top: 0;
+           left: 0;
+           display: block;
+          width: 100%;
+      }
+
+{% if device.is_small %}
+    #info-update {
+        margin-top: 15px;
+    }
+{% else %}
+    #displays, #indicators-tab, #main-contents-tab, .chzn-select  {
+        z-index: 10;
+    }
+    #loc-tab-stat-container {
+        width: 300px !important;
+    }
+    #indicators-tab span {
+      display: inline-block;
+      padding: 3px;
+    }
+
+{% endif %}
+    #home_display .container-fluid {
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+    }
+  </style>
 {% endblock %}
 {% block title %}
   Survey Map
 {% endblock %}
 {% block content %}
-<div id="completion_map" >
+
+
+<div id="home_display">
+
+    <ul class="nav nav-tabs center-block rathna-nav">
+        <li class="active"><a data-toggle="tab" href="#loc-stats-tab">LOCATIONS</a></li>
+        <li ><a data-toggle="tab" href="#indicators-tab">INDICATORS</a></li>
+
+    </ul>
+     <div class="container" style="padding: 5px; margin: 0;">
+     {% if device.is_small %}
+             <div class="row r-row">
+                <div class="col-md-12" >
+                    <div class="container-fluid" style="padding: 0; margin: 0;">
+                        <div id="map-controls" class="row r-row"  style="padding: 0; margin: 0;">
+                            <div class="rat_h3_3 col-md-12"  style="padding: 0; margin: 0;margin-bottom: 10px;">Survey</div>
+                            <div class="col-md-12"  style="padding: 0; margin: 0;">{{map_filter}}</div>
+                        </div>
+                        <div class="row r-row"   style="padding: 0; margin: 0; " >
+                <div class="col-md-12">
+                    <div class="map-show"  style="padding: 0; margin: 0;">
+                        <div id="survey_map" class="center-block"></div>
+                    </div>
+                </div>
+             </div>
+                     </div>
+                </div>
+             </div>             
+             <div class="row r-row"  style="padding: 0; margin: 0;" >
+                <div id="displays" class="col-md-12">
+                    <div id="loc-tab-stat-container" class="container-fluid" style="padding: 0; margin: 0;">
+                        <div id="indicators-tab" class="tab-pane fade container-fluid" style="padding: 0; margin: 0;">
+                            <div  class="row r-row" style="padding: 0; margin: 0;">
+                                {% include "home/_indicator_display.html" %}
+                            </div>
+                        </div>
+                        <div id="loc-stats-tab" class="tab-pane fade  in active container-fluid" style="padding: 0; margin: 0;">      
+                            <div id="info-update" class="row r-row">&nbsp;</div>
+                            <div id="map-legend" class="row r-row"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+     {%else%}
+
+            <div class="row r-row" >
+                <div id="displays" class="col-md-2">
+                    <div class="container-fluid" style="padding: 0; margin: 0;">
+                        <div id="map-controls" class="row r-row"  style="padding: 0; margin: 0;">
+                            <div class="rat_h3_3 col-md-12"  style="padding: 0; margin: 0;margin-bottom: 10px;">Survey</div>
+                            <div class="col-md-12"  style="padding: 0; margin: 0;">{{map_filter}}</div>
+                        </div>
+
+                        <div id="loc-tab-stat-container" class="container-fluid" style="padding: 0; margin: 0;">
+                            <div id="indicators-tab" class="tab-pane fade row r-row" style="padding: 0; margin: 0; position: relative;">
+                                <div  lass="col-md-12" style="padding: 0; margin: 0;">
+                                    {% include "home/_indicator_display.html" %}
+                                </div>
+
+                            </div>
+                            <div id="loc-stats-tab" class="tab-pane fade  in active row r-row">
+                                <div id="info-update" class="col-md-12" style="padding: 0; margin: 0; width: 100%;">{% include 'page_loader.html' %}</div>
+                                <br/>
+                                <div id="map-legend" class="col-md-12" style="padding: 0; margin: 0; width: 100%;">
+                                </div>
+                            </div>
+                       </div>
+                    </div>
+                </div>
+                <div class="col-md-1">&nbsp;</div>
+                <div class="col-md-7">
+                    <div class="map-show"  style="padding: 0; margin: 0;">
+                        <div id="survey_map" style="padding: 0; margin: 0;"></div>
+                    </div>
+                </div>
+                <div class="col-md-2">&nbsp;</div>
+            </div>
+    {%endif%}
+    </div>
 </div>
-<form id="completion_form" class="hide">
-<select id="surveys" >
-    <option value="">Choose a survey</option>
-    {% for survey in surveys %}
-        <option value="{{ survey.id }}">{{ survey.name }}</option>
-    {%  endfor %}
-</select>
-</form>
+
+
+
 {% endblock%}
 
 {% block javascripts %}
-    <script src="{{ STATIC_URL }}leaflet/leaflet.js"></script>
     <script type="text/javascript">
-        var map = L.map('completion_map').setView([1.34,32.683525], 7, {zoomControl: true, doubleClickZoom: false, scrollWheelZoom:false}),
-    osmUrl='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+       var map = L.map('survey_map', {zoomControl: false, doubleClickZoom: false, scrollWheelZoom: false, attributionControl: false}).setView([{{map_center}}], {{ zoom_level|default:6}}),
+
     info = L.control(),
-    legend = L.control({position: 'bottomright'}),
+    //legend = L.control({position: 'bottomright'}),
+    indicatorLocationData = {},
+    indicatorCountryData = {},      // used to keep the country indicator
+    indicatorSurveys = { {% for indicator in display_indicators %} '{{indicator.name}}': '{{indicator.survey.id}}', {% endfor %} },
+    indicatorTable = document.getElementById('indicator-table'),
+    statsInfo = document.getElementById('info-update'),
+    countryIndicator = '',
     geojson;
-  osmAttrib='Mics survey  © Mics';
-  layer = new L.TileLayer(osmUrl, {minZoom: 6, maxZoom: 12, attribution: osmAttrib});
+    map.dragging.disable();
+    map.touchZoom.disable();
+    map.doubleClickZoom.disable();
+    L.control.zoom({
+         position:'topright',
+    }).addTo(map);
+  var defaultZoom = map.getZoom();
+  var initBounds = map.getBounds();
+    adjustInitialZoom(map);
 
-map.addLayer(layer);
+  //osmAttrib=;
+    L.control.attribution({prefix: '© uSurvey'}).addTo(map);
+  var mapData = null;
 
-$(function(){
-    $("#surveys").on('change', function(){
-        getCompletionFor($(this).val())
+function adjustInitialZoom(map) {
+    // get the width of the screen after the resize event
+    var width = document.documentElement.clientWidth;
+    // tablets are between 768 and 922 pixels wide
+    // phones are less than 768 pixels wide
 
-    })
-});
 
-function getCompletionFor(survey_id){
-    $.getJSON("/survey/"+ survey_id +"/completion/json/", function (rate_data) {
-        $.getJSON("{{shape_file_uri}}", function (data) {
-          $.each(data, function(element){
-             data.features.map(function(feature){
-              var property = feature.properties['{{loc_field}}'];
-              if(property === undefined)
-                property = feature.properties['{{alt_loc_field}}'];
-              if(property)
-                property = property.toUpperCase();
-              feature.properties.rate = rate_data[property]
-            })
-          });
-       geojson = L.geoJson(data, {style: style, onEachFeature: onEachFeature}).addTo(map);
-      });
-    });
+    if (width < 768) {
+        // set the zoom level to 10
+        return map.setZoom(6);
+    }
+    else
+        map.setZoom(defaultZoom);
 }
 
+$(function(){
+    $(window).on("resize", function() {
+        adjustInitialZoom(map);
+    }).trigger("resize");
+    $("#id_survey").on('change', function(){
+        resetMap();
+        getCompletionFor();
+        refreshIndicatorDisplay();
+    });
+    loadInitialMap();
+    load_indicators();
+    refreshIndicatorDisplay();
+});
+
+
+function refreshIndicatorDisplay() {
+    $('.indicators').hide();
+    if($("#id_survey").val()) {
+        $('.indicator-'+$("#id_survey").val()).show();
+    }
+}
+
+
+var legend = null;
+var heatBandSize = null;
+
+function updateLegend(max) {
+    var steps = 5;
+    if(max < 25)
+        max = 25;       //just to make sure it is divisible into 5 places.
+    heatBandSize = max/steps;
+    var div = document.getElementById('map-legend');
+    div.innerHTML = '<h4>Ave. (Respondents/EA)</h4><br />';
+    div.innerHTML += '<i class="map-legend" style="background:' + getColorFor() + '"></i>'+ " No Data<br/>";
+    for (var i = 0; i < steps; i++) {
+        div.innerHTML += '<i class="map-legend" style="background:' + getColorFor(i*heatBandSize) + ';"></i> ';
+        div.innerHTML += Math.floor(i*heatBandSize) +" &mdash; "+ Math.floor((i + 1)*heatBandSize) + "<br/>";
+    }
+    div.innerHTML += '<i class="map-legend" style="background:' + getColorFor(steps*heatBandSize) + '"></i> ';
+    div.innerHTML += Math.floor(steps*heatBandSize) +" and Above";
+}
+
+function getCompletionFor(){
+    if(!$("#id_survey").val())
+        return resetMap();
+    $(".loader").show();
+    var survey_url = "{% url 'survey_json_summary' %}?survey=" + $("#id_survey").val();
+    max_rate = 0;
+    $.getJSON(survey_url, function (rate_data) {
+        $(".loader").fadeOut("slow");
+        statsInfo.innerHTML = '';
+        mapData.features.map(function(feature){
+          var property = feature.properties['{{loc_field}}'];
+          if(!property)
+            property = feature.properties['{{alt_loc_field}}'];
+          if(property && property.toUpperCase() in rate_data) {
+            property = property.toUpperCase();
+            feature.properties.rate = rate_data[property];
+            max_rate = Math.max(max_rate, rate_data[property].value);
+          }
+          else
+              feature.properties.rate = {'value': null, description: ''};
+        });
+       //update legend
+        updateLegend(max_rate);
+        refreshMap();
+    });
+
+}
+
+function refreshMap() {
+    geojson = L.geoJson(mapData, {style: style, onEachFeature: onEachFeature}).addTo(map);
+    map.fitBounds(geojson.getBounds());
+}
+
+
+function load_indicators(){
+    $(".loader").show();
+    var indicator_url = "{% url 'survey_indicators' %}";
+    //load country level indicator then load location level indicator values
+    var request_data = {'report_level': 0};
+    if($("#id_survey").val())
+        request_data['survey'] = $("#id_survey").val();
+    $.getJSON(indicator_url,
+        request_data,
+        function (data) {
+            $(".loader").fadeOut("slow");
+            indicatorCountryData = data;
+            updateIndicators();
+            countryIndicator = indicatorTable.innerHTML;
+        }
+      );
+    delete request_data['report_level'];            // let backend figure out indicator level
+    $.getJSON(indicator_url,
+        request_data,
+        function (data) {
+         indicatorLocationData = data;
+      });
+}
+
+function loadInitialMap(){
+    $.getJSON("{{shape_file_uri}}", function (data) {
+         mapData = data;
+         resetMap();
+      });
+}
+
+
+function resetMap() {
+    mapData.features.map(function(feature){
+            feature.properties.rate = {value: null};
+        });
+       refreshMap();
+}
+
+var colorCodes = ['#EFF3FF', '#C6DBEF', '#9ECAE1', '#6BAED6', '#3182BD', '#08519C']
+
 function getColorFor(rate) {
-    return rate > 80 && rate <= 100 ? '#800026' :
-           rate > 60 && rate <= 80  ? '#BD0026' :
-           rate > 40 && rate <= 60  ? '#E31A1C' :
-           rate > 20 && rate <= 40  ? '#FC4E2A' :
-           rate > 0  && rate <= 20  ? '#FD8D3C' :
-           rate == 0 ? '#FFFFFF':
-           '#D1D0CE';
+    if(rate === undefined || rate === null || rate < 0)
+        return '#FFFFFF';
+    return colorCodes[Math.floor(rate/heatBandSize)];
     }
 
 function style(feature) {
-    return {
-        fillColor: getColorFor(feature.properties.rate),
-        weight: 2,
-        opacity: 0.55,
-        color: '#FD8D3C',
-        dashArray: '3',
-        fillOpacity: 1
-    };
+   try {
+        return {
+            fillColor: getColorFor(feature.properties.rate.value),
+            weight: 1.5,
+            opacity: 0.55,
+            color: '#1ba6e1',
+            fillOpacity: 1
+        };
+    }catch(err){
+
+    }
 }
 
 function onEachFeature(feature, layer) {
+/*    var property = feature.properties['{{loc_field}}'];
+ if(!property)
+    property = feature.properties['{{alt_loc_field}}'];
+    if(property) {
+        property = property.toUpperCase();
+        var label = L.marker(layer.getBounds().getCenter(), {
+          icon: L.divIcon({
+            className: property,
+            html: '<span style="font-size: x-small;">'+property+'</span>',
+            iconSize: [25, 20]
+          })
+            }).addTo(map);
+    }*/
     layer.on({
-      mouseover: highlightDistrict,
-      click: zoomDistrict,
-      mouseout: resetDistrictHighlight
+      mouseover: highlightAdminLevel,
+      mouseout: resetAdminLevelHighlight
   });
+
+}
+
+getIndicatorHtml = function(name, featureProps, locationName, styleIndex, indicatorData) {
+    var propertySummary = indicatorData[name][locationName];
+    if(propertySummary == undefined)
+        return '';
+    var indicatorValue = propertySummary['{{indicator_reports_field}}'];
+    var displayValue = 'N/A';
+    if(indicatorValue) {
+        indicatorValue = parseFloat(indicatorValue).toFixed(1);
+        displayValue = indicatorValue;
+    }
+    else {
+        indicatorValue = 0.0;
+    }
+    html = '<div class="hero-description poll-hero-title indicators indicator-' + indicatorSurveys[name] +' indic-' + styleIndex +'">\
+                 <span class="tite' + styleIndex +'">' +  indicatorValue + '</span> <i>' + name + '</i>';
+    for(variable in propertySummary) {
+        if(variable != '{{indicator_reports_field}}')
+            html += ' <p><span>'+ propertySummary[variable] + '</span><i>' + variable + '</i></p>';
+    }
+    html +=  '</div>';
+    return html;
+}
+
+
+updateIndicators = function(featureProps, locationName) {
+     var indicatorData;
+     if(locationName)
+        indicatorData = indicatorLocationData;
+     else {
+        indicatorData = indicatorCountryData;
+        locationName = '{{country.name.upper}}';
+     }
+     indicatorTable.innerHTML = '<div class="row r-row">\
+                                        <div style="margin-left:-8px !important;" class="col-sm-12">\
+                                            <p style="font-size:17px; color:#ff8200; font-weight:bold;">' + getLocationHeader(featureProps, locationName) + '</p>\
+                                         </div>\
+                                    </div>\
+                                    <div class="row r-row"  style="font-family: Open Sans; ">\
+                                        <div class="col-sm-12">';
+     var styleIndex = 0;
+     for (var name in indicatorData){
+        styleIndex = styleIndex%3+2;
+        indicatorTable.innerHTML += getIndicatorHtml(name, featureProps, locationName, styleIndex, indicatorData);
+        styleIndex++;
+     }
+     indicatorTable.innerHTML += '</div>\
+                                </div>';
+     refreshIndicatorDisplay();
 }
 
 info.onAdd = function (map) {
-  this._div = L.DomUtil.create('div', 'info');
-  this.update();
-  return this._div;
+
 };
+
+function getLocationHeader(featureProps, locationName) {
+   var openStatusHTML = '<h3 class="rat_h3_1 red">'+locationName+'</h3>';
+   if(featureProps) {
+       openStatusHTML = '<h3 class="rat_h3_1 red">'+locationName+': Closed</h3>';
+       if(featureProps.rate.is_open)
+            openStatusHTML = '<h3 class="rat_h3_1 green">'+locationName+': Open</h3>';
+   }
+   return openStatusHTML;
+}
+
 info.update = function (props) {
-  this._div.innerHTML = '<h1>Completion rates:</h1>';
+  statsInfo.innerHTML = '';
   if(typeof props != 'undefined'){
-    var property = props['{{loc_field}}'];
-    if(property === undefined)
-        property = props['{{alt_loc_field}}'];
-    if(property)
-       property = property.toUpperCase();
-    rate = props.rate >-1 ? props.rate + '%' : 'Survey not opened.';
-    this._div.innerHTML += property +': '+ rate;
+    var locationName = props['{{loc_field}}'];
+    if(!locationName)
+        locationName = props['{{alt_loc_field}}'];
+    if(locationName) {
+
+       locationName = locationName.toUpperCase();
+       updateIndicators(props, locationName);
+        if('total_eas' in props.rate){
+            rate = props.rate.value >-1 ? props.rate.value: 'No Data.';
+             statsInfo.innerHTML = '<table class="rathna_table">\
+                                <thead>\
+                                    <tr>\
+                                        <th colspan="2" class="text-left">\
+                                             <h3 class="rat_h3_1">'+getLocationHeader(props, locationName)+'</h3>\
+                                        </th>\
+                                    </tr>\
+                                </thead>\
+                                <tbody>\
+                                    <tr class="r_heading" style="border-bottom:1px solid #ccc">\
+                                        <th >'+props.rate.total_interviews+'</th>\
+                                        <th>'+props.rate.total_eas+'</th>\
+                                    </tr>\
+                                    <tr>\
+                                        <td >Interviews</td>\
+                                        <td >Total EAs</td>\
+                                    </tr>\
+                                    <tr class="r_heading" style="border-bottom:1px solid #ccc">\
+                                        <th>'+props.rate.value+'</th>\
+                                        <th>'+props.rate.active_eas+'</th>\
+                                    </tr>\
+                                    <tr class="r_heading" >\
+                                        <td >Interviews (Per EA)</td>\
+                                        <td >Interviewed EAs</td>\
+                                    </tr>\
+                                    <tr class="r_heading" style="border-bottom:1px solid #ccc">\
+                                        <th >'+props.rate.per_active_ea+'</th>\
+                                        <th></th>\
+                                    </tr>\
+                                    <tr class="r_heading" >\
+                                        <td >Per Interviewed EA (Ave)</td>\
+                                        <td></td>\
+                                    </tr>\
+                                </tbody>\
+                                </table>';
+
+        }
+        else{
+             statsInfo.innerHTML = '<table class="rathna_table">\
+                                        <thead>\
+                                            <tr>\
+                                                <th colspan="2" class="text-left">\
+                                                    <h3 class="rat_h3_1">'+locationName+'</h3>\
+                                                </th>\
+                                            </tr>\
+                                        </thead>\
+                                  </table>';
+        }
+    }
   }
 };
 
-var legend = L.control({position: 'bottomright'});
 
-legend.onAdd = function (map) {
-    var div = L.DomUtil.create('div', 'info legend'),
-        grades = [0,20, 40, 60, 80, 100];
-    div.innerHTML += "<h1>Key</h1>"
-        + '<i style="background:' + getColorFor(-1) + '"></i>'+ " Survey not opened<br/>";
-    for (var i = 0; i < grades.length; i++) {
-        div.innerHTML +=
-            '<i style="background:' + getColorFor(grades[i] + 1) + '"></i> ';
-        if(typeof  grades[i] != 'undefined' && typeof  grades[i +1] != 'undefined'){
-            div.innerHTML += grades[i] +" &mdash; "+ (grades[i + 1]) + "% <br/>"
-        }
-    }
-    return div;
-};
+//survey_selector.addTo(map)
 
-var survey_selector = L.control({position: 'topleft'});
-
-    survey_selector.onAdd = function(map){
-        var selector_div = L.DomUtil.create('div', 'survey');
-        var surveysHtml = $('#completion_form');
-        $(selector_div).html(surveysHtml.html());
-        $(surveysHtml).removeAttr('class', 'hide')
-        $(surveysHtml).remove()
-        return selector_div;
-    }
-
-legend.addTo(map);
-info.addTo(map);
-survey_selector.addTo(map)
-
-function highlightDistrict(event){
+function highlightAdminLevel(event){
     var layer = event.target
     layer.setStyle({
         weight: 3,
-        color:'#666',
+        color:'#FF8200',
         dashArray: '',
+        //fillColor: '#95bee5',
         fillOpacity: 0.3
     })
    if (!L.Browser.ie && !L.Browser.opera) {
@@ -150,12 +848,22 @@ function highlightDistrict(event){
     info.update(layer.feature.properties)
 }
 
-function zoomDistrict(event){
-    map.fitBounds(event.target.getBounds())
+info.addTo(map);
+
+function zoomAdminLevel(event){
+    map.fitBounds(event.target.getBounds());
+    var layer = event.target;
+    var adminLevel = layer.feature.properties['{{loc_field}}'];
+    if(!adminLevel)
+         adminLevel = layer.feature.properties['{{alt_loc_field}}'];
+    //console.info('AdminLevel: ' + adminLevel);
+
 }
 
-function resetDistrictHighlight(event){
-    geojson.resetStyle(event.target)
+function resetAdminLevelHighlight(event){
+    geojson.resetStyle(event.target);
+    indicatorTable.innerHTML = countryIndicator;
+    refreshIndicatorDisplay();
 }
 
     </script>

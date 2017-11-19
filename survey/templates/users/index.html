@@ -2,36 +2,37 @@
 {% block title %}
   Users List
 {% endblock %}
+{% block search %}
+{% include "search_form.html" %}
+{% include "horizontal_filter_form.html" with a_form=users_filter_form no_button=True filter_id='users_filter_form' %}
+{% endblock %}
+{% block page_actions %}
+<style type="text/css">
+    .search {     
+    margin-top: 5px !important;
+    }
+</style>
+<ul id="horizontal-filter">
+    <li>
+        <a style="padding: 3px 5px;margin-left: 10px;" href="{% url 'new_user_page' %}" class="btn btn-white btn-warning btn-bold pull-right" id="add-user"><i class="ace-icon fa fa-plus bigger-120"></i> Add User</a>
+    </li>
+    <li>
+        <a style="padding: 3px 5px" href="{% url 'download_users' %}" class="btn btn-white btn-warning btn-bold pull-right" id="export-users"><i class="ce-icon fa fa-external-link bigger-120"></i>Download Users</a>
+    </li>
+</ul>
+{% endblock %}
 {% block content %}
 {% load pagination_tags %}
-{% autopaginate users 30 %}
+{% autopaginate users max_display_per_page %}
 {% load template_tags %}
-	<div class="filter-option">
-			<h5>Filter By Status</h5>
-		    <ul id="horizontal-filter">
-		        <li>
-					<a href="{% url 'users_index' %}" class="btn btn_primary">All</a>
-		        </li>
-		        <li>
-		            <a href="{% url 'users_index' %}?status=active" class="btn btn_primary">Active</a>
-		        </li>
-		        <li>
-		            <a href="{% url 'users_index' %}?status=deactivated" class="btn btn_primary">Deactivated</a>
-		        </li>
-		    </ul>
-	</div>
-    <br class="clear" />
-    <div class="actions">
-        <a href="{% url 'new_user_page' %}" class="btn btn_primary pull-right" id="add-user"><i class="icon-plus"></i> Add User</a>
-        {% include "search_form.html" %}
-    </div>
-        <table class="table table-striped table-bordered table-hover table-sort">
+        <!-- <table class="table table-striped table-bordered table-hover table-sort"> -->
+        <table id="datatables" class="table table-striped table-bordered table-hover dataTable">
             <thead>
             <tr>
-                <th  title="click to sort by name">Full name</th>
-                <th  title="click to sort by role">Role</th>
-                <th  title="click to sort by mobile number">Mobile number</th>
-                <th  title="click to sort by status">Current Status</th>
+                <th  class="sorting" title="click to sort by name">Full name</th>
+                <th  class="sorting" title="click to sort by role">Role</th>
+                <th  class="sorting" title="click to sort by mobile number">Mobile number</th>
+                <th  class="sorting" title="click to sort by status">Current Status</th>
                 <th style="background-image: None;">Actions</th>
             </tr>
             </thead>
@@ -53,20 +54,32 @@
                     </td>
                     <td>
                         {% if user.is_active %}
-                                Active
+                                <span class="text-success">Active</span>
                         {% else %}
-                                Deactivated
+                                <span class="text-danger">Deactivated</span>
                         {% endif %}
                     </td>
                     <td>
                         <div class="btn-group">
-                            <a href="{% url 'users_edit' user.pk %}" class="btn btn-small edit"><i class="icon-pencil"></i> Edit</a>
-                            <a href="{% url 'users_show_details' user.pk %}" class="btn btn-small"><i class="icon-list"></i> Details</a>
+                        <button class="btn btn-minier btn-yellow dropdown-toggle" data-toggle="dropdown" data-position="auto">
+                           <i class="usur-icon fa fa-caret-down icon-only bigger-120"></i>
+                       </button>                      
+                       <ul class="dropdown-menu dropdown-only-icon dropdown-yellow dropdown-menu-right dropdown-caret dropdown-close">
+                       <li>
+                            <a href="{% url 'users_edit' user.pk 'view' %}" class="tooltip-info" data-rel="tooltip" title="" data-original-title="View"><span class="blue"><i class="usur-icon fa fa-eye bigger-120"></i> View Details</span></a>
+                            </li>
+                            <li>
+                            <a href="{% url 'users_edit' user.pk 'edit' %}" class="tooltip-info" data-rel="tooltip" title="" data-original-title="Edit"><span class="blue"><i class="usur-icon fa fa-edit bigger-120"></i> Edit</span></a>
+                            </li>
+                            <li>
                             {% if user.is_active %}
-                                <a href="#deactivate_user_{{ user.pk }}" data-toggle="modal" class="btn btn-small"><i class="icon-lock"></i> Deactivate</a>
+                                <a href="#deactivate_user_{{ user.pk }}" data-toggle="modal" class="tooltip-info" data-rel="tooltip" title="" data-original-title="DeActivate"><span class="red"><i class="usur-icon fa fa-low-vision bigger-120"></i> DeActivate</span></a>
                             {% else %}
-                                <a href="#re-activate_user_{{ user.pk }}" data-toggle="modal" class="btn btn-small"><i class="icon-lock"></i> Activate</a>
+                                <!-- <a href="#re-activate_user_{{ user.pk }}" data-toggle="modal" class="btn btn-small"><i class="icon-lock"></i> Activate</a> -->
+                                <a href="#re-activate_user_{{ user.pk }}" data-toggle="modal" class="tooltip-info" data-rel="tooltip" title="" data-original-title="Activate"><span class="green"><i class="usur-icon fa fa-eye bigger-120"></i>Activate</span></a>
                             {% endif %}
+                            </li>
+                            </ul>
                         </div>
                     </td>
                 </tr>
@@ -76,4 +89,13 @@
             </tbody>
         </table>
     {% paginate %}
+    <div class="paginate_msg">Total {{ page_obj.paginator.count }} entries. </div>
+{% endblock %}
+{% block javascripts %}
+<link rel="stylesheet" href="{{ STATIC_URL }}css/dataTables.bootstrap.css" type="text/css">
+<script type="text/javascript" src="https://code.jquery.com/jquery-1.12.4.js"></script>
+
+<script src="{{ STATIC_URL }}/js/jquery.dataTables.js"></script>
+<script src="{{ STATIC_URL }}/js/dataTables.bootstrap.js" type="text/javascript" charset="utf-8"></script>
+{% include 'max_display_per_page_form.html' %}
 {% endblock %}

@@ -1,14 +1,62 @@
 from datetime import date
+from django.test.client import Client
+from django.contrib.auth.models import User
+from django.db.models import Q
+from django.core.urlresolvers import reverse
+from model_mommy import mommy
 from django.test import TestCase
-from survey.models import Batch, Survey, LocationTypeDetails, EnumerationArea, Household, HouseholdListing, SurveyHouseholdListing, QuestionModule
-from survey.templatetags.template_tags import *
-from survey.views.location_widget import LocationWidget
+from survey.models import *
 from survey.models.locations import *
-from survey.models.households import HouseholdMemberGroup
+from survey.templatetags.template_tags import *
 from survey.models.questions import *
+from survey.models.respondents import (RespondentGroupCondition, GroupTestArgument,
+                                       ParameterQuestion, SurveyParameterList, RespondentGroup,
+                                       ParameterTemplate)
 
 
 class TemplateTagsTest(TestCase):
+
+    def setUp(self):
+        self.survey = mommy.make(Survey)
+        self.batch = mommy.make(Batch, survey=self.survey)
+        self.qset = QuestionSet.get(pk=self.batch.id)
+        self.question = mommy.make(Question, qset=self.qset, answer_type=NumericalAnswer.choice_name())
+        self.ea = EnumerationArea.objects.create(name="BUBEMBE", code="11-BUBEMBE")
+        self.investigator = Interviewer.objects.create(name="InvestigatorViewdata",
+                                                       ea=self.ea,
+                                                       gender='1', level_of_education='Primary',
+                                                       language='Eglish', weights=0,date_of_birth='1987-01-01')
+
+        self.surveyAllocation_obj = SurveyAllocation.objects.create(
+            interviewer=self.investigator,
+            survey=self.survey,
+            allocation_ea=self.ea,
+            status=1
+            )
+        self.interview = Interview.objects.create(
+            interviewer=self.investigator,
+            ea=self.ea,
+            survey=self.survey,
+            question_set=self.qset,
+            )
+        self.listingsample = ListingSample.objects.create(survey=self.survey, interview=self.interview)
+
+    def test_get_value(self):
+        class A(object):
+            b = 5
+        a = A()
+        self.assertEquals(get_value(a, 'b'), 5)
+        a = {'c': 7}
+        self.assertEquals(get_value(a, 'c'), 7)
+
+    def test_show_flow_condition(self):
+        # flow without validation
+        flow = mommy.make(QuestionFlow, question=self.question)
+        self.assertEquals(show_condition(flow), '')
+        validation = mommy.make(ResponseValidation, validation_test=NumericalAnswer.equals.__name__)
+        text_argument = mommy.make(TextArgument, validation=validation, position=1, param=1)
+        flow.validation = validation
+        self.assertIn(flow.validation.validation_test, show_condition(flow))
 
     def test_modulo_understands_number_is_modulo_of_another(self):
         self.assertTrue(modulo(4, 2))
@@ -64,54 +112,26 @@ class TemplateTagsTest(TestCase):
         self.assertEqual('/surveys/1/batches/2/',
                          get_url_with_ids("1, 2", 'batch_show_page'))
 
-    def test_get_odk_mem_question(self):
-        household_member_group = HouseholdMemberGroup.objects.create(
-            name="test name1324", order=12)
-        question_mod = QuestionModule.objects.create(
-            name="Test question name", description="test desc")
-        batch = Batch.objects.create(order=1)
-        question = Question.objects.create(identifier='123.1', text="This is a question", answer_type='Numerical Answer',
-                                           group=household_member_group, batch=batch, module=question_mod)
-        self.assertEqual(question.text, get_odk_mem_question(question))
+    def test_current(self):
+        l= [1,2]
+        self.assertEqual(1,current(l,0))
+        self.assertEqual(None,current(l,10))
 
-    def test_is_relavent_odk(self):
-        household_member_group = HouseholdMemberGroup.objects.create(
-            name="test name1324", order=12)
-        ea = EnumerationArea.objects.create(name="Kampala EA A")
-        survey = Survey.objects.create(
-            name="Test Survey", description="Desc", sample_size=10, has_sampling=True)
-        investigator = Interviewer.objects.create(name="Investigator",
-                                                  ea=ea,
-                                                  gender='1', level_of_education='Primary',
-                                                  language='Eglish', weights=0)
-        household_listing = HouseholdListing.objects.create(
-            ea=ea, list_registrar=investigator, initial_survey=survey)
-        household = Household.objects.create(house_number=123456, listing=household_listing, physical_address='Test address',
-                                             last_registrar=investigator, registration_channel="ODK Access", head_desc="Head", head_sex='MALE')
-        question_mod = QuestionModule.objects.create(
-            name="Test question name", description="test desc")
-        batch = Batch.objects.create(order=1)
-        question = Question.objects.create(identifier='123.1', text="This is a question", answer_type='Numerical Answer',
-                                           group=household_member_group, batch=batch, module=question_mod)
-        surname = HouseholdMember._meta.get_field('surname')
-        batch.survey = survey
-        batch.start_question = question
-        first_name = HouseholdMember._meta.get_field('first_name')
-        gender = HouseholdMember._meta.get_field('gender')
-        context = {
-            surname.verbose_name.upper().replace(' ', '_'):
-            mark_safe(
-                '<output value="/survey/household/householdMember/surname"/>'),
-            first_name.verbose_name.upper().replace(' ', '_'):
-            mark_safe(
-                '<output value="/survey/household/householdMember/firstName"/>'),
-            gender.verbose_name.upper().replace(' ', '_'):
-            mark_safe('<output value="/survey/household/householdMember/sex"/>'),
-        }
+    def test_replace(self):
+        str = " world"
+        self.assertEqual("helloworld", replace_space(str, "hello"))
 
     def test_should_return_concatenated_ints_in_a_single_string(self):
         self.assertEqual('1, 2', add_string(1, 2))
         self.assertEqual('1, 2', add_string('1', '2'))
+
+    def test_concat_strings(self):
+        arg = "abc"
+        self.assertEqual('abc', arg)
+
+    def test_condition_text(self):        
+        self.assertEqual('EQUALS', condition_text('EQUALS'))
+        self.assertEqual('', condition_text('abv'))
 
     def test_should_return_repeated_string(self):
         self.assertEqual('000', repeat_string('0', 4))
@@ -122,6 +142,13 @@ class TemplateTagsTest(TestCase):
         batch = Batch.objects.create(name="open survey", survey=survey)
         self.assertEqual("selected='selected'",
                          is_survey_selected_given(survey, batch))
+
+    def test_should_return_selected_for_is_selected(self):
+        # survey = Survey.objects.create(
+        #     name="open survey", description="open survey", has_sampling=True)
+        batch = Batch.objects.create(name="batchnames")        
+        self.assertEqual("selected='selected'",
+                         is_selected(batch,batch))        
 
     def test_should_return_none_for_selected_batch(self):
         survey = Survey.objects.create(
@@ -164,9 +191,6 @@ class TemplateTagsTest(TestCase):
         self.assertEqual(None, non_response_is_activefor(
             all_open_locations, kampala))
 
-    def setUp(self):
-        locate = LocationType.objects.create()
-
     def test_knows_ea_is_selected_given_location_data(self):
         country = LocationType.objects.create(name="Country", slug='country')
         district = LocationType.objects.create(
@@ -180,14 +204,8 @@ class TemplateTagsTest(TestCase):
         ea2 = EnumerationArea.objects.create(name="EA Kisasi2")
         ea1.locations.add(kisasi)
         ea2.locations.add(kisasi)
-
-        location_widget = LocationWidget(selected_location=kisasi, ea=ea1)
-
-        self.assertEqual("selected='selected'",
-                         is_ea_selected(location_widget, ea1))
-        self.assertIsNone(is_ea_selected(location_widget, ea2))
-
-    def test_is_location_selected(self):
+ 
+    def test_ea_is_location_selected(self):
         country = LocationType.objects.create(name="Country1", slug='country')
         district = LocationType.objects.create(
             name="District1", parent=country, slug='district')
@@ -200,9 +218,6 @@ class TemplateTagsTest(TestCase):
         ea2 = EnumerationArea.objects.create(name="EA Kisasi12")
         ea1.locations.add(kisasi)
         ea2.locations.add(kisasi)
-
-        location_widget = LocationWidget(selected_location=kisasi, ea=ea1)
-        self.assertIsNone(is_location_selected(location_widget, ea1))
 
     def test_batch_is_selected(self):
         batch = Batch.objects.create(order=1, name="Batch name")
@@ -232,14 +247,15 @@ class TemplateTagsTest(TestCase):
                          is_batch_open_for_location(open_locations, kampala))
 
     def test_condition(self):
-        condition = GroupCondition.objects.create(
-            attribute="AGE", value=2, condition="EQUALS")
-        self.assertEqual("EQUALS", condition.condition)
+        condition = RespondentGroupCondition.objects.create(validation_test="EQUALS",
+                                                            respondent_group_id=1,test_question_id=1)
+        self.assertEqual("EQUALS", condition.validation_test)
 
     def test_quest_validation_opts(self):
-        batch = Batch.objects.create(order=1, name="Batch name")
-        condition = GroupCondition.objects.create(
-            attribute="AGE", value=2, condition="GREATER_THAN")
+        batch = Batch.objects.create(order=1, name="Batch name")        
+        condition = RespondentGroupCondition.objects.create(validation_test="EQUALS",
+                                                            respondent_group_id=1,
+                                                            test_question_id=1)
 
     def test_ancestors_reversed_reversed(self):
         country = LocationType.objects.create(name='Country', slug='country')
@@ -249,41 +265,22 @@ class TemplateTagsTest(TestCase):
         village = LocationType.objects.create(name='Village', slug='village')
         subcounty = LocationType.objects.create(
             name='Subcounty', slug='subcounty')
-
         africa = Location.objects.create(name='Africa', type=country)
-        LocationTypeDetails.objects.create(
-            country=africa, location_type=country)
-        LocationTypeDetails.objects.create(
-            country=africa, location_type=region)
-        LocationTypeDetails.objects.create(country=africa, location_type=city)
-        LocationTypeDetails.objects.create(
-            country=africa, location_type=parish)
-        LocationTypeDetails.objects.create(
-            country=africa, location_type=village)
-        LocationTypeDetails.objects.create(
-            country=africa, location_type=subcounty)
-
         uganda = Location.objects.create(
             name='Uganda', type=region, parent=africa)
-
         abim = Location.objects.create(name='ABIM', parent=uganda, type=city)
-
         abim_son = Location.objects.create(
             name='LABWOR', parent=abim, type=parish)
-
         abim_son_son = Location.objects.create(
             name='KALAKALA', parent=abim_son, type=village)
         abim_son_daughter = Location.objects.create(
             name='OYARO', parent=abim_son, type=village)
-
         abim_son_daughter_daughter = Location.objects.create(
             name='WIAWER', parent=abim_son_daughter, type=subcounty)
-
         abim_son_son_daughter = Location.objects.create(
             name='ATUNGA', parent=abim_son_son, type=subcounty)
         abim_son_son_son = Location.objects.create(
             name='WICERE', parent=abim_son_son, type=subcounty)
-
         self.assertEqual([], ancestors_reversed(africa))
         self.assertEqual([africa], ancestors_reversed(uganda))
         self.assertEqual([africa, uganda], ancestors_reversed(abim))
@@ -292,3 +289,19 @@ class TemplateTagsTest(TestCase):
                          ancestors_reversed(abim_son_son))
         self.assertEqual([africa, uganda, abim, abim_son,
                           abim_son_son], ancestors_reversed(abim_son_son_son))
+
+    def test_trim(self):
+        str1 = "survey_test"
+        self.assertEquals(str1.strip(), trim(str1))
+    # def test_get_question_text(self):
+    #     self.assertIsNotNone(get_question_text(self.question))
+
+    # def test_get_name_references(self):
+    #     self.assertIsNotNone(get_name_references(self.qset))        
+    # def test_get_node_path(self):
+    #     self.assertIsNotNone(get_node_path(self.question))
+
+    # def test_get_loop_aware_path(self):
+    #     self.assertIsNotNone(get_loop_aware_path(self.question))
+    
+

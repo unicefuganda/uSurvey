@@ -1,10 +1,11 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from survey.forms.question_module_form import QuestionModuleForm
-from survey.models import QuestionModule, Question
+from survey.models import QuestionModule
 from django.core.urlresolvers import reverse
+from survey.utils.query_helper import get_filterset
 
 
 @login_required
@@ -21,14 +22,21 @@ def new(request):
     request.breadcrumbs([
         ('Modules', reverse('question_module_listing_page')),
     ])
-    return render(request, 'question_module/new.html',
-                  {'question_module_form': question_module_form, 'title': 'New Module', 'button_label': 'Create',
+    return render(request,
+                  'question_module/new.html',
+                  {'question_module_form': question_module_form,
+                   'title': 'New Module',
+                   'button_label': 'Create',
                    'action': '/modules/new/'})
 
 
 @permission_required('auth.can_view_batches')
 def index(request):
     all_question_modules = QuestionModule.objects.all()
+    search_fields = ['name', 'description']
+    if 'q' in request.GET:
+        all_question_modules = get_filterset(
+            all_question_modules, request.GET['q'], search_fields)
     context = {'question_modules': all_question_modules}
     return render(request, "question_module/index.html", context)
 
@@ -65,6 +73,9 @@ def edit(request, module_id):
     request.breadcrumbs([
         ('Modules', reverse('question_module_listing_page')),
     ])
-    return response or render(request, 'question_module/new.html',
-                              {'question_module_form': question_module_form, 'title': 'Edit Module', 'button_label': 'Save',
+    return response or render(request,
+                              'question_module/new.html',
+                              {'question_module_form': question_module_form,
+                               'title': 'Edit Module',
+                               'button_label': 'Save',
                                'action': '/modules/%s/edit/' % module.id})

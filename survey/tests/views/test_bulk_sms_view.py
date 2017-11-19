@@ -1,20 +1,17 @@
 from django.test.client import Client
 from django.contrib.auth.models import User
 from survey.models.locations import *
-from survey.interviewer_configs import PRIME_LOCATION_TYPE
-
 from survey.tests.base_test import BaseTest
-
 
 class BulkSMSTest(BaseTest):
 
     def setUp(self):
         self.client = Client()
         user_without_permission = User.objects.create_user(
-            username='useless', email='rajni@kant.com', password='I_Suck')
+            username='useless', email='demo2@kant.com', password='I_Suck')
         raj = self.assign_permission_to(User.objects.create_user(
-            'Rajni', 'rajni@kant.com', 'I_Rock'), 'can_view_batches')
-        self.client.login(username='Rajni', password='I_Rock')
+            'demo2', 'demo2@kant.com', 'demo2'), 'can_view_batches')
+        self.client.login(username='demo2', password='demo2')
         self.country = LocationType.objects.create(
             name="Country", slug="country")
         self.district = LocationType.objects.create(
@@ -50,7 +47,6 @@ class BulkSMSTest(BaseTest):
             self.assertEquals(str(message), "Please select a location.")
         self.failUnlessEqual(response.status_code, 200)
         self.assertRedirects(response, 'http://testserver/bulk_sms')
-
         response = self.client.post(
             '/bulk_sms/send', data={'locations': [self.kampala.pk, self.abim.pk], 'text': ''}, follow=True)
         for message in response.context['messages']:

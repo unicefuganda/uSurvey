@@ -1,0 +1,26 @@
+{% load template_tags %}
+<div class="modal fade " id="delete_condition_{{id}}" tabindex="-1" role="dialog"  aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title">Delete {{ name }}</h4>
+      </div>
+      <div class="modal-body">
+        <span class="alert_confirm">Confirm:</span> Are you sure you want to delete {{ object_name }}?
+        {% if object_name.groups.all %}
+          <p> It is attached to the following groups:
+            <ul>
+              {% for group in object_name.groups.all %}
+                <li><a href="{% url 'household_member_groups_details' group.id %}">{{ group.name }}</a></li>
+              {% endfor %}
+          </p>
+        {% endif %}
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
+        <a class="btn btn-primary" href="{{ url }}">Yes</a>
+      </div>
+    </div>
+  </div>
+</div>

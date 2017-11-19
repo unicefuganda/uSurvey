@@ -32,7 +32,7 @@ function show_or_hide_attribute_fields(attribute_value){
 
     hide_between_value_fields();
 
-    if ($('#id_condition').val().toUpperCase() != 'BETWEEN'){
+    if ($('#id_condition').val() && $('#id_condition').val().toUpperCase() != 'BETWEEN'){
         hide_between_value_fields()
         if(attribute_value == 'value'){
             value_field.show();
@@ -40,7 +40,7 @@ function show_or_hide_attribute_fields(attribute_value){
         }
 
     }
-    if ($('#id_condition').val().toUpperCase() == 'BETWEEN'){
+    if ($('#id_condition').val() && $('#id_condition').val().toUpperCase() == 'BETWEEN'){
         show_between_value_fields()
     }
 }
@@ -57,18 +57,71 @@ function show_or_hide_next_question(action_value) {
         next_question_field.hide();
         next_question_field.attr('disabled', 'disabled')
     }
-    next_question_field.hide();
     $(' .chzn-select').trigger("liszt:updated");
 }
 
+var id_text_delim = ":    ";
+
 function append_to_next_question_dropdown(data) {
     counter=0;
+    $('#id_next_question').append('<option value="">Question-Code'+id_text_delim+'Text</option>');
     $.each(data, function () {
-        $('#id_next_question').append("<option value=" + data[counter]['id'] + ">" + data[counter]['identifier'] + " -- "+ data[counter]['text'] + "</option>");
+        $('#id_next_question').append('<option value="' + data[counter]['id'] + '">' + data[counter]['identifier'] + id_text_delim + data[counter]['text'] + "</option>");
         counter++;
     });
-     $(' .chzn-select').trigger("liszt:updated");
+    change_to_select2($('#id_next_question'));
+//     $(' .chzn-select').trigger("liszt:updated");
+//     $('#id_next_question').select2({
+//        templateResult: next_question_format,
+//        templateSelection: next_question_select_format,
+//        theme: "classic",
+//    });
 }
+
+function change_to_select2(obj, delimiter, show_entire_selected) {
+     if(!delimiter)
+         delimiter = id_text_delim;
+     show_entire_selected =  show_entire_selected === true ? true : false;
+     obj.select2({
+        templateResult: function(state) { return item_list_format(state, delimiter) },
+        templateSelection: function(state) { return item_select_format(state, delimiter, show_entire_selected) },
+        theme: "classic",
+    });
+}
+
+function item_list_format(state, delimiter) {
+    var key_terminus = state.text.indexOf(delimiter);
+    //alert(JSON.stringify(state))
+//    if(state.disabled === true)
+//        return '';
+    if(state.id){    // to do: handle this more elegantly
+        var key = state.text.substring(0, key_terminus);
+        var val = state.text.substring(key_terminus + 1);
+    }
+    else{
+        var key = '<strong class="opt-header">'+state.text.substring(0, key_terminus)+'</strong>';
+        var val = '<strong class="opt-header">'+state.text.substring(key_terminus + 1)+'</strong>';
+    }
+    return $('<div class="opt-item"><span class="opt-id" style="display: inline-block; padding-right: 2%; width: 40%; word-wrap:break-word;">' + key +
+    '</span><span class="opt-text" style="display: inline-block; word-wrap:break-word;">'+ val + '</span></div>');
+}
+
+function item_select_format(state, delimiter, show_entire_selected) {
+    if(state.id){
+        var key_terminus = state.text.indexOf(delimiter);
+        if(show_entire_selected)
+            var content_to_show = state.text;
+        else
+            var content_to_show = state.text.substring(key_terminus + 1);
+        var text = '<span style="color: #3875d7">' + content_to_show + '</span>';
+    }
+    else{
+        var text =  '<strong>Choose Item</strong>';
+     }
+
+    return $('<div align="center">' + text + '</div>');
+}
+
 
 function append_to_drop_down_options(url)
 {
@@ -108,7 +161,7 @@ function fill_questions_or_subquestions_in_next_question_field(action_value){
     var show_sub_questions = ['ASK_SUBQUESTION'];
     var show_back_to_questions = ['BACK_TO'];
     var question_id = $('#id_question').val();
-    var batch_id = $('#id_batch').val()
+    var batch_id = $('#id_batch').val();
     var questions_url = "";
     if(show_questions.indexOf(action_value) != -1)
     {
@@ -125,7 +178,8 @@ function fill_questions_or_subquestions_in_next_question_field(action_value){
         questions_url = '/questions/' + question_id +'/prev_questions_json/'
         $('#add_subquestion').hide();
     }
-    replace_next_question_with_right_data(questions_url);
+    if(questions_url)
+        replace_next_question_with_right_data(questions_url);
 }
 
 function isHTML(str) {
@@ -182,7 +236,7 @@ jQuery(function($){
 
         post.done(function(data){
             if(data){
-                 $('#id_next_question').append("<option value=" + data['id'] + ">" + data['identifier'] + " -- "+ data['text'] + "</option>");
+                 $('#id_next_question').append("<option value=" + data['id'] + ">" + data['identifier'] + id_text_delim + data['text'] + "</option>");
                 $('#close_modal').click();
             } else{
                 append_error_to_text(data);

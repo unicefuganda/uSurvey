@@ -1,10 +1,9 @@
 from django.test import TestCase
-from datetime import datetime, date
+from datetime import date
 from survey.models.locations import *
 from survey.forms.interviewer import *
 from survey.models import EnumerationArea, Survey
 from survey.models.backend import Backend
-
 
 class InvestigatorFormTest(TestCase):
 

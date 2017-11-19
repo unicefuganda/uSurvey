@@ -1,9 +1,8 @@
 import logging
 import os
-from datetime import datetime
 from django.conf import settings
 
-APP_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+APP_DIR = settings.LOG_DIR
 LOG_FILE = os.path.join(APP_DIR, 'mics_odk.log')
 logger = logging.getLogger('audit_logger')
 handler = logging.FileHandler(LOG_FILE)
@@ -11,9 +10,10 @@ formatter = logging.Formatter('[%(asctime)s] %(levelname)s %(message)s')
 handler.setFormatter(formatter)
 logger.addHandler(handler)
 if settings.DEBUG:
-    logger.setLevel(logging.DEBUG)
+    LOG_LEVEL = logging.DEBUG
 else:
-    logger.setLevel(logging.INFO)
+    LOG_LEVEL = logging.INFO
+logger.setLevel(LOG_LEVEL)
 
 
 class Enum(object):
@@ -30,6 +30,7 @@ class Enum(object):
 
     def __iter__(self):
         return self.enums.itervalues()
+
 
 Actions = Enum(
     PROFILE_ACCESSED="profile-accessed",
@@ -78,7 +79,15 @@ def get_client_ip(request):
     return ip
 
 
-def audit_log(action, request_user, investigator, message, audit, request, level=logging.DEBUG):
+def audit_log(
+    action,
+    request_user,
+    investigator,
+    message,
+    audit,
+    request,
+    level=LOG_LEVEL
+):
     """
     Create a log message based on these params
 
@@ -87,7 +96,8 @@ def audit_log(action, request_user, investigator, message, audit, request, level
     @param account_username: The investigator name the action was performed on
     @param message: The message to be displayed on the log
     @param level: log level
-    @param audit: a dict of key/values of other info pertaining to the action e.g. form's id_string, submission uuid
+    @param audit: a dict of key/values of other \
+        info pertaining to the action e.g. form's id_string, submission uuid
     @return: None
     """
     extra = {

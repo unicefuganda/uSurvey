@@ -1,0 +1,28 @@
+<h3>
+    {% block title %} {{ title }} {% endblock %}
+</h3>
+{% block pre_form_content %}
+    <div class="control-group" style="width: 40%; padding-left: 1%">
+        <label class="control-label"></label>
+    </div>
+{% endblock %}
+ <form action="{{ modal_action }}" method="post" accept-charset="utf-8" id="{{ id }}" class="form-horizontal {{ class }}">
+    {% csrf_token %}
+    {% include "naked_form.html" with a_form=questionform %}
+     <div class="form-actions">
+         <button type="submit" class="btn btn-primary" name="save_sub_question_button" id="modal_sub_question_button"  data-disabled-text="{{ loading_text }}">{{ button_label }}</button>
+         <button  data-dismiss="modal" class="btn btn-primary" name="cancel_button">Cancel</button>
+     </div>
+
+ </form>
+    <script type="text/template" id="question-option-template">
+        <div class="control-group options question-option">
+            <label class="control-label col-md-12">Option <span class="number"></span></label>
+            <div class="controls">
+                <input type="text" maxlength="100" name="options">
+            <a style="padding: 0px !important;" href="javascript:;" class="btn btn-white btn-warning btn-bold add-option"><i class="ace-icon fa fa-plus bigger-120 orange"></i></i></a>
+            <a style="padding: 0px !important;" href="javascript:;" class="btn btn-white btn-warning btn-bold remove-option"><i class="ace-icon fa fa-minus bigger-120 orange"></i></i></a>
+            </div>
+        </div>
+    </script>
+

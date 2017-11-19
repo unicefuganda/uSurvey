@@ -30,7 +30,9 @@ font-weight
 {
  font-size:14px;
  color:#0066FF;
+ margin-bottom:5px
   }
+
 .btnforallxlarge
 {
 height: 50px;
@@ -432,7 +434,7 @@ a:focus {
 }
 
 .offset6 {
-  margin-left: 500px;
+  margin-left: 500px;margin-left: 500px;
 }
 
 .offset5 {

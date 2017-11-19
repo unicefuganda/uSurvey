@@ -2,9 +2,18 @@
 {% block title %}
   Download reports
 {% endblock %}
+{
 {% block content %}
-  <h4>
+<style type="text/css">
+.dataTables_wrapper .row:first-child {
+    padding-top: 0px !important;
+    padding-bottom: 0px !important;
+    background-color: #FFF !important;
+}
+	.dataTables_wrapper select {    margin-bottom: 0 !important;    margin-left: 4px!important;    margin-right: 4px!important;    margin-top: 0px !important;    padding: 3px !important;    width: 261px!important;}
+</style>
+  <h4 style="margin-top: 5px;margin-bottom: 10px;">
     Choose survey to get interviewers who completed a survey
   </h4>
-{% include "horizontal_filter_form.html" with a_form=report_form no_button=False filter_id='report_form' filter_button_name='download' %}
+{% include "horizontal_filter_form.html" with a_form=report_form no_button=False filter_id='report_form' filter_button_name='Download' %}
 {% endblock %}

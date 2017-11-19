@@ -1,75 +1,149 @@
-import os
 import string
+import time
+from django.core.files.base import ContentFile
 from datetime import datetime
-from django.conf import settings
-from django.core.exceptions import ObjectDoesNotExist, ValidationError
-from django.db import models
-from survey.models.access_channels import InterviewerAccess, ODKAccess, USSDAccess
-from survey.models.base import BaseModel
+from django_rq import job
+from django.contrib.auth.models import User
+from django.utils import timezone
 from dateutil.parser import parse as extract_date
-from survey.models.locations import Point
-from django import template
-from survey.interviewer_configs import MESSAGES
-from survey.utils.decorators import static_var
-from django.db.models.signals import post_save
-from django.dispatch import receiver
+from django.conf import settings
+from django.core.exceptions import ValidationError
+from django.db import models
 from django.db.models import Max
-
-
-def reply_test(cls, func):
-    func.is_reply_test = True
-    return func
+from survey.utils.logger import glogger as logger
+from survey.models.base import BaseModel
+from survey.models.access_channels import InterviewerAccess, ODKAccess, USSDAccess
+from survey.models.locations import Point
+from survey.utils.decorators import static_var
 
 
 class Interview(BaseModel):
     interviewer = models.ForeignKey(
-        "Interviewer", null=True, related_name="interviews")
-    householdmember = models.ForeignKey(
-        "HouseholdMember", null=True, related_name="interviews", db_index=True)
-    batch = models.ForeignKey(
-        "Batch", related_name='interviews', db_index=True)
+        "Interviewer",
+        null=True,
+        related_name="interviews")  # nullable for simulation & backend load
+    ea = models.ForeignKey('EnumerationArea', related_name='interviews',
+                           db_index=True, null=True)  # repeated here for easy reporting
+    survey = models.ForeignKey(
+        'Survey',
+        related_name='interviews',
+        db_index=True,
+        null=True)
+    question_set = models.ForeignKey(
+        'QuestionSet',
+        related_name='interviews',
+        db_index=True)
+    interview_reference = models.ForeignKey(
+        'Interview',
+        related_name='follow_up_interviews',
+        null=True,
+        blank=True)
     interview_channel = models.ForeignKey(
-        InterviewerAccess, related_name='interviews')
-    closure_date = models.DateTimeField(null=True, blank=True, editable=False)
-    ea = models.ForeignKey(
-        'EnumerationArea', related_name='interviews', db_index=True)
-    last_question = models.ForeignKey(
-        "Question", related_name='ongoing', null=True, blank=True)
+        InterviewerAccess, related_name='interviews', null=True)
+    closure_date = models.DateTimeField(null=True, blank=True, editable=False, verbose_name='Completion Date')
+    # just used to capture preview/data entry tester
+    uploaded_by = models.ForeignKey(User, null=True, blank=True)
+    test_data = models.BooleanField(default=False)
+    #instance_id = models.CharField(max_length=200, null=True, blank=True)
+    last_question = models.ForeignKey("Question", related_name='ongoing', null=True, blank=True)
 
     def __unicode__(self):
-        return '%s-%s: %s' % (self.interviewer.name, self.householdmember.first_name, self.batch.name)
+        return '%s: %s' % (self.id, self.question_set.name)
 
     def is_closed(self):
         return self.closure_date is not None
 
     @property
+    def qset(self):
+        from survey.models.questions import QuestionSet
+        return QuestionSet.get(pk=self.question_set.pk)
+
+    @property
     def has_started(self):
         return self.last_question is not None
 
-    def get_anwser(self, question, capwords=True):
-        if self.householdmember.belongs_to(question.group):
-            answer_class = Answer.get_class(question.answer_type)
-            answers = answer_class.objects.filter(
-                interview=self, question=question)
-            if answers.exists():
-                reply = unicode(answers[0].to_text())
-                if capwords:
-                    reply = string.capwords(reply)
-                return reply
+    def get_answer(self, question, capwords=True):
+        answer_class = Answer.get_class(question.answer_type)
+        answers = answer_class.objects.filter(interview=self, question=question)
+        if answers.exists():
+            reply = unicode(answers[0].to_text())
+            if capwords:
+                reply = string.capwords(reply)
+            return reply
         return ''
 
-    def respond(self, reply=None, channel=ODKAccess.choice_name()):
-        '''
-            Respond to given reply for specified channel.
+    @classmethod
+    def save_answers(cls, qset, survey, ea, access_channel, question_map, answers, survey_parameters=None,
+                     reference_interview=None, media_files={}):
+        """Used to save a dictionary list of answers. keys in each answer dict must be keys in the question map
+        :param qset:
+        :param survey:
+        :param ea:
+        :param access_channel:
+        :param question_map: For convinence, a dictionary containing ID to question instance {1: quest1, 2: quest2... }
+        :param answers: list of dictionaries each contains the [{quest_id: answer, quest_id2: answer2, ...}, ]
+        :param survey_parameters: This is a dictionary of group paramaters
+        :param reference_interview: Reference interview if any
+        :param media_files: Any media files available. Required for file related answers (Image, audio and video)
+        :return:
+        """
+        interviewer = access_channel.interviewer
+        interviews = []
+        if reference_interview and (issubclass(reference_interview, Interview) is False):
+            reference_interview = Interview.get(id=reference_interview)
+
+        def _save_record(record):
+            now = timezone.now()
+            closure_date = record.get('completion_date', now).replace(tzinfo=now.tzinfo)
+            interview = Interview.objects.create(survey=survey, question_set=qset,
+                                                 ea=ea, interviewer=interviewer, interview_channel=access_channel,
+                                                 closure_date=closure_date,
+                                                 interview_reference=reference_interview)
+            interviews.append(interview)
+            map(lambda (q_id, answer): _save_answer(interview, q_id, answer), record.items())
+            if survey_parameters:
+                map(lambda (q_id, answer): _save_answer(interview, q_id, answer), survey_parameters.items())
+
+        def _save_answer(interview, q_id, answer):
+            try:
+                question = question_map.get(q_id, None)
+                if question and answer:
+                    answer_class = Answer.get_class(question.answer_type)
+                    if question.answer_type in [AudioAnswer.choice_name(), ImageAnswer.choice_name(),
+                                                VideoAnswer.choice_name()]:
+                        media = media_files.get(answer, None)
+                        if hasattr(media, 'read'):
+                            answer = media
+                        else:
+                            # only file objects or the file contents
+                            answer = ContentFile(media, name=answer)
+                    try:
+                        old_answer = answer_class.objects.get(interview=interview, question=question)
+                        old_answer.update(answer)
+                    except answer_class.DoesNotExist:
+                        answer_class.create(interview, question, answer)
+                    except Exception, ex:
+                        logger.error('error saving %s, desc: %s' % (q_id, str(ex)))
+            except Exception, ex:
+                logger.error('error saving %s, desc: %s' % (q_id, str(ex)))
+        map(_save_record, answers)
+        return interviews
+
+    def respond(self, reply=None, channel=ODKAccess.choice_name(), answers_context={}):
+        """
+            Respond to given reply for specified channel. Irrespective to group.
+            Might be depreciating group in the near future
             This method is volatile.Raises exception if some error happens in the process
         :param reply:
         :param channel:
         :return: Returns next question if any
-        '''
+        """
         if self.is_closed():
             return
-        if self.last_question and reply is None:
-            return self.householdmember.get_composed(self.last_question.display_text(USSDAccess.choice_name()))
+        if self.last_question is None or (self.last_question and reply is None):
+            self.last_question = self.question_set.start_question
+            self.save()
+            return self.last_question.display_text(channel=channel, context=answers_context)
         next_question = None
         if self.has_started:
             # save reply
@@ -78,81 +152,98 @@ class Interview(BaseModel):
             # compute nnext
             next_question = self.last_question.next_question(reply)
         else:
-            next_question = self.batch.start_question
+            next_question = self.question_set.start_question
         # now confirm the question is applicable
-        if next_question and (self.householdmember.belongs_to(next_question.group)
-                              and AnswerAccessDefinition.is_valid(channel, next_question.answer_type)) is False:
-            next_question = self.batch.next_inline(self.last_question, groups=self.householdmember.groups,
-                                                   channel=channel)  # if not get next line question
+        if next_question and AnswerAccessDefinition.is_valid(channel, next_question.answer_type) is False:
+            # if not get next line question
+            next_question = self.question_set.next_inline(self.last_question, channel=channel)
         response_text = None
         if next_question:
             self.last_question = next_question
-            response_text = self.householdmember.get_composed(
-                next_question.display_text(USSDAccess.choice_name()))
+            response_text = self.last_question.display_text(channel=channel, context=answers_context)
         else:
-            print 'interview batch ', self.batch.name
-            # if self.batch.name == 'Test5':
-            #     import pdb; pdb.set_trace()
-            # no more questions to ask. capture this time as closure
-            self.closure_date = datetime.now()
+            self.closure_date = timezone.now()
         self.save()
         return response_text
 
-    # @property
-    # def has_pending_questions(self):
-    # return self.last_question is not None and
-    # self.last_question.flows.filter(next_question__isnull=False).exists()
+    @classmethod
+    def interviews_in(cls, location, survey=None, include_self=False):
+        left = location.lft
+        right = location.rght
+        if include_self is False:
+            left = left + 1
+            right = right - 1
+        kwargs = {'ea__locations__lft__gte': left, 'ea__locations__lft__lte': right,
+                  'ea__locations__level__gte': location.level}
+        if survey:
+            kwargs['survey'] = survey
+        return Interview.objects.filter(**kwargs)
 
     @classmethod
-    def pending_batches(cls, house_member, ea, survey, available_batches):
-        if available_batches is None:
-            available_batches = ea.open_batches(survey)
-        print 'available batches: ', available_batches
-        completed_interviews = Interview.objects.filter(householdmember=house_member, batch__in=available_batches,
-                                                        closure_date__isnull=False)
-        completed_batches = [
-            interview.batch for interview in completed_interviews]
-        return [batch for batch in available_batches if batch.start_question and batch not in completed_batches]
-
-    @classmethod
-    def interviews(cls, house_member, interviewer, survey):
-        available_batches = interviewer.ea.open_batches(survey, house_member)
-        interviews = Interview.objects.filter(
-            householdmember=house_member, batch__in=available_batches)
-        # return (completed_interviews, pending_interviews)
-        return (interviews.filter(closure_date__isnull=False), interviews.filter(closure_date__isnull=True))
-#         completed_batches = [interview.batch for interview in completed_interviews]
-# return [batch for batch in available_batches if batch not in
-# completed_batches]
-
-    def members_with_open_batches(self):
-        pass
-
-
-#     @property
-#     def first_question(self):
-#         question = self.batch.start_question
+    def interviews(cls, survey):
+        return Interview.objects.filter(survey=survey)
 
     class Meta:
         app_label = 'survey'
-        unique_together = [('householdmember', 'batch'), ]
 
 
 class Answer(BaseModel):
-    NO_LOOP = -1
+    STRING_FILL_LENGTH = 20
+    # now question_type is used to store the exact question we are answering
+    # (Listing, Batch, personal info)
+    # I think using generic models is an overkill since they're all
+    question_type = models.CharField(max_length=100)
+    # questions
     interview = models.ForeignKey(
-        Interview, related_name='%(class)s', db_index=True)
-#     interviewer_response = models.CharField(max_length=200)  #This shall hold the actual response from interviewer
-#                                                             #value shall hold the exact worth of the response
-    question = models.ForeignKey("Question", null=True, related_name="%(class)s",
-                                 on_delete=models.PROTECT, db_index=True)
-    # used to identify answers belonging to
-    loop_id = models.IntegerField(default=-1)
-    # same question loop for looping flows
+        Interview,
+        related_name='%(class)s',
+        db_index=True)
+    question = models.ForeignKey(
+        "Question",
+        null=True,
+        related_name="%(class)s",
+        on_delete=models.PROTECT,
+        db_index=True)
+    # basically calculated field for reporting
+    identifier = models.CharField(max_length=200, db_index=True)
+    # basically calculated field for reporting
+    as_text = models.CharField(max_length=200, db_index=True)
+    # basically calculated field for reporting
+    as_value = models.CharField(max_length=200, db_index=True)
 
     @classmethod
-    def create(cls, interview, question, answer, loop_id=NO_LOOP):
-        return cls.objects.create(question=question, value=answer, interview=interview, loop_id=loop_id)
+    def create(cls, interview, question, answer, as_text=None, as_value=None):
+        try:  # check if text and value is convertable to strings
+            if as_text is None:
+                as_text = cls.prep_text(unicode(answer)[:200])
+            if as_value is None:
+                as_value = cls.prep_value(unicode(answer)[:200])
+        except BaseException:
+            pass
+        return cls.objects.create(
+            question=question,
+            value=answer,
+            question_type=question.__class__.type_name(),
+            interview=interview,
+            identifier=question.identifier,
+            as_text=as_text,
+            as_value=as_value)
+
+    def __unicode__(self):
+        return unicode(self.as_text)
+
+    @classmethod
+    def prep_value(cls, val):
+        return unicode(val).lower()
+
+    @classmethod
+    def prep_text(cls, text):
+        return unicode(text).lower()
+
+    def update(self, answer):
+        self.as_text = answer
+        self.as_value = answer
+        self.save()
 
     @classmethod
     def supported_answers(cls):
@@ -160,7 +251,10 @@ class Answer(BaseModel):
 
     @classmethod
     def answer_types(cls):
-        return [cl.choice_name() for cl in Answer.__subclasses__() if cl is not NonResponseAnswer]
+        answer_types = [cl.choice_name() for cl in Answer.__subclasses__() if cl not in [NonResponseAnswer,
+                                                                                         NumericalTypeAnswer]]
+        answer_types.extend([cl.choice_name() for cl in NumericalTypeAnswer.__subclasses__()])
+        return sorted(answer_types)
 
     @classmethod
     def get_class(cls, verbose_name):
@@ -168,10 +262,17 @@ class Answer(BaseModel):
         for cl in Answer.__subclasses__():
             if cl.choice_name() == verbose_name:
                 return cl
-        ValueError('unknown class')
+        # check in numerical answer type
+        for cl in NumericalTypeAnswer.__subclasses__():
+            if cl.choice_name() == verbose_name:
+                return cl
+        raise ValueError('unknown class')
 
     def to_text(self):
-        return self.value
+        return self.as_text
+
+    def to_label(self):
+        return self.as_value
 
     def pretty_print(self, as_label=False):
         return self.to_text()
@@ -190,12 +291,26 @@ class Answer(BaseModel):
             return False
 
     @classmethod
+    def fetch_contains(cls, answer_key, txt, qs=None):
+        txt = cls.prep_value(txt)
+        if qs is None:
+            qs = cls.objects
+        return qs.filter(**{'%s__icontains' % answer_key: txt})
+
+    @classmethod
     def odk_contains(cls, node_path, value):
         return "regex(%s, '.*(%s).*')" % (node_path, value)
 
     @classmethod
     def equals(cls, answer, value):
-        return answer == value
+        return unicode(answer).lower() == unicode(value).lower()
+
+    @classmethod
+    def fetch_equals(cls, answer_key, value, qs=None):
+        value = cls.prep_value(value)
+        if qs is None:
+            qs = cls.objects
+        return qs.filter(**{'%s__iexact' % answer_key: unicode(value)})
 
     @classmethod
     def odk_equals(cls, node_path, value):
@@ -208,6 +323,13 @@ class Answer(BaseModel):
         return answer.startswith(txt)
 
     @classmethod
+    def fetch_starts_with(cls, answer_key, txt, qs=None):
+        txt = cls.prep_value(txt)
+        if qs is None:
+            qs = cls.objects
+        return qs.filter(**{'%s__istartswith' % answer_key: unicode(txt)})
+
+    @classmethod
     def odk_starts_with(cls, node_path, value):
         return "regex(%s, '^(%s).*')" % (node_path, value)
 
@@ -218,12 +340,26 @@ class Answer(BaseModel):
         return answer.endswith(txt)
 
     @classmethod
+    def fetch_ends_with(cls, answer_key, txt, qs=None):
+        txt = cls.prep_value(txt)
+        if qs is None:
+            qs = cls.objects
+        return qs.filter(**{'%s__iendswith' % answer_key: unicode(txt)})
+
+    @classmethod
     def odk_ends_with(cls, node_path, value):
         return "regex(%s, '.*(%s)$')" % (node_path, value)
 
     @classmethod
     def greater_than(cls, answer, value):
         return answer > value
+
+    @classmethod
+    def fetch_greater_than(cls, answer_key, value, qs=None):
+        value = cls.prep_value(value)
+        if qs is None:
+            qs = cls.objects
+        return qs.filter(**{'%s__gt' % answer_key: value})
 
     @classmethod
     def odk_greater_than(cls, node_path, value):
@@ -234,6 +370,13 @@ class Answer(BaseModel):
         return answer < value
 
     @classmethod
+    def fetch_less_than(cls, answer_key, value, qs=None):
+        value = cls.prep_value(value)
+        if qs is None:
+            qs = cls.objects
+        return qs.filter(**{'%s__lt' % answer_key: value})
+
+    @classmethod
     def odk_less_than(cls, node_path, value):
         return "%s &lt; '%s'" % (node_path, value)
 
@@ -242,8 +385,50 @@ class Answer(BaseModel):
         return upperlmt > answer >= lowerlmt
 
     @classmethod
+    def get_validation_query_params(cls):
+        return {cls.greater_than.__name__: 'gt', cls.less_than.__name__: 'lt',
+                cls.starts_with.__name__: 'istartswith', cls.ends_with.__name__: 'iendswith',
+                cls.contains.__name__: 'icontains', cls.equals.__name__: 'iexact'}
+
+    @classmethod
+    def get_validation_queries(cls, method_name, answer_key, *test_args, **kwargs):
+        namespace = kwargs.pop('namespace', '')
+        validation_queries = cls.get_validation_query_params()
+        if method_name == cls.between.__name__:         # only between takes two arguments
+            query_args = []
+            return {'%s%s__%s' % (namespace, answer_key, validation_queries[cls.less_than.__name__]): test_args[1],
+                    '%s%s__%s' % (namespace, answer_key,
+                                  validation_queries[cls.greater_than.__name__]): test_args[0]
+                    }
+        else:
+            return {'%s%s__%s' % (namespace, answer_key, validation_queries[method_name]): test_args[0],}
+    # 
+    # @classmethod
+    # def __getattr__(cls, name):
+    #     """Shall be used to implement all fetch_validation function methods.
+    #     This is required instead of implementing individual code for each. This function results in db call
+    #     :param name:
+    #     :return:
+    #     """
+    #     if name.startswith('fetch_'):
+    #         method_name = name[6:]
+    # 
+    #         def wrapper(answer_key, qs=cls.objects, *test_args):
+    #             return qs.filter(**cls.get_validation_queries(method_name, answer_key, *test_args))
+    #         return wrapper
+    #     raise AttributeError
+
+    @classmethod
+    def fetch_between(cls, answer_key, lowerlmt, upperlmt, qs=None):
+        upperlmt = cls.prep_value(upperlmt)
+        lowerlmt = cls.prep_value(lowerlmt)
+        if qs is None:
+            qs = cls.objects
+        return qs.filter(**{'%s__lt' % answer_key: upperlmt, '%s__gte' % answer_key: lowerlmt})
+
+    @classmethod
     def odk_between(cls, node_path, lowerlmt, upperlmt):
-        return "(%s &gt; '%s') and (%s &lt; '%s')" % (node_path, lowerlmt, node_path, upperlmt)
+        return "(%s &gt; '%s') and (%s &lt;= '%s')" % (node_path, lowerlmt, node_path, upperlmt)
 
     @classmethod
     def print_odk_validation(cls, node_path, validator_name, *args):
@@ -256,37 +441,48 @@ class Answer(BaseModel):
 
     @classmethod
     def validators(cls):
-        return [cls.starts_with, cls.ends_with, cls.equals, cls.between, cls.less_than,
-                cls.greater_than, cls.contains, ]
+        return [
+            cls.starts_with,
+            cls.ends_with,
+            cls.equals,
+            cls.between,
+            cls.less_than,
+            cls.greater_than,
+            cls.contains,
+        ]
 
     @classmethod
     def validate_test_value(cls, value):
-        '''Shall be used to validate that a given value is appropriate for this answer
+        """Shall be used to validate that a given value is appropriate for this answer
         :return:
-        '''
+        """
         for validator in cls._meta.get_field_by_name('value')[0].validators:
             validator(value)
 
     class Meta:
         app_label = 'survey'
-        abstract = True
+        abstract = False
         get_latest_by = 'created'
 
 
-class NumericalAnswer(Answer):
-    value = models.PositiveIntegerField(null=True)
+class NumericalTypeAnswer(Answer):
 
     @classmethod
     def validators(cls):
-        return [cls.greater_than, cls.equals, cls.less_than, cls.between]
+        return [
+            cls.equals,
+            cls.between,
+            cls.less_than,
+            cls.greater_than,
+        ]
 
     @classmethod
-    def create(cls, interview, question, answer, loop_id=Answer.NO_LOOP):
-        try:
-            value = int(answer)
-        except Exception:
-            raise
-        return cls.objects.create(question=question, value=answer, interview=interview, loop_id=loop_id)
+    def prep_text(cls, val):
+        return unicode(val).zfill(cls.STRING_FILL_LENGTH)
+
+    @classmethod
+    def prep_value(cls, val):
+        return unicode(val).zfill(cls.STRING_FILL_LENGTH)
 
     @classmethod
     def greater_than(cls, answer, value):
@@ -317,18 +513,83 @@ class NumericalAnswer(Answer):
 
     @classmethod
     def odk_between(cls, node_path, lowerlmt, upperlmt):
-        return "(%s &gt; %s) and (%s &lt; %s)" % (node_path, lowerlmt, node_path, upperlmt)
+        return "(%s &gt; %s) and (%s &lt;= %s)" % (
+            node_path, lowerlmt, node_path, upperlmt)
 
     @classmethod
     def validate_test_value(cls, value):
         try:
             int(value)
-        except ValueError, ex:
+        except ValueError as ex:
             raise ValidationError([unicode(ex), ])
 
     class Meta:
         app_label = 'survey'
+        abstract = True
+
+
+class NumericalAnswer(NumericalTypeAnswer):
+    value = models.PositiveIntegerField(null=True)
+
+    @classmethod
+    def create(cls, interview, question, answer):
+        try:
+            value = int(answer)
+            text_value = cls.prep_value(value)    # zero fill to 1billion
+        except Exception:
+            raise
+        return super(
+            NumericalAnswer,
+            cls).create(
+            interview,
+            question,
+            answer,
+            as_text=value,
+            as_value=text_value)
+
+    class Meta:
+        app_label = 'survey'
         abstract = False
+
+
+class AutoResponse(NumericalTypeAnswer):
+    """Shall be used to capture responses auto generated
+    """
+    value = models.CharField(null=True, max_length=100)
+
+    @classmethod
+    def choice_name(cls):
+        return 'Auto Generated'
+
+    class Meta:
+        app_label = 'survey'
+        abstract = False
+
+    @classmethod
+    def create(cls, interview, question, answer):
+        """Anwer shall be auto prepended with interviewer name
+                :param interview:
+        :param question:
+        :param answer:
+        :return:
+        """
+        try:
+            value = int(answer)
+            prefix = 'flow-test'
+            if interview.interview_channel:
+                prefix = interview.interview_channel.user_identifier
+            # zero fill to 1billion
+            text_value = '%s-%s' % (prefix, cls.prep_value(value))
+        except Exception:
+            raise
+        return super(
+            AutoResponse,
+            cls).create(
+            interview,
+            question,
+            answer,
+            as_text=value,
+            as_value=text_value)
 
 
 class ODKGeoPoint(Point):
@@ -341,7 +602,7 @@ class ODKGeoPoint(Point):
 
 
 class TextAnswer(Answer):
-    value = models.CharField(max_length=100, blank=False, null=False)
+    value = models.CharField(max_length=200, blank=False, null=False)
 
     class Meta:
         app_label = 'survey'
@@ -362,13 +623,37 @@ class MultiChoiceAnswer(Answer):
     value = models.ForeignKey("QuestionOption", null=True)
 
     @classmethod
-    def create(cls, interview, question, answer, loop_id=Answer.NO_LOOP):
+    def create(cls, interview, question, answer):
         try:
-            answer = int(answer)
-            answer = question.options.get(order=answer)
-        except:
+            if unicode(answer).isdigit():
+                answer = int(answer)
+                answer = question.options.get(order=answer)
+            else:
+                answer = question.options.get(text__iexact=answer)
+        except BaseException, ex:
+            raise ex
+        return super(
+            MultiChoiceAnswer,
+            cls).create(
+            interview,
+            question,
+            answer,
+            as_text=answer.text,
+            as_value=answer.order)
+
+    def update(self, answer):
+        try:
+            if unicode(answer).isdigit():
+                answer = int(answer)
+                answer = self.question.options.get(order=answer)
+            else:
+                answer = self.question.options.get(text__iexact=answer)
+        except BaseException:
             pass
-        return cls.objects.create(question=question, value=answer, interview=interview, loop_id=loop_id)
+        self.as_text = answer.text
+        self.as_value = answer.order
+        self.value = answer
+        self.save()
 
     class Meta:
         app_label = 'survey'
@@ -397,7 +682,8 @@ class MultiSelectAnswer(Answer):
     value = models.ManyToManyField("QuestionOption", )
 
     @classmethod
-    def create(cls, interview, question, answer, loop_id=Answer.NO_LOOP):
+    def create(cls, interview, question, answer):
+        raw_answer = answer
         if isinstance(answer, basestring):
             answer = answer.split(' ')
         if isinstance(answer, list):
@@ -407,24 +693,17 @@ class MultiSelectAnswer(Answer):
             selected = question.options.filter(pk__in=chosen)
         else:
             selected = answer
+            raw_answer = ' '.join(answer.values_list('text', flat=True))
         ans = cls.objects.create(
-            question=question, interview=interview, loop_id=loop_id)
+            question=question,
+            question_type=question.__class__.type_name(),
+            interview=interview,
+            identifier=question.identifier,
+            as_text=raw_answer,
+            as_value=raw_answer)
         for opt in selected:
             ans.value.add(opt)
         return ans
-
-    # def __init__(self, question, answer, *args, **kwargs):
-    #     super(MultiSelectAnswer, self).__init__(*args, **kwargs)
-    #     if isinstance(answer, basestring):
-    #         answer = answer.split(' ')
-    #     if isinstance(answer, list):
-    #         selected = [a.lower() for a in answer]
-    #         options = question.options.all()
-    #         chosen = [op.pk for op in options if op.text.lower() in selected]
-    #         self.selected = question.options.filter(pk__in=chosen)
-    #     else:
-    #         self.selected = answer
-    #     self.question = question
 
     class Meta:
         app_label = 'survey'
@@ -437,7 +716,7 @@ class MultiSelectAnswer(Answer):
 
     def to_label(self):
         texts = []
-        map(lambda opt: texts.append(str(opt.order)), self.value.all())
+        map(lambda opt: texts.append(unicode(opt.order)), self.value.all())
         return ' and '.join(texts)
 
     def pretty_print(self, as_label=False):
@@ -459,11 +738,22 @@ class DateAnswer(Answer):
     value = models.DateField(null=True)
 
     @classmethod
-    def create(cls, interview, question, answer, loop_id=Answer.NO_LOOP):
+    def prep_value(cls, val):
+        if isinstance(val, basestring):
+            val = extract_date(val, dayfirst=False)
+        # prepare as integer. for saving
+        date_value = int(time.mktime(val.timetuple()))
+        return unicode(date_value).zfill(cls.STRING_FILL_LENGTH)
+
+    @classmethod
+    def create(cls, interview, question, answer):
+        raw_answer = answer
         if isinstance(answer, basestring):
-            answer = extract_date(answer, fuzzy=True)
-        question = question
-        return cls.objects.create(question=question, value=answer, interview=interview, loop_id=loop_id)
+            answer = extract_date(answer, dayfirst=False)
+        # use zfill to normalize the string for comparism
+        return super(DateAnswer, cls).create(interview, question, answer, as_text=raw_answer,
+                                             as_value=cls.prep_value(answer)
+                                             )
 
     class Meta:
         app_label = 'survey'
@@ -474,17 +764,83 @@ class DateAnswer(Answer):
         return [cls.greater_than, cls.equals, cls.less_than, cls.between]
 
     @classmethod
+    def greater_than(cls, answer, value):
+        if isinstance(value, basestring):
+            value = extract_date(value, dayfirst=True).date()
+        if isinstance(answer, basestring):
+            answer = extract_date(answer, dayfirst=True).date()
+        return answer > value
+
+    @classmethod
+    def less_than(cls, answer, value):
+        if isinstance(value, basestring):
+            value = extract_date(value, dayfirst=True).date()
+        if isinstance(answer, basestring):
+            answer = extract_date(answer, dayfirst=True).date()
+        return answer < value
+
+    @classmethod
+    def between(cls, answer, lowerlmt, upperlmt):
+        if isinstance(answer, basestring):
+            answer = extract_date(answer, dayfirst=True).date()
+        if isinstance(lowerlmt, basestring):
+            lowerlmt = extract_date(lowerlmt, dayfirst=True).date()
+        if isinstance(upperlmt, basestring):
+            upperlmt = extract_date(upperlmt, dayfirst=True).date()
+        return upperlmt > answer >= lowerlmt
+
+    @classmethod
+    def to_odk_date(cls, date_val):
+        if isinstance(date_val, basestring):
+            date_val = extract_date(date_val, dayfirst=True)
+        return "date('%s')" % date_val.strftime('%Y-%m-%d')
+
+    @classmethod
+    def odk_greater_than(cls, node_path, value):
+        return "%s &gt; %s" % (node_path, cls.to_odk_date(value))
+
+    @classmethod
+    def odk_less_than(cls, node_path, value):
+        return "%s &lt; %s" % (node_path, cls.to_odk_date(value))
+
+    @classmethod
+    def odk_between(cls, node_path, lowerlmt, upperlmt):
+        return "(%s &gt; %s) and (%s &lt;= %s)" % (
+            node_path, cls.to_odk_date(lowerlmt), node_path, cls.to_odk_date(upperlmt))
+
+    @classmethod
     def validate_test_value(cls, value):
         '''Shall be used to validate that a given value is appropriate for this answer
         :return:
         '''
         try:
             extract_date(value, fuzzy=True)
-        except ValueError, ex:
+        except ValueError as ex:
             raise ValidationError([unicode(ex), ])
 
 
-class AudioAnswer(Answer):
+class FileAnswerMixin(object):
+    @classmethod
+    def create(cls, interview, question, answer, as_text=None, as_value=None):
+        try:
+            # answer is a file object
+            as_value = answer.name
+            as_text = answer.name
+        except BaseException:
+            as_text = ''
+            as_value = ''
+            pass
+        return cls.objects.create(
+            question=question,
+            value=answer,
+            question_type=question.__class__.type_name(),
+            interview=interview,
+            identifier=question.identifier,
+            as_text=as_text,
+            as_value=as_value)
+
+
+class AudioAnswer(Answer, FileAnswerMixin):
     value = models.FileField(upload_to=settings.ANSWER_UPLOADS, null=True)
 
     class Meta:
@@ -499,7 +855,7 @@ class AudioAnswer(Answer):
         return ''
 
 
-class VideoAnswer(Answer):
+class VideoAnswer(Answer, FileAnswerMixin):
     value = models.FileField(upload_to=settings.ANSWER_UPLOADS, null=True)
 
     class Meta:
@@ -514,7 +870,7 @@ class VideoAnswer(Answer):
         return ''
 
 
-class ImageAnswer(Answer):
+class ImageAnswer(Answer, FileAnswerMixin):
     value = models.FileField(upload_to=settings.ANSWER_UPLOADS, null=True)
 
     class Meta:
@@ -533,12 +889,23 @@ class GeopointAnswer(Answer):
     value = models.ForeignKey(ODKGeoPoint, null=True)
 
     @classmethod
-    def create(cls, interview, question, answer, loop_id=Answer.NO_LOOP):
+    def create(cls, interview, question, answer):
+        raw_answer = answer
         if isinstance(answer, basestring):
             answer = answer.split(' ')
-            answer = ODKGeoPoint(latitude=answer[0], longitude=answer[
-                                 1], altitude=[2], precision=answer[3])
-        return cls.objects.create(question=question, value=answer, interview=interview, loop_id=loop_id)
+            answer = ODKGeoPoint.objects.create(
+                latitude=answer[0],
+                longitude=answer[1],
+                altitude=answer[2],
+                precision=answer[3])
+        return super(
+            GeopointAnswer,
+            cls).create(
+            interview,
+            question,
+            answer,
+            as_text=raw_answer,
+            as_value=raw_answer)
 
     class Meta:
         app_label = 'survey'
@@ -553,11 +920,11 @@ class GeopointAnswer(Answer):
 
 
 class NonResponseAnswer(BaseModel):
-    household = models.ForeignKey(
-        'Household', related_name='non_response_answers')
-    survey_listing = models.ForeignKey(
-        'SurveyHouseholdListing', related_name='non_response_answers')
-    value = models.CharField(max_length=100, blank=False, null=False)
+    interview = models.ForeignKey(
+        Interview,
+        related_name='non_response_answers',
+        db_index=True)
+    value = models.CharField(max_length=200, blank=False, null=False)
     interviewer = models.ForeignKey(
         "Interviewer", null=True, related_name='non_response_answers')
 
@@ -568,6 +935,14 @@ class NonResponseAnswer(BaseModel):
     @classmethod
     def validators(cls):
         return []
+
+    @property
+    def as_text(self):
+        return self.value
+
+    @property
+    def as_value(self):
+        return self.value
 
 
 class AnswerAccessDefinition(BaseModel):
@@ -584,7 +959,9 @@ class AnswerAccessDefinition(BaseModel):
     @classmethod
     def is_valid(cls, channel, answer_type):
         try:
-            return cls.objects.get(answer_type=answer_type, channel=channel) is not None
+            return cls.objects.get(
+                answer_type=answer_type,
+                channel=channel) is not None
         except cls.DoesNotExist:
             return False
 
@@ -594,4 +971,62 @@ class AnswerAccessDefinition(BaseModel):
 
     @classmethod
     def answer_types(cls, channel):
-        return set(AnswerAccessDefinition.objects.filter(channel=channel).values_list('answer_type', flat=True))
+        """Returns the answer type compatible with this channel"""
+        return set(
+            AnswerAccessDefinition.objects.filter(
+                channel=channel).values_list(
+                'answer_type', flat=True))
+
+    @classmethod
+    def reload_answer_categories(cls):
+        from survey.models import USSDAccess, ODKAccess, WebAccess
+        cls.objects.get_or_create(channel=USSDAccess.choice_name(),
+                                                     answer_type=AutoResponse.choice_name())
+        cls.objects.get_or_create(channel=USSDAccess.choice_name(),
+                                                     answer_type=NumericalAnswer.choice_name())
+        cls.objects.get_or_create(channel=USSDAccess.choice_name(),
+                                                     answer_type=TextAnswer.choice_name())
+        cls.objects.get_or_create(channel=USSDAccess.choice_name(),
+                                                     answer_type=MultiChoiceAnswer.choice_name())
+
+        # ODK definition
+        cls.objects.get_or_create(channel=ODKAccess.choice_name(),
+                                                     answer_type=AutoResponse.choice_name())
+        cls.objects.get_or_create(channel=ODKAccess.choice_name(),
+                                                     answer_type=NumericalAnswer.choice_name())
+        cls.objects.get_or_create(channel=ODKAccess.choice_name(),
+                                                     answer_type=TextAnswer.choice_name())
+        cls.objects.get_or_create(channel=ODKAccess.choice_name(),
+                                                     answer_type=MultiChoiceAnswer.choice_name())
+        cls.objects.get_or_create(channel=ODKAccess.choice_name(),
+                                                     answer_type=MultiSelectAnswer.choice_name())
+        cls.objects.get_or_create(channel=ODKAccess.choice_name(),
+                                                     answer_type=ImageAnswer.choice_name())
+        cls.objects.get_or_create(channel=ODKAccess.choice_name(),
+                                                     answer_type=GeopointAnswer.choice_name())
+        cls.objects.get_or_create(channel=ODKAccess.choice_name(),
+                                                     answer_type=DateAnswer.choice_name())
+        cls.objects.get_or_create(channel=ODKAccess.choice_name(),
+                                                     answer_type=AudioAnswer.choice_name())
+        cls.objects.get_or_create(channel=ODKAccess.choice_name(),
+                                                     answer_type=VideoAnswer.choice_name())
+
+        # web form definition
+        cls.objects.get_or_create(channel=WebAccess.choice_name(),
+                                                     answer_type=NumericalAnswer.choice_name())
+        cls.objects.get_or_create(channel=WebAccess.choice_name(),
+                                                     answer_type=TextAnswer.choice_name())
+        cls.objects.get_or_create(channel=WebAccess.choice_name(),
+                                                     answer_type=MultiChoiceAnswer.choice_name())
+        cls.objects.get_or_create(channel=WebAccess.choice_name(),
+                                                     answer_type=MultiSelectAnswer.choice_name())
+        cls.objects.get_or_create(channel=WebAccess.choice_name(),
+                                                     answer_type=ImageAnswer.choice_name())
+        cls.objects.get_or_create(channel=WebAccess.choice_name(),
+                                                     answer_type=GeopointAnswer.choice_name())
+        cls.objects.get_or_create(channel=WebAccess.choice_name(),
+                                                     answer_type=DateAnswer.choice_name())
+        cls.objects.get_or_create(channel=WebAccess.choice_name(),
+                                                     answer_type=AudioAnswer.choice_name())
+        cls.objects.get_or_create(channel=WebAccess.choice_name(),
+                                                     answer_type=VideoAnswer.choice_name())

@@ -4,20 +4,20 @@
 {% endblock %}
 {% block content %}
 {% load pagination_tags %}
-{% autopaginate batches 50 %}
+{% autopaginate batches max_display_per_page %}
 {% load template_tags %}
  <a href="#new_batch" data-toggle="modal" class="btn btn_primary pull-right" id="add_batch"><i class="icon-plus"></i> Add Batch</a>
   <br class="clear"/>
   <br/>
-  <table class="table table-striped table-bordered table-hover">
+  <table id="" class="table table-striped table-bordered table-hover dataTable no-footer" role="grid" aria-describedby="dynamic-table_info">
     <thead>
       <tr>
-        <th>
+        <th class="sorting">
           Batch Name
         </th>
-        <th>
+        <th  class="sorting">
           Description
-        </th>
+        </th class="sorting">
         <th>
           Actions
         </th>
@@ -37,7 +37,7 @@
               <a class="btn btn-small" href="{% url 'batch_questions_page' batch.id %}"><i class="icon-pencil"></i>Add/Edit Questions</a>
               <a class="btn btn-small" href="{% url 'batch_edit_page' survey.id batch.pk %}"><i class="icon-pencil"></i> Edit</a>
               {% if can_delete %}
-              <a class="btn btn-small" data-toggle="modal" href="#delete_batch_{{batch.id}}"><i class="icon-trash"></i> Delete</a>
+              <a class="btn btn-small" data-toggle="modal" href="{% url 'delete_batch' batch.id %}"><i class="icon-trash"></i> </a>
               {% endif %}
               {% if batch.survey_questions %}
                 <a class="btn btn-small" href="{% url 'batch_show_page' survey.id batch.pk %}"><i class="icon-lock"></i> Open/Close</a>
@@ -63,5 +63,8 @@
     </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
 
+
+
 {% paginate %}
+{% include 'max_display_per_page_form.html' %}
 {% endblock %}

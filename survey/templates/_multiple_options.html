@@ -1,10 +1,11 @@
-<script type="text/template" id={{ id }}>
+<script type="text/template" id="{{ id }}">
+
     <div class="control-group options question-option">
-        <label class="control-label">{{ option_label }} <span class="number"></span></label>
+        <label class="control-label col-md-4">{{ option_label }} <span class="number"></span></label>
         <div class="controls">
-            <input type="text" maxlength="100" name={{ name }}>
-            <a href="javascript:;" class="add-on btn btn_primary add-option"><i class="icon-plus"></i></a>
-            <a href="javascript:;" class="add-on btn btn_primary remove-option"><i class="icon-remove"></i></a>
+            <input type="text" maxlength="100" name="{{ name }}">
+            <a style="padding: 0px !important;" href="javascript:;" class="btn btn-white btn-warning btn-bold add-option"><i class="ace-icon fa fa-plus bigger-120 orange"></i></i></a>
+            <a style="padding: 0px !important;" href="javascript:;" class="btn btn-white btn-warning btn-bold remove-option"><i class="ace-icon fa fa-minus bigger-120 orange"></i></i></a>
             {% if extra_fields %}
                 <label class="control-label" for="id_required">required</label>
                 <div class="controls ">

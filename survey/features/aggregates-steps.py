@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import datetime
-from time import sleep
 from lettuce import *
 from django.utils.datastructures import SortedDict
 from rapidsms.contrib.locations.models import *
@@ -66,7 +65,8 @@ def and_i_have_2_investigators_with_households(step):
     investigator_2 = Investigator.objects.create(
         name="Batman", mobile_number="1234", location=world.someother_county)
     uid_counter = 0
-    for index in range(investigator_configs.NUMBER_OF_HOUSEHOLD_PER_INVESTIGATOR):
+    for index in range(
+            investigator_configs.NUMBER_OF_HOUSEHOLD_PER_INVESTIGATOR):
         Household.objects.create(
             investigator=investigator, uid=uid_counter + index)
         Household.objects.create(
@@ -102,13 +102,18 @@ def and_i_should_see_all_districts_location_selected(step):
 
 
 @step(u'Then I should see number of households and clusters completed and pending')
-def then_i_should_see_number_of_households_and_clusters_completed_and_pending(step):
+def then_i_should_see_number_of_households_and_clusters_completed_and_pending(
+        step):
     world.page.assert_status_count(
-        pending_households=20, completed_housesholds=0, pending_clusters=2, completed_clusters=0)
+        pending_households=20,
+        completed_housesholds=0,
+        pending_clusters=2,
+        completed_clusters=0)
 
 
 @step(u'And I should see a list of investigators with corresponding phone numbers and pending households')
-def and_i_should_see_a_list_of_investigators_with_corresponding_phone_numbers_and_pending_households(step):
+def and_i_should_see_a_list_of_investigators_with_corresponding_phone_numbers_and_pending_households(
+        step):
     world.page.check_presence_of_investigators(
         world.investigator, world.investigator_2)
 
@@ -120,7 +125,8 @@ def and_i_choose_a_location_and_a_closed_batch(step):
 
 
 @step(u'And I should see a message that says that this batch is currently closed')
-def and_i_should_see_a_message_that_says_that_this_batch_is_currently_closed(step):
+def and_i_should_see_a_message_that_says_that_this_batch_is_currently_closed(
+        step):
     world.page.assert_presence_of_batch_is_closed_message()
 
 
@@ -196,11 +202,17 @@ def and_i_have_an_investigator_and_households(step):
     world.investigator = Investigator.objects.create(
         name="some_investigator", mobile_number="123456784", ea=world.ea)
     world.household_1 = Household.objects.create(
-        investigator=world.investigator, uid=101, ea=world.ea, survey=world.survey_1)
+        investigator=world.investigator,
+        uid=101,
+        ea=world.ea,
+        survey=world.survey_1)
     world.household_2 = Household.objects.create(
-        investigator=world.investigator, uid=102, ea=world.ea, survey=world.survey_1)
-    world.member_2 = HouseholdMember.objects.create(household=world.household_2,
-                                                    date_of_birth=datetime.datetime(2000, 02, 02))
+        investigator=world.investigator,
+        uid=102,
+        ea=world.ea,
+        survey=world.survey_1)
+    world.member_2 = HouseholdMember.objects.create(
+        household=world.household_2, date_of_birth=datetime.datetime(2000, 0o2, 0o2))
 
 
 @step(u'And I should see percent completion')

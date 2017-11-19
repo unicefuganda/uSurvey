@@ -1,0 +1,49 @@
+{% if cond_errors %}
+    <ul class="error" id="cond-errors">
+        {% for key, error in cond_errors.items %}
+            <li class="error">{{error}}</li>
+        {% endfor %}
+    </ul>
+{% else %}
+{% load template_tags %}
+<table id="criteria_conditions" class="table table-striped table-bordered table-hover no-footer" role="grid" aria-describedby="dynamic-table_info">
+    <thead>
+    <tr>
+        <th class="sorting">
+            Filter
+        </th>
+        <th class="sorting">
+            Condition
+        </th>
+        <th class="sorting">
+            Value
+        </th>
+         <th>
+            Delete
+        </th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for condition in conditions %}
+        <tr>
+            <td >
+                {{ condition.test_question.identifier }}
+            </td>
+            <td >
+                {{ condition.validation_test }}
+            </td>
+            <td>
+                {{ condition.test_arguments|join_list:" and " }}
+
+            </td>
+            <td>
+                <a href="#delete_condition_{{condition.id}}" data-toggle="modal" class="tooltip-info" data-rel="tooltip" title="" data-original-title="Delete"><span class="blue"><i class="usur-icon fa fa-trash bigger-120"  id="delete-icon-{{condition.id}}"></i></span></a>
+
+            {% include "base/delete_modal.html" with object_name="" id=condition.id name="Condition" url=condition.id|get_url_with_ids:"delete_indicator_criteria" %}
+            </td>
+        </tr>
+    {% endfor %}
+
+    </tbody>
+</table>
+{% endif %}

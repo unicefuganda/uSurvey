@@ -1,24 +1,38 @@
+import string
+import re
+import redis
+from django.core.cache import cache
+from cacheops import cached_as
+from dateutil import relativedelta
+from datetime import date
+import json
+import inspect
 from django import template
 from django.core.urlresolvers import reverse
 from survey.interviewer_configs import MONTHS
 from survey.models.helper_constants import CONDITIONS
 from survey.utils.views_helper import get_ancestors
-from survey.models import Survey, Question, Batch, Interviewer, MultiChoiceAnswer, \
-    GroupCondition, Answer, AnswerAccessDefinition, ODKAccess, HouseholdMember
-from survey.odk.utils.log import logger
-from django.core.exceptions import ObjectDoesNotExist
+from survey.models import (Survey, Question, Batch, Interviewer, MultiChoiceAnswer, Answer, AnswerAccessDefinition,
+                           ODKAccess, SurveyAllocation)
+from survey.models import AudioAnswer
+from survey.models import ImageAnswer
+from survey.models import QuestionSet
+from survey.models import VideoAnswer
 from django.utils.safestring import mark_safe
-from dateutil import relativedelta
-from datetime import date
-import json
-import inspect
 from django.utils import html
 from survey.forms.logic import LogicForm
-import redis
 
 store = redis.Redis()
 
 register = template.Library()
+
+
+@register.filter
+def current(value, arg):
+    try:
+        return value[int(arg)]
+    except:
+        return None
 
 
 @register.filter
@@ -29,9 +43,22 @@ def next(value, arg):
         return None
 
 
+
+
 @register.filter
 def space_replace(value, search_string):
     return value.replace(search_string, ' ')
+
+
+@register.filter
+def replace_space(value, replace_string):
+    """Basically the inverse of space replace
+    :param value:
+    :param replace_string:
+    :return:
+    """
+    return value.replace(' ', replace_string)
+
 
 
 @register.filter
@@ -78,13 +105,18 @@ def display_list(list):
 
 @register.filter
 def join_list(list, delimiter):
-    new_list = ['<span class="muted">%s</span>' % str(item) for item in list]
+    new_list = ['<span class="muted">%s</span>' % string.capwords(str(item)) for item in list]
     return mark_safe(delimiter.join(new_list))
 
 
 @register.filter
-def get_value(dict, key):
-    return dict.get(key, "")
+def get_value(obj, key):
+    if isinstance(obj, dict):
+        return obj.get(key, "")
+    elif isinstance(key, basestring) and hasattr(obj, key):
+        return getattr(obj, key)
+    elif callable(obj):
+        return obj(key)
 
 
 @register.filter
@@ -120,6 +152,8 @@ def get_url_with_ids(args, url_name):
     if not str(args).isdigit():
         arg_list = [int(arg) for arg in args.split(',')]
         return reverse(url_name, args=arg_list)
+    if isinstance(args, dict):
+        reverse(url_name, kwargs=args)
     return reverse(url_name, args=(args,))
 
 
@@ -131,6 +165,11 @@ def get_url_without_ids(url_name):
 @register.filter
 def add_string(int_1, int_2):
     return "%s, %s" % (str(int_1), str(int_2))
+
+
+@register.assignment_tag
+def concat_strings(*args):
+    return ''.join([str(arg) for arg in args])
 
 
 @register.filter
@@ -145,8 +184,8 @@ def modulo(num, val):
 
 
 @register.filter
-def repeat_string(string, times):
-    return string * (times - 1)
+def repeat_string(s, times):
+    return s * (times - 1)
 
 
 @register.filter
@@ -174,8 +213,15 @@ def ancestors_reversed(location):
 @register.filter
 def show_condition(flow):
     if flow.validation_test:
-        return '%s ( %s )' % (flow.validation_test, ' and '.join(flow.test_arguments))
+        return '%s ( %s )' % (flow.validation_test, ' and '.join([str(param) for param in flow.test_params]))
     return ""
+
+
+@register.assignment_tag
+def get_login_message(request):
+    if request.GET.get('next').endswith(reverse('activate_super_powers_page')):
+        from django.contrib import messages
+        messages.warning(request, 'You need to re-login to activate power mode')
 
 
 @register.filter
@@ -211,15 +257,42 @@ def trim(value):
     return value.strip()
 
 
+@register.assignment_tag
+def get_question_value(question, answers_dict):
+    return answers_dict.get(question.pk)
+
+
 @register.filter
 def household_completed_percent(interviewer):
-    #    import pdb;pdb.set_trace()
     households = interviewer.households.all()
     total = households.count()
     completed = len([hld for hld in households.all(
     ) if not hld.survey_completed() and hld.household_member.count() > 0])
     if total > 0:
         return "%s%%" % str(completed * 100 / total)
+
+
+@register.assignment_tag
+def get_answer(question, interview):
+    @cached_as(question, interview)
+    def _get_answer():
+        answer_class = Answer.get_class(question.answer_type)
+        try:
+            if answer_class in [VideoAnswer, AudioAnswer, ImageAnswer]:
+                return mark_safe('<a href="{% url download_qset_attachment %s %s %}">Download</a>' % (question.pk,
+                                                                                                      interview.pk))
+            else:
+                answer = answer_class.objects.filter(interview=interview, question=question).last()
+                if answer:
+                    return answer.value
+        except answer_class.DoesNotExist:
+            return ''
+    return _get_answer()
+
+
+@register.assignment_tag
+def can_start_survey(interviewer):
+    return SurveyAllocation.can_start_batch(interviewer)
 
 
 @register.filter
@@ -234,10 +307,28 @@ def households_for_open_survey(interviewer):
     return len([hs for hs in households if hs.get_head() is not None])
 
 
+@register.assignment_tag
+def build_question_text(text, context):
+    context = template.Context(context)
+    return template.Template(text).render(context)
+
+
 @register.filter
 def total_household_members(interviewer):
     households = interviewer.households.all()
     return sum([household.household_member.count() for household in households])
+
+
+@register.assignment_tag
+def has_super_powers(request):
+    from survey.utils.views_helper import has_super_powers
+    return has_super_powers(request)
+
+
+@register.assignment_tag
+def is_relevant_sample(ea_id, assignments):
+    ea_assignmts = assignments.filter(allocation_ea__id=ea_id)
+    return ' or '.join(["selected(/qset/surveyAllocation, '%s')" % a.allocation_ea.name for a in ea_assignmts ])
 
 
 @register.assignment_tag
@@ -249,66 +340,61 @@ def get_download_url(request, url_name, instance=None):
 
 
 @register.assignment_tag
-def get_question_path(question, loop_boundaries):
-    return get_node_path(question, loop_boundaries)
+def get_absolute_url(request, url_name, *args):
+    return request.build_absolute_uri(reverse(url_name, args=args))
 
 
 @register.assignment_tag
-def get_non_loop_question_path(question):
-    batch = question.batch
-    return '/survey/b%s/q%s' % (batch.pk, question.pk)
+def get_home_url(request):
+    return request.build_absolute_uri('/')
 
 
 @register.assignment_tag
-def get_odk_mem_question(question):
-    surname = HouseholdMember._meta.get_field('surname')
-    first_name = HouseholdMember._meta.get_field('first_name')
-    gender = HouseholdMember._meta.get_field('gender')
-    context = {
-        surname.verbose_name.upper().replace(' ', '_'):
-        mark_safe('<output value="/survey/household/householdMember/surname"/>'),
-        first_name.verbose_name.upper().replace(' ', '_'):
-        mark_safe('<output value="/survey/household/householdMember/firstName"/>'),
-        gender.verbose_name.upper().replace(' ', '_'):
-            mark_safe('<output value="/survey/household/householdMember/sex"/>'),
-    }
-    question_context = template.Context(context)
-    return template.Template(html.escape(question.text)).render(question_context)
+def get_sample_data_display(sample):
+    return sample.get_display_label()
 
 
-def get_node_path(question, loop_boundaries):
-    batch = question.batch
-    boundary = loop_boundaries.get(question.pk, None)
-    if boundary:
-        start_id, end_id = boundary
-        return '/survey/b%s/q%sq%s/q%s' % (batch.pk,
-                                           start_id, end_id,
-                                           question.pk)
-    # should take account with looping question
-    return '/survey/b%s/q%s' % (batch.pk, question.pk)
+@register.assignment_tag
+def get_loop_aware_path(question):
+    loops = question.qset.get_loop_story().get(question.pk, [])
+    tokens = ['q%sq%s' % (loop.loop_starter.pk, loop.loop_ender.pk) for loop in loops]
+    if tokens:
+        return '/%s' % '/'.join(tokens)
+    else:
+        return ''
+
+
+def get_xform_relative_path(question):
+    return '/qset/qset%s/questions/surveyQuestions%s' % (question.qset.pk, get_loop_aware_path(question))
+
+
+def get_node_path(question):
+    return '%s/q%s' % (get_xform_relative_path(question), question.pk)
 
 
 @register.assignment_tag(takes_context=True)
-def is_relevant_odk(context, question, interviewer, registered_households, loop_boundaries):
-    batch = question.batch
+def is_relevant_odk(context, question, interviewer):
+    batch = question.qset
     if question.pk == batch.start_question.pk:
         default_relevance = 'true()'
     else:
         default_relevance = 'false()'
-    relevance_context = ' (%s) %s' % (
+    relevance_context = ' (%s)' % (
         ' or '.join(context.get(question.pk, [default_relevance, ])),
-        is_relevant_by_group(context, question, registered_households)
     )
+    if hasattr(question, 'group') and question.group:
+        relevance_context = '%s %s' % (relevance_context, is_relevant_by_group(context, question))
+
     # do not include back to flows to this
     flows = question.flows.exclude(desc=LogicForm.BACK_TO_ACTION)
-    node_path = get_node_path(question, loop_boundaries)
+    node_path = get_node_path(question)
     flow_conditions = []
     if flows:
         for flow in flows:
             if flow.validation_test:
                 text_params = [t.param for t in flow.text_arguments]
                 answer_class = Answer.get_class(question.answer_type)
-                flow_condition = answer_class.print_odk_validation(
+                flow_condition = answer_class.print_odk_validation(     # get appropriate flow condition
                     node_path, flow.validation_test, *text_params)
                 flow_conditions.append(flow_condition)
                 if flow.next_question:
@@ -317,69 +403,80 @@ def is_relevant_odk(context, question, interviewer, registered_households, loop_
                         next_question.pk, ['false()', ])
                     next_q_context.append(flow_condition)
                     context[next_question.pk] = next_q_context
-
-        null_flows = flows.filter(
-            validation_test__isnull=True, next_question__isnull=False)
-        connecting_flows = question.connecting_flows.all()
+        null_flows = flows.filter(validation__isnull=True, next_question__isnull=False)
         if null_flows:
             null_flow = null_flows[0]
-            null_condition = ['true()', ]
-            if question.flows.filter(desc=LogicForm.BACK_TO_ACTION).exists() is False:
-                null_condition.append("string-length(%s) &gt; 0" % node_path)
+            # check if next question if we are moving to a less looped question
+            # essentially same as checking if next question is outside current questions loop
+            loop_story = question.qset.get_loop_story()
+            # fix for side by side loops. check
+            # basically check if next question is not on same loop
+            if len(loop_story.get(question.pk, [])) > len(loop_story.get(null_flow.next_question.pk, [])):
+                null_condition = ["count(%s) &gt; 0" % node_path, ]
+            else:
+                null_condition = ["string-length(%s) &gt; 0" % node_path, ]
+            # ['true()', "string-length(%s) &gt; 0" % node_path]
             # null_condition = ['true()', ]
-            if len(flow_conditions) > 0:
-                null_condition.append('not (%s)' %
+            if len(flow_conditions) > 0 and hasattr(question, 'loop_ended') is False:
+                null_condition.append('not(%s)' %
                                       ' or '.join(flow_conditions))
             next_question = null_flow.next_question
             next_q_context = context.get(next_question.pk, ['false()', ])
             next_q_context.append('(%s)' % ' and '.join(null_condition))
-            if question.group != next_question.group:
+            if hasattr(question, 'group') and (hasattr(next_question, 'group') is False or
+                                                       question.group != next_question.group):
                 next_q_context.append('true()')
+            # if get_loop_aware_path(question) != get_loop_aware_path(next_question):
+            #     next_q_context.append('true()')
+            # if hasattr(next_question, 'loop_ended'):
+            #     next_q_context.append('true()')
             context[next_question.pk] = next_q_context
-            # if connecting_flows.count() == 0 or (next_question and
-            #                                              question.group != next_question.group):
-            #     prob_next = batch.next_inline(next_question,
-            #                                   exclude_groups=[next_question.group, ])
-            #     if prob_next:
-            #         prob_next_context = context.get(prob_next.pk, [])
-            #         prob_next_context.append('true()')
-            #         else:
-            #             prob_next_context.append("string-length(%s) &gt; 0" % node_path)
-            #         context[prob_next.pk] = prob_next_context
     return mark_safe(relevance_context)
 
 
-def is_relevant_by_group(context, question, registered_households):
-    question_group = question.group
-    relevant_existing = []
-    relevant_new = []
-    attributes = {
-        'AGE': '/survey/household/householdMember/age',
-        'GENDER': '/survey/household/householdMember/sex',
-                  'GENERAL': '/survey/household/householdMember/isHead'
-    }
-    for condition in question_group.get_all_conditions():
-        relevant_new.append(condition.odk_matches(attributes))
+def get_group_question_path(qset, group_question):
+    return '/qset/qset%s/questions/groupQuestions/q%s' % (qset.id, group_question.id)
 
-    # for household in registered_households:
-    #     for member in household.members.all():
-    #         if member.belongs_to(question_group):
-    #             relevant_existing.append(" /survey/registeredHousehold/selectedMember = '%s_%s' " % (member.household.pk, member.pk))
-    #         else:
-    #         #get next inline question... This is another flow leading to the next inline question in case current is not applicable
-    #             connecting_flows = question.connecting_flows.filter(validation_test__isnull=True)
-    #             if connecting_flows:
-    #                 f_question = connecting_flows[0].question
-    #                 next_question = f_question.batch.next_inline(f_question, groups=member.groups,
-    #                                                                         channel=ODKAccess.choice_name())
-    #                 if next_question:
-    #                     node_path = '/survey/b%s/q%s' % (f_question.batch.pk, f_question.pk)
-    #                     next_q_context = context.get(next_question.pk, ['false()', ])
-    #                     next_q_context.append("string-length(%s) &gt; 0" % node_path)
-    #                     context[next_question.pk] = next_q_context
-    relevance_builder = ['false()', ]
-    if relevant_new:
-        relevance_builder.append('(%s)' % ' and '.join(relevant_new))
-    if relevant_existing:
-        relevance_builder.append('(%s)' % ' or '.join(relevant_existing))
-    return ' and (%s)' % ' or '.join(relevance_builder)
+
+def get_name_references(qset):
+    @cached_as(QuestionSet.objects.filter(pk=qset.pk))
+    def _get_name_references(qset):
+        name_references = {}
+        for question in qset.questions.all():
+            name_references[question.identifier] = mark_safe('<output value="%s"/>' % get_node_path(question))
+        try:
+            qset = Batch.get(pk=qset.pk)
+            if hasattr(qset, 'parameter_list'):
+                for question in qset.parameter_list.questions.all():
+                    name_references[question.identifier] = \
+                        mark_safe('<output value="%s"/>' % get_group_question_path(qset, question))
+        except Batch.DoesNotExist:
+            pass
+        return name_references
+    return template.Context(_get_name_references(qset))
+
+
+@register.assignment_tag
+def get_question_text(question):
+    question_context = get_name_references(question.qset)
+    return template.Template(html.escape(question.text)).render(question_context)
+
+
+def is_relevant_by_group(context, question):
+    question_group = question.group
+    qset = question.qset
+
+    @cached_as(question_group, qset)
+    def _is_relevant_by_group(qset):
+        qset = QuestionSet.get(pk=qset.pk)
+        relevant_new = []
+        for condition in question_group.group_conditions.all():
+            test_question = qset.parameter_list.questions.get(identifier=condition.test_question.identifier)
+            answer_class = Answer.get_class(condition.test_question.answer_type)
+            relevant_new.append(answer_class.print_odk_validation(get_group_question_path(qset, test_question),
+                                                                  condition.validation_test,  *condition.test_params))
+        relevance_builder = ['false()', ]
+        if relevant_new:
+            relevance_builder.append('(%s)' % ' and '.join(relevant_new))
+        return ' and (%s)' % ' or '.join(relevance_builder)
+    return _is_relevant_by_group(qset)

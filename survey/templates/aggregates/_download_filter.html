@@ -1,15 +1,76 @@
 {% extends "horizontal_filter_form.html" %}
 {% block prefilter %}
     <br />
-<div class="forleft">
-    {% include "horizontal_naked_form.html" with a_form=locations_filter no_button=True filter_id='location_filter' %}
-</div>
+    <br />    
 {% endblock %}
 {% block submit_button %}
+<style type="text/css">
+	.dataTables_wrapper select {    margin-bottom: 0 !important;    margin-left: 4px!important;    margin-right: 4px!important;    margin-top: 0px !important;    padding: 3px !important;    width: 200px!important;}
+</style>
 <td valign="middle" class="downbutton">
-    <input type="submit" name="action" value="Email Spreadsheet" class="btnforall" id="email_excel" />
-     <input type="submit" name="action"  value="Download Spreadsheet" class="btnforall" id="download_excel" />
+    <input type="submit" name="action" value="Email Spreadsheet" class="btn btn-primary" id="email_excel" style="    border-left: 0px solid #0577e0 !important;     padding: 4px;margin-bottom: 5px;margin-top: 5px;" />
+     <input type="submit" name="action"  value="Download Spreadsheet" class="btn btn-primary" id="download_excel" style="border-left: 0px solid #0577e0 !important;     padding: 4px;" />
 </td>
+
+<div class="modal fade" id="progress_modal" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 id="download-status" class="modal-title">...</h4>
+      </div>
+    </div>
+  </div>
+</div>
+<script type="text/javascript">
+   $(document).ready(function(){
+        updateProgress = function(text) {
+            var i = 0;
+            var interval = setInterval(function() {
+                  i = ++i % 5;
+                  $("#download-status").html(text + '<span class="text-warning">' + Array(i+1).join(".") + '</span>');
+                }, 1000);
+            return interval;
+        }
+        $('#email_excel').click(function(event){
+            $('#progress_modal').modal('show');
+            var interval = updateProgress("Waiting for server");
+            return true;
+        });
+        $('#download_excel').click(function(event){
+            if(!$('#id_batch').val())
+                return true;
+            // else rest follows
+            event.preventDefault();
+            var form = $(this).closest('form');
+            $('#progress_modal').modal('show');
+            var interval = updateProgress("Report is being generated. Please wait");
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", '.?'+form.serialize()+'&'+this.name+'='+this.value);        //include this action name
+            xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');                 // for request.is_ajax()
+            xhr.responseType = "arraybuffer";
+            xhr.onload = function () {
+                if (this.status === 200) {
+                    clearInterval(interval);
+                    interval = updateProgress("Retrieving file");
+                    var blob = new Blob([xhr.response], {type: xhr.getResponseHeader("Content-Type")});
+                    var objectUrl = URL.createObjectURL(blob);
+                    var a = document.createElement("a");
+                    document.body.appendChild(a);
+                    a.style = "display: none";
+                    a.href = objectUrl;
+                    a.download = xhr.getResponseHeader('Content-Disposition').split('=')[1];
+                    clearInterval(interval);
+                    $('#progress_modal').modal('hide');
+                    a.click();
+                }
+            };
+            xhr.send();
+            return false;
+        });
+   } );
+</script>
+
 {% endblock %}
 
 

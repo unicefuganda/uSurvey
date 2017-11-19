@@ -1,75 +1,277 @@
-__author__ = 'Eswar'
-
+__author__ = 'antsmc2'
+import time
+from zipfile import ZipFile
+from StringIO import StringIO
+from django.core.files.uploadedfile import SimpleUploadedFile
+from lxml import etree
+import python_digest
+from model_mommy import mommy
+import random
+from hashlib import md5
+from django.test import TestCase
+from django.contrib.sites.models import Site
+from django.core.urlresolvers import reverse
 from django.test.client import Client
 from django.contrib.auth.models import User
-from django.test import TestCase
-from survey.models.batch import Batch
-from survey.models import GroupCondition, HouseholdHead, QuestionModule, Indicator, Formula, Survey, EnumerationArea, \
-    HouseholdMemberGroup, InterviewerAccess, NumericalAnswer
+from survey.models import (InterviewerAccess, ODKAccess, USSDAccess, Interview, Interviewer, QuestionSetChannel,
+                           EnumerationArea, Survey, SurveyAllocation, Question, QuestionSet, Batch, BatchQuestion,
+                           QuestionOption, ODKSubmission)
+from survey.forms.question import get_question_form
+# import all question types
+from survey.models import (Answer, NumericalAnswer, TextAnswer, MultiChoiceAnswer, MultiSelectAnswer, GeopointAnswer,
+                           ImageAnswer, AudioAnswer, VideoAnswer, DateAnswer, AutoResponse, Attachment)
+from survey.tests.models.survey_base_test import SurveyBaseTest
 
-from survey.models.locations import *
-from survey.tests.base_test import BaseTest
-from survey.odk.utils.odk_helper import *
 
-
-class ODKHelperTest(TestCase):
+class ODKTest(SurveyBaseTest):
 
     def setUp(self):
-        self.question_mod = QuestionModule.objects.create(
-            name="Test question name", description="test desc")
-        self.batch = Batch.objects.create(order=1)
-        self.household_member_group = HouseholdMemberGroup.objects.create(
-            name="test name1324", order=12)
-        self.ea = EnumerationArea.objects.create(name="EA1")
-        self.country = LocationType.objects.create(
-            name='Country', slug='country')
-        self.district = LocationType.objects.create(
-            name='District', parent=self.country, slug='district')
-        self.survey = Survey.objects.create(name="haha")
-        self.uganda = Location.objects.create(name="Uganda", type=self.country)
-        self.kampala = Location.objects.create(
-            name="Kampala", type=self.district, parent=self.uganda)
-        self.ea.locations.add(self.kampala)
-        self.interviewer = Interviewer.objects.create(name="Investigator",
-                                                      ea=self.ea,
-                                                      gender='1', level_of_education='Primary',
-                                                      language='Eglish', weights=0)
-        self.question = Question.objects.create(identifier='123.1', text="This is a question", answer_type='Numerical Answer',
-                                                group=self.household_member_group, batch=self.batch, module=self.question_mod)
+        super(ODKTest, self).setUp()
+        self.odk_user = ODKAccess.objects.create(interviewer=self.interviewer, user_identifier='ants',
+                                                 odk_token='antsman')
 
-    def test_get_answer_path(self):
-        # question = Question.objects.create(identifier='123.1',text="This is a question", answer_type='Numerical Answer',
-        #                                    group=self.household_member_group,batch=self.batch,module=self.question_mod)
-        answer_path = get_answer_path(self.batch, self.question)
+    def _save_ussd_compatible_questions(self):
+        self._create_ussd_non_group_questions()
 
-        expected_result = '//survey/b%s/q%s' % (
-            self.batch.pk, self.question.pk)
-        self.assertEqual(answer_path, expected_result)
+    def _make_odk_request(self, url=reverse('odk_survey_forms_list'), data=None, content_type=None, raw=False):
+        username = self.odk_user.user_identifier
+        password = self.odk_user.odk_token
+        auth_headers = {}
+        if content_type:
+            auth_headers['content_type'] = content_type
+        if data is None:
+            # first do digest challeng
+            response = self.client.get(url)
+            self.assertEquals(response.status_code, 401)
+            digest_challenge = response.get('www-authenticate')
+            auth_headers['HTTP_AUTHORIZATION'] = self._get_digest_header(username, password, 'get',
+                                                                         url, digest_challenge)
+            return self.client.get(url, **auth_headers)
+        else:
+            response = self.client.post(url)
+            self.assertEquals(response.status_code, 401)
+            digest_challenge = response.get('www-authenticate')
+            auth_headers['HTTP_AUTHORIZATION'] = self._get_digest_header(username, password, 'post',
+                                                                         url, digest_challenge)
+            if raw:
+                return self.client.post(url, data, **auth_headers)
+            else:
+                return self.client.post(url, data=data, **auth_headers)
 
-    def test_record_interview_answer(self):
-        # question = Question.objects.create(identifier='123.2',text="This is a question", answer_type='Numerical Answer',
-        #                                    group=self.household_member_group,batch=self.batch,module=self.question_mod)
-        survey = Survey.objects.create(
-            name="Test Survey", description="Desc", sample_size=10, has_sampling=True)
-        household_listing = HouseholdListing.objects.create(
-            ea=self.ea, list_registrar=self.interviewer, initial_survey=survey)
-        household = Household.objects.create(house_number=123456, listing=household_listing, physical_address='Test address',
-                                             last_registrar=self.interviewer, registration_channel="ODK Access", head_desc="Head", head_sex='MALE')
-        survey_householdlisting = SurveyHouseholdListing.objects.create(
-            listing=household_listing, survey=survey)
-        household_member = HouseholdMember.objects.create(surname="sur", first_name='fir', gender='MALE', date_of_birth="1988-01-01",
-                                                          household=household, survey_listing=survey_householdlisting,
-                                                          registrar=self.interviewer, registration_channel="ODK Access")
-        household_member_group = HouseholdMemberGroup.objects.create(
-            name="test name", order=1)
-        question_mod = QuestionModule.objects.create(
-            name="Test question name", description="test desc")
-        batch = Batch.objects.create(order=1)
-        interviewer_access = InterviewerAccess.objects.create(interviewer=self.interviewer, user_identifier="test", is_active=True,
-                                                              reponse_timeout=100, duration="120")
-        interview = Interview.objects.create(interviewer=self.interviewer, householdmember=household_member, batch=batch,
-                                             interview_channel=interviewer_access, closure_date="2017-01-01", ea=self.ea, last_question=self.question)
-        answer = NumericalAnswer.objects.create(interview=interview, question=self.question,
-                                                value=1)
-        self.assertIsNotNone(record_interview_answer(
-            interview, self.question, 0))
+    def _get_digest_header(self, username, password, method, uri, digest_challenge):
+        return python_digest.build_authorization_request(
+            username,
+            method.upper(),
+            uri,
+            1,  # nonce_count
+            digest_challenge=digest_challenge,
+            password=password
+        )
+
+    def test_form_list_throws_no_error(self):
+        response = self._make_odk_request()
+        self.assertEquals(response.status_code, 200)
+
+    def test_no_xform_without_opening_batch(self):
+        response = self._make_odk_request()
+        self.assertEquals(response.status_code, 200)
+        qset = QuestionSet.objects.first()
+        path = '<formID>%s</formID>' % qset.pk
+        self.assertNotIn(path, response.content)
+
+    def test_xform_with_opening_batch(self):
+        batch = QuestionSet.get(id=self.qset.id)
+        batch.open_for_location(self.ea.locations.first())
+        response = self._make_odk_request()
+        self.assertEquals(response.status_code, 200)
+        path = '<formID>%s</formID>' % batch.pk
+        self.assertIn(path, response.content)
+
+    def test_batch_without_questions_has_empty_questions_section_in_xform(self):
+        url = reverse('download_odk_batch_form', args=(self.qset.id, ))
+        response = self._make_odk_request(url=url)
+        self.assertEquals(response.status_code, 200)
+        # at least some reference representation would be there is it's been referenec some how
+        self.assertNotIn('ref="/qset/qset%s/questions/surveyQuestions' % self.qset.id, response.content)
+
+    def test_select_batch_odk_question(self):
+        self._save_ussd_compatible_questions()
+        url = reverse('download_odk_batch_form', args=(self.qset.id, ))
+        response = self._make_odk_request(url=url)
+        self.assertEquals(response.status_code, 200)
+        survey_tree = etree.fromstring(response.content)
+        path = '/qset/qset%s/questions/surveyQuestions/q%s' % (self.qset.id, self.qset.questions.first().id)
+        self.assertIn(path, response.content)
+
+    def _get_completed_xform(self, answer1, answer2, answer3, answer4):
+        completed = b'''<qset id="%(qset)s" >
+                         <meta>
+                            <instanceID>%(instance_id)s</instanceID>
+                            <instanceName>%(instance_id)s-Name</instanceName>
+                        <creationDate />
+                        <locked />
+                         </meta>
+                         <submissions>
+                             <id />
+                             <dates>
+                                 <lastModified />
+                             </dates>
+                         </submissions>
+                           <surveyAllocation>%(survey_allocation)s</surveyAllocation>
+                           <qset1>
+                            <questions>
+                                <groupQuestions></groupQuestions>
+                                <surveyQuestions>
+                                    <q1>%(answer1)s</q1><q2>%(answer2)s</q2><q3>%(answer3)s</q3><q4>%(answer4)s</q4>
+                                </surveyQuestions>
+                            </questions>
+                           </qset1>
+                       </qset>
+                       '''
+        context = {'qset': self.qset.id, 'instance_id': random.randint(0, 1000),
+                   'survey_allocation': self.survey_allocation.allocation_ea.name.encode('utf8'),
+                   'answer1': answer1, 'answer2': answer2, 'answer3': answer3, 'answer4': answer4}
+        return completed % context
+
+    def _get_completed_xform2(self, answer1, answer2, answer3, answer4, answer5, answer6, answer7,
+                              answer8, answer9, answer10):
+        completed = b'''<qset id="%(qset)s" >
+                         <meta>
+                            <instanceID>%(instance_id)s</instanceID>
+                            <instanceName>%(instance_id)s-Name</instanceName>
+                        <creationDate />
+                        <locked />
+                         </meta>
+                         <submissions>
+                             <id />
+                             <dates>
+                                 <lastModified />
+                             </dates>
+                         </submissions>
+                           <surveyAllocation>%(survey_allocation)s</surveyAllocation>
+                           <qset1>
+                            <questions>
+                                <groupQuestions></groupQuestions>
+                                <surveyQuestions>
+                                    <q1>%(answer1)s</q1><q2>%(answer2)s</q2><q3>%(answer3)s</q3><q4>%(answer4)s</q4>
+                                    <q5>%(answer5)s</q5><q6>%(answer6)s</q6><q7>%(answer7)s</q7><q8>%(answer8)s</q8>
+                                    <q9>%(answer9)s</q9><q10>%(answer10)s</q10>
+                                </surveyQuestions>
+                            </questions>
+                           </qset1>
+                       </qset>
+                       '''
+        context = {'qset': self.qset.id, 'instance_id': random.randint(0, 1000),
+                   'survey_allocation': self.survey_allocation.allocation_ea.name.encode('utf8'),
+                   'answer1': answer1, 'answer2': answer2, 'answer3': answer3, 'answer4': answer4,
+                   'answer5': answer5, 'answer6': answer6, 'answer7': answer7, 'answer8': answer8,
+                   'answer9': answer9, 'answer10': answer10, }
+        return completed % context
+
+    def test_submit_xform(self):
+        self._create_ussd_non_group_questions(self.qset)
+        xml = self._get_completed_xform('2', 'James', 'Y', '1')
+        # import pdb; pdb.set_trace()
+        f = SimpleUploadedFile("surveyfile.xml", xml)
+        url = reverse('odk_submit_forms')
+        response = self._make_odk_request(url=url, data={'xml_submission_file': f}, raw=True)
+        self.assertTrue( 300 > response.status_code and response.status_code >= 200)
+        self.assertEquals(ODKSubmission.objects.count(), 1)
+        # not confirm that 4 responses were given
+        self.assertEquals(Answer.objects.count(), 4)
+        # now test the instances listpage
+        url = reverse('odk_submission_list')
+        # check all the if the
+        raj = self.assign_permission_to(User.objects.create_user('Rajni', 'rajni@kant.com', 'I_Rock'),
+                                        'can_view_aggregates')
+        client = Client()
+        client.login(username='Rajni', password='I_Rock')
+        response = client.get(url)
+        templates = [template.name for template in response.templates]
+        self.assertIn('odk/submission_list.html', templates)
+        self.assertEquals(response.context['submissions'].count(), 1)
+        # check instances list on ODK
+        url = reverse('instances_form_list')
+        response = self._make_odk_request(url=url)
+        templates = [template.name for template in response.templates]
+        self.assertIn("odk/instances_xformsList.xml", templates)
+        self.assertEquals(response.context['submissions'].count(), 1)
+        self.assertEquals(response.context['submissions'].filter(status=ODKSubmission.COMPLETED).count(), 1)
+        submission = response.context['submissions'].first()
+        # try to download the previously submitted form
+        url = reverse('download_odk_submission', args=(submission.pk, ))
+        response = self._make_odk_request(url=url)
+        self.assertTrue( 300 > response.status_code and response.status_code >= 200)
+        self.assertEquals(submission.xml.strip(), response.content.strip())
+        tree = etree.fromstring(submission.xml)
+        dates_nodes = tree.xpath('//qset/submissions/dates/lastModified')
+        # this field is only included when updating instances
+        self.assertEquals(len([d.text for d in dates_nodes if d.text]), 1)
+        self.assertEquals(tree.xpath('//qset/submissions/id')[0].text, str(submission.id))
+        # now submit modified form
+        f = SimpleUploadedFile("surveyfile.xml", submission.xml.encode('utf8'))
+        url = reverse('odk_submit_forms')
+        response = self._make_odk_request(url=url, data={'xml_submission_file': f}, raw=True)
+        self.assertTrue(300 > response.status_code and response.status_code >= 200)
+        self.assertEquals(ODKSubmission.objects.count(), 1)
+        self.assertEquals(Answer.objects.count(), 4)        # note: update only doesn't increase answer or subs count
+        submission = ODKSubmission.objects.order_by('created').last()
+        tree = etree.fromstring(submission.xml)
+        # this field is only included when updating instances
+        self.assertEquals(tree.xpath('//qset/submissions/id')[0].text, str(submission.id))
+
+    def test_submit_xform_with_file_form(self):
+        import os
+        self._create_test_non_group_questions(self.qset)
+        BASE_DIR = os.path.dirname(__file__)
+        image_path = os.path.join(BASE_DIR, 'testimage.png')
+        video_path = os.path.join(BASE_DIR, 'testvideo.mov')
+        audio_path = os.path.join(BASE_DIR, 'testaudio.m4a')
+        with open(image_path) as fi, open(video_path) as fv, open(audio_path) as fa:
+            fi_name = os.path.basename(fi.name)
+            fa_name = os.path.basename(fa.name)
+            fv_name = os.path.basename(fv.name)
+            fi_content = fi.read()
+            fa_content = fa.read()
+            fv_content = fv.read()
+            answers = ('2', 'James', 'Y', '1', ['Y', 'MB'], '31-08-2017', '12.8 8.0 8 7', fi_name, fa_name, fv_name)
+            xml = self._get_completed_xform2(*answers)
+            f = SimpleUploadedFile("surveyfile.xml", xml)
+            sfi = SimpleUploadedFile(fi_name, fi_content)
+            sfa = SimpleUploadedFile(fa_name, fa_content)
+            sfv = SimpleUploadedFile(fv_name, fv_content)
+            url = reverse('odk_submit_forms')
+            response = self._make_odk_request(url=url, data={'xml_submission_file': f,
+                                                             fi_name: sfi, fa_name: sfa,
+                                                             fv_name: sfv}, raw=True)
+            self.assertTrue(300 > response.status_code and response.status_code >= 200)
+            self.assertEquals(ODKSubmission.objects.count(), 1)
+            self.assertEquals(Attachment.objects.count(), 3)
+            # not confirm that 4 responses were given
+            self.assertEquals(Answer.objects.count(), len(answers))
+            # now test the instances listpage
+            submission = ODKSubmission.objects.first()
+            url = reverse('download_submission_attachment', args=(submission.pk,))
+            # check all the if the
+            raj = self.assign_permission_to(User.objects.create_user('Rajni', 'rajni@kant.com', 'I_Rock'),
+                                            'can_view_aggregates')
+            client = Client()
+            client.login(username='Rajni', password='I_Rock')
+            response = client.get(url)
+            self.assertEquals(response._headers['content-type'][1], 'application/zip')
+            extracted = self._extract_zip(response.content)
+            # check instances list on ODK
+            for key, extracted_content in extracted.items():
+                # doing checks this way because we're compressing entire directory
+                # filename may have a random pre/appender to it
+                if fi_name in key:
+                    self.assertEquals(extracted_content, fi_content)   # fake image
+                if fa_name in key:
+                    self.assertEquals(extracted_content, fa_content)   # fake audio
+                if fv_name in key:
+                    self.assertEquals(extracted_content, fv_content)   # fake video
+
+    def _extract_zip(self, input_content):
+        input_zip = StringIO(input_content)
+        input_zip = ZipFile(input_zip)
+        return {name: input_zip.read(name) for name in input_zip.namelist()}

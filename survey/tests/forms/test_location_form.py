@@ -1,6 +1,6 @@
 from django.template.defaultfilters import slugify
 from django.test import TestCase
-from survey.forms.locations import LocationTypeForm, LocationForm
+from survey.forms.locations import LocationTypeForm
 from survey.models.locations import *
 
 
@@ -43,7 +43,6 @@ class LocationFormTest(TestCase):
         self.district = LocationType.objects.create(
             name='District', slug='district', parent=self.country)
         self.uganda = Location.objects.create(name='Uganda', type=self.country)
-
         self.form_data = {
             'name': 'kampala',
             'type': self.district.pk,

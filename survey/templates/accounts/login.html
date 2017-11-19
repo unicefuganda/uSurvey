@@ -1,75 +1,123 @@
-{% extends "layout.html" %}
-{% block title %}
-  Login
-{% endblock %}
+{% extends "base.html" %}
+{% load repeatedblocks %}
+{% load template_tags %}
+{% block page_title %} Login {%endblock%}
+{% block extra_content %}
 
-{% block content %}
-<script type="text/javascript" src="{{ STATIC_URL }}js/jquery.min.js"></script>
+<section id="login-content" class="login-content">
+    <div class="awe-parallax bg-login-content">
+    </div>
+    <div class="awe-overlay"></div>
+    <div class="container">
+        <div class="row"  style="margin-top:80px;">
+            <!-- FORM -->
+            <div class="col-xs-12 col-lg-4 pull-right">
+                <div class="form-login">
+                    {% if form.errors %}
+                    <label class="error" style="color:yellow">Your username and password didn't match. Please try again.</label>
+                    {% endif %}
+                    {% if not form.errors %}
+                    {% endif %}                   
+                    <form method="post" action="{% url 'django.contrib.auth.views.login' %}">
+                        <h2 style="font-family: Open-Sans">uSurvey</h2>
+                        {% csrf_token %} 
+                        <div>
+                            <div class="form-email">
+                                <!-- <label for="username" style="color: #fff">{{ form.username.label_tag }}</label> -->
+                                {{ form.username }}
+                            </div>
+                        </div>
+                        <div class="form-password">
+                            <!-- <label  for="inputPassword" style="color: #fff">{{ form.password.label_tag }}</label> -->
+                            {{ form.password }}
+                        </div>
+                        <div class="form-check" >
+                            <input id="check" type="checkbox">
+                            <!-- <label for="check">
+                                <i class="icon md-check-2"></i>
+                                Remember me</label> -->                      
+                        </div>
+                        <div class="form-submit-1">
+                            <input value="Sign In" class="mc-btn btn-style-1" type="submit">
+                            {% if next %}
+                            <input type="hidden" name="next" value="{{ next }}" />
+                            {% else %}
+                            <input type="hidden" name="next" value="{% url 'home_page' %}" />
+                            {% endif %}
+                        </div>
+                        <a style='float: right;' href="{% url 'password_reset' %}">Forgot password?</a>
+                    </form>
+                </div>
+            </div>
+            <!-- END / FORM -->
+            <div class="image col-md-12">
+                <img src="{{ STATIC_URL }}loginassest/img-thumb.png" alt="">
+            </div>
+        </div>
+    </div>
+    <!-- <div style="min-height: 100px;">&nbsp;</div> -->
+</section>
+            
+{%endblock%}
+{% block extra_css %}
+<link href="{{ STATIC_URL }}loginassest/css.css" rel="stylesheet" type="text/css">
+<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}loginassest/bootstrap.css">
+<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}loginassest/style.css">
+<link rel="stylesheet" href="{{ STATIC_URL }}toassets/style_002.css" type="text/css">
+<style type="text/css">
 
-
-<script type="text/javascript">// <![CDATA[
-var image_array = new Array();
-    <!--image_array[0] = "{{ STATIC_URL }}img/L1.jpg";-->
-    image_array[0] = "{{ STATIC_URL }}img/L2.jpg";
-    image_array[1] = "{{ STATIC_URL }}img/L3.jpg";
-    image_array[2] = "{{ STATIC_URL }}img/L4.jpg";
-
-    var rand_path = image_array[Math.floor(Math.random() * image_array.length)];
-
-    $(document).ready(function() {
-        $('body').css('background', 'url('+rand_path+')');
-        $('body').css('background-repeat', 'no-repeat');
-        $('body').css('background-size', 'cover');
-    });
-// ]]></script>
-   {% if form.errors %}
-<br><br>
-      <div class="alert alert-error">
-        <label class="error">Your username and password didn't match. Please try again.</label>
-      </div>
-  {% endif %}
-
-  {% if not form.errors %}
-
-  {% endif %}
-
-<style>
-.forright {
-    position: relative;
-    top: 20px;
-	right:30;
-} 
-
-.forleft {
-    position: absolute;
-    top: 250px;
-    left: 30;
-	width: 400px;
-    FONT-FAMILY: Trebuchet MS, Myriad Pro, Arial;
-    font-size: 15px;
-    color:#FFFFFF;
-    text-decoration:none;
-	font-weight:bold;
-    
+#cssmenu > ul > li .login {
+    color: yellow;}
+    .form-email input, .form-password input {    
+    /*padding: 0 65px !important;*/
+    width: 100%;
 }
+#id_username, #id_password{
+    text-align: center;
+}
+@media screen and (min-device-width: 360px) and (max-device-width: 768px) {
+.login-content .form-login {
+    position: relative;
+     z-index: 99; 
+    max-width: 400px;
+    margin-left: auto;
+    margin-top: -90px;
+    margin-bottom: 300px;
+    margin-right: auto;
+}
+}
+ 
+ @media screen and (min-device-width: 320px) and (max-device-width: 568px) {
+.login-content .form-login {
+    position: relative;
+     z-index: 99; 
+    max-width: 400px;
+    margin-left: auto;
+    margin-top: -90px;
+    margin-bottom: 265px;
+    margin-right: auto;
+}
+}
+
+ @media screen and (min-device-width: 767px) and (max-device-width: 1024px) {
+.login-content .form-login {
+    position: relative;
+     z-index: 99; 
+    max-width: 400px;
+    margin-left: auto;
+    margin-top: -90px;
+    margin-bottom: 500px;
+    margin-right: auto;
+}
+   
 </style>
+{%endblock%}
+{% block extra_js %}
+<script type="text/javascript">
+    $('#id_username').attr("placeholder","Username");
+    $('#id_password').attr("placeholder","Password");
+</script>
+{%endblock%}
+</body>
+</html>
 
-<div class="forleft"></div>
-  <div class="forright"><form class="login-form" method="post" action="{% url 'django.contrib.auth.views.login' %}">
-      <span>Type your username and password to login</span>
-      <hr>
-    {% csrf_token %}
-      <label class="control-label" for="username">{{ form.username.label_tag }}</label>
-
-        {{ form.username }}
-      <label class="control-label" for="inputPassword">{{ form.password.label_tag }}</label>
-        {{ form.password }}
-        <button type="submit" class="btnforallxlarge" >Login</button>
-    {% if next %}
-        <input type="hidden" name="next" value="{{ next }}" />
-    {% else %}
-        <input type="hidden" name="next" value="{% url 'home_page' %}" />
-    {% endif %}
-  </form></div>
-
-{% endblock %}

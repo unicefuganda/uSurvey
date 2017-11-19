@@ -1,0 +1,201 @@
+{% load template_tags %}
+{% if display_format == 'text' %}
+{% block plain_text_content %}
+{% comment %} being careful about the spacing since the target is USSD or plain text. This part needs to be made more readable {% endcomment %}
+{% if answer_form.errors %}{{answer_form.text_error}}{% endif %}{% if interview %}{% if 'prompt_user_loop' in loops %}{% if loops.prompt_user_loop %}{{loops.prompt_user_loop}}{% else %}{{answer_form.DEFAULT_LOOP_PROMPT}}{% endif %}{{ answer_form.render_extra_ussd }}{% else %}{% build_question_text interview.last_question.text existing_answers as text %}
+{% if text %}{% if answer_form.render_prepend_ussd %}
+{{answer_form.render_prepend_ussd}}{% endif %}{{text}} ({{interview.last_question.answer_type}})
+{{ answer_form.render_extra_ussd }}{% endif %}
+{% endif %}
+{% else %}
+{% if access and not answer_form.errors %}Welcome {{access.interviewer.name}}!{% endif %}
+{{answer_form.render_prepend_ussd}}
+{{ answer_form.render_extra_ussd }}
+{% endif %}
+{% endblock %}
+{% else %}
+<div class="row" id="preview-container">
+   <div class="row">
+      <div class="col-md-6">
+        &nbsp;
+      </div>
+      <div>
+         <!-- Mobile view start-->
+         <div class="iphone_bg">
+            <div class="geni">
+               <div class="block">
+                  <div class="previewstyle">
+                     <div class="statusbar-overlay"></div>
+                      <div class="panel-overlay"></div>
+                      <div class="views">
+                        <div class="view view-main" data-page="form">
+                          <div class="pages">
+                              <div data-page="features" class="page no-navbar page-on-left">
+                                  <div class="page-content">
+                                  </div>
+                              </div>
+                              <div data-page="form" class="page no-toolbar no-navbar page-on-center">
+                                  <div class="page-content">
+                                      <div id="pages_maincontent">
+                                              {% block preview_title %}
+                                                {% if title %}
+                                                   <h2 class="page_title">{{interview.question_set.name|default:title }}</h2>
+                                                {% else %}
+                                                    <h2 class="page_title">{{interview.question_set.name|default:'Data Entry'}}</h2>
+                                                {% endif %}
+                                              {% endblock %}
+                                                {% if answer_form.non_field_errors %}
+                                                <br /><br />
+                                                <div id="non_field_errors" class="alert alert-error">{{ answer_form.non_field_errors }}</div>
+                                                {%  endif %}
+                                                <div class="page_single layout_fullwidth_padding">
+                                                  <div class="contactform">
+                                                     {% block contactform %}
+                                                        {% if answer_form.is_multipart %}
+                                                         <form enctype="multipart/form-data" id="interview_form" method="post" action="{{action}}">
+                                                            {% else %}
+                                                         <form id="interview_form" method="post" action="{{action}}">
+                                                            {% endif %}
+                                                            {% if interview.last_question.loops and access.choice_name != 'Ussd Access' %}
+                                                            <div class="loops form_row">
+                                                               {% for loop in interview.last_question.loops %}
+                                                               &raquo; {{ loop.loop_starter.identifier }} ({{loops.count|get_value:loop.id}})
+                                                               {% endfor %}
+                                                            </div>
+                                                            {%  endif %}
+                                                            {% csrf_token %}
+                                                            {% block form_fields %}
+                                                                <div class="form_row">
+                                                                 {% if 'prompt_user_loop' in loops %}
+                                                                     <label>{% if loops.prompt_user_loop %}{{loops.prompt_user_loop}}{% else %}{{answer_form.DEFAULT_LOOP_PROMPT}}{% endif %}</label>
+                                                                 {% else %}
+                                                                     {% build_question_text interview.last_question.text existing_answers as text %}
+                                                                     {% if text %}
+                                                                        <label>{{text}} ({{interview.last_question.answer_type}})</label>
+                                                                     {% endif %}
+                                                                 {% endif %}
+                                                                   {% if access.choice_name == 'Ussd Access' %}
+                                                                     <div>{{ answer_form.render_extra_ussd_html }}</div>
+                                                                   {% endif %}
+                                                                   {% include "bland_form.html" with a_form=answer_form %}
+                                                                </div>
+                                                                <br />
+                                                                <input name="submit" class="form_submit submit" id="submit" value="Go" type="submit">
+
+                                                                {% if is_preview or has_go_back  %}
+                                                                       <input name="has-go-back" class="form_submit submit" id="has-go-back" value="true" type="hidden">
+                                                                    {% if has_go_back  %}
+                                                                       <input name="go-back" class="form_submit submit" id="go-back" value="Back" type="submit">
+                                                                    {% endif %}
+                                                                {% endif %}
+                                                             {% endblock %}
+                                                         </form>
+                                                     {% endblock %}
+                                                    </div>
+                                               </div>
+                                       </div>
+                                 </div>
+                              </div>
+                          </div>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+         <!-- Mobile View End-->
+      </div>
+   </div>
+</div>
+
+<style type="text/css">
+   .iphone_bg {
+      width: 100%;
+      height: 639px;
+      margin: 0px auto auto;
+      background: url('{{STATIC_URL}}img/iphone-sim.png') no-repeat center;
+   }
+   .geni {
+      width:247px;
+      margin:0px auto;
+      padding-top:57px;
+      padding-left:6px;
+      z-index:1;
+   }
+   .exod {
+
+   margin-bottom:5px;
+   }
+
+   #id_gender{
+      display: inline-block;
+      vertical-align: middle;
+      margin-bottom: -6px;
+   }
+   #id_access_channels{
+      display: inline-block;
+      vertical-align: middle;
+   }
+   #text-counter{
+      margin-left: 10px !important;
+   }
+   .ms-container{
+      margin-left: auto;
+      margin-right: auto;
+      width: 915px;
+   }
+   .ms-list{
+      margin-top: -14px !important;
+   }
+   .inline pos-rel > open {
+      display: none !important;
+   }
+   .exod {
+      text-algin:center;
+      margin-bottom:5px;
+   }
+   .previewstyle {
+      border: 1px solid #307ecc;
+      height: 360px;
+       padding-top: 20px;
+      min-height: 300px;
+      text-align: left;
+      padding-left: 15px;
+      padding-right: 15px;
+      width: 100%;
+      background:#fff;
+   }
+   .form-horizontal .control-label {
+      padding-top:25px;text-align: left;
+   }
+    .int-part{margin-top: -25px;}
+     .dataTables_wrapper input[type="text"] {
+    margin:  0px;
+}
+.error{padding-top: 3px;font-size: 11px;font-weight: normal;}
+label {
+
+    margin-bottom: 2px;
+
+}
+.controls{font-weight: bold;}
+
+</style>
+<script src="{{ STATIC_URL }}js/jquery-ui.min.js" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript">
+  jQuery(function($) {
+      $(".datepicker").datepicker({
+       changeMonth: true,
+       changeYear: true,
+       dateFormat: 'dd-mm-yy',
+       yearRange: "-120:+nn"
+     });
+  });
+  </script>
+<script type="text/javascript">
+   $(document).ready(function(){
+     $('.controls textarea ').after($('<span id="text-counter"></span>'));
+     });
+</script>
+{% endif %}
+

@@ -18,10 +18,16 @@ def and_i_have_a_household(step):
         name="Investigator 1", mobile_number="1", ea=world.ea)
     world.household = Household.objects.create(
         investigator=world.investigator, ea=world.investigator.ea, uid=4)
-    HouseholdHead.objects.create(household=world.household, surname="Test", first_name="User",
-                                 date_of_birth="1980-09-01", male=True,
-                                 occupation='Agricultural labor', level_of_education='Primary',
-                                 resident_since_year=2013, resident_since_month=2)
+    HouseholdHead.objects.create(
+        household=world.household,
+        surname="Test",
+        first_name="User",
+        date_of_birth="1980-09-01",
+        male=True,
+        occupation='Agricultural labor',
+        level_of_education='Primary',
+        resident_since_year=2013,
+        resident_since_month=2)
 
 
 @step(u'And I visit new household member page')
@@ -53,8 +59,11 @@ def and_i_fill_all_member_related_fields(step):
 
 @step(u'And also I have a household member')
 def and_also_i_have_a_household_member(step):
-    world.household_member = HouseholdMember.objects.create(surname='member1', date_of_birth='2013-08-30', male=True,
-                                                            household=world.household)
+    world.household_member = HouseholdMember.objects.create(
+        surname='member1',
+        date_of_birth='2013-08-30',
+        male=True,
+        household=world.household)
 
 
 @step(u'And I visit edit household member page')

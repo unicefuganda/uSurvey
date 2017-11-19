@@ -1,6 +1,11 @@
+from django.conf import settings
+from cacheops import cache
+from cacheops import CacheMiss
+from django.utils import timezone
+
 
 def contains_key(params, key):
-    return params.has_key(key) and params[key].isdigit()
+    return key in params and params[key].isdigit()
 
 
 def is_not_digit_nor_empty(params, key):
@@ -52,3 +57,58 @@ def prepend_to_keys(params, text):
     for key, value in params.items():
         new_params[text + key] = value
     return new_params
+
+
+PENDING_VALIDATION = 1
+VALIDATED = 2
+
+
+def activate_super_powers(request):
+    if get_super_powers_details(request) is None:
+        cache.set(
+            '%s:%s' %
+            (request.user.pk,
+             settings.SUPER_POWERS_KEY),
+            data={
+                'started': timezone.now(),
+                'status': PENDING_VALIDATION},
+            timeout=settings.SUPER_POWERS_DURATION)
+        return False
+    else:
+        cache.set(
+            '%s:%s' %
+            (request.user.pk,
+             settings.SUPER_POWERS_KEY),
+            data={
+                'started': timezone.now(),
+                'status': VALIDATED},
+            timeout=settings.SUPER_POWERS_DURATION)
+        return True
+
+
+def deactivate_super_powers(request):
+    try:
+        return cache.delete(
+            '%s:%s' %
+            (request.user.pk, settings.SUPER_POWERS_KEY))
+    except BaseException:
+        return 0
+
+
+def has_super_powers(request):
+    try:
+        return cache.get(
+            '%s:%s' %
+            (request.user.pk, settings.SUPER_POWERS_KEY))
+    except CacheMiss:
+        return False
+
+
+def get_super_powers_details(request):
+    try:
+        return cache.get(
+            '%s:%s' %
+            (request.user.pk, settings.SUPER_POWERS_KEY)).get(
+            'status', None)
+    except CacheMiss:
+        return None

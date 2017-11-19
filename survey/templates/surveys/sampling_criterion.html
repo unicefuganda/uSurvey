@@ -1,0 +1,142 @@
+{% extends "form.html" %}
+
+{% block title %}
+    Sampling Criteria for {{ survey }}
+{% endblock %}
+{% block display_form_fields %}
+<div class="container-fluid">
+    <div class="row r-row">
+        <div class="col-md-7">
+            {% include "naked_form.html" with a_form=sampling_form %}
+         </div>
+        <div class="col-md-5">
+            <ul class="list-data text-warning">
+                  <li ><i class="fa fa-arrow-right"></i> Use this form to define the criteria to use for listing</li>
+                  <li ><i class="fa fa-arrow-right"></i> Select a Listing question</li>
+                  <li ><i class="fa fa-arrow-right"></i> Configure the listing condition</li>
+                 <li ><i class="fa fa-arrow-right"></i> Settings defined here would be applied when sampling listing during for data collection</li>
+             </ul>
+         </div>
+    </div>
+</div>
+
+{% endblock %}
+    
+{% block javascripts %}
+        <script type="text/javascript">
+         $(document).ready(function() {
+                 
+
+                 if(!$('#id_value').val()) {
+                     $('#id_value-control-group').hide();
+                     $('#id_value').prop('disabled', true);
+                 }
+                 if(!$('#id_options').val()) {
+                     $('#id_options-control-group').hide();
+                     $('#id_options').prop('disabled', true);
+                 }
+                 if(!$('#id_min').val()){
+                     $('#id_min-control-group').hide();
+                     $('#id_min').prop('disabled', true);
+                 }
+                 if(!$('#id_max').val()){
+                     $('#id_max-control-group').hide();
+                     $('#id_max').prop('disabled', true);
+                 }
+                 var validate_options = {
+                    {% for question in survey.listing_form.questions.all %}
+                        '{{ question.pk }}' : [{% for validator in question.validator_names %}'{{ validator }}',{% endfor %}],
+                    {% endfor %}
+                 }
+                 var question_options = {
+                    {% for question in survey.listing_form.questions.all %}
+                        '{{ question.pk }}' : { {% for opt in question.options.all %}'{{ opt.text }}': '{{ opt.text }}',{% endfor %} },
+                    {% endfor %}
+                 }
+                 $('#id_listing_question').change(function(){
+                    $('#id_validation_test option:gt(0)').remove();
+                    $.each(validate_options[$('#id_listing_question').val()], function(key, value) {
+                      $('#id_validation_test').append($("<option></option>")
+                         .attr("value", value).text(value));
+                    });
+                   if(question_options[$('#id_listing_question').val()])
+                        $.each(question_options[$('#id_listing_question').val()], function(key, value) {
+                          $('#id_options').append($("<option></option>")
+                             .attr("value", key).text(value));
+                        });
+                });
+
+
+                 $('#id_validation_test').change(function(){
+                    do_process($(this).val(), question_options);
+                 });
+                 {%  if sampling_form.validation_test.value %}
+                    do_process("{{sampling_form.validation_test.value}}", question_options);
+                 {%endif%}
+             
+
+                
+            });
+
+
+            function do_process(validation_test, question_options){
+                    switch(validation_test) {
+                        case('between'):
+                             $('#id_options-control-group').hide();
+                            $('#id_options').prop('disabled', true);
+                            $('#id_value-control-group').hide();
+                            $('#id_value').prop('disabled', true);
+                             $('#id_min-control-group').show();
+                             $('#id_min').prop('disabled', false);
+                             $('#id_max-control-group').show();
+                             $('#id_max').prop('disabled', false);
+                            break;
+                        case('equals'):
+                            if(Object.keys(question_options[$('#id_listing_question').val()]).length > 0){
+                                $('#id_options-control-group').show();
+                                $('#id_options').prop('disabled', false);
+                                $('#id_value-control-group').hide();
+                                $('#id_value').prop('disabled', true);
+                                 $('#id_min-control-group').hide();
+                                 $('#id_min').prop('disabled', true);
+                                 $('#id_max-control-group').hide();
+                                 $('#id_max').prop('disabled', true);
+                                break;
+                            }
+                        default:
+
+                            $('#id_options-control-group').hide();
+                            $('#id_options').prop('disabled', true);
+                            $('#id_value-control-group').show();
+                            $('#id_value').prop('disabled', false);
+                             $('#id_min-control-group').hide();
+                             $('#id_min').prop('disabled', true);
+                             $('#id_max-control-group').hide();
+                             $('#id_max').prop('disabled', true);
+                    }
+            }
+
+
+
+
+            
+
+        </script>
+        <script src="{{STATIC_URL}}js/logic.js" type="text/javascript" charset="utf-8"></script>
+        <script type="text/javascript">
+            id_text_delim = '-';
+            change_to_select2( $('#id_listing_question'));
+        </script>
+        <style type="text/css">
+            .list-data{line-height: 22px;font-size: 14px;}
+            
+            .select2-container{width: 500px !important;}
+            .dataTables_wrapper select{}
+        </style>
+{% endblock %}
+
+{% block non_form_content %}
+
+    <h4>Existing Criteria</h4>
+    {% include 'surveys/_view_criteria.html' %}
+{% endblock %}

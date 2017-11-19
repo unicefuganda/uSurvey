@@ -11,6 +11,9 @@
   {% if parent_question %}
      <h4> to question: {{parent_question.text}} <h4>
   {% endif %}
+  {% if questionform.prev_question %}
+     <h4> Preceeding question: {{questionform.prev_question.text}} <h4>
+  {% endif %}
     <p>Please note that the following special characters will be removed on USSD [* ! # ' ; &]</p>
 {% endblock%}
 {% block display_form_fields %}
@@ -48,20 +51,21 @@
 {% endblock %}
     {% block buttons %}
   <div class="form-actions">
-    <button id="button" type="submit" class="btn btn-primary submit" name="save_button" data-disabled-text="{{ loading_text }}">Save</button>
+    <button id="button" type="submit" class="btn btn-primary submit" name="save_button" data-disabled-text="{{ loading_text }}"><i class="fa fa-save"></i> Save</button>
       {% if not questionform.instance.identifier %}
-      <button id="button" type="submit" class="btn btn-primary submit" name="add_to_lib_button" data-disabled-text="{{ loading_text }}">Save and Add to Bank</button>
+      <button id="button" type="submit" class="btn btn-primary submit" name="add_to_lib_button" data-disabled-text="{{ loading_text }}"><i class="fa fa-save"></i> Save and Add to Bank</button>
       {% endif %}
     {% if cancel_url %}
-      <a href="{{ cancel_url }}" class="btn btn-primary" name="cancel_button" class="cancel">Cancel</a>
+      <a href="{{ cancel_url }}" class="btn btn-primary" name="cancel_button" class="cancel"><i class="fa fa-close"></i> Cancel</a>
     {% else %}
-      <a href="#" class="btn btn-primary" name="cancel_button" id="cancel_{{ id }}" class="cancel">Cancel</a>
+      <a href="#" class="btn btn-primary" name="cancel_button" id="cancel_{{ id }}" class="cancel"><i class="fa fa-close"></i>Cancel</a>
     {% endif %}
   </div>
     {% endblock %}
 
 {% block javascripts %}
     <script src="{{STATIC_URL}}js/questions.js" type="text/javascript" charset="utf-8"></script>
+    <script src="{{STATIC_URL}}js/question_options.js" type="text/javascript" charset="utf-8"></script>
         <script type="text/javascript">
             channel_map = {
                 {% for answer_type, channels in questionform.answer_map.items %}

@@ -1,0 +1,90 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Data Entry/Simulator
+{% endblock %}
+{% block page_actions %}
+  {% if access %}
+    <div >
+        <a class="btn btn-white btn-warning btn-bold" href="{% url 'refresh_data_entry' access.id %}">
+          <i class="ace-icon fa fa-refresh bigger-120"></i>
+												Restart
+											</a>
+                      </div>
+   {% endif %}
+{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{{ STATIC_URL }}assets/formstyleres.css" />
+<link rel="stylesheet" href="{{ STATIC_URL }}css/flipclock.css" />
+<style>
+    #preview-container, #preview-container .col-md-12  {
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100%;
+    }
+</style>
+{% endblock %}
+{% block content %}
+    <div id="preview-container" class="container">
+        <div class="row r-row" style="margin: 0; padding: 0;">
+            {% if access %}
+                {% if access.choice_name == 'Ussd Access' %}
+                   <div class="col-md-6">
+                      <div class="container-fluid" id="countdown-container" >
+                          <div class="row r-row">&nbsp;</div>
+                          <div class="row r-row">&nbsp;</div>
+                        <div class="row r-row">
+                            <div class="col-md-12" id="timer">
+
+                            </div>
+                        </div>
+
+                      <div class="modal fade" id="timer_modal" tabindex="-1" role="dialog" aria-hidden="true">
+                          <div class="modal-dialog">
+                            <div class="modal-content">
+                              <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                <h4 class="modal-title">USSD Session Timeout reached!</h4>
+                              </div>
+                              <div class="modal-body">
+                                <span class="alert_confirm">Session Timeout reached for this interview.</span><strong>Would you like to continue data entry?</strong>
+                              </div>
+                              <div class="modal-footer">
+                                <button type="button" class="btn btn-primary delete_variable_modal" onclick="$('#timer_modal').modal('hide');">Yes</button>
+                                <a class="btn btn-primary delete-modal clear-button" href="." >No</a>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                     </div>
+                  </div>
+              {% endif %}
+              <div class="{% if access.choice_name == 'Ussd Access' %}col-md-6{% else %}col-md-12{% endif %}">
+                {% include "interviews/new_interview.html" with use_ajax_post=True %}
+             </div>
+            {% else %}
+                <div class="col-md-12">
+                    {% include "interviews/new_interview.html" with use_ajax_post=False %}
+                </div>
+            {% endif %}
+            {% block javascripts %}
+                <script src="{{STATIC_URL}}js/flipclock.min.js"></script>
+                  <script type="text/javascript">
+                      $(function(){
+                            var timer = $("#timer").FlipClock({{ussd_session_timeout|default:180}}, {
+                                            clockFace: 'MinuteCounter',
+                                            countdown: true,
+                                            callbacks: {
+                                                stop: function() {
+                                                    $('#timer_modal').modal('show');
+                                                },
+                                            }
+                                        });
+
+                        });
+              </script>
+            {% endblock %}
+        </div>
+    </div>
+{% endblock %}

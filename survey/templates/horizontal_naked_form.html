@@ -1,5 +1,7 @@
 {% load template_tags %}
-<table class="inline {{ class }}">
+<div class="row">
+<div class="col-md-12">
+<table style="width: 100%" class="inline {{ class }} table-responsive">
 <tr id="control-group">
 {% for field in a_form.visible_fields %}
 <td valign="top">
@@ -22,6 +24,14 @@
 {% endfor %}
 </tr>
 </table>
+</div>
+</div>
 {% for hidden in a_form.hidden_fields %}
   {{ hidden }}
 {% endfor %}
+<style type="text/css">
+  .dataTables_wrapper .row:last-child {
+    border-bottom: none !important;
+    background-color: none !important;
+}
+</style>

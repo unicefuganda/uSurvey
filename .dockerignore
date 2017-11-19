@@ -1,0 +1,12 @@
+.git
+*.log
+.Trashes
+*.sqlite3
+tmp
+.env
+mics/localsettings.py
+*.md
+
+
+
+

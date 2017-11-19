@@ -1,0 +1,15 @@
+{% extends "horizontal_filter_form.html"%}
+{% block postfilter %}
+    {% include "horizontal_naked_form.html" with a_form=survey_filter no_button=True  %}
+{% endblock %}
+{% block extra_js %}
+<script type="text/javascript">
+    $(function(){
+        {% for field in survey_filter.visible_fields %}
+            $('#{{ field.auto_id }}').on('change', function () {
+                $('#{{ filter_id }}').submit();
+            });
+        {% endfor %}
+        });
+    </script>
+{% endblock %}

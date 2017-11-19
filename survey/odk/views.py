@@ -19,80 +19,57 @@ from django.core.urlresolvers import reverse
 from django.core.exceptions import PermissionDenied
 from django.conf import settings
 from django.template import RequestContext, loader, Context
-from survey.odk.utils.log import audit_log, Actions, logger
-from survey.odk.utils.odk_helper import get_survey_allocation, process_submission, disposition_ext_and_date, \
-    get_zipped_dir, HouseholdNumberAlreadyExists, \
-    response_with_mimetype_and_name, OpenRosaResponseBadRequest, OpenRosaRequestForbidden, OpenRosaRequestConflict, \
-    OpenRosaResponseNotAllowed, OpenRosaResponse, OpenRosaResponseNotFound, OpenRosaServerError, \
-    BaseOpenRosaResponse, HttpResponseNotAuthorized, http_digest_interviewer_auth, NotEnoughHouseholds
-from survey.models import Survey, Interviewer, Household, ODKSubmission, Answer, Batch, SurveyHouseholdListing, \
-    HouseholdListing, SurveyAllocation
+from .utils.log import audit_log, Actions
+from survey.utils.logger import glogger as logger
+from .utils.odk_helper import (
+    get_survey_allocation,
+    process_submission,
+    disposition_ext_and_date,
+    get_zipped_dir,
+    response_with_mimetype_and_name,
+    OpenRosaResponseBadRequest,
+    OpenRosaRequestForbidden,
+    OpenRosaRequestConflict,
+    OpenRosaResponseNotAllowed,
+    OpenRosaResponse,
+    OpenRosaResponseNotFound,
+    OpenRosaServerError,
+    BaseOpenRosaResponse,
+    HttpResponseNotAuthorized,
+    http_digest_interviewer_auth,
+    NotEnoughData)
+from survey.models.odk_submission import get_upload_dir
+from survey.models import (
+    Survey,
+    Interviewer,
+    ODKSubmission,
+    Answer,
+    Batch,
+    SurveyAllocation,
+    ODKFileDownload,
+    Interview,
+    QuestionSet)
+from survey.models import ListingSample
 from django.utils.translation import ugettext as _
 from django.contrib.sites.models import Site
 from survey.utils.query_helper import get_filterset
 from survey.models import BatchLocationStatus
-from survey.interviewer_configs import LEVEL_OF_EDUCATION, NUMBER_OF_HOUSEHOLD_PER_INTERVIEWER
-from survey.interviewer_configs import MESSAGES
 from collections import OrderedDict
 
 
-def get_survey_xform(allocation):
-    interviewer, survey = allocation.interviewer, allocation.survey
-    template_file = "odk/survey_form-no-repeat.xml"
-    if BatchLocationStatus.objects.filter(batch__survey=survey, non_response=True).exists():
-        template_file = 'odk/non-response-no-repeat.xml'
-    registered_households = interviewer.generate_survey_households(survey)
-    batches = interviewer.ea.open_batches(survey)
-    # batches_map =
-    loop_starters = set()
-    map(lambda batch: loop_starters.update(batch.loop_starters()), batches)
-    loop_enders = set()
-    map(lambda batch: loop_enders.update(batch.loop_enders()), batches)
-    loop_boundaries = OrderedDict()
-    map(lambda batch: loop_boundaries.update(
-        batch.loop_back_boundaries()), batches)
-    return render_to_string(template_file, {
-        'interviewer': interviewer,
-        # interviewer.households.filter(survey=survey, ea=interviewer.ea).all(),
-        'registered_households': registered_households,
-        'title': '%s - %s' % (survey, ', '.join([batch.name for batch in batches])),
-        'survey': survey,
-        'allocation': allocation,
-        'survey_batches': batches,
-        'messages': MESSAGES,
-        'loop_starters': loop_starters,
-        'loop_enders': loop_enders,
-        'loop_boundaries': loop_boundaries,
-        'answer_types': dict([(cls.__name__.lower(), cls.choice_name()) for cls in Answer.supported_answers()])
-    })
-
-
-def get_household_list_xform(interviewer, survey, house_listing):
-    selectable_households = None
-    # total_households = house_listing.households.count()
-    # if total_households > 0:
-    #     selectable_households = [idx+1 for idx in range(total_households)]
-    return render_to_string("odk/household_listing-repeat.xml", {
-        'interviewer': interviewer,
-        'survey': survey,
-        'educational_levels': LEVEL_OF_EDUCATION,
-        'messages': MESSAGES,
-        'selectable_households': selectable_households,
-    })
-
-
-def get_on_response_xform(interviewer, survey):
-    batches = interviewer.ea.open_batches(survey)
-    return render_to_string("odk/survey_form-no-repeat.xml", {
-        'interviewer': interviewer,
-        # interviewer.households.filter(survey=survey, ea=interviewer.ea).all(),
-        'registered_households': registered_households,
-        'title': '%s - %s' % (survey, ', '.join([batch.name for batch in batches])),
-        'survey': survey,
-        'survey_batches': batches,
-        'messages': MESSAGES,
-        'answer_types': dict([(cls.__name__.lower(), cls.choice_name()) for cls in Answer.supported_answers()])
-    })
+def get_qset_xform(interviewer, allocations, qset, ea_samples={}):
+    return render_to_string("odk/question_set.xml",
+                            {'interviewer': interviewer,
+                             'qset': qset,
+                             'stage': allocations[0].stage,
+                                'assignments': allocations,
+                                'non_response_reasons': settings.NON_RESPONSE_REASONS,
+                                'answer_types': dict([(
+                                    cls.__name__.lower(),
+                                    cls.choice_name())
+                                    for cls in Answer.supported_answers()]),
+                                'ea_samples': ea_samples,
+                             })
 
 
 @login_required
@@ -100,9 +77,9 @@ def get_on_response_xform(interviewer, survey):
 def download_submission_attachment(request, submission_id):
     odk_submission = ODKSubmission.objects.get(pk=submission_id)
     filename = '%s-%s-%s.zip' % (odk_submission.survey.name,
-                                 odk_submission.household_member.pk, odk_submission.interviewer.pk)
-    attachment_dir = os.path.join(
-        settings.SUBMISSION_UPLOAD_BASE, str(odk_submission.pk), 'attachments')
+                                 odk_submission.ea.name,
+                                 odk_submission.question_set.name)
+    attachment_dir = get_upload_dir(odk_submission)
     response = HttpResponse(content_type='application/zip')
     response['Content-Disposition'] = 'attachment; filename="%s"' % filename
     response.write(get_zipped_dir(attachment_dir))
@@ -113,44 +90,94 @@ def download_submission_attachment(request, submission_id):
 @permission_required('auth.can_view_aggregates')
 def submission_list(request):
     odk_submissions = ODKSubmission.objects.all().order_by('-created')
-    search_fields = ['interviewer__name', 'interviewer__ea__name', 'survey__name',
-                     'household_member__household__house_number', 'household_member__surname',
-                     'household_member__first_name', 'form_id', 'instance_id']
-    if request.GET.has_key('q'):
+    search_fields = [
+        'interviewer__name',
+        'interviewer__ea__name',
+        'survey__name',
+        'form_id',
+        'instance_id']
+    if 'q' in request.GET:
         odk_submissions = get_filterset(
             odk_submissions, request.GET['q'], search_fields)
-    return render(request, 'odk/submission_list.html', {'submissions': odk_submissions,
-                                                        'placeholder': 'interviewer, house, member, survey',
-                                                        'request': request})
+    return render(request,
+                  'odk/submission_list.html',
+                  {'submissions': odk_submissions,
+                   'placeholder': 'interviewer, house, member, survey',
+                   'request': request})
+
+
+@http_digest_interviewer_auth
+@require_GET
+def instances_form_list(request):
+    """ This is where ODK Collect gets its download list.
+    Get all ODK submissions for this EA and survey
+    """
+    interviewer = request.user
+    assignments = interviewer.unfinished_assignments
+    submissions = ODKSubmission.objects.filter(status=ODKSubmission.COMPLETED,
+                                               ea__in=[a.allocation_ea for a in assignments],
+                                               survey=assignments.first().survey)  # pick irrespective of status
+    # now exclude any question already being used as a sample sample
+    listing_interviews = ListingSample.objects.values_list(
+        'interview', flat=True)
+    submissions = submissions.exclude(interviews__in=listing_interviews)
+    content = render_to_string("odk/instances_xformsList.xml", {
+        'interviewer': interviewer,
+        'submissions': submissions,
+        'request': request,
+    })
+    response = BaseOpenRosaResponse(content)
+    response.status_code = 200
+    return response
+
+
+@http_digest_interviewer_auth
+def download_odk_submissions(request, submission_id):
+    interviewer = request.user
+    submission = get_object_or_404(ODKSubmission,
+        # check if the interviewer authorized for this submission EA!
+        pk=submission_id,
+        ea__in=[a.allocation_ea for a in interviewer.unfinished_assignments],
+    )
+    response = BaseOpenRosaResponse(submission.xml)
+    response.status_code = 200
+    return response
 
 
 @http_digest_interviewer_auth
 @require_GET
 def form_list(request):
-    """
-        This is where ODK Collect gets its download list.
+    """ This is where ODK Collect gets its download list.
     """
     interviewer = request.user
     #get_object_or_404(Interviewer, mobile_number=username, odk_token=token)
     # to do - Make fetching households more e
-    allocation = get_survey_allocation(interviewer)
-    if allocation and interviewer.ea.open_batches:
-        audit_log(Actions.USER_FORMLIST_REQUESTED, request.user, interviewer,
-                  _("survey allocation %s" % allocation.survey), {}, request)
-        survey = allocation.survey
-        survey_listing = SurveyHouseholdListing.get_or_create_survey_listing(
-            interviewer, survey)
+    assignments = get_survey_allocation(interviewer)
+    if assignments.count():
+        # now removed the condition for open batches
+        # this is done in favor of doing the computation later when needed.
+        # by design an interviewer is only
+        survey = assignments[0].survey
+        # assigned to perform same survey in different eas
+        audit_log(
+            Actions.USER_FORMLIST_REQUESTED, request.user, interviewer, _(
+                "survey allocation %s: %s" %
+                (interviewer, survey)), {}, request)
         audit = {}
-
-        audit_log(Actions.USER_FORMLIST_REQUESTED, request.user, interviewer,
-                  _("Requested forms list. for %s" % interviewer.name), audit, request)
+        audit_log(
+            Actions.USER_FORMLIST_REQUESTED, request.user, interviewer, _(
+                "Requested forms list. for alloc: %s:%s" %
+                (survey, interviewer)), audit, request)
+        open_batches = set()
+        for assignment in assignments:
+            open_batches.update(assignment.allocation_ea.open_batches(survey))
         content = render_to_string("odk/xformsList.xml", {
-            'allocation': allocation,
+            'assignments': assignments,
             'survey': survey,
             'interviewer': interviewer,
             'request': request,
-            'survey_listing': survey_listing,
-            'Const': SurveyAllocation
+            'Const': SurveyAllocation,
+            'open_batches': open_batches
         })
         response = BaseOpenRosaResponse(content)
         response.status_code = 200
@@ -160,66 +187,70 @@ def form_list(request):
 
 
 @http_digest_interviewer_auth
-def download_xform(request, survey_id):
+def download_xform(request, batch_id):
     interviewer = request.user
-    survey = get_object_or_404(Survey, pk=survey_id)
-    allocation = get_survey_allocation(interviewer)
-    if allocation:
-        try:
-            if survey.has_sampling and allocation.stage in [None, SurveyAllocation.LISTING]:
-                if allocation.stage is None:
-                    allocation.stage = SurveyAllocation.LISTING
-                    allocation.save()
-                survey_listing = SurveyHouseholdListing.get_or_create_survey_listing(
-                    interviewer, survey)
-                survey_xform = get_household_list_xform(
-                    interviewer, survey, survey_listing.listing)
-            else:
-                survey_xform = get_survey_xform(allocation)
-            form_id = '%s' % allocation.pk
-
-            audit = {
-                "xform": form_id
-            }
-            audit_log(Actions.FORM_XML_DOWNLOADED, request.user, interviewer,
-                      _("'%(interviewer)s' Downloaded XML for form '%(id_string)s'.") % {
-                          "interviewer": interviewer.name,
-                          "id_string": form_id
-                      }, audit, request)
-            response = response_with_mimetype_and_name('xml', 'survey-%s' % allocation.pk,
-                                                       show_date=False, full_mime='text/xml')
-            response.content = survey_xform
-            return response
-        except:
-            raise
-            print 'an error occurred'
-            pass
-    return OpenRosaResponseNotFound()
+    batch = get_object_or_404(Batch, pk=batch_id)
+    survey = batch.survey
+    ea_samples = {}
+    assignments = get_survey_allocation(interviewer)
+    if assignments and survey.has_sampling:
+        assignments.update(stage=SurveyAllocation.SURVEY)
+        for assignment in assignments:
+            if assignment.sample_size_reached(
+            ):            # only randomize eas that has reached sample size
+                ea = assignment.allocation_ea
+                listing_survey = survey.preferred_listing or survey
+                try:
+                    ListingSample.generate_random_samples(
+                        listing_survey, survey, ea)
+                except ListingSample.SamplesAlreadyGenerated:
+                    pass
+                ea_samples[ea.pk] = ListingSample.samples(survey, ea)
+    return _get_qset_response(
+        request,
+        interviewer,
+        assignments,
+        batch,
+        ea_samples=ea_samples)
 
 
 @http_digest_interviewer_auth
-def download_houselist_xform(request):
+def download_listing_xform(request):
     interviewer = request.user
-    allocation = get_survey_allocation(interviewer)
-    response = OpenRosaResponseNotFound()
-    if allocation:
-        survey = allocation.survey
-        survey_listing = SurveyHouseholdListing.get_or_create_survey_listing(
-            interviewer, survey)
-        householdlist_xform = get_household_list_xform(
-            interviewer, survey, survey_listing.listing)
-        form_id = 'allocation-%s' % allocation.id
+    assignments = get_survey_allocation(interviewer)
+    qset = assignments[0].survey.listing_form
+    response = OpenRosaResponseNotFound('No survey allocated')
+    return _get_qset_response(request, interviewer, assignments, qset)
+
+
+def _get_qset_response(request, interviewer, assignments, qset, ea_samples={}):
+    response = OpenRosaResponseNotFound('No survey allocated')
+    if assignments.count():
+        # all assignemnts are of same survey
+        survey = assignments[0].survey
+        download = ODKFileDownload.objects.create()
+        # record file downloads for all eas of this inviewer
+        map(
+            lambda assignment: download.assignments.add(assignment),
+            assignments)
+        qset_xform = get_qset_xform(
+            interviewer, assignments, qset, ea_samples=ea_samples)
+        form_id = 'allocation-%s-%s' % (survey.id, interviewer.id)
         audit = {
             "xform": form_id
         }
-        audit_log(Actions.FORM_XML_DOWNLOADED, request.user, interviewer,
-                  _("'%(interviewer)s' Downloaded XML for form '%(id_string)s'.") % {
-                      "interviewer": interviewer.name,
-                      "id_string": form_id
-                  }, audit, request)
-        response = response_with_mimetype_and_name('xml', 'household_listing-%s' % survey.pk,
+        audit_log(
+            Actions.FORM_XML_DOWNLOADED,
+            request.user,
+            interviewer,
+            _("'%(interviewer)s' Downloaded XML for form '%(id_string)s'.") % {
+                "interviewer": interviewer.name,
+                "id_string": form_id},
+            audit,
+            request)
+        response = response_with_mimetype_and_name('xml', '-'.join([qset.verbose_name(), str(survey.pk)]),
                                                    show_date=False, full_mime='text/xml')
-        response.content = householdlist_xform
+        response.content = qset_xform
     return response
 
 
@@ -237,10 +268,11 @@ def submission(request):
     try:
         xml_file_list = request.FILES.pop("xml_submission_file", [])
         if len(xml_file_list) != 1:
-            return OpenRosaResponseBadRequest(u"There should be a single XML submission file.")
-        media_files = request.FILES.values()
-        submission_report = process_submission(
-            interviewer, xml_file_list[0], media_files=media_files)
+            return OpenRosaResponseBadRequest(
+                u"There should be a single XML submission file.")
+        media_files = request.FILES
+        logger.info('submission from: %s-%s' % (interviewer.name, interviewer.id))
+        submission_report = process_submission(interviewer, xml_file_list[0], media_files=media_files)
         logger.info(submission_report)
         context = Context({
             'message': settings.ODK_SUBMISSION_SUCCESS_MSG,
@@ -251,37 +283,36 @@ def submission(request):
         })
         t = loader.get_template('odk/submission.xml')
         audit = {}
-        audit_log(Actions.SUBMISSION_CREATED, request.user, interviewer,
-                  _("'%(interviewer)s' Submitted XML for form '%(id_string)s'. Desc: '%(desc)s'") % {
-                      "interviewer": interviewer.name,
-                      "desc": submission_report.description,
-                      "id_string": submission_report.form_id
-                  }, audit, request)
+        audit_log(
+            Actions.SUBMISSION_CREATED,
+            request.user,
+            interviewer,
+            _("'%(interviewer)s' Submitted XML for form \
+                '%(id_string)s'. Desc: '%(desc)s'") % {
+                "interviewer": interviewer.name,
+                "desc": submission_report.description,
+                "id_string": submission_report.form_id},
+            audit,
+            request)
         response = BaseOpenRosaResponse(t.render(context))
         response.status_code = 201
         response['Location'] = request.build_absolute_uri(request.path)
+        logger.debug('sending: ')
         return response
-    except NotEnoughHouseholds:
-        desc = 'Not enough households'
+    except NotEnoughData:
+        desc = settings.ODK_UPLOADED_DATA_BELOW_SAMPLE_SIZE
         audit_log(Actions.SUBMISSION_REQUESTED, request.user, interviewer,
-                  _("Failed attempted to submit XML for form for interviewer: '%(interviewer)s'. desc: '%(desc)s'") % {
+                  _("Failed attempted to submit XML for form for interviewer: \
+                    '%(interviewer)s'. desc: '%(desc)s'") % {
                       "interviewer": interviewer.name,
                       "desc": desc
                   }, {'desc': desc}, request, logging.WARNING)
-        return OpenRosaRequestForbidden(u"Not Enough Households")
-    except HouseholdNumberAlreadyExists:
-        desc = 'House number already exists'
-        audit_log(Actions.SUBMISSION_REQUESTED, request.user, interviewer,
-                  _("Failed attempted to submit XML for form for interviewer: '%(interviewer)s'. desc: '%(desc)s'") % {
-                      "interviewer": interviewer.name,
-                      "desc": desc
-                  }, {'desc': desc}, request, logging.WARNING)
-        # return OpenRosaRequestConflict(u'Household Number Already exists')
-        return OpenRosaResponseNotAllowed(u'Household Number Already exists')
+        return OpenRosaRequestForbidden(desc)
     except Exception, ex:
         audit_log(Actions.SUBMISSION_REQUESTED, request.user, interviewer,
-                  _("Failed attempted to submit XML for form for interviewer: '%(interviewer)s'. desc: '%(desc)s'") % {
+                  _("Failed attempted to submit XML for form for interviewer:\
+                        '%(interviewer)s'. desc: '%(desc)s'") % {
                       "interviewer": interviewer.name,
                       "desc": str(ex)
                   }, {'desc': str(ex)}, request, logging.WARNING)
-        return OpenRosaServerError(u"An error occurred. Please try again")
+        return OpenRosaServerError(settings.ODK_ERROR_OCCURED)

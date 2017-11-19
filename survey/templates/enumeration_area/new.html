@@ -1,11 +1,14 @@
 {% extends "form.html" %}
 
 {% block title %}
- {% if enumeration_area_form.instance %}
+ {% if enumeration_area_form.name.value %}
  	Change Enumeration Area
  {% else %}
-  New Enumeration Area
+  Add Enumeration Area
  {% endif %}
+{% endblock %}
+{% block search %}
+{% include "locations_filter_form.html" with a_form=locations_filter no_button=True filter_id='loc_filter' no_auto_refresh=True %}
 {% endblock %}
 {% block pre_form_content %}
     <div class="control-group" style="width: 40%">
@@ -13,7 +16,18 @@
     </div>
 {% endblock%}
 {% block display_form_fields %}
-{% include "horizontal_naked_form.html" with a_form=locations_filter %}
+<style type="text/css">
+	.control-label{
+		margin-left: 20px !important;
+	}	
+#ea_name{
+	margin-left: 70px !important;
+}
+.ms-container{
+	margin-left: 100px !important;
+}
+</style>
+
 {% include "naked_form.html" with a_form=enumeration_area_form %}
 {% endblock %}
 
@@ -30,18 +44,16 @@
 	 	    		{% endfor %}
 	        }
 	        $.getJSON(url, params, function (data) {
-	        	$('#ms-ea-locations .ms-elem-selectable').hide();
-	            $('#ea-locations option').hide();
-	            $.each(data, function () {
-	                $('#ea-locations option[value='+this.id+']').show();
-	                $('#'+this.id+'-selectable').show();
-	            });
+	        	$('#ea-locations').empty();
+        		$(data).each(function () {
+					$("<option />", {
+						val: this.id,
+						text: this.name
+					}).appendTo($('#ea-locations'));
+				});
+				$('#ea-locations').multiSelect("destroy").multiSelect();
 	        });
 	    });
-
-
-
-
   	{% for location_type in location_filter_types %}
 	$('#id_{{ location_type }}').on('change', function () {
 	    	params = { 'parent_loc' : $('#id_{{ location_type }}').val(), 'type' : '{{ location_type.pk }}'};
@@ -54,8 +66,29 @@
 	            });
         		$(' .chzn-select').trigger("liszt:updated");
 	        });
-
 	    });
   	{% endfor %}
     </script>
+    <style type="text/css">
+    .form-inline .control-label { 
+     margin-top: 18px;
+}    	
+    	.controls > label {
+    		padding-bottom: 25px !important;
+    	}
+    	.ms-container {    
+    margin-top: -25px !important;
+    width: 100% !important;    
+}  
+.controls {
+    margin-bottom: 20px;
+    margin-top: -18px;
+}  	
+.form-horizontal .control-label{
+	width: 0px !important;
+    padding-right: 0px !important;  
+    text-align: none !important; 
+}
+
+    </style>
 {% endblock %}

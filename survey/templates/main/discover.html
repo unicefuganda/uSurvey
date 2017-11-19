@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% load repeatedblocks %}
+{% load template_tags %}
+
+{% block page_title %}Discover{%endblock%}
+
+{% block extra_slider %}
+{% include 'slideshow.html' %}
+{% endblock %}
+
+
+{% block extra_content %}
+
+<section class="commonSection " style="background-color: #ffffff; background-repeat: no-repeat; " > 
+    <div class="container">
+        <div class="fw-row usurvey-static-content" style="min-height: 400px;">
+            <div class="col-md-12">
+                <p>&nbsp;</p>
+                <h3>Discover</h3>
+                <div class="static-content">
+                    <br/><br/>
+                    <h4 class="text-center">Coming Soon</h4>
+                    <div style="min-height: 500px;">&nbsp;</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{%endblock%}
+
+{% block extra_css %}
+    <style type="text/css">
+        #cssmenu > ul > li .discover {
+        color: yellow;}
+     </style>
+{%endblock%}
+
+{% block extra_js %}
+
+{%endblock%}
+   </body>
+</html>

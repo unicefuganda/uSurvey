@@ -1,4 +1,3 @@
-from random import randint
 
 from lettuce import *
 from survey.features.page_objects.batches import BatchListPage, AddBatchPage
@@ -17,8 +16,16 @@ def and_i_have_100_surveys(step):
     world.survey = list()
     for i in xrange(100):
         try:
-            world.survey.append(Survey.objects.create(name='survey %d' % i, description='survey descrpition %d' % i,
-                                                      type=(True if i % 2 else False), sample_size=i))
+            world.survey.append(
+                Survey.objects.create(
+                    name='survey %d' %
+                    i,
+                    description='survey descrpition %d' %
+                    i,
+                    type=(
+                        True if i %
+                        2 else False),
+                    sample_size=i))
         except Exception:
             pass
 
@@ -72,7 +79,10 @@ def then_i_should_see_that_the_survey_was_saved_successfully(step):
 @step(u'And I have a survey')
 def and_i_have_a_survey(step):
     world.survey = Survey.objects.create(
-        name='survey name', description='survey descrpition', type=False, sample_size=10)
+        name='survey name',
+        description='survey descrpition',
+        type=False,
+        sample_size=10)
 
 
 @step(u'And I click on a survey name')

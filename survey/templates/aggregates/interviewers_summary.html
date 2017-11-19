@@ -3,17 +3,23 @@
 {% block title %}
   Interviewers List
 {% endblock %}
+{% block search %}
+ 
+{% include "horizontal_filter_form.html" with a_form=locations_filter no_button=True filter_id='locations_filter' %}
+<!-- <br /> -->
+{% endblock %}
 {% block content %}
 {% load pagination_tags %}
-{% autopaginate interviewers 50 %}
- <div class="filters">
-      {% include "horizontal_filter_form.html" with a_form=locations_filter no_button=True filter_id='locations_filter' %}
-  <br/>
-  </div>
- {% include "search_form.html" %}
-</div>
+{% include "search_form.html" %}
+{% autopaginate interviewers max_display_per_page %}
 
-    <table class="table table-striped table-bordered table-hover table-sort">
+</div>
+<style type="text/css">
+.search {
+    margin-top: 10px !important;
+}
+</style>
+    <table class="table dataTable table-striped table-bordered table-hover table-sort">
       <thead>
         <tr>
           <th>
@@ -22,12 +28,11 @@
           <th>
             Enumeration Area
           </th>
-          <!-- th>
-            Total Households in E.A.
-          </th -->
-
           <th>
-            Total Registered
+            Presently Assigned EA Interviews
+          </th>
+          <th>
+            Total Interviews
           </th>
         </tr>
       </thead>
@@ -40,12 +45,11 @@
             <td>
               {{ interviewer.ea.name }}
             </td>
-            <!-- td>
-              {{ interviewer.ea.total_households }}
-            </td -->
-
             <td>
-              {{ interviewer.present_households.count }}
+              {{ interviewer.present_interviews }}
+            </td>
+            <td>
+              {{ interviewer.interviews.count }}
             </td>
           </tr>
         {% endfor %}
@@ -53,9 +57,16 @@
     </table>
 
 {% paginate %}
+<div class="paginate_msg">Total {{ page_obj.paginator.count }} entries. </div>
 {% endblock %}
 
 {% block javascripts %}
   <script src="{{STATIC_URL}}/js/interviewer.js" type="text/javascript" charset="utf-8"></script>
   <script src="{{STATIC_URL}}/js/location-widget.js" type="text/javascript" charset="utf-8"></script>
+  <link rel="stylesheet" href="{{ STATIC_URL }}css/dataTables.bootstrap.css" type="text/css">
+<!-- <script type="text/javascript" src="https://code.jquery.com/jquery-1.12.4.js"></script> -->
+
+<script src="{{ STATIC_URL }}/js/jquery.dataTables.js"></script>
+<script src="{{ STATIC_URL }}/js/dataTables.bootstrap.js" type="text/javascript" charset="utf-8"></script>
+{% include 'max_display_per_page_form.html' %}
 {% endblock %}

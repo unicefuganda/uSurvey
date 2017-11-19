@@ -1,0 +1,370 @@
+{% extends "form.html" %}
+{% load template_tags %}
+{% block title %}
+{% if parent_question or heading %}
+{{ heading }}
+{% else %}
+{% if instance %}Edit{%else%} Add{%endif%} Question
+{% endif %}
+{% endblock %}
+{% block extra_head %}
+<link rel="stylesheet" href="{{ STATIC_URL }}css/awesomplete.css" />
+<script src="{{ STATIC_URL }}js/awesomplete.min.js" async></script>
+<link href="{{STATIC_URL}}css/select2.css" rel="stylesheet"/>
+<script src="{{STATIC_URL}}js/select2.full.js"></script>
+
+<style type="text/css">
+    .form-horizontal {
+        margin-top: 5px;
+    }
+    .form-horizontal .control-label-2 {
+        padding-top: 7px !important;
+        margin-bottom: 0;
+        text-align: right;
+    }
+    div.row {
+        background: none !important;
+    }
+</style>
+{% endblock %}
+{% block page_actions %}
+    <div>
+        {% if batch.survey and batch.survey.has_sampling %}
+            <a href="#view_listing" style="padding-left: 0px;padding-right: 3px;" class="btn btn-white btn-warning btn-bold" data-toggle="modal">
+                        &nbsp;&nbsp;<i class="fa fa-eye"></i>
+                         View Listing&nbsp;</a>
+        {% endif %}
+        {% if batch.parameter_list and batch.parameter_list.parameters %}
+            <a href="#view_group_parameters" style="padding-left: 0px;padding-right: 3px;" class="btn btn-white btn-warning btn-bold" data-toggle="modal">
+                        &nbsp;&nbsp;<i class="fa fa-eye"></i>
+                         View Group Parameters&nbsp;</a>
+        {% endif %}
+    </div>
+    {% if batch.survey and batch.survey.has_sampling %}
+        <div class="modal fade" id="view_listing" tabindex="-1" role="dialog"  aria-hidden="true" >
+            <div class="modal-dialog modal-dialog-1" >
+                <div class="modal-content modal-content-1" >
+                  <div class="modal-body" >
+                    {% include "set_questions/_qset_questions.html" with batch=batch.survey.listing_form questions=batch.survey.listing_form.questions_inline hide_actions=True %}
+                  </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+          </div><!-- /.modal -->
+    {% endif %}
+    {% if batch.parameter_list and batch.parameter_list.parameters %}
+        <div class="modal fade" id="view_group_parameters" tabindex="-1" role="dialog"  aria-hidden="true" >
+            <div class="modal-dialog modal-dialog-1" >
+                <div class="modal-content modal-content-1" >
+                  <div class="modal-body" >
+                    {% include "set_questions/_qset_questions.html" with batch=batch.parameter_list questions=batch.parameter_list.parameters hide_actions=True %}
+                  </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+          </div><!-- /.modal -->
+    {% endif %}
+{% endblock %}
+{% block pre_form_content %}
+{% if parent_question %}
+<h4> to question: {{parent_question.text}} </h4>
+{% endif %}
+{% if prev_question %}
+<h4 style="margin-bottom:10px!important;"> <span>Preceding question:</span> {{prev_question.text}} </h4>
+{% endif %}
+<p>Please note that the following special characters will be removed on USSD [* ! # ' ; &]</p>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-12" id="modal-info" />
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+
+            <form action="{% url 'json_create_response_validation' %}" method="post" accept-charset="utf-8" class="form-horizontal" id="validation_form">
+                {% csrf_token %}
+                <div class="modal fade" tabindex="-1" role="dialog" id="add_validation"  aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                          <div class="modal-header" style="background-color: #3498DB;border-top: 1px solid #70B6E5;border-bottom: 5px solid #2372A7;" >
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                            <h4 class="modal-title" style="color: #fff">Add/Edit Validation</h4>
+                          </div>
+                          <div class="modal-body">
+                            {% include "naked_form.html" with a_form=response_validation_form %}
+
+                            <div class="form-actions">
+                                <button id="button" type="submit" class="btn btn-primary submit" name="save_button" data-disabled-text="{{ loading_text }}"><i class="fa fa-save"></i> Save</button>
+                                <a href="#" class="btn btn-primary" name="cancel_button" class="cancel" style=" padding-right: 5px; padding-left: 5px; padding-bottom: 1px;" data-dismiss="modal"><i class="fa fa-close"></i> Dismiss</a>
+                            </div>
+                          </div>
+                        </div><!-- /.modal-content -->
+                    </div><!-- /.modal-dialog -->
+                  </div><!-- /.modal -->
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock%}
+{% block display_form_fields %}
+    <div class="questions container-fluid">
+        <div class="row">
+            <div class="col-md-6 question-form">
+                {% include "naked_form.html" with a_form=questionform %}
+                {% if options %}
+                <script type="text/template" id="question-option-template-instance">
+                  {% for option in options %}
+                   {% if option %}
+                   <div class="control-group options question-option">
+                        <label class="control-label col-md-4">Option <span class="number"> {{ option.order }}</span></label>
+                        <div class="controls">
+                            <input type="text" maxlength="100" name="options" value="{{ option.text }}">
+                            <a style="padding: 0px !important;" href="javascript:;" class="btn btn-white btn-warning btn-bold add-option"><i class="ace-icon fa fa-plus bigger-120 orange"></i></i></a>
+                            <a style="padding: 0px !important;" href="javascript:;" class="btn btn-white btn-warning btn-bold remove-option"><i class="ace-icon fa fa-minus bigger-120 orange"></i></i></a>
+
+                        </div>
+                    </div>
+                    {% endif %}
+                  {% endfor %}
+                  </script>
+                {% endif %}
+                {% include "_multiple_options.html" with option_label='Option' id="question-option-template" name='options'%}
+            </div>
+            <div class="col-md-6">
+                {% include "set_questions/help_text.html" with a_form=questionform %}
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block buttons %}
+<div class="form-actions">
+    <button id="button" type="submit" class="btn btn-primary submit" name="save_button" data-disabled-text="{{ loading_text }}"><i class="fa fa-save"></i> Save</button>
+    <button id="button" type="submit" class="btn btn-primary submit" name="add_more_button" data-disabled-text="{{ loading_text }}"><i class="fa fa-save"></i> Save and Add More</button>
+    <button id="button" type="submit" class="btn btn-primary submit" name="add_to_lib_button" data-disabled-text="{{ loading_text }}"><i class="fa fa-save"></i> Save and Update Library</button>
+    {% if cancel_url %}
+    <a href="{{ cancel_url }}" class="btn btn-primary" name="cancel_button" class="cancel" style=" padding-right: 5px; padding-left: 5px; padding-bottom: 1px;"><i class="fa fa-close"></i> Cancel</a>      
+    {% else %}
+    <a href="#" class="btn btn-primary" name="cancel_button" id="cancel_{{ id }}" class="cancel">Cancel</a>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script src="{{STATIC_URL}}js/textcounter.js"></script>
+<script type="text/javascript">
+
+     jQuery(function($){
+        $('#id_validation_test').change(function(){
+            resetParams();
+        });
+        $('#id_text').focus(function(){
+            $('.help-text').show();
+        });
+        $('#id_text').focusout(function(){
+            $('.help-text').hide();
+        });
+
+        $('#id_text').textcounter({
+            countContainerElement: 'span',
+            counterText: " %d/"+ $('#id_text').attr('maxlength'),
+            countSpaces: true
+        });
+        $('.help-text').hide();
+        function resetParams() {
+            $('#id_value-control-group').show();
+            $('#id_min-control-group').hide();
+            $('#id_max-control-group').hide();
+            if($('#id_validation_test').val().toUpperCase() == 'BETWEEN') {
+                $('#id_value-control-group').hide();
+                $('#id_min-control-group').show();
+                $('#id_max-control-group').show();
+           }
+        }
+        //post($('#validation_form').
+        resetParams();
+
+        $('#validation_form').submit(function(e) {
+               $.ajax({
+                    url : "{% url 'json_create_response_validation' %}", // the endpoint
+                    type : "POST", // http method
+                    data : $('#validation_form').serializeArray(), // data sent with the post request
+
+                    // handle a successful response
+                    success : function(json) {
+                        if(json.success) {
+                            $('#validation_form')[0].reset();
+                            $('#id_response_validation').append($('<option>', {value: json.created.id, text: json.created.text}));
+                            $('#id_response_validation').val(json.created.id);
+                            $('#add_validation').modal('hide');
+                        }
+                        else{
+                            $('#modal_info').html('<div class="alert alert-danger" role="alert">\
+                                                      <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>\
+                                                      <span class="sr-only">Error:</span>' +
+                                                        json.error +
+                                                    '</div>');
+                        }
+                    },
+
+                    // handle a non-successful response
+                    error : function(xhr,errmsg,err) {
+                        $('#modal_info').html('<div class="alert alert-danger" role="alert">\
+                                                      <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>\
+                                                      <span class="sr-only">Error:</span> \
+                                                      Error occurred while treating the request</div>'); // add the error to the dom
+                        console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
+                    }
+              });
+              e.preventDefault();
+        });
+
+        $('#id_answer_type').change(function(){
+            $('#id_response_validation').val('');
+            toggleResponseValidationField();
+        });
+        {% if options %}
+            $('#id_answer_type-control-group').after($('#question-option-template-instance').html());
+        {% endif %}
+        toggleResponseValidationField();
+        function toggleResponseValidationField() {
+            var validation_answer_types = [{% for answer_type in questionform.VALIDATION_ANSWER_TYPES %}'{{answer_type}}',{% endfor %}];
+            if(validation_answer_types.indexOf($('#id_answer_type').val()) > -1) {
+                $('#id_response_validation-control-group').show();
+            }
+            else
+                $('#id_response_validation-control-group').hide();
+
+            //Show only relevant response validations as per answer_type
+            $.ajax({
+                url: "{% url 'get_response_validations' %}",
+                data: {'answer_type': $('#id_answer_type').val()},
+                success: function(response_validation_ids) {
+                    $('#id_response_validation option').hide();
+                    $('#id_response_validation option').prop('disabled', true);
+                    $('#id_response_validation option[value=""]').show();
+                    $('#id_response_validation option[value=""]').prop('disabled', false);
+                    jQuery.each(response_validation_ids, function(i, id) {
+                       $('#id_response_validation option[value='+id+']').show();
+                       $('#id_response_validation option[value='+id+']').prop('disabled', false);
+                    });
+                    $('#id_response_validation').select2('destroy');        // have to recreate the select2
+                    change_to_select2( $('#id_response_validation'), ': ', true);
+                }
+            });
+            // show only valid validations in validation_test
+            $.ajax({
+                url: "{% url 'get_answer_validations' %}",
+                data: {'answer_type': $('#id_answer_type').val()},
+                success: function(validation_names) {
+                    $('#id_validation_test option').hide();
+                    $('#id_validation_test option').prop('disabled', true);
+                    $('#id_validation_test option[value=""]').show();
+                    $('#id_validation_test option[value=""]').prop('disabled', false);
+                    jQuery.each(validation_names, function(i, name) {
+                       $('#id_validation_test option[value='+name+']').show();
+                       $('#id_validation_test option[value='+name+']').prop('disabled', false);
+                    });
+                    $('#id_response_validation').select2('destroy');        // have to recreate the select2
+                    change_to_select2( $('#id_response_validation'), ': ', true);
+                }
+            });
+            if($('#id_answer_type').val().toLowerCase().indexOf('date') > -1)
+                $('.expected-response').datepicker(datePickerSettings);
+            else
+                $('.expected-response').datepicker('destroy');
+        }
+    });
+
+    </script>
+
+<style type="text/css">
+    .ussd-alert {
+        padding: 3px;
+    }
+    .ussd-alert span{
+        text-align: center;
+    }
+    #id_identifier{
+    width: 261px !important;
+    height: 25px !important;
+    }
+    #id_text{
+    width: 261px !important;
+    height: 125px !important;
+    margin-left: 4px !important;
+    }
+    .dataTables_wrapper select {    margin-bottom: 0 !important;    margin-left: 4px!important;    margin-right: 4px!important;    margin-top: 0px !important;    padding: 3px !important;    width: 261px!important;}
+    .form-actions {
+    background-color: #fff;
+    border-top: 1px solid #c3a0d9;
+    margin-bottom: 0px !important; 
+    margin-top: 0px !important; 
+    padding: 8px 20px 20px !important;
+    /* text-align: center; */
+    } 
+    .orange{
+    padding: 3px !important;
+    } 
+    #id_answer_type,#id_module,#id_group{
+    width: 261px !important; }
+    .dataTables_wrapper input[name='options']{width: 220px !important;height: 25px !important;margin-left: 6px !important;}
+    .controls .btn-warning{font-size: 12px !important;}
+</style>
+<!-- <div class="control-group">
+    <label class="control-label" for="text_counter"></label>
+    <div class="controls">
+        <span id="text-counter"></span>
+    </div>
+    </div> -->
+<style type="text/css">
+    .controls {
+    margin-bottom: 20px !important;
+    }
+    .control-group{
+        margin-top: 15px !important;
+    }
+    #id_access_channels{
+    display: inline-block;
+    vertical-align: middle;
+    }
+    #text-counter{
+    margin-left: 10px !important;
+    }
+    .ms-list{
+    margin-top: -14px !important;
+    }
+    .inline pos-rel > open {
+    display: none !important;
+    }
+</style>
+<script src="{{STATIC_URL}}js/type-auto-suggest.js" type="text/javascript" charset="utf-8"></script>
+<script src="{{STATIC_URL}}js/questions.js" type="text/javascript" charset="utf-8"></script>
+<script src="{{STATIC_URL}}js/question_options.js" type="text/javascript" charset="utf-8"></script>
+<script src="{{STATIC_URL}}js/logic.js" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript">
+   change_to_select2( $('#id_response_validation'), ': ', true);
+</script>
+<script type="text/javascript">
+    channel_map = {
+        {% for answer_type, channels in questionform.answer_map.items %}
+            '{{answer_type}}' : [{% for channel in channels %}'{{channel}}',{% endfor %}],
+        {% endfor %}
+    };
+    $(function(){
+        $('#id_text').on('keyup', function(){
+           if($('#id_text').val().length > {{USSD_MAX_CHARS}}) {
+                $('#ussd-max-chars').html('<p class="ussd-alert fa fa-warning"><span>Text is exceeded USSD character limit.\
+                     This may not show properly on USSD</span>\
+                       </p>');
+           }
+           else {
+                $('#ussd-max-chars').html('');
+           }
+           make_suggestions('#id_text', "{% url 'qset_identifiers' %}?id={{batch.pk}}{% if questionform.instance.id %}&q_id={{questionform.instance.id}}{% endif %}");
+           this.focus();
+        });
+        $('#id_answer_type').change(function(){
+            help_text = channel_map[$('#id_answer_type').val()].join(' and ');
+            $('#id_answer_type_tip').text(help_text);
+            //$( '.id_answer_type_tip[title]' ).qtip();
+        });
+    });
+</script>
+{% endblock %}

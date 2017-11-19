@@ -1,15 +1,63 @@
 <h3>
   {% block title %} {{ title }} {% endblock %}
 </h3>
+<style type="text/css">
+  #id_name{
+   /*margin-left: -2px !important;*/
+   width: 308px !important;
+  }
+  #id_sample_size{
+        height: 25px !important;
+        width: 60px !important;
+        margin-left: 5px !important;
+  }
+  #id_preferred_listing{
+    width: 308px !important;
+  }
+  #id_listing_form{ 
+ width: 308px !important; 
+  }
+  #id_email_group_chosen{
+   width: 308px !important; 
+  }
+  .dataTables_wrapper select {    margin-bottom: 0 !important;    margin-left: 4px!important;    margin-right: 4px!important;    margin-top: 0px !important;    padding: 3px !important;    width: 261px!important;}
+  .controls{
+    margin-bottom: 5px !important;
+  }  
+  .dataTables_wrapper #id_name, .dataTables_wrapper textarea {
+    width: 308px !important;
+}
+</style>
 <form action="{{ action }}" method="post" accept-charset="utf-8" id="{{ id }}" class="form-horizontal {{ class }}">
   {% csrf_token %}
   {% include "naked_form.html" with a_form=survey_form %}
   <div class="form-actions">
-    <button type="submit" class="btnforall" name="save_button"  data-disabled-text="{{ loading_text }}">{{ button_label }}</button>
+    <button type="submit" class="btn btn-primary submit btnforall" name="save_button"  data-disabled-text="{{ loading_text }}"><i class="fa fa-save"></i> {{ button_label }}</button>
         {% if cancel_url %}
-            <a href="{{cancel_url}}" class="btn btn-primary" name="cancel_button">Cancel</a>
+            <a href="{{cancel_url}}" class="btn btn-primary" name="cancel_button"><i class="fa fa-close"></i> Cancel</a>
         {% else %}
-            <button class="btnforall" data-dismiss="modal">Cancel</button>
+            <button class="btn btn-primary btnforall" data-dismiss="modal"><i class="fa fa-close"></i> Cancel</button>
         {% endif %}
   </div>
 </form>
+<script type="text/javascript">
+  $(document).ready(function(){
+        $("label[for='id_listing_form']").text("New Listing");
+        $("#id_listing_form").change(function() {
+          if($(this).val()){
+            $("#id_preferred_listing-control-group").hide();
+            $("#id_random_sample_label-control-group").show();
+          }
+          else{
+            $("#id_preferred_listing-control-group").show();
+            $("#id_random_sample_label-control-group").hide();
+            }
+        });
+
+        $("#id_listing_form option[value='']").text("--Select New Listing Form--");
+        $("select#id_listing_form").val("");
+        $("#id_preferred_listing option[value='']").text("--Select Preferred Listing Form--");
+
+        });
+    
+</script>

@@ -1,0 +1,179 @@
+<h4>
+  Indicator Variables
+</h4>
+
+    <div id="variable-form-body">
+        {% include "indicator/indicator_form.html"  with variable_form=variable_form %}
+    </div>
+{% block javascripts %}
+        <script type="text/javascript">
+            $(function(){
+                resetAll();
+                originalFormHTML = $('#variable-form-body').html();
+            });
+            function post_variable_form(){
+                    var postData = $('#variable-form').serializeArray();
+                    $.ajax({
+                        url : $('#variable-form').attr('action'),
+                        type: "POST",
+                        headers: {'X-CSRFToken': '{{ csrf_token }}'},
+                        data : postData,
+                        dataType : "html",
+                        success: function( data ){
+                            $('#variable-form-body').html(data);
+                            resetAll();
+                        }
+                    });
+             };
+             var originalFormHTML = "";
+             function resetFields() {
+                 if(!$('#id_value').val()) {
+                         $('#id_value-control-group').hide();
+                         $('#id_value').prop('disabled', true);
+                 }
+                 if(!$('#id_options').val()) {
+                     $('#id_options-control-group').hide();
+                     $('#id_options').prop('disabled', true);
+                 }
+                 if(!$('#id_min').val()){
+                     $('#id_min-control-group').hide();
+                     $('#id_min').prop('disabled', true);
+                 }
+                 if(!$('#id_max').val()){
+                     $('#id_max-control-group').hide();
+                     $('#id_max').prop('disabled', true);
+                 }
+             }
+             function resetChangeActions() {
+                $('#id_test_question').change(function(){
+                    var url = '{% url "question_options" %}' + '?ques_id='+ $("#id_test_question").val();
+                    $.getJSON(url, function (data) {
+                        $.each(data, function(key, value) {
+                          $('#id_options').append($("<option></option>")
+                             .attr("value", key).text(value));
+                        });
+                    });
+                    url = '{% url "question_validators" %}' + '?ques_id='+ $("#id_test_question").val();
+                    $.getJSON(url, function (data) {
+                        $('#id_validation_test option:gt(0)').remove();
+                        $.each(data, function(key, value) {
+                          $('#id_validation_test').append($("<option></option>")
+                             .attr("value", value).text(value));
+                        });
+                    });
+                });
+
+                $('#id_validation_test').change(function(){
+                    switch($(this).val()) {
+                        case('between'):
+                             $('#id_options-control-group').hide();
+                            $('#id_options').prop('disabled', true);
+                            $('#id_value-control-group').hide();
+                            $('#id_value').prop('disabled', true);
+                             $('#id_min-control-group').show();
+                             $('#id_min').prop('disabled', false);
+                             $('#id_max-control-group').show();
+                             $('#id_max').prop('disabled', false);
+                            break;
+                        case('equals'):
+                            if($('#id_options option').length > 0){
+                                $('#id_options-control-group').show();
+                                $('#id_options').prop('disabled', false);
+                                $('#id_value-control-group').hide();
+                                $('#id_value').prop('disabled', true);
+                                 $('#id_min-control-group').hide();
+                                 $('#id_min').prop('disabled', true);
+                                 $('#id_max-control-group').hide();
+                                 $('#id_max').prop('disabled', true);
+                                break;
+                            }
+                        default:
+                            $('#id_options-control-group').hide();
+                            $('#id_options').prop('disabled', true);
+                            $('#id_value-control-group').show();
+                            $('#id_value').prop('disabled', false);
+                             $('#id_min-control-group').hide();
+                             $('#id_min').prop('disabled', true);
+                             $('#id_max-control-group').hide();
+                             $('#id_max').prop('disabled', true);
+                    }
+                });
+
+             }
+            function resetDeleteModal() {
+                $('.delete-modal').click(function(){
+                    $.ajax({
+                        url : $(this).attr('href'),
+                        type: "GET",
+                        dataType : "html",
+                        success: function( data ){
+                            $('#variable-form-body').html(data);
+                            $('#var-button').click(post_variable_form);
+                            resetAll();
+                        }
+                    });
+                    return false;
+                });
+            }
+            function resetClear() {
+                $('#clear_variable_button').show();
+                $('.clear-button').click(function(){
+                    $.ajax({
+                        url : $(this).attr('href'),
+                        type: "GET",
+                        dataType : "html",
+                        success: function( data ){
+                            $('#variable-form-body').html(data);
+                            $('#var-button').click(post_variable_form);
+                            resetAll();
+                        }
+                    });
+                    return false;
+                });
+            }
+             function resetDone() {
+
+                //if done, check if variable was created and assign it to this variable list
+                $('.done').click(function(){
+                    if($('#var-id') && $('#id_variables [value="'+$('#var-id').attr('value')+'"]').length == 0) {
+                        $('#id_variables').append($('<option>', {value:$('#var-id').attr('value'),
+                                                            text: $('#var-id').attr('name'),
+                                                            selected: 'selected'}));
+                     }
+                    if($('#var-id') && $('#id_variables [value="'+$('#var-id').attr('value')+'"]').length > 0){
+                        $('#id_variables option[value="'+$('#var-id').attr('value')+'"]').prop('text', $('#var-id').attr('name'));
+                    }
+                    $('#variable-form-body').html(originalFormHTML);
+                    resetAll();
+                    return true;
+                });
+             }
+             function resetVariablesButton() {
+                if($('#id_variables :selected').length > 0) {
+                    $('#edit_variable').show();
+                    $('#delete_variable').show();
+                }
+                else {
+                    $('#edit_variable').hide();
+                    $('#delete_variable').hide();
+                }
+             }
+             function resetAll() {
+                    reload_test_questions();
+                    resetFields();
+                    resetChangeActions();
+                    resetDeleteModal();
+                    resetClear();
+                    resetDone();
+                    validate_formulae();
+                    $('#var-button').click(post_variable_form);
+                    resetVariablesButton();
+                    $('#id_variables').change(function() {
+                        resetVariablesButton();
+                    });
+                }
+
+
+        </script>
+{% endblock %}
+

@@ -4,16 +4,24 @@
 {% endblock %}
 {% block content %}
 {% load template_tags %}
-    <h3>Upload Location Weights</h3>
+<style type="text/css">
+    #id_file{
+        display: inline !important;
+    }
+    .controls{
+            margin-bottom: 0px !important;
+    }
+</style>
+    <h4>Upload Location Weights</h4>
     <form action="{{ action }}" enctype="multipart/form-data" method="post" accept-charset="utf-8" id="{{ id }}" class="form-horizontal {{ class }}">
         {% csrf_token %}
         {% include "naked_form.html" with a_form=upload_form %}
         <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapse_table">Input File Layout</a></div>
 
         <div class="form-actions">
-            <button type="submit" class="btnforall" name="save_button"
+            <button type="submit" class="btn btn-primary" name="save_button"
                     data-disabled-text="{{ loading_text }}">{{ button_label }}</button>
-            <a href="#" class="btnforall" name="cancel_button">Cancel</a>
+            <a href="#" class="btn btn-primary" name="cancel_button">Cancel</a>
             </ul>
 
         </div>

@@ -1,14 +1,15 @@
-div.dataTables_length label {
+/*div.dataTables_length label {
 	float: left;
 	text-align: left;
 }
 
 div.dataTables_length select {
 	width: 75px;
-}
+}*/
 
 div.dataTables_filter label {
 	float: right;
+	display: none;
 }
 
 div.dataTables_info {
@@ -35,7 +36,7 @@ table.table thead .sorting_desc_disabled {
 	*cursor: hand;
 }
 
-table.table thead .sorting { background: url('../images/sort_both.png') no-repeat center right; }
+/*table.table thead .sorting { background: url('../images/sort_both.png') no-repeat center right; }*/
 table.table thead .sorting_asc { background: url('../images/sort_asc.png') no-repeat center right; }
 table.table thead .sorting_desc { background: url('../images/sort_desc.png') no-repeat center right; }
 

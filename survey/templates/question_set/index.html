@@ -1,0 +1,248 @@
+{% extends "layout.html" %}
+{% block title %}
+  {% if model.verbose_name == 'Batch' %}
+        Batches
+  {% else %}
+  {{ model.verbose_name }}
+  {% endif %}
+{% endblock %}
+{% block extra_head %}
+<style type="text/css">
+.dataTables_wrapper .row {
+    margin: 0!important;
+    display: none !important;
+  }
+    .status {
+        width: 50px !important;
+    }
+#red_circle  {
+    /*background: #d12a09 none repeat scroll 0 0;
+    border-radius: 70px;
+    height: 10px;
+    margin-top: 5px;
+    width: 10px;*/
+    background: #a3a3a3 none repeat scroll 0 0;
+    border: 1px solid #000;
+    margin-top: 5px;
+    border-radius: 70px;
+    height: 10px;
+    width: 10px;
+    margin-left: 15px
+}
+#green_circle {
+    background: #009948 none repeat scroll 0 0;
+    border-radius: 70px;
+    height: 10px;
+    margin-top: 5px;
+    text-align: center;
+    width: 10px;
+    margin-left: 15px
+}
+#amber_circle {
+    background: #ffcc00 none repeat scroll 0 0;
+    border-radius: 70px;
+    height: 10px;
+    margin-top: 5px;
+    width: 10px;
+    margin-left: 15px
+}
+.dataTables_scrollBody{
+                          height: 330px !important;
+                        }
+
+</style>
+{% endblock %}
+{% block search %}
+
+{% endblock %}
+{% block page_actions %}
+<!-- Start LEGENDS -->
+<!-- <div style="margin-right: 200px">
+<span style="padding-left:25px; font-family:Open Sans; font-size:12px; color:gray;"><i class="fa fa-circle" aria-hidden="true"> Not Started</i></span>
+<span style="padding-left:8px; font-family:Open Sans; font-size:12px; color:green;"><i class="fa fa-circle" aria-hidden="true"> Ongoing</i></span>
+<span style="padding-left:8px; font-family:Open Sans; font-size:12px; color:#ff6600;"><i class="fa fa-circle" aria-hidden="true"> Completed</i></span>
+</div> -->
+<!-- End LEGENDS -->  
+    <!-- <button class="btn btn-white btn-warning btn-bold" data-toggle="modal" data-target="#new_question_set"  id="add_question_set"> -->
+    <a class="btn btn-white btn-warning btn-bold" 
+    href="{% if model_name == 'Batch' %}{% url 'new_batch_page' survey.id %}
+    {%elif model_name == 'ListingTemplate' %}
+    {% url 'new_listing_template_page' %}
+    {%endif%}"
+    >
+          <i class="ace-icon fa fa-plus bigger-120"></i>
+                        Create New {{ model.verbose_name }}
+                      </a>
+                      
+
+{% endblock %}
+{% block content %}
+{% load pagination_tags %}
+{% include "search_form.html" %}
+{% load template_tags %}
+{% autopaginate question_sets max_display_per_page %}
+
+ <!-- <br /> -->
+  <table id="datatables" class="table table-striped table-bordered table-hover dataTable no-footer" role="grid" aria-describedby="dynamic-table_info">
+    <thead>
+      <tr>
+        <th class="sorting">
+            Sts.
+        </th>
+        <th class="sorting">
+          Name
+        </th>
+        {% if model_name == 'ListingTemplate' %}
+        <th>Surveys</th>
+        {%endif%}
+        <th class="sorting">
+          Description
+        </th>
+        <th class="sorting">
+          Total Responses
+        </th>
+        <th>
+          Actions
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for question_set in question_sets %}
+        <tr>
+          <td>
+              {% if question_set.is_open %}<div id="green_circle" title="Ongoing"><span class="hide">S</span></div>{% elif question_set.interviews.count %}<div id="amber_circle" title="Completed"><span class="hide">C</span></div>{% else %}<div id="red_circle" title="Not Started"><span class="hide">N</span></div>{% endif %}
+          </td>
+          <td>
+             <a href="{% url 'qset_questions_page' question_set.id %}">{{ question_set.name }}</a>
+          </td>
+          {%if model_name == 'ListingTemplate'%}
+          <td>
+            {% if question_set.survey_list %}
+            <a style="color: #369 !important;
+    font-style: normal !important;
+    text-decoration: none !important;" href="#survey_{{question_set.pk}}" data-toggle="modal">View ({{question_set.survey_list|length}})</a>
+                    <div class="modal" id="survey_{{question_set.pk}}" tabindex="-1" role="dialog"  aria-hidden="true">
+              <div class="modal-dialog">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                      <h4 class="modal-title" style = "color:#fff;" >Assigned Surveys for {{question_set.name}}</h4>
+                    </div>
+                    <div class="modal-body">
+                      <table class="table">
+                          {% for each in  question_set.survey_list %}
+                            <tr>
+                              <td>{{each|title}}<td>
+                            </tr>
+                          {% endfor %}
+                        </table>
+                    </div>
+                  </div><!-- /.modal-content -->
+              </div><!-- /.modal-dialog -->
+          </div><!-- /.modal -->
+            {%else%}
+            N/A
+            {%endif%}
+          </td>
+          {%endif%}
+          <td>
+            {{ question_set.description }}
+          </td>
+          <td>
+              {{ question_set.interviews.count}}
+          </td>
+          <td>
+            <div class="">
+                <div class="inline pos-rel">
+                       <button class="btn btn-minier btn-yellow dropdown-toggle" data-toggle="dropdown" data-position="auto">
+                           <i class="usur-icon fa fa-caret-down icon-only bigger-120"></i>
+                       </button>
+                        <ul class="dropdown-menu dropdown-only-icon dropdown-yellow dropdown-menu-right dropdown-caret dropdown-close">
+                            <li>
+                                <a href='{% url "edit_"|add:model.resolve_tag|add:"_page" question_set.id %}' class="tooltip-info" data-rel="tooltip" title="" data-original-title="Edit"><span class="blue"><i class="usur-icon fa fa-pencil-square-o bigger-120"></i>Edit</span></a>
+                            </li>
+                            {% if not question_set.interviews.exists %}
+
+                            {% if model.verbose_name == 'Batch' %}
+                            <li><a href="{% url 'delete_qset' question_set.id survey.id %}" data-toggle="modal" class="tooltip-success" data-rel="tooltip" title=""><span class="red"><i class="usur-icon fa fa-trash bigger-120"></i>Delete</span></a></li>
+
+                     {% include "base/delete_modal.html" with object_name=question_set.name id=question_set.id name=question_set.verbose_name url=question_set.id|add_string:survey.id|get_url_with_ids:"delete_qset" %}
+                {% else %}
+
+                <li>
+                <a href="#delete_listing_{{question_set.id}}" class="tooltip-info" data-toggle="modal" data-rel="tooltip" title="" data-original-title="Delete"><span class="red"><i class="usur-icon fa fa-trash bigger-120"></i>Delete</span></a>
+                </li>
+
+                    
+
+                {% endif %}
+                {% endif %}
+                            <li>
+                                <a href="{% url 'qset_questions_page' question_set.pk %}" class="tooltip-info" data-rel="tooltip" title="" data-original-title="Edit"><span class="blue"><i class="usur-icon fa fa-question-circle bigger-120"></i>View/Edit Questions</span></a>
+                            </li>
+                            {% if question_set.interviews.count %}
+                                <li><a href="{% url 'view_data_home' question_set.pk %}" class="tooltip-error" data-rel="tooltip" title=""><span class="red"><i class="usur-icon fa fa-table bigger-120"></i>View Data</span></a></li>
+                            {% endif %}
+                            {% if question_set.verbose_name = 'Batch' and question_set.flow_questions %}
+                            <li><a href="{% url 'batch_show_page' question_set.survey.id question_set.pk %}" class="tooltip-error" data-rel="tooltip" title=""><span class="red"><i class="usur-icon a fa fa-folder-open-o/fa fa-times-circle bigger-120"></i>Open/Close</span></a></li>
+                            {% endif %}
+                            {% if model.verbose_name == 'Listing Form' %}
+                            <li>
+                                
+
+                                <!--<a href="{% url 'clone_qset_page' question_set.id %}" class="tooltip-info" data-rel="tooltip" title="" data-original-title="Clone"><span class="blue"><i class="usur-icon fa fa-clone bigger-120"></i>Clone</span></a>-->
+                                <a href="#clone_listing_form_{{question_set.id}}" data-toggle="modal" class="tooltip-info" data-rel="tooltip" title="" data-original-title="Clone"><span class="blue"><i class="usur-icon fa fa-clone bigger-120"></i>Clone</span></a>                           
+
+
+                            </li>
+                            {% endif %}
+                        </ul>
+                </div>
+            </div>
+            {% include "base/delete_modal.html" with object_name=question_set.name id=question_set.id name="Listing" url=question_set.id|get_url_with_ids:"delete_qset_listingform" %}
+          {% include "base/clone_modal.html" with object_name=question_set.name id=question_set.pk name="listing_form" url=question_set.id|get_url_with_ids:"clone_qset_page" %}
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+    <div class="modal fade" id="new_question_set" tabindex="-1" role="dialog"  aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" style="color: #fff;">New {{ model.verbose_name.capitalize }}</h4>
+              </div>
+              <div class="modal-body">
+                {% if model.verbose_name == 'Batch' %}
+                    {% include "question_set/inline_new.html" with title="" model=model action=survey.id|get_url_with_ids:"new_batch_page"  button_label="Save"%}
+                {% else %}
+                    {% include "question_set/inline_new.html" with title="" model=model action="new_"|add:model.resolve_tag|add:"_page"|get_url_without_ids  button_label="Save"%}
+                {% endif %}
+              </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+  {% paginate %}
+  <div class="paginate_msg">Total {{ page_obj.paginator.count }} entries. </div>
+{% endblock %}
+
+
+{% block javascripts %}
+<link rel="stylesheet" href="{{ STATIC_URL }}css/dataTables.bootstrap.css" type="text/css">
+<script type="text/javascript" src="https://code.jquery.com/jquery-1.12.4.js"></script>
+
+<script src="{{ STATIC_URL }}/js/jquery.dataTables.js"></script>
+<script src="{{ STATIC_URL }}/js/dataTables.bootstrap.js" type="text/javascript" charset="utf-8"></script>
+
+    <script src="{{STATIC_URL}}js/questions.js" type="text/javascript" charset="utf-8"></script>
+    <script src="{{STATIC_URL}}js/jquery.validate.js" type="text/javascript" charset="utf-8"></script>
+  
+{% include 'max_display_per_page_form.html' %}
+<style type="text/css">
+  
+  .dataTables_wrapper #id_name {
+    width: 261px !important;
+}
+</style>
+{% endblock %}

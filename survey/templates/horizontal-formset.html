@@ -1,11 +1,36 @@
 {% load template_tags %}
+<style type="text/css">
+/*	.dataTables_wrapper input[type="search"], .dataTables_wrapper input[type="text"], .dataTables_wrapper select {
+    margin-bottom: 0 !important;
+    margin-left: 0px !important;
+    padding: 4px !important;
+    margin-right: 4px !important;
+    width: 220px !important;
+}*/
+#id_gender >li{
+        float: left !important;
+        margin-left: 15px !important;
+    }
 
+    #id_gender >li:first-child{
+        float: left !important;
+        margin-left: 0px !important;
+    }
+    #id_country_code{width: 40px !important;
+   height: 25px !important;
+margin-left: 0px !important;
+text-align: center;
+margin-top: 5px;
+ }
+
+</style>
 <fieldset>
                 <legend>{{ legend }}</legend>
                 {{ formset.management_form }}
                 {{ formset.non_form_errors }}
-				<table class="inline">
+				<table style="width: 100%" class="inline table-responsive">
 				<thead>
+				<tr>
 					{% for form in formset %}
 						{% if forloop.first %}
 							{% for field in form.visible_fields %}
@@ -13,6 +38,7 @@
 							{% endfor %}
 						{% endif %}
 					{% endfor %}
+					</tr>
 				</thead>
                 {% for form in formset %}
 
@@ -22,7 +48,9 @@
 							<td class="horizontal-formset">
 								  {% if field.label_tag|is_mobile_number %}
 								   <div class="ccode">
-									   <span class="add-on">{{ country_phone_code }}</span>
+<span class="add-on"><input type="text" readonly="readonly" value="{{ country_phone_code }}" size="3" id="id_country_code" placeholder="256"></span>
+            <span>{{form.mobile_number}}</span>
+									   <!-- <span class="add-on">{{ country_phone_code }}</span> -->
 								  {% endif %}
 									{{field}}
 								  {% if field.label_tag|is_mobile_number %}
@@ -32,6 +60,7 @@
 					{% endfor %}
 						</tr>
 						<tr class="error">
+						<td>
 							{% for field in form.visible_fields %}
 								{% if field.errors %}
 									<label class="error">
@@ -46,6 +75,7 @@
 					  {{ hidden }}
 					{% endfor %}
 					</div>
+					</td>
 						</tr>
                 {% endfor %}
 				</tbody>

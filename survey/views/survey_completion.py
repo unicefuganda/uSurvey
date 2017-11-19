@@ -1,17 +1,18 @@
 import json
 import ast
 from django.contrib import messages
+from django.utils.datastructures import SortedDict
 from django.contrib.auth.decorators import login_required, permission_required
 from django.core.serializers.json import DjangoJSONEncoder
 from django.http import HttpResponse
 from django.shortcuts import render, get_object_or_404
-from survey.models import Location, LocationType
+from django.db.models import Count
+from survey.models import Location, LocationType, Indicator,\
+    Answer, QuestionOption
 from survey.forms.enumeration_area import LocationsFilterForm as LocFilterForm
 from survey.forms.filters import LocationFilterForm
-from survey.models import Survey, Interviewer, SurveyAllocation, Household, Batch, EnumerationArea
-from survey.services.completion_rates_calculator import BatchLocationCompletionRates, \
-    BatchHighLevelLocationsCompletionRates, BatchSurveyCompletionRates
-from survey.views.location_widget import LocationWidget
+from survey.models import Survey, Interviewer, SurveyAllocation,\
+    Batch, EnumerationArea, Interview
 from survey.utils.views_helper import contains_key, is_not_digit_nor_empty
 from survey.utils.query_helper import get_filterset
 from django.core.urlresolvers import reverse
@@ -30,106 +31,44 @@ def is_valid(params):
     return True
 
 
-@login_required
-@permission_required('auth.can_view_aggregates')
-def survey_completion_summary(request, household_id, batch_id):
-    household = get_object_or_404(Household, pk=household_id)
-    batch = get_object_or_404(Batch, pk=batch_id)
-    survey = batch.survey
-    ea = household.listing.ea
-    allocations = SurveyAllocation.objects.filter(
-        allocation_ea=ea, survey=batch.survey)
-    context = {}
-    if allocations.exists():
-        completion_rates = BatchLocationCompletionRates(
-            batch, ea=ea, specific_households=[household_id, ])
-        result_service = ResultsDownloadService(
-            batch=batch, specific_households=[household_id, ])
-        reports = result_service.generate_interview_reports()
-        reports_headers = reports.pop(0)
-        context.update({
-            'household': household,
-            'batch': batch,
-            'reports_headers': reports_headers,
-            'reports': reports,
-            'completion_rates': completion_rates,
-            'interviewer': allocations[0].interviewer
-        })
-    request.breadcrumbs([
-        ('Completion Rates', reverse('survey_completion_rates', )),
-        ('EA Completion', reverse('ea_completion_summary', args=(ea.pk, batch.pk))),
-    ])
-    return render(request, 'aggregates/household_completion_report.html', context)
-
-
-@login_required
-@permission_required('auth.can_view_aggregates')
-def ea_completion_summary(request, ea_id, batch_id):
-    ea = get_object_or_404(EnumerationArea, pk=ea_id)
-    batch = get_object_or_404(Batch, pk=batch_id)
-    return render_household_details(request, ea.locations.all()[0], batch, ea.pk)
-
-
-@login_required
-@permission_required('auth.can_view_aggregates')
-def location_completion_summary(request, location_id, batch_id):
-    location = get_object_or_404(Location, pk=location_id)
-    batch = get_object_or_404(Batch, pk=batch_id)
-    return render_household_details(request, location, batch)
-
-
-def render_household_details(request, location, batch, ea=None):
-    context = {'batch': batch}
-    request.breadcrumbs([
-        ('Completion Rates', reverse('survey_completion_rates', )),
-    ])
-    if ea:
-        ea = get_object_or_404(EnumerationArea, pk=ea)
-        context['selected_ea'] = ea
-        allocations = SurveyAllocation.objects.filter(
-            allocation_ea=ea, survey=batch.survey)
-        if allocations.exists():
-            context['interviewer'] = allocations[0].interviewer
-        location = ea.locations.all()[0]
-    completion_rates = BatchLocationCompletionRates(
-        batch, location=location, ea=ea)
-    context.update(
-        {'completion_rates': completion_rates, 'location': location})
-    return render(request, 'aggregates/household_completion_status.html', context)
-
-
 def __get_parent_level_locations():
     return Location.objects.filter(type=LocationType.largest_unit())
 
 
 @login_required
 @permission_required('auth.can_view_aggregates')
-def show(request):
-    selected_location = None
-    location_filter_form = LocationFilterForm()
-    content = {'action': 'survey_completion_rates',
-               'request': request}
-    locations_filter = LocFilterForm(data=request.POST, include_ea=True)
-    if request.method == 'POST':
-        location_filter_form = LocationFilterForm(request.POST)
-        if location_filter_form.is_valid():
-            batch = location_filter_form.cleaned_data.get('batch', None)
-            content['selected_batch'] = batch
-            selected_location = locations_filter.last_location_selected
-            selected_ea = request.POST.get('enumeration_area', None)
-            if selected_ea:
-                return render_household_details(request, selected_location, batch, selected_ea)
-            if selected_location:
-                high_level_locations = selected_location.get_children().order_by('name')
-                content['selection_location_type'] = LocationType.objects.get(
-                    parent=selected_location.type)
-            else:
-                high_level_locations = __get_parent_level_locations()
-            content['completion_rates'] = BatchHighLevelLocationsCompletionRates(
-                batch, high_level_locations)
-    content['locations_filter'] = locations_filter
-    content['filter'] = location_filter_form
-    return render(request, 'aggregates/completion_status.html', content)
+def indicators_json(request):
+    in_kwargs = {'display_on_dashboard': True}
+    report_level = None
+    if request.GET.get('survey'):
+        in_kwargs['survey__id'] = request.GET['survey']
+    if request.GET.get('report_level'):
+        report_level = int(request.GET['report_level'])
+    indicators = Indicator.objects.filter(**in_kwargs).order_by('name')
+
+    @cached_as(indicators, extra=(report_level, ))
+    def get_result_json():
+        """Basically fetch all indicators as per the map level info
+        :return:
+        """
+        indicator_details = {}
+        country = Location.country()
+        if hasattr(settings, 'MAP_ADMIN_LEVEL'):
+            location_type = country.get_descendants()[settings.MAP_ADMIN_LEVEL - 1]
+        else:
+            location_type = LocationType.largest_unit()
+        if report_level is None:
+            lreport_level = location_type.level
+        else:
+            lreport_level = report_level
+        for indicator in indicators:
+            indicator_df = indicator.get_data(country, report_level=lreport_level).fillna(0)
+            indicator_df.index = indicator_df.index.str.upper()
+            indicator_details[indicator.name] = indicator_df.transpose(
+            ).to_dict()
+        return json.dumps(indicator_details, cls=DjangoJSONEncoder)
+    json_dump = get_result_json()
+    return HttpResponse(json_dump, content_type='application/json')
 
 
 @login_required
@@ -137,28 +76,103 @@ def show(request):
 def completion_json(request, survey_id):
     @cached_as(Survey.objects.filter(id=survey_id))
     def get_result_json():
-        # print "Getting data from DB"
-        survey = Survey.objects.get(id=survey_id)
-        location_type = LocationType.largest_unit()
-        completion_rates = BatchSurveyCompletionRates(
-            location_type).get_completion_formatted_for_json(survey)
+        """Basically if survey is sampled and we are\
+            now in batch collection phase, display percentage completion.
+        For listing or census data collection, just show count
+        :return:
+        """
+        survey = get_object_or_404(Survey, pk=survey_id)
+        country_type = LocationType.objects.get(parent__isnull=True)
+        hierachy_count = country_type.get_descendant_count()
+        if hasattr(settings, 'MAP_ADMIN_LEVEL'):
+            location_type = country_type.get_descendants()[settings.MAP_ADMIN_LEVEL - 1]
+        else:
+            location_type = LocationType.largest_unit()
+        divider = 1.0
+        completion_rates = {}
+        has_sampling = survey.has_sampling
+        is_open = survey.is_open()
+        parent_loc = 'locations'
+        for i in range(hierachy_count - location_type.level):    # fetches direct descendants from ea__locations
+            parent_loc = '%s__parent' % parent_loc
+        total_interviews = dict(Interview.objects.filter(**{'survey': survey
+                                                            }).values_list('ea__%s__name' % parent_loc
+                                                                           ).annotate(total=Count('id', distinct=True)))
+        total_eas = dict(EnumerationArea.objects.all().values_list('%s__name' % parent_loc
+                                                                   ).annotate(total=Count('id', distinct=True)))
+        active_eas = dict(Interview.objects.filter(**{'survey': survey,
+                                                      }).values_list('ea__%s__name' % parent_loc
+                                                           ).annotate(total=Count('ea', distinct=True)))
+        # basically get interviews count
+        for location in location_type.locations.all():
+            type_total_eas = total_eas.get(location.name, 0)
+            type_total_interviews = total_interviews.get(location.name, 0)
+            type_active_eas = active_eas.get(location.name, 0)
+            indicator_value = float(type_total_interviews) / type_total_eas
+            completion_rates[location.name.upper()] = {
+                'value': '{0:.2f}'.format(indicator_value),
+                'total_eas': type_total_eas,
+                'active_eas': type_active_eas,
+                'is_open': survey.is_open_for(location),
+                'per_active_ea': '{0:.2f}'.format(float(type_total_interviews)/(type_active_eas or 1.0)),
+                'total_interviews': type_total_interviews,
+            }
         return json.dumps(completion_rates, cls=DjangoJSONEncoder)
     json_dump = get_result_json()
     return HttpResponse(json_dump, content_type='application/json')
 
 
 @login_required
-@permission_required('survey.view_completed_survey')
+@permission_required('auth.can_view_aggregates')
+def json_summary(request):
+    request_data = request.GET if request.method == 'GET' else request.POST
+    survey_id = request_data['survey']
+    return completion_json(request, survey_id)
+
+
+# @login_required
+# @permission_required('auth.can_view_aggregates')
+# def survey_parameters(request):
+#     indicator = get_object_or_404(Indicator, pk=request.GET['indicator'])
+#     parameters = []
+#     try:
+#         map(lambda opt: parameters.append(
+#         {'id': opt.id, 'name': opt.text}), indicator.parameter.options.all())
+#     except Exception as e:
+#         pass
+#     return HttpResponse(json.dumps(parameters),
+#                         content_type='application/json')
+
+
+@login_required
+@permission_required('auth.can_view_aggregates')
+def survey_indicators(request):
+    survey = get_object_or_404(Survey, pk=request.GET['survey'])
+    indicators = []    
+    indicators_list = Indicator.objects.filter(survey=survey)
+    map(lambda indicator: indicators.append(
+                {
+                    'id': indicator.id,
+                    'name': indicator.name
+                }),
+                indicators_list
+                )
+    return HttpResponse(json.dumps(indicators),
+                        content_type='application/json')
+
+
+@login_required
+@permission_required('auth.view_completed_survey')
 def show_interviewer_completion_summary(request):
     params = request.GET
     selected_location = None
     selected_ea = None
     interviewers = Interviewer.objects.order_by('id')
     search_fields = ['name', 'ea__name']
-    if request.GET.has_key('q'):
+    if 'q' in request.GET:
         interviewers = get_filterset(
             interviewers, request.GET['q'], search_fields)
-    if params.has_key('status'):
+    if 'status' in params:
         interviewers = interviewers.intervieweraccess.filter(
             is_active=ast.literal_eval(params['status']))
     locations_filter = LocFilterForm(data=request.GET, include_ea=True)

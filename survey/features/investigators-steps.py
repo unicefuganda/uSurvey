@@ -29,8 +29,13 @@ def create_reseacher():
     researcher = Group.objects.create(name='researcher1')
     user = User.objects.create_user('Rajni', 'rajni@kant.com', 'I_Rock')
     researcher.user_set.add(user)
-    set_permissions(researcher, ['can_view_aggregates', 'can_view_households', 'can_view_batches',
-                                 'can_view_investigators', 'can_view_locations', 'can_view_household_groups'])
+    set_permissions(researcher,
+                    ['can_view_aggregates',
+                     'can_view_households',
+                     'can_view_batches',
+                     'can_view_investigators',
+                     'can_view_locations',
+                     'can_view_household_groups'])
 
     return user
 
@@ -76,7 +81,9 @@ def and_i_have_locations(step):
     world.kampala_village = Location.objects.create(
         name="Village", type=world.village, tree_parent=world.kampala_parish)
     world.kampala_county_village = Location.objects.create(
-        name="Kampala County Village", type=world.village, tree_parent=world.kampala_parish)
+        name="Kampala County Village",
+        type=world.village,
+        tree_parent=world.kampala_parish)
 
     world.ea = EnumerationArea.objects.create(name="EA")
     world.ea.locations.add(world.kampala_village)
@@ -120,8 +127,14 @@ def given_i_have_100_investigators(step):
     for _ in xrange(100):
         random_number = str(randint(1, 99999))
         try:
-            Investigator.objects.create(name="Investigator " + random_number, mobile_number=random_number,
-                                        age=12, level_of_education="Nursery", language="Luganda", location=uganda)
+            Investigator.objects.create(
+                name="Investigator " +
+                random_number,
+                mobile_number=random_number,
+                age=12,
+                level_of_education="Nursery",
+                language="Luganda",
+                location=uganda)
         except Exception:
             pass
 
@@ -176,7 +189,9 @@ def and_i_should_see_no_investigators_registered_message(step):
 def and_i_request_filter_list_for_another_county_with_no_investigator(step):
     county_type = LocationType.objects.get(name='County')
     new_county = Location.objects.create(
-        name="some county", type=county_type, tree_parent=world.kampala_district)
+        name="some county",
+        type=county_type,
+        tree_parent=world.kampala_district)
     Investigator.objects.filter(ea__locations=new_county).delete()
     world.page = FilteredInvestigatorsListPage(world.browser, new_county.id)
     world.page.visit()
@@ -204,7 +219,12 @@ def and_i_have_an_investigator(step):
     world.ea.locations.add(kampala)
 
     world.investigator = Investigator.objects.create(
-        name="Rajni", mobile_number="123456789", age=25, level_of_education="Nursery", language="Luganda", ea=world.ea)
+        name="Rajni",
+        mobile_number="123456789",
+        age=25,
+        level_of_education="Nursery",
+        language="Luganda",
+        ea=world.ea)
 
 
 @step(u'And I visit investigators page')

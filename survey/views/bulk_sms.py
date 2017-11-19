@@ -6,7 +6,6 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.core.urlresolvers import reverse
 from django.contrib import messages
 
-from survey.interviewer_configs import *
 from survey.models.interviewer import Interviewer
 
 
@@ -32,7 +31,7 @@ def send(request):
 
 
 def valid_parameters(params, request):
-    if not params.has_key('locations'):
+    if 'locations' not in params:
         messages.error(request, "Please select a location.")
         return False
     if len(params['text'][0]) < 1:

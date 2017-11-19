@@ -1,0 +1,115 @@
+{% load repeatedblocks %}
+{% load template_tags %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="icon" type="image/png" href="{{ STATIC_URL }}images/favicon.png">
+        <title>uSurvey | {% block page_title %}{{ PROJECT_TITLE }}{% endblock %}</title>
+        <link rel="stylesheet" href="{{ STATIC_URL }}toassets/contentsty.css">
+        <link rel="stylesheet" href="{{ STATIC_URL }}toassets/conshortcodes.css">
+        <link id="theme_css" rel="stylesheet" href="{{ STATIC_URL }}toassets/light.css">
+        <link id="skin_css" rel="stylesheet" href="{{ STATIC_URL }}toassets/contentdefault.css">
+        <link rel="stylesheet" href="{{ STATIC_URL }}toassets/assets.css">
+        <link rel="stylesheet" href="{{ STATIC_URL }}toassets/menstyle.css">
+        <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}banassets/banstyle.css">
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css?family=Dosis" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css?family=Baloo+Bhaina" rel="stylesheet"> 
+        <link rel="stylesheet" href="{{ STATIC_URL }}toassets/bootstrap.css" type="text/css" media="all">
+        <link rel="stylesheet" href="{{ STATIC_URL }}toassets/animate.css" type="text/css" media="all">
+        <link rel="stylesheet" href="{{ STATIC_URL }}toassets/preset.css" type="text/css" media="all">
+        <link rel="stylesheet" href="{{ STATIC_URL }}toassets/style_002.css" type="text/css" media="all">
+        <link rel="stylesheet" href="{{ STATIC_URL }}toassets/responsive.css" type="text/css" media="all">
+        <link rel="stylesheet" href="{{ STATIC_URL }}toassets/font-awesome.css" type="text/css" media="all">
+        <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+        <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+        <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+        <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+        <![endif]-->
+
+        <style type="text/css">
+            .headerFix {
+            background: #0099ff; 
+            border-bottom:6px solid #0073bf;
+            }
+            .container-fluid {
+            padding-left:0px;
+            padding-right:0px;
+            }
+            .commonSection {    
+            padding: 0px 0 0px !important;} 
+             </style>
+             {% block extra_css %}
+
+            {% endblock %}
+    </head>
+    <body>
+        <header class="headerFix" name="slideshow">
+            <div class="logo pull-left">
+               <div class="logoImg">               
+                  <a href="/"><img src="{{ STATIC_URL }}toassets/Logo_Main.png" alt="uSurvey"></a>
+               </div>
+            </div>
+            <nav id='cssmenu'>
+                <div id="head-mobile"></div>
+                <div class="button"></div>
+                <ul>
+                    <li><a href="/" class="home"><i class="fa fa-home"></i> HOME</a></li>
+                    <li><a href="https://usurvey.readthedocs.io/" target="new" class="discover">DISCOVER</a></li>
+                    <li><a href="{% url 'home_success_story_list' %}" class="success-story">SUCCESS STORIES</a></li>
+                    <li><a href="{% url 'about_page' %}" class="about">ABOUT</a></li>
+                    {% if user.is_authenticated %}
+                    <li id="menu-item-181" class="ulogin menu-item menu-item-type-post_type menu-item-object-page menu-item-181 pull-right"><a href="{% url 'home_page' %}">SURVEY</a></li>
+                    {% else %}
+                    <li id="menu-item-181" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-181 pull-right" > <a class="login" href="{% url 'login_page' %}"><i class="fa fa-lock"></i> LOGIN</a></li>
+                    {% endif%}
+                </ul>
+            </nav>
+            <div class="clearfix"></div>
+        </header>
+
+        {% block extra_slider %}
+        {% endblock %}
+
+        
+        {% block extra_content %}
+        {% endblock %}
+
+       
+        <footer class="footerArea" >
+            <section class="copyRight" >
+                <div class="container">
+                    <div class="row">
+                        <div class="col-lg-12 col-sm-12 col-xs-12 text-center" >
+                            <p><img src="{{ STATIC_URL }}toassets/bottomfooter_logo.jpg"></p>
+                            <div class="copy_text" >Copyright © 2017 UNICEF and UBOS </div>
+                        </div>
+                        <!-- <div class="topSocial col-md-12 text-center">
+                            <ul>
+                                <li><a class="facebook" href="#"><i class="fa fa-facebook"></i></a></li>
+                                <li><a class="twitter" href="#"><i class="fa fa-twitter"></i></a></li>
+                                <li><a class="google" href="#"><i class="fa fa-linkedin"></i></a></li>
+                            </ul>
+                        </div> -->
+                    </div>
+                </div>
+            </section>    
+        </footer>
+
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+        <script type="text/javascript" src="{{ STATIC_URL }}toassets/menjs.js"></script>
+        <script type="text/javascript" src="{{ STATIC_URL }}toassets/theme.js"></script>
+        <script type="text/javascript" src="{{ STATIC_URL }}toassets/modernizr.js"></script>
+        
+        {% block extra_js %}
+
+        {% endblock %}
+
+   </body>
+</html>

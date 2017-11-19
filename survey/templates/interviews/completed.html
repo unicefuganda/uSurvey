@@ -1,0 +1,16 @@
+{% extends "interviews/answer.html" %}
+{% block plain_text_content %}
+Survey Completed.
+Enter any key to return to main.
+{% endblock %}
+{% block preview_title %}
+    <h2 class="page_title" style="line-height:20px; margin: 0;">Survey {{interview.question_set.name}} completed.</h2>
+{% endblock %}
+{% block contactform %}
+    <div class="form_row center">
+        <br /><br />
+        <a class="btn btn-white btn-warning btn-bold block" href="." style="margin: auto;">
+                    <i class="ace-icon fa fa-check bigger-120"></i>
+                     Done</a>
+    </div>
+{% endblock %}

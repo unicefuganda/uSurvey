@@ -45,7 +45,7 @@ $(function(){
           "age":{ number: "Please enter a valid number. No space or special charcters."},
           "mobile_number": {
               number: "Please enter a valid number. No space or special charcters.",
-              minlength:jQuery.format("Too few digits. Please enter {0} digits.")
+              minlength:jQuery.validator.format("Too few digits. Please enter {0} digits.")
           },
           "confirm_mobile_number":{number: "Please enter a valid number. No space or special charcters"}
       },
@@ -68,7 +68,7 @@ $(function(){
 
   if($("#create-investigator-form").is(':visible')){
       validations.rules.mobile_number.remote = '/investigators/check_mobile_number';
-      validations.messages.mobile_number.remote = jQuery.format("{0} is already registered.");
+      validations.messages.mobile_number.remote = jQuery.validator.format("{0} is already registered.");
   }
 
   $('.investigator-form').validate(validations);

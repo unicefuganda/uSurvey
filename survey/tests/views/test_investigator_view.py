@@ -1,5 +1,4 @@
 import json
-
 from django.test.client import Client
 from mock import *
 from django.template.defaultfilters import slugify
@@ -7,12 +6,10 @@ from survey.models.locations import *
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.conf import settings
-from survey.models import Backend, Household, LocationTypeDetails, EnumerationArea, Survey, ODKAccess, USSDAccess
+from survey.models import Backend, EnumerationArea, Survey, ODKAccess, USSDAccess
 from survey.models.interviewer import Interviewer
 from survey.tests.base_test import BaseTest
 from survey.forms.interviewer import InterviewerForm
-from survey.models.formula import *
-
 
 class InvestigatorsViewTest(BaseTest):
 
@@ -23,7 +20,6 @@ class InvestigatorsViewTest(BaseTest):
         raj = self.assign_permission_to(User.objects.create_user('Rajni', 'rajni@kant.com', 'I_Rock'),
                                         'can_view_interviewers')
         self.client.login(username='Rajni', password='I_Rock')
-
         self.country = LocationType.objects.create(
             name='Country', slug='country')
         self.district = LocationType.objects.create(
@@ -32,9 +28,7 @@ class InvestigatorsViewTest(BaseTest):
             name='City', slug='city', parent=self.district)
         self.village = LocationType.objects.create(
             name='Village', slug='village', parent=self.city)
-
         self.uganda = Location.objects.create(name='Uganda', type=self.country)
-
         self.kampala = Location.objects.create(
             name='Kampala', parent=self.uganda, type=self.district)
         self.abim = Location.objects.create(
@@ -46,8 +40,6 @@ class InvestigatorsViewTest(BaseTest):
         self.ea = EnumerationArea.objects.create(name="EA2")
         self.ea.locations.add(self.kampala_city_village)
         self.survey = Survey.objects.create(name='test survey')
-
-# new_interviewer_page
 
     def test_create_investigators_success(self):
         ea = self.ea
@@ -81,7 +73,6 @@ class InvestigatorsViewTest(BaseTest):
             reverse('new_interviewer_page'), data=form_data)
         accesses = ODKAccess.objects.filter(
             user_identifier=form_data['user_identifier'])
-        # self.assertTrue(response.path.endswith('login'))
         self.assertEquals(accesses.count(), 1)
         self.assertEquals(accesses[0].interviewer.name, form_data['name'])
 
@@ -129,7 +120,6 @@ class InvestigatorsViewTest(BaseTest):
                                                   gender='1', level_of_education='Primary',
                                                   language='English')
         response = self.client.post(reverse('download_interviewers'))
-        # one for header another for the interviewr details
         self.assertEquals(len(response.content.splitlines()), 2)
 
     def test_list_interviewers_gives_no_error(self):
@@ -163,22 +153,3 @@ class InvestigatorsViewTest(BaseTest):
             reverse('unblock_interviewer_ussd', args=(interviewer.pk, )))
         self.assertTrue(interviewer.ussd_access.filter(
             is_active=True).exists())
-
-    # def test_block_non_existing_interviewer_brings_error_message(self):
-    #     response = self.client.get(
-    #         reverse('block_interviewer_odk', args=(3, )))
-    #     messages = response.context['messages']
-    #     self.assertTrue(len(messages) > 0)
-    #     self.assertEquals(messages[0].tag, 'error')
-    #     self.client.get(reverse('block_interviewer_ussd', args=(3, )))
-    #     messages = response.context['messages']
-    #     self.assertTrue(len(messages) > 0)
-    #     self.assertEquals(messages[0].tag, 'error')
-    #     self.client.get(reverse('unblock_interviewer_odk', args=(6, )))
-    #     messages = response.context['messages']
-    #     self.assertTrue(len(messages) > 0)
-    #     self.assertEquals(messages[0].tag, 'error')
-    #     self.client.get(reverse('unblock_interviewer_ussd', args=(8, )))
-    #     messages = response.context['messages']
-    #     self.assertTrue(len(messages) > 0)
-    #     self.assertEquals(messages[0].tag, 'error')

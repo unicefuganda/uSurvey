@@ -1,7 +1,6 @@
 from lettuce import *
 
 from survey.features.page_objects.accounts import LogoutPage
-from survey.features.page_objects.root import AboutPage
 
 
 @step(u'Given I am not logged in')

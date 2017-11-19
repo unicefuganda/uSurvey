@@ -1,49 +1,115 @@
 {% extends "form.html" %}
 
 {% block title %}
-  New Question Template
+  {% if questionform.instance.pk %} Edit {% else %} New {% endif %}{{ model_class.verbose_name }}
 {% endblock %}
 {% block pre_form_content %}
 <p>Please note that the following special characters will be removed on USSD [* ! # ' ; &]</p>
 {% endblock%}
 {% block display_form_fields %}
-<div class="control-group">
+<style type="text/css">
+.dataTables_wrapper .row:first-child {
+     padding-top: 0px !important; 
+     padding-bottom: 0px !important; 
+     background-color: #FFF !important; 
+}
+#id_identifier{
+    width: 261px !important;
+    height: 25px !important;
+    margin-left: -1px !important;
+  }
+  #id_text{
+    width: 261px !important;
+    margin-left: 0px !important;
+  }
+  .dataTables_wrapper select {    margin-bottom: 0 !important;    margin-left: 4px!important;    margin-right: 4px!important;    margin-top: 0px !important;    padding: 3px !important;    width: 261px!important;}
+</style>
+<!-- <div class="control-group">
         <label class="control-label" for="text_counter"></label>
         <div class="controls">
             <span id="text-counter"></span>
         </div>
-  </div>
+  </div> -->
+
 {% include "naked_form.html" with a_form=questionform %}
 {% if options %}
   {% for option in options %}
    {% if option %}
+   
     <div class="control-group options question-option">
-        <label class="control-label">Option <span class="number"> {{ option.order }}</span></label>
+        <label  class="control-label col-md-4" style="margin-top: 15px !important;">Option <span class="number"> {{ option.order }}</span></label>
         <div class="controls">
-            <input type="text" maxlength="100" name="options" value="{{ option.text }}">
-            <a href="javascript:;" class="add-on btn btn_primary add-option"><i class="icon-plus"></i></a>
-            <a href="javascript:;" class="add-on btn btn_primary remove-option"><i class="icon-remove"></i></a>
-        </div>
+                <input type="text" maxlength="100" name="options" value="{{option.text}}">
+            <a style="padding: 0px !important;" href="javascript:;" class="btn btn-white btn-warning btn-bold add-option"><i class="ace-icon fa fa-plus bigger-120 orange"></i></a>
+            <a style="padding: 0px !important;" href="javascript:;" class="btn btn-white btn-warning btn-bold remove-option"><i class="ace-icon fa fa-minus bigger-120 orange"></i></a>
+            </div>
     </div>
     {% endif %}
   {% endfor %}
 
 {% endif %}
+
 {% include "_multiple_options.html" with option_label='Option' id="question-option-template" name='options'%}
 {% endblock %}
 
+    {% block buttons %}
+  <div class="form-actions">
+    <button id="button" type="submit" class="btn btn-primary submit" name="save_button" data-disabled-text="{{ loading_text }}"><i class="fa fa-save"></i> Save</button>
+    <button id="button" type="submit" class="btn btn-primary submit" name="add_more_button" data-disabled-text="{{ loading_text }}"><i class="fa fa-save"></i> Save and Add More</button>
+
+    {% if cancel_url %}
+      <a href="{{ cancel_url }}" class="btn btn-primary" name="cancel_button" class="cancel" style=" padding-right: 5px;
+    padding-left: 5px;
+    padding-bottom: 1px;"><i class="fa fa-close"></i> Cancel</a>
+    {% else %}
+      <a href="../" class="btn btn-primary" name="cancel_button" id="cancel_{{ id }}" class="cancel"><i class="fa fa-close"></i> Cancel</a>
+    {% endif %}
+  </div>
+    {% endblock %}
+
 {% block javascripts %}
+    <script src="{{ STATIC_URL }}js/jquery.validate.min.js" type="text/javascript" charset="utf-8"></script>
     <script src="{{STATIC_URL}}/js/questions.js" type="text/javascript" charset="utf-8"></script>
+    <script src="{{STATIC_URL}}js/question_options.js" type="text/javascript" charset="utf-8"></script>
     <script type="text/javascript">
     channel_map = {
         {% for answer_type, channels in questionform.answer_map.items %}
             '{{answer_type}}' : [{% for channel in channels %}'{{channel}}',{% endfor %}],
         {% endfor %}
     };
-    $('#id_answer_type').change(function(){
-        help_text = channel_map[$('#id_answer_type').val()].join(' and ');
-       // alert($('#id_answer_type_tip').val());
-       $('#id_answer_type_tip').text(help_text);
-    });
+
 </script>
+<script type="text/javascript">
+$(document).ready(function(){
+
+$("#id_module option[value='']").text("--Select Module--");
+
+
+  
+</script>
+
+<script type="text/javascript">
+
+$("#id_text").attr({"cols":29});
+</script>
+
+
+<style type="text/css">
+  #id_identifier{width: 261px !important;
+height: 25px !important;
+margin-left: 0px !important; }
+.dataTables_wrapper select {margin-left: 0px !important;}
+.btn-white{padding: 0px !important;font-size: 10px !important;}
+.dataTables_wrapper input[name=options] {
+  width: 261px !important;
+    height: 27px !important;
+margin-left: 1px !important;
+margin-top: 10px !important;
+}
+.dataTables_wrapper .btn.btn-white{margin-top: 10px !important;}
+.dataTables_wrapper .question-option label{margin-top: 15px !important;}
+#id_answer_type,#id_module,#id_group{
+width: 261px !important; }
+input[name='options']{width: 261px !important;height: 25px !important;margin-left: 3px;}
+</style>
 {% endblock %}

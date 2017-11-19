@@ -1,0 +1,187 @@
+{% extends "layout.html" %}
+{% load template_tags %}
+{% load pagination_tags %}
+{% block extra_head %}
+    <link rel="stylesheet" href="{{ STATIC_URL }}assets/formstyleres.css" />
+    <style type="text/css">
+
+        div.row-fluid {
+            display: none;
+        }
+      #test_flow .iphone_bg {
+          margin: 0 auto auto !important;
+          background-color: rgba(0, 0, 0, 0) !important;
+       }
+       #test_flow .modal-dialog {
+          float: right;
+          margin-top: 110px;
+          background-color: rgba(0, 0, 0, 0) !important;
+       }
+
+      #test_flow  div.modal-body,  #test_flow .modal-body div {
+            background-color: rgba(0, 0, 0, 0) !important;
+       }
+
+      #test_flow  div.previewstyle,  #test_flow .previewstyle div {
+            background-color: #fff  !important;
+        }
+
+      #answer_section {
+            z-index: 1000;
+      }
+
+    </style>
+{% endblock %}
+{% block title %}
+    Questions
+{% endblock %}
+{% block search %}
+{% include "search_form.html" %}
+ {% include "horizontal_filter_form.html" with a_form=question_filter_form no_button=True filter_id='question-filter-form' %}
+ <style>
+ .search-wrapper {
+    /*margin-top: -7px !important;*/
+    margin-right: -5px !important;
+}
+ .search{
+            margin-top: 8px !important;
+        }
+
+  .horititle {
+    margin-left: -18px !important;
+    padding-bottom: 0px !important;
+}
+#question-filter-form{
+    padding-bottom: 17px !important;
+}
+.searchButton{
+    line-height: 1px !important;
+}      
+ </style>  
+
+{% endblock %}
+{% block page_actions %}
+    <div >
+        {% if batch.survey and batch.survey.has_sampling %}
+            <a href="#view_listing" style="padding-left: 0px;padding-right: 3px;" class="btn btn-white btn-warning btn-bold" data-toggle="modal">
+                        &nbsp;&nbsp;<i class="fa fa-eye"></i>
+                         View Listing Questions&nbsp;</a>
+        {% endif %}
+        {% if batch.parameter_list and batch.parameter_list.parameters %}
+            <a href="#view_group_parameters" style="padding-left: 0px;padding-right: 3px;" class="btn btn-white btn-warning btn-bold" data-toggle="modal">
+                        &nbsp;&nbsp;<i class="fa fa-eye"></i>
+                         View Group Parameters&nbsp;</a>
+        {% endif %}
+        <a href="#test_flow" style="padding-left: 0px;padding-right: 3px;" class="btn btn-white btn-warning btn-bold" data-toggle="modal">
+                        &nbsp;&nbsp;<i class="fa fa-mobile-phone fa-lg"></i>
+                         Preview&nbsp;</a>
+        <a style="padding-left: 4px;padding-right: 3px;" class="btn btn-white btn-warning btn-bold" href="{% url 'export_questions_in_qset' batch.id %}">
+                        <i class="ace-icon fa fa-external-link bigger-120"></i>
+                         Export Questions</a>
+        {% if batch.interviews.count == 0 %}
+            <a style="padding-left: 4px;padding-right: 3px;" class="btn btn-white btn-warning btn-bold" href="{% url 'new_qset_question_page' batch.id %}" data-toggle="modal">
+                                <i class="ace-icon fa fa-plus bigger-120"></i>
+                                 Add Question</a>
+            <a style="padding-left: 4px;padding-right: 3px;" class="btn btn-white btn-warning btn-bold" href="{% url 'qset_assign_questions_page' batch.id %}" data-toggle="modal">
+                                <i class="ace-icon fa fa-check-square-o bigger-120"></i>
+                                 Select Question</a>
+
+        {% endif %}
+    </div>
+{% endblock %}
+{% block content %}
+
+    <div class="modal fade" id="test_flow" tabindex="-1" role="dialog"  aria-hidden="true" style="background: none !important;box-shadow: none !important;">
+        <div class="modal-dialog modal-dialog-1" style="background: none !important;">
+            <div class="modal-content modal-content-1" style="background: none !important;box-shadow: none !important; border: none !important;">
+              <div class="modal-body test_flow_modal" style="background: none !important;">
+                {% include "interviews/new_interview.html" with action=batch.id|get_url_with_ids:"test_qset_flow" title="Preview" use_ajax_post=True %}
+              </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+      </div><!-- /.modal -->
+    <script type="text/javascript">
+    $(document).ready(function(){
+        var img = new Image();
+        img.src = $('.iphone_bg').first().css('background-image').replace(/url\(|\)$|"/ig, '');
+        // first time its getting img width is 0 after page refresh 333
+        //$('.modal-dialog-1, .modal-content-1, .iphone_bg').width(img.width);
+        // tTook new classes for preview due to css issue
+        $('.modal-dialog-1, .modal-content-1, .iphone_bg').width('333');
+      });
+    </script>
+    {% if batch.survey and batch.survey.has_sampling %}
+        <div class="modal fade" id="view_listing" tabindex="-1" role="dialog"  aria-hidden="true" >
+            <div class="modal-dialog" >
+                <div class="modal-content" >
+                  <div class="modal-body">
+                    {% include "set_questions/_qset_questions.html" with batch=batch.survey.listing_form questions=batch.survey.listing_form.questions_inline hide_actions=True %}
+                  </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+          </div><!-- /.modal -->
+    {% endif %}
+    {% if batch.parameter_list and batch.parameter_list.parameters %}
+        <div class="modal fade" id="view_group_parameters" tabindex="-1" role="dialog"  aria-hidden="true" >
+            <div class="modal-dialog" >
+                <div class="modal-content" >
+                  <div class="modal-body">
+                    {% include "set_questions/_qset_questions.html" with batch=batch.parameter_list questions=batch.parameter_list.parameters hide_actions=True %}
+                  </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+          </div><!-- /.modal -->
+    {% endif %}
+    {% if batch %}
+        <form method="post" accept-charset="utf-8" action="{% url 'qset_update_question_order_page' batch.id %}">
+        {% csrf_token %}
+
+    {% endif %}
+
+
+    {% include "set_questions/_qset_questions.html"  %}
+
+<div class="paginate_msg col-md-2 pull-left" style="margin-left: -15px;mar">Total {{ page_obj.paginator.count }} entries. </div>
+<div class="col-md-8"></div>
+{% if batch and batch.interviews.count == 0 %}
+    <div class="col-md-2"><button style="margin-top: 20px;margin-right: -15px;float: right;" type="submit" href="#batch_{{batch.pk}}" data-toggle="modal" class="btn btn-primary  pull-right" name="save_button" {% if batch.has_loop or batch.has_skip %}onclick="return false;"{% endif %}>Update Question Order</button></div>
+      {% if batch.has_loop or batch.has_skip %}
+            <div class="modal fade" id="batch_{{batch.pk}}" tabindex="-1" role="dialog"  aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h4 class="modal-title">Confirmation Required</h4>
+                      </div>
+                      <div class="modal-body">
+                        <p>Questions has a {% if batch.has_loop %}Loop{% else %}Skip Logic{% endif %} attached. Updating the order would delete this.</p>
+                         <p> Would you like to continue?</p></div>
+                          <div class="modal-footer">
+                            <button type="submit" class="btn btn-primary submit btnforall" name="save_button"  data-disabled-text="{{ loading_text }}">Yes</button>
+                            <button type="button" class="btn btn-primary submit btnforall" data-dismiss="modal" aria-hidden="true">No</button>
+                           </div>                      
+                    </div><!-- /.modal-content -->
+                </div><!-- /.modal-dialog -->
+            </div><!-- /.modal -->
+       {% endif %}
+    </form>
+{% endif %}
+
+{% endblock %}
+
+{% block javascripts %}
+<link rel="stylesheet" href="{{ STATIC_URL }}css/dataTables.bootstrap.css" type="text/css">
+<script src="{{ STATIC_URL }}/js/jquery.dataTables.js"></script>
+<script src="{{ STATIC_URL }}/js/dataTables.bootstrap.js" type="text/javascript" charset="utf-8"></script>
+
+            
+    {% if batch %}
+        <script src="{{ STATIC_URL }}js/jquery.tablednd.js" type="text/javascript" charset="utf-8"></script>
+        <script src="{{ STATIC_URL }}js/batch_questions.js" type="text/javascript" charset="utf-8"></script>
+    {% endif %}
+    <script src="{{ STATIC_URL }}js/questions.js" type="text/javascript" charset="utf-8"></script>    <style type="text/css">
+        
+         .dataTables_wrapper .row:last-child{border: none !important;}
+
+    </style>
+{% endblock %}

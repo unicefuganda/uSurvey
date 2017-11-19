@@ -2,34 +2,38 @@
 {% block title %}
   {{ batch.name }}
 {% endblock %}
-{% block content %}
-	<div class='filter-options'>
-			<h5>Filter By Status</h5>
-		    <ul id="horizontal-filter">
-		        <li>
-			    <a href="{% url 'batch_show_page' batch.survey.pk batch.pk %}" class="btn btn_primary">All</a>
-		        </li>
-		        <li>
-		            <a href="{% url 'batch_show_page' batch.survey.pk batch.pk %}?status=open" class="btn btn_primary">Open</a>
-		        </li>
-		        <li>
-		            <a href="{% url 'batch_show_page' batch.survey.pk batch.pk %}?status=closed" class="btn btn_primary">Closed</a>
-		        </li>
-		    </ul>
-	</div>
-	<div class="bulk-actions">
-		
+{% block search %}
+<style type="text/css">
+  .search{
+    margin-top: 4px;
+  }
+    .dataTables_wrapper input[type="text"] {
+    <!--width: 345px !important;-->
+
+  }
+</style>
+{% include "search_form.html" %}
+<div class='filter-options'>
+  {% include "horizontal_filter_form.html" with a_form=open_status_filter no_button=True filter_id='open_status_filter' %}
+{% endblock %}
+{% block page_actions %}
 		<form action="{% url 'batch_all_locs' batch.pk %}" method="POST" accept-charset="utf-8" id="open-for-location-form">
-			
+
               {% csrf_token %}
               {% if open_locations.count > 0 %}
-              	<input type="submit" name="action" value="Close All" class="btn right">
+              	<input type="submit" name="action" class="btn btn-white btn-warning btn-bold" value="Close All" class="btn right" />
               {% endif %}
               {% if locations.count > open_locations.count %}
-              	<input type="submit" name="action" value="Open All" class="btn right">
+              	<input type="submit" name="action" value="Open All" class="btn btn-white btn-warning btn-bold" />
               {% endif %}
         </form>
-	</div>
+
+
+
+{% endblock %}
+{% block content %}
+{% load pagination_tags %}
+
   <table class="table table-striped table-bordered table-hover table-sort">
     <thead>
       <tr>
@@ -81,7 +85,10 @@
       {% endfor %}
     </tbody>
   </table>
+  {% paginate %}
 {% endblock %}
 {% block javascripts %}
+         <script src="{{ STATIC_URL }}js/jquery.validate.min.js" type="text/javascript" charset="utf-8"></script>
 		<script type="text/javascript" src="{{ STATIC_URL }}js/batch.js"></script>
+    {% include 'max_display_per_page_form.html' %}
 {% endblock %}

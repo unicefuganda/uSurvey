@@ -1,0 +1,27 @@
+{% extends 'layout.html' %}
+{% load template_tags %}
+{% block title %} {{indicator.name}} {% endblock %}
+{% block page_title %}Indicator Analysis{% endblock %}
+{% block page_actions %}
+        <div  style="margin-top: -18px;">
+                         <a style="padding-left: 4px;padding-right: 3px;" id="export_question" class="btn btn-white btn-warning btn-bold" href="{% url 'download_indicator_analysis' indicator.id %}?{{request.POST.urlencode}}" id="download_analysis">
+                        <i class="ace-icon fa fa-external-link bigger-120 "></i>
+                         Download Analysis Data</a>
+{% endblock %}
+{% block search %}
+{% include "indicator/indicator_metrics_filter.html" with a_form=locations_filter  no_button=True filter_id='location_filter' method='post' %}
+<br />
+{% endblock %}
+
+{% block content %}
+<div style="overflow-x:auto; width: 100%;">
+{{ graph }}
+</div>
+<br /><br />
+
+<div style="overflow-x:auto; width: 100%;">
+    <h4>{{indicator.REPORT_FIELD_NAME}} = {{indicator.formulae_string}}</h4>
+    {{ report }}
+</div>
+
+{% endblock %}

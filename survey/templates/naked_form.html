@@ -1,25 +1,171 @@
 {% load template_tags %}
+{% block extra_inline %}
+<style type="text/css">
+     .controls {
+        margin-bottom: 20px;
+        overflow-wrap: breakword;
+     }
+    label {
+        overflow-wrap: breakword;
+    }
+    #id_gender{
+      display: inline-block;
+      vertical-align: middle;
+      margin-bottom: -6px;
+    }
+    #id_gender_0{
+      margin: 0px !important;
+    }
+    #id_gender_1{
+      margin: 0px !important;
+    }
+    #id_access_channels{
+      display: inline-block;
+      vertical-align: middle;
+    }
+    #text-counter{
+    margin-left: 10px !important;
+  }
+
+  .ms-list{
+        margin-top: -14px !important;
+  }
+  .inline pos-rel > open {
+    display: none !important;
+  }
+  </style>
+  <style type="text/css">
+    .iphone_bg {
+    width: 100%;
+    height: 639px;
+    margin: auto;
+    background: url('{{ STATIC_URL }}img/iphone.png') no-repeat center;
+    }
+    .geni {
+    width:247px;
+    margin:0px auto;
+    padding-top:57px;
+    padding-left:6px;
+    z-index:1;
+    }
+
+    #id_gender{
+    display: inline-block;
+    vertical-align: middle;
+    margin-bottom: -6px;
+    }
+    #id_gender_0{
+    margin: 0px !important;
+    }
+    #id_gender_1{
+    margin: 0px !important;
+    }
+    #id_access_channels{
+    display: inline-block;
+    vertical-align: middle;
+    }
+    #text-counter{
+    margin-left: 10px !important;
+    }
+    .ms-container{
+    margin-left: 60px;
+    /*width: 915px;*/
+    width: 100%;
+    }
+    .ms-list{
+    margin-top: -14px !important;
+    }
+    .inline pos-rel > open {
+    display: none !important;
+    }
+    .exod {
+    text-align:center;
+    margin-bottom:5px;
+    }
+    .add-m-text{
+    margin-top: 15px !important;
+    vertical-align: middle;
+   }
+
+.int-part{margin-top: 10px;}
+
+ .subh {
+    color: #093;
+    font-size: 13px;
+ }
+
+/*.form-horizontal .control-label {
+    line-height: 28px;
+    padding-top: 29px;
+    text-align: center;
+}*/
+
+.form-actions {
+    background-color: #fff;
+    border-top: 1px solid #c3a0d9;
+    margin-bottom: -17px;
+    margin-right: 21px;
+    margin-top: 10px;
+    padding: 12px 20px 20px;
+    width: 100%;
+}
+</style>
+{% endblock %}
+
 {% for field in a_form.visible_fields %}
-<style type="text/css">label{
-	margin-top: -7px;
-	}
-    </style>
-  <div class="control-group">
-    <label class="control-label" for="{{field.auto_id}}">{{field.label}}</label>
+  <div id="{{field.auto_id}}-control-group" class="control-group int-part">
     <div class="controls {{ field|is_radio }}">
-      {{field}}
-        &nbsp;&nbsp;<span id="{{field.auto_id}}_tip" class="help tip">{{ field.help_text }}</span>
+        <label class="control-label" for="{{field.auto_id}}" style="padding: 5px;">{{field.label}}</label>
+        <span data-toggle="{{ field.help_text }}"data-placement="left">{{field}}</span>
+        {% if field.field.icons %}
+            <div class="input-prepend" style="display: inline-block; border: none;">
+                {% for icon, attrs in field.field.icons.items %}
+                    <span {% for key, val in attrs.items %} {{key}}="{{val}}"{% endfor %} style="padding: 2px 5px;cursor: pointer;">
+                        {% if icon.lower == 'edit' %}
+                            <span style="color:#478FCA;"><i class="fa fa-edit fa-2x"></i></span>
+                        {%elif icon.lower == 'add'  %}
+                            <span style="color:#69AA46;"><i class="fa fa-plus-square fa-2x"></i></span>
+                        {%elif icon.lower == 'delete'  %}
+                            <span style="color:#DD5A43;">
+                            <i class="fa fa-minus-square fa-2x"></i>
+                            </span>
+                        {%elif icon.lower == 'view'  %}
+                            <span style="color:pink">
+                                <i class="fa fa-eye"></i>
+                            </span>
+                        {%elif icon.lower == 'check'  %}
+                            <span style="color:orange">
+                                <i class="fa fa-exclamation-triangle"></i>
+                            </span>
+                        {% else %}
+                            <span style="color:grey">
+                                <i class="{{ icon.name }}"></i>
+                            </span>
+                        {%endif%}
+
+                    </span>
+                {% endfor %}
+            </div>
+        {% endif %}
         {% if field.errors %}
-        <label class="error" >
-            {% for error in field.errors %}
-                {{ error}}
-            {% endfor %}
-         </label>
+        <label class="control-label" style="padding: 5px;">&nbsp;</label>
+        <span data-toggle="{{ field.help_text }}"data-placement="left">&nbsp;
+            <label class="error" style="color:red; padding-top:10px; width: 50%;" >
+                {% for error in field.errors %}
+                    {{ error}}
+                {% endfor %}
+             </label>
+         </span>
         {% endif %}
     </div>
   </div>
-{% endfor %}
 
+{% endfor %}
+<script type="text/javascript">
+  $(document).ready(function(){
+    $('.controls textarea ').after($('<span id="text-counter"></span>'));
+  })
+</script>
 {% for hidden in a_form.hidden_fields %}
   {{ hidden }}
 {% endfor %}

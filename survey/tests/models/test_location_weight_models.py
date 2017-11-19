@@ -21,7 +21,6 @@ class LocationTypeDetailsTest(BaseTest):
             name='district', slug='district')
         location = Location.objects.create(
             name="Kampala", type=district, parent=uganda)
-
         survey = Survey.objects.create(name="Kampala Survey")
         location_weight = LocationWeight.objects.create(
             location=location, survey=survey, selection_probability=0.2)

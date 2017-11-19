@@ -1,0 +1,56 @@
+{% extends "layout.html" %}
+{% load template_tags %}
+{% block title %}
+  {{title}}
+{% endblock %}
+
+{% block search %}
+{% include "view_data_filter_form.html" with a_form=locations_filter no_button=True filter_id='loc_data_filter' %}
+
+{% endblock %}
+{% block content_search %}
+{% if report %}
+    {% include "search_form.html" %}
+{% endif %}
+{% endblock %}
+{% block page_actions %}
+{% if selected_qset %}
+<style type="text/css">
+	.search {    
+    margin-top: 10px !important;
+}
+</style>
+<div class="" style="margin-top: -18px;">
+                         <a style="padding-left: 4px;padding-right: 3px;" id="export_question" class="btn btn-white btn-warning btn-bold" href="{% url 'download_qset_data' selected_qset.id %}?{{request.GET.urlencode}}" id="download_qset_data">
+                        <i class="ace-icon fa fa-external-link bigger-120 "></i>
+                         Export Data</a>
+		</div>
+{% endif %}
+{% endblock %}
+{% block content %}
+{% load pagination_tags %}
+{% if report %}
+{% autopaginate interviews max_display_per_page %}
+<!-- <br> -->
+<div style="width: 100%;">
+    {{ report }}
+</div>
+{% paginate %}
+<div class="paginate_msg">Total {{ page_obj.paginator.count }} entries. </div>
+{% endif %}
+{% endblock %}
+
+{% block javascripts %}
+<link rel="stylesheet" href="{{ STATIC_URL }}css/dataTables.bootstrap.css" type="text/css">
+
+<script src="{{ STATIC_URL }}/js/jquery.dataTables.js"></script>
+<script src="{{ STATIC_URL }}/js/dataTables.bootstrap.js" type="text/javascript" charset="utf-8"></script>
+  <script src="{{STATIC_URL}}js/location-widget.js" type="text/javascript" charset="utf-8"></script>
+ 
+	<link rel="stylesheet" href="{{ STATIC_URL }}css/dataTables.bootstrap.css" type="text/css">
+<!-- <script type="text/javascript" src="https://code.jquery.com/jquery-1.12.4.js"></script> -->
+
+<script src="{{ STATIC_URL }}/js/jquery.dataTables.js"></script>
+<script src="{{ STATIC_URL }}/js/dataTables.bootstrap.js" type="text/javascript" charset="utf-8"></script>
+{% include 'max_display_per_page_form.html' %}
+{% endblock %}

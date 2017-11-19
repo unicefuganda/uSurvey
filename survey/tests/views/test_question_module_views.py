@@ -1,21 +1,20 @@
 from django.contrib.auth.models import User
 from django.test import Client
 from survey.forms.question_module_form import QuestionModuleForm
-from survey.models import QuestionModule, Question, HouseholdMemberGroup
+from survey.models import QuestionModule, Question
 from survey.models.batch import *
 from survey.tests.base_test import BaseTest
-
 
 class QuestionModuleViewTest(BaseTest):
 
     def setUp(self):
         self.client = Client()
         User.objects.create_user(
-            username='useless', email='rajni@kant.com', password='I_Suck')
-        raj = self.assign_permission_to(User.objects.create_user('Rajni', 'rajni@kant.com', 'I_Rock'),
+            username='useless', email='demo8@kant.com', password='I_Suck')
+        raj = self.assign_permission_to(User.objects.create_user('demo8', 'demo8@kant.com', 'demo8'),
                                         'can_view_batches')
         self.assign_permission_to(raj, 'can_view_investigators')
-        self.client.login(username='Rajni', password='I_Rock')
+        self.client.login(username='demo8', password='demo8')
 
     def test_get_new_question_module(self):
         response = self.client.get('/modules/new/')
@@ -88,10 +87,6 @@ class QuestionModuleViewTest(BaseTest):
         education_module = QuestionModule.objects.create(name="Education")
         batch = Batch.objects.create(
             name="Batch name", description='description')
-        group_3 = HouseholdMemberGroup.objects.create(name="Group 3", order=2)
-        question = Question.objects.create(identifier='1.1', text="This is a question1", answer_type='Numerical Answer',
-                                           group=group_3, batch=batch, module=education_module)
-        self.failUnless(Question.objects.filter(id=question.id))
         response = self.client.get('/modules/%s/delete/' % education_module.id)
         self.failIf(QuestionModule.objects.filter(id=education_module.id))
         self.assertRedirects(response, "/modules/", 302, 200)

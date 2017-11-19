@@ -1,15 +1,14 @@
 from django import forms
-from django.core.exceptions import ValidationError
 from django.forms import ModelForm
 from survey.models import Batch, BatchChannel, QuestionTemplate, WebAccess
-from django.utils.safestring import mark_safe
-from survey.models.formula import *
 
 
 class BatchForm(ModelForm):
-    access_channels = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple(attrs={'class': 'access_channels'}),
-                                                choices=[opt for opt in BatchChannel.ACCESS_CHANNELS
-                                                         if not opt[0] == WebAccess.choice_name()])
+    access_channels = forms.MultipleChoiceField(
+        widget=forms.CheckboxSelectMultiple(
+            attrs={
+                'class': 'access_channels'}), choices=[
+            opt for opt in BatchChannel.ACCESS_CHANNELS if not opt[0] == WebAccess.choice_name()])
 
     def __init__(self, *args, **kwargs):
         if kwargs.get('instance'):
@@ -23,7 +22,7 @@ class BatchForm(ModelForm):
         fields = ['name', 'description', 'survey', ]
 
         widgets = {
-            'description': forms.Textarea(attrs={"rows": 4, "cols": 50}),
+            'description': forms.Textarea(attrs={"rows": 3, "cols": 30}),
             'survey': forms.HiddenInput(),
         }
 
@@ -36,8 +35,12 @@ class BatchForm(ModelForm):
 
 
 class BatchQuestionsForm(ModelForm):
-    questions = forms.ModelMultipleChoiceField(label=u'', queryset=QuestionTemplate.objects.filter(),
-                                               widget=forms.SelectMultiple(attrs={'class': 'multi-select'}))
+    questions = forms.ModelMultipleChoiceField(
+        label=u'',
+        queryset=QuestionTemplate.objects.filter(),
+        widget=forms.SelectMultiple(
+            attrs={
+                'class': 'multi-select'}))
 
     class Meta:
         model = Batch

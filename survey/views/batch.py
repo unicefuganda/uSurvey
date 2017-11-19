@@ -5,34 +5,33 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib import messages
-from survey.interviewer_configs import *
-from survey.models import HouseholdMemberGroup, QuestionModule
+from survey.models import QuestionLoop
 from survey.models import Survey, Location, LocationType
-from survey.models import Survey, Batch, QuestionTemplate, Question, QuestionFlow, QuestionOption
-from survey.models.batch import Batch
-from survey.forms.batch import BatchForm, BatchQuestionsForm
-from survey.forms.filters import QuestionFilterForm
+from survey.models import Batch
+from survey.models import QuestionFlow
+from survey.models import Survey
+from survey.forms.question_set import BatchForm
+from survey.forms.filters import BatchOpenStatusFilterForm
+from .question_set import QuestionSetView
+from survey.utils.query_helper import get_filterset
 
 
 @login_required
 @permission_required('auth.can_view_batches')
-def index(request, survey_id):
-    survey = Survey.objects.get(id=survey_id)
-    batches = Batch.objects.filter(survey__id=survey_id)
-    # if request.is_ajax():
-    #     batches = batches.values('id', 'name').order_by('name')
-    #     json_dump = json.dumps(list(batches), cls=DjangoJSONEncoder)
-    #     return HttpResponse(json_dump, mimetype='application/json')
-    request.breadcrumbs([
-        ('Surveys', reverse('survey_list_page')),
-    ])
-    # if there has been no household listing yet
-    can_delete = survey.survey_house_listings.exists() is False
-    context = {'batches': batches, 'survey': survey,
-               'request': request, 'batchform': BatchForm(instance=Batch(survey=survey)),
-               'action': '/surveys/%s/batches/new/' % survey_id, 'can_delete': can_delete}
-    return render(request, 'batches/index.html',
-                  context)
+def index(request, survey_id=None):
+    if survey_id:
+        survey = Survey.get(pk=survey_id)
+    request.breadcrumbs(Batch.index_breadcrumbs(survey=survey))
+    if survey_id is None:
+        batches = Batch.objects.all()
+    else:
+        batches = Batch.objects.filter(survey__id=survey_id)
+    qset_view = QuestionSetView(model_class=Batch)
+    qset_view.questionSetForm = BatchForm
+    return qset_view.index(
+        request, batches, extra_context={
+            'survey': survey}, initial={
+            'survey': survey.pk})
 
 
 @login_required
@@ -49,25 +48,23 @@ def batches(request, survey_id):
 @permission_required('auth.can_view_batches')
 def show(request, survey_id, batch_id):
     batch = Batch.objects.get(id=batch_id)
-    prime_location_type = LocationType.largest_unit()
-    locations = Location.objects.filter(
-        type=prime_location_type).order_by('name')
+    open_status_filter = BatchOpenStatusFilterForm(batch, request.GET)
     batch_location_ids = batch.open_locations.values_list(
         'location_id', flat=True)
-    if request.GET.has_key('status'):
-        if request.GET['status'] == 'open':
-            locations = locations.filter(id__in=batch_location_ids)
-        else:
-            locations = locations.exclude(id__in=batch_location_ids)
-    request.breadcrumbs([
-        ('Surveys', reverse('survey_list_page')),
-        (batch.survey.name, reverse('batch_index_page', args=(batch.survey.pk, ))),
-    ])
+    locations = open_status_filter.get_locations()
+    search_fields = ['name', ]
+    if 'q' in request.GET:
+        locations = get_filterset(locations, request.GET['q'], search_fields)
+    request.breadcrumbs(Batch.edit_breadcrumbs(survey=batch.survey))
     open_locations = locations.filter(id__in=batch_location_ids)
-    context = {'batch': batch,
-               'locations': locations,
-               'open_locations': open_locations,
-               'non_response_active_locations': batch.get_non_response_active_locations()}
+    non_response_active_locations = batch.get_non_response_active_locations()
+    context = {
+        'batch': batch,
+        'locations': locations,
+        'open_locations': open_locations,
+        'open_status_filter': open_status_filter,
+        'non_response_active_locations': non_response_active_locations
+        }
     return render(request, 'batches/show.html', context)
 
 
@@ -84,7 +81,13 @@ def all_locs(request, batch_id):
     if action.lower() == 'close all':
         for location in locations:
             batch.close_for_location(location)
-    return HttpResponseRedirect(reverse('batch_show_page', args=(batch.survey.id, batch_id, )))
+    return HttpResponseRedirect(
+        reverse(
+            'batch_show_page',
+            args=(
+                batch.survey.id,
+                batch_id,
+            )))
 
 
 @login_required
@@ -109,47 +112,38 @@ def close(request, batch_id):
 @permission_required('auth.can_view_batches')
 def new(request, survey_id):
     survey = Survey.objects.get(id=survey_id)
-    batch_form = BatchForm(initial={'survey': survey})
-    response, batchform = _process_form(request, survey_id, action_str='added')
-    request.breadcrumbs([
-        ('Surveys', reverse('survey_list_page')),
-        (survey.name, reverse('batch_index_page', args=(survey.pk, ))),
-        #         (_('%s %s') % (action.title(),model.title()),'/crud/%s/%s' % (model,action)),
-    ])
-    context = {'batchform': batchform, 'button_label': "Create", 'id': 'add-batch-form', 'title': 'New Batch',
-               'action': '/surveys/%s/batches/new/' % survey_id, 'cancel_url': '/surveys/', 'survey': survey}
-    return response or render(request, 'batches/new.html', context)
-
-
-def _process_form(request, survey_id, instance=None, action_str='edited'):
-    batch_form = BatchForm(instance=instance)
-    response = None
-    if request.method == 'POST':
-        batch_form = BatchForm(data=request.POST, instance=instance)
-        if batch_form.is_valid():
-            batch_form.save(**request.POST)
-            messages.success(
-                request, 'Question successfully %sed.' % action_str)
-            response = HttpResponseRedirect(
-                reverse('batch_index_page', args=(survey_id,)))
-        else:
-            messages.error(request, 'Question was not %sed.' % action_str)
-    return response, batch_form
+    qset_view = QuestionSetView(model_class=Batch)
+    qset_view.questionSetForm = BatchForm
+    request.breadcrumbs(Batch.new_breadcrumbs(survey=survey))
+    response = qset_view.new(
+        request, extra_context={
+            'survey': survey}, initial={
+            'survey': survey.pk})
+    if response.status_code == 302:
+        response = HttpResponseRedirect(
+            reverse('batch_index_page', args=(survey.pk, )))
+    return response
 
 
 @permission_required('auth.can_view_batches')
-def edit(request, survey_id, batch_id):
-    batch = Batch.objects.get(id=batch_id, survey__id=survey_id)
-    response, batchform = _process_form(
-        request, survey_id, instance=batch, action_str='edited')
-    request.breadcrumbs([
-        ('Surveys', reverse('survey_list_page')),
-        (batch.survey.name, reverse('batch_index_page', args=(batch.survey.pk, ))),
-        #         (_('%s %s') % (action.title(),model.title()),'/crud/%s/%s' % (model,action)),
-    ])
-    context = {'batchform': batchform, 'button_label': "Save", 'id': 'edit-batch-form', 'title': 'Edit Batch',
-               'action': '/surveys/%s/batches/%s/edit/' % (survey_id, batch.id), 'survey': batch.survey}
-    return response or render(request, 'batches/new.html', context)
+def edit(request, batch_id):
+    batch = Batch.get(pk=batch_id)
+    survey = batch.survey
+    qset_view = QuestionSetView(model_class=Batch)
+    qset_view.questionSetForm = BatchForm
+    breadcrumbs = Batch.edit_breadcrumbs(survey=survey)
+    cancel_url = '../'
+    if breadcrumbs:
+        request.breadcrumbs(breadcrumbs)
+        cancel_url = breadcrumbs[-1][1]
+    response = qset_view.edit(
+        request, batch, extra_context={
+            'cancel_url': cancel_url}, initial={
+            'survey': survey.pk})
+    if response.status_code == 302:
+        response = HttpResponseRedirect(
+            reverse('batch_index_page', args=(survey.pk, )))
+    return response
 
 
 def _add_success_message(request, action_str):
@@ -158,77 +152,17 @@ def _add_success_message(request, action_str):
 
 @permission_required('auth.can_view_batches')
 def delete(request, survey_id, batch_id):
-    batch = Batch.objects.get(id=batch_id)
-    can_be_deleted, message = batch.can_be_deleted()
-    if not can_be_deleted:
-        messages.error(request, message)
-    else:
-        batch.delete()
-        _add_success_message(request, 'deleted')
-    return HttpResponseRedirect(reverse('batch_index_page', args=(survey_id,)))
-
-
-@permission_required('auth.can_view_batches')
-def assign(request, batch_id):
-    batch = Batch.objects.get(id=batch_id)
-    if batch.is_open():
-        error_message = "Questions cannot be assigned to open batch: %s." % batch.name.capitalize()
-        messages.error(request, error_message)
-        return HttpResponseRedirect("/batches/%s/questions/" % batch_id)
-    batch_questions_form = BatchQuestionsForm(batch=batch)
-    batch = Batch.objects.get(id=batch_id)
-    groups = HouseholdMemberGroup.objects.all()
-    groups.exists()
-    modules = QuestionModule.objects.all()
-    modules.exists()
-    if request.method == 'POST':
-        data = dict(request.POST)
-        last_question = batch.last_question_inline()
-        lib_questions = QuestionTemplate.objects.filter(
-            identifier__in=data.get('identifier', ''))
-        # print 'data: ', data, 'lib questions: ', lib_questions
-        if lib_questions:
-            for lib_question in lib_questions:
-                question = Question.objects.create(identifier=lib_question.identifier,
-                                                   text=lib_question.text,
-                                                   answer_type=lib_question.answer_type,
-                                                   group=lib_question.group,
-                                                   module=lib_question.module,
-                                                   batch=batch
-                                                   )
-                # assign the options
-                for option in lib_question.options.all():
-                    QuestionOption.objects.create(
-                        question=question, text=option.text, order=option.order)
-                if last_question:
-                    QuestionFlow.objects.create(
-                        question=last_question, next_question=question)
-                else:
-                    batch.start_question = question
-                    batch.save()
-                last_question = question
-#         batch_questions_form = BatchQuestionsForm(batch=batch, data=request.POST, instance=batch)
-        success_message = "Questions successfully assigned to batch: %s." % batch.name.capitalize()
-        messages.success(request, success_message)
-        return HttpResponseRedirect(reverse("batch_questions_page",  args=(batch_id, )))
-    all_modules = QuestionModule.objects.all()
-    used_identifiers = [
-        question.identifier for question in batch.batch_questions.all()]
-    library_questions = QuestionTemplate.objects.exclude(
-        identifier__in=used_identifiers).order_by('identifier')
-    question_filter_form = QuestionFilterForm()
-#     library_questions =  question_filter_form.filter(library_questions)
-    request.breadcrumbs([
-        ('Surveys', reverse('survey_list_page')),
-        (batch.survey.name, reverse('batch_index_page', args=(batch.survey.pk, ))),
-        (batch.name, reverse('batch_questions_page', args=(batch.pk, ))),
-    ])
-    context = {'batch_questions_form': unicode(batch_questions_form), 'batch': batch,
-               'button_label': 'Save', 'id': 'assign-question-to-batch-form', 'groups': groups,
-               'library_questions': library_questions, 'question_filter_form': question_filter_form,
-               'modules': all_modules}
-    return render(request, 'batches/assign.html',
-                  context)
+    try:
+        batch = Batch.get(id=batch_id)
+        QuestionSetView(model_class=Batch).delete(request, batch)
+    except Exception as e:
+        messages.warning(request, str(e))
+    return HttpResponseRedirect(
+        reverse(
+            'batch_index_page',
+            args=(
+                batch.survey.id,
+            )))
 
 
 @permission_required('auth.can_view_batches')
@@ -238,30 +172,35 @@ def update_orders(request, batch_id):
     if len(new_orders) > 0:
         # wipe off present inline flows
         inlines = batch.questions_inline()
-        start_question = inlines.pop(0)
-        question = start_question
-        for next_question in inlines:
-            QuestionFlow.objects.filter(
-                question=question, next_question=next_question).delete()
-            question = next_question
-        order_details = []
-        map(lambda order: order_details.append(order.split('-')), new_orders)
-        order_details = sorted(
-            order_details, key=lambda detail: int(detail[0]))
-        # recreate the flows
-        questions = batch.batch_questions.all()
-        if questions:  # so all questions can be fetched once and cached
-            question_id = order_details.pop(0)[1]
-            start_question = questions.get(pk=question_id)
-            for order, next_question_id in order_details:
-                QuestionFlow.objects.create(question=questions.get(pk=question_id),
-                                            next_question=questions.get(pk=next_question_id))
-                question_id = next_question_id
-            batch.start_question = start_question
-            batch.save()
-
-        success_message = "Question orders successfully updated for batch: %s." % batch.name.capitalize()
-        messages.success(request, success_message)
+        if inlines:
+            start_question = inlines.pop(0)
+            question = start_question
+            for next_question in inlines:
+                QuestionFlow.objects.filter(
+                    question=question, next_question=next_question).delete()
+                question = next_question
+            order_details = []
+            map(lambda order: order_details.append(order.split('-')), new_orders)
+            order_details = sorted(
+                order_details, key=lambda detail: int(detail[0]))
+            # recreate the flows
+            questions = batch.questions.all()
+            if questions:  # so all questions can be fetched once and cached
+                question_id = order_details.pop(0)[1]
+                start_question = questions.get(pk=question_id)
+                for order, next_question_id in order_details:
+                    QuestionFlow.objects.create(
+                        question=questions.get(
+                            pk=question_id), next_question=questions.get(
+                            pk=next_question_id))
+                    question_id = next_question_id
+                batch.start_question = start_question
+                batch.save()
+            # now remove any loop associated with this batch
+            QuestionLoop.objects.filter(loop_starter__qset__id=batch_id).delete()
+            success_message = "Question orders successfully\
+            updated for batch: %s." % batch.name.capitalize()
+            messages.success(request, success_message)
     else:
         messages.error(request, 'No questions orders were updated.')
     return HttpResponseRedirect("/batches/%s/questions/" % batch_id)
@@ -271,7 +210,10 @@ def update_orders(request, batch_id):
 def check_name(request, survey_id):
     response = Batch.objects.filter(
         name=request.GET['name'], survey__id=survey_id).exists()
-    return HttpResponse(json.dumps(not response), content_type="application/json")
+    return HttpResponse(
+        json.dumps(
+            not response),
+        content_type="application/json")
 
 
 @permission_required('auth.can_view_batches')
@@ -284,6 +226,40 @@ def list_batches(request):
         ('Surveys', reverse('survey_list_page')),
     ])
     return render(request, 'layout.html')
+
+
+@permission_required('auth.can_view_batches')
+def list_all_questions(request):
+    batch_id = request.GET.get('id', None)
+    batch = Batch.get(pk=batch_id)
+    # if request.is_ajax():
+    json_dump = json.dumps(
+        [{'id': q.id, 'identifier': q.identifier}
+            for q in batch.all_questions], cls=DjangoJSONEncoder)
+    return HttpResponse(json_dump, content_type='application/json')
+    # return HttpResponseRedirect(
+    #     reverse(
+    #         'batch_index_page',
+    #         args=(
+    #             batch.survey.pk,
+    #         )))
+
+
+@permission_required('auth.can_view_batches')
+def list_batch_questions(request):
+    batch_id = request.GET.get('id', None)
+    batch = Batch.get(pk=batch_id)
+    if request.is_ajax():
+        json_dump = json.dumps(
+            [{'id': q.id, 'identifier': q.identifier}
+                for q in batch.flow_questions], cls=DjangoJSONEncoder)
+        return HttpResponse(json_dump, content_type='application/json')
+    return HttpResponseRedirect(
+        reverse(
+            'batch_index_page',
+            args=(
+                batch.survey.pk,
+            )))
 
 
 def activate_non_response(request, batch_id):

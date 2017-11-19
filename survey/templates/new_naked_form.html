@@ -1,0 +1,17 @@
+<div class="container">
+    {% for field in a_form.visible_fields %}
+    <div class="form-group {% if field.errors %}has-error has-feedback{% endif %}" id="{{field.auto_id}}-control-group">
+      <label class="control-label col-sm-2" for="{{field.auto_id}}">{{field.label}}</label>
+      <div class="col-sm-4">
+        {{field}}
+      </div>
+      <div class="col-sm-2">
+        <span class="error">{{field.errors.0}}</span>
+      </div>
+    </div>
+    {% endfor %}
+        {% for hidden in a_form.hidden_fields %}
+      {{ hidden }}
+    {% endfor %}
+</div>
+

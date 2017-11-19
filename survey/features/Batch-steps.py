@@ -1,8 +1,10 @@
-from time import sleep
 from lettuce import *
 from rapidsms.contrib.locations.models import *
 
-from survey.features.page_objects.batches import BatchListPage, AddBatchPage, EditBatchPage, AssignQuestionToBatchPage, BatchShowPage
+from survey.features.page_objects.batches import AddBatchPage
+from survey.features.page_objects.batches import AssignQuestionToBatchPage
+from survey.features.page_objects.batches import BatchListPage
+from survey.features.page_objects.batches import EditBatchPage
 from survey.features.page_objects.question import BatchQuestionsListPage
 from survey.features.page_objects.root import HomePage
 from survey.investigator_configs import *
@@ -14,7 +16,10 @@ from survey.models.batch import Batch, BatchLocationStatus
 @step(u'And I have a batch')
 def and_i_have_prime_locations(step):
     world.batch = Batch.objects.create(
-        order=1, name="Batch A", description='description', survey=world.survey)
+        order=1,
+        name="Batch A",
+        description='description',
+        survey=world.survey)
 
 
 @step(u'And I have prime locations')
@@ -113,8 +118,13 @@ def then_i_should_see_validation_error_messages(step):
 def and_i_have_100_batches(step):
     for i in xrange(100):
         try:
-            Batch.objects.create(order=i, name="Batch %d" % i,
-                                 description='description %d' % i, survey=world.survey)
+            Batch.objects.create(
+                order=i,
+                name="Batch %d" %
+                i,
+                description='description %d' %
+                i,
+                survey=world.survey)
         except Exception:
             pass
 
@@ -191,7 +201,9 @@ def then_i_should_see_the_assign_question_page_of_that_batch(step):
     world.page = AssignQuestionToBatchPage(world.browser, world.batch)
     world.page.validate_url()
     world.page.is_text_present(
-        "Select Questions for %s - %s" % (world.survey.name.capitalize(), world.batch.name.capitalize()))
+        "Select Questions for %s - %s" %
+        (world.survey.name.capitalize(),
+         world.batch.name.capitalize()))
 
 
 @step(u'When I select some questions')
@@ -231,7 +243,11 @@ def then_i_should_see_the_question_which_belong_to_that_group(step):
 
 
 def create_question_for_group(group):
-    return Question.objects.create(text="question-group%s" % group.name, answer_type=Question.NUMBER, group=group)
+    return Question.objects.create(
+        text="question-group%s" %
+        group.name,
+        answer_type=Question.NUMBER,
+        group=group)
 
 
 @step(u'And I have one question belonging to that group')
@@ -282,7 +298,8 @@ def and_i_select_a_question_from_the_list(step):
 
 
 @step(u'Then I should see in selected list the question which belong to that group')
-def then_i_should_see_in_selected_list_the_question_which_belong_to_that_group(step):
+def then_i_should_see_in_selected_list_the_question_which_belong_to_that_group(
+        step):
     world.page.see_the_question(True, world.question_1_with_group_1.id)
     world.page.see_the_question(True, world.question_2_with_group_1.id)
     world.page.see_the_question(False, world.question_2_with_group_2.id)
@@ -307,15 +324,22 @@ def then_i_should_see_batch_name_already_exists_error_message(step):
 
 @step(u'And If I have an open batch in another survey in this location')
 def and_if_i_have_an_open_batch_in_another_survey_in_this_location(step):
-    world.survey1 = Survey.objects.create(name='another survey', description='another survey descrpition', type=False,
-                                          sample_size=10)
+    world.survey1 = Survey.objects.create(
+        name='another survey',
+        description='another survey descrpition',
+        type=False,
+        sample_size=10)
     batch = Batch.objects.create(
-        order=1, name="Batch B", description='description', survey=world.survey1)
+        order=1,
+        name="Batch B",
+        description='description',
+        survey=world.survey1)
     batch.open_for_location(world.districts[1])
 
 
 @step(u'Then I should see an error that another batch from another survey is already open')
-def then_i_should_see_an_error_that_another_batch_from_another_survey_is_already_open(step):
+def then_i_should_see_an_error_that_another_batch_from_another_survey_is_already_open(
+        step):
     open_batch_error_message = "%s has already open batches from survey %s" % (
         world.districts[1].name, world.survey1.name)
     world.page.is_text_present(open_batch_error_message)

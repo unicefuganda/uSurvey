@@ -3,16 +3,20 @@ from survey.models.locations import Location
 from survey.models import BaseModel
 from django.db import models
 from survey.models.surveys import Survey
-from survey.models.batch import Batch, BatchLocationStatus
+from survey.models.batch import BatchLocationStatus
 
 
 class EnumerationArea(BaseModel):
-    name = models.CharField(max_length=100, blank=False, null=True)
+    name = models.CharField(
+        max_length=200,
+        blank=False,
+        null=True,
+        db_index=True)
     code = models.CharField(max_length=200, editable=False,
                             blank=True, null=True, unique=True)
     # total_households = models.PositiveIntegerField(null=True, blank=True)
     locations = models.ManyToManyField(
-        Location, related_name="enumeration_areas")
+        Location, related_name="enumeration_areas", db_index=True)
 
     def __unicode__(self):
         return self.name
@@ -38,20 +42,14 @@ class EnumerationArea(BaseModel):
 
     def open_surveys(self):
         location_registry = self.get_survey_openings()
-        return list(Survey.objects.filter(pk__in=[reg.batch.survey.pk for reg in location_registry]))
+        return list(
+            Survey.objects.filter(
+                pk__in=[
+                    reg.batch.survey.pk for reg in location_registry]))
 
-    def open_batches(self, survey, house_member=None, access_channel=None):
+    def open_batches(self, survey, access_channel=None):
         location_registry = self.get_survey_openings(survey)
         batches = list([reg.batch for reg in location_registry])
-        if house_member is not None:
-            applicable = []
-            for batch in batches:
-                if batch.is_applicable(house_member):
-                    # if access_channel and not batch.access_channels.filter(channel=access_channel):
-                    #     pass
-                    # else:
-                    applicable.append(batch)
-            batches = applicable
         return sorted(batches, key=lambda batch: batch.order)
 
     def get_siblings(self):
@@ -59,7 +57,11 @@ class EnumerationArea(BaseModel):
 
     @classmethod
     def under_(cls, selected_location):
-        return cls.objects.filter(locations__in=selected_location.get_leafnodes()).distinct('name')
+        left = selected_location.lft + 1
+        right = selected_location.rght - 1
+        kwargs = {'locations__lft__gte': left, 'locations__lft__lte': right,
+                  'locations__level__gt': selected_location.level}
+        return cls.objects.filter(**kwargs).distinct('name')
 
 #     def validate_unique(self, *args, **kwargs):
 #         super(EnumerationArea, self).validate_unique(*args, **kwargs)

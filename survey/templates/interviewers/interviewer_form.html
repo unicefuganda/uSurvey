@@ -3,35 +3,51 @@
 {% block title %}
 {{ title }}
 {% endblock %}
-{% block extra_css %}
-<style type="text/css">
-	.radio_field {
-		margin-top: -15px;
-	height:10px;
-	  }
-	.p {
-		margin-top: -30px;
-	  }
-	label{
-	margin-top: -7px;
-	}
+{% block search %}
+{% include "locations_filter_form.html" with a_form=locations_filter no_button=True filter_id='loc_filter' no_auto_refresh=True %}
+{% endblock %}
 
-</style>
-{% endblock %}
-{% block pre_form_content %}
-{% include "horizontal_filter_form.html" with a_form=locations_filter no_button=True filter_id='loc_filter' no_auto_refresh=True%}
-<br class="break" />
-{% endblock %}
+
 {% block display_form_fields %}
-  {% include "naked_form.html" with a_form=form %}
-  <legend>ODK Access</legend>
+<style type="text/css">
+  #id_ea_chosen {
+    border-left: 3px solid #0577e0;
+    display: inline-block;
+    margin-bottom: 0;
+    border-radius: 5px;
+    vertical-align: middle;
+}
+</style>
+<div id="legend">
+            <legend style="color: #034b94;font-weight: bold;">Interviewer Details</legend>
+          </div>
+{% include "naked_form.html" with a_form=form %}
+<style type="text/css">
+  .col-md-3 {
+    width: 50% !important;
+}
+</style>
+<div>
+  <legend style="color: #034b94;font-weight: bold;">ODK Access</legend>
   {% include "horizontal_naked_form.html" with a_form=odk_access_form %}
-<br class="break" />
-  {% include "horizontal-formset.html" with formset=ussd_access_form legend='USSD Access' class='ussd_form' %}
-
+<!-- <br /> -->
+</div>
+<div>
+<p style="color: #034b94;font-weight: bold;font-size: 14px;">USSD Access</p>
+  <div class="ussd_mobile">{% include "horizontal-formset.html" with formset=ussd_access_form class='ussd_form' %}  </div>
+</div>
 {% endblock %}
 
 {% block javascripts %}
+<style type="text/css">
+    .dataTables_wrapper .add-on input[type="text"] {
+    width: 38px !important;
+    margin-top: 5px;
+
+}
+
+</style>
+	 <script src="{{ STATIC_URL }}js/jquery.validate.min.js" type="text/javascript" charset="utf-8"></script>
     <script src="{{STATIC_URL}}js/investigator.js" type="text/javascript" charset="utf-8"></script>
     <script src="{{STATIC_URL}}js/location-widget.js" type="text/javascript" charset="utf-8"></script>
     <script src="{{ STATIC_URL }}js/jquery.formset.js"></script>
@@ -40,60 +56,57 @@
             $(".ussd_form").formset({
                 prefix: "{{ ussd_access_form.prefix}}",
                 deleteText: "",
-                addText: '<span class="add-m-text">add mobile number</span>',
+                addText: '<span class="add-m-text">Add Mobile Number</span>',
                 extraClasses: ['row1', 'row2', 'row3']
             });
-        })
+        });
+
     </script>
-  <script type="text/javascript">
-  <!--$('#id_ea').on('change', function () {-->
-  		<!--var ea_id = $('#id_ea');-->
-        <!--url = "{% url 'open_surveys_in_ea_area' %}";-->
-        <!--params = {"ea_id" : ea_id.val() }-->
-        <!--$.getJSON(url, params, function (data) {-->
-                <!--$('#id_survey option').hide();-->
-	 			<!--$('#id_survey option[value=""]').show();-->
-	  		    <!--$.each(data, function () {-->
-	             <!--$('#id_survey option[value='+this.id+']').show();-->
-	          <!--});-->
-	      <!--});-->
+    <script type="text/javascript">
+      {% if mode == 'view' %}
+        $("#id_name").attr("readonly","readonly");
+        $("#id_date_of_birth").attr("readonly","readonly");
+        $("#id_gender_0").attr("disabled","disabled");
+        $("#id_gender_1").attr("disabled","disabled");
+        $("#id_level_of_education").attr("disabled","disabled");
+        $("#id_language").attr("disabled","disabled");
+        $("#id_survey").attr("disabled","disabled");
 
-  <!--});-->
+        $("#id_user_identifier").attr("readonly","readonly");
+        $("#id_is_active").attr("disabled","disabled");
+        $("#id_odk_token").attr("readonly","readonly");
+        
+        $("#id_District").attr("disabled","disabled");
+        $("#id_County").attr("disabled","disabled");
+        $("#id_Subcounty").attr("disabled","disabled");
+        $("#id_Parish").attr("disabled","disabled");
+        $("#id_ea").attr("disabled","disabled");
 
-  	{% for location_type in location_filter_types %}
-	$('#id_{{ location_type }}').on('change', function () {
-	    	params = { 'parent_loc' : $('#id_{{ location_type }}').val(), 'type' : '{{ location_type.pk }}'};
-	    	url = "{% url 'location_sub_types' %}";
-	        $.getJSON(url, params, function (data) {
-	        	$('#id_' + data.sub_type).find('option').remove().end()
-	        	.append('<option value="">-------</option>').val('');
-        		$.each(data.locations, function () {
-        			$('#id_' + data.sub_type).append('<option value='+this.id+'>'+this.name+'</option>');
-	            });
-        		$(' .chzn-select').trigger("liszt:updated");
-	        });
+        $("#button").text('Edit');
+        $("#button").attr({"type":"button","onclick":"window.location.href='{% url 'edit_interviewer_page' interviewer_id %}'"});
+        $(".add-row").attr("href",'');
+        
+      {%endif%}
+    </script>
 
-	    });
-  	{% endfor %}
-    $('.ea_filters').on('change', function () {
-    	{% for location_type in location_filter_types %}
-    	   var {{ location_type }}_selected = $('#id_{{ location_type }}').val();
-    	{% endfor %}
-    	url = "{% url 'enumeration_area_filter' %}";
-        params = {
-        		{% for location_type in location_filter_types %}
-        			{{ location_type }} : {{ location_type }}_selected,
- 	    		{% endfor %}
-        }
-        $.getJSON(url, params, function (data) {
-            $('#id_ea').find('option').remove().end()
-	        	.append('<option value="">-------</option>');
-        		$.each(data, function () {
-        			$('#id_ea').append('<option value='+this.id+'>'+this.name+'</option>');
-	            });
-            $(' .chzn-select').trigger("liszt:updated");
+    <script type="text/javascript">
+    FORM_RULES = {
+        '{{ form.name.name }}': 'required',
+        '{{ form.date_of_birth.name }}': 'required',
+        '{{ form.gender.name }}': 'required',
+        '{{ form.level_of_education.name }}': 'required',
+        '{{ form.language.name }}': 'required',
+        '{{ form.ea.name }}': 'required',
+        '{{ odk_access_form.user_identifier.name }}': 'required',
+        '{{ odk_access_form.odk_token.name }}': 'required',
+
+    };
+     
+    $(document).ready(function() {
+        $('#create-interviewer-form').validate({
+            rules: FORM_RULES
         });
     });
-  </script>
+    </script>
 
 {% endblock %}

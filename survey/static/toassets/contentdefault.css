@@ -1,0 +1,101 @@
+﻿a:hover,.main-color,.testimonials-bg:before, .testimonials-bg:after,.post-item:hover .post-content h4 a,.top-head.transparent .top-nav > ul > li.selected > a,.side-nav li.dl-back a,.side-nav ul li.selected > a,.tags li:hover a,
+.accordion h5.acc-head a:not(.collapsed),.icon-box.lg-icon:hover i:before,.widget_menu ul li.selected a,.TweetAuthor a,.section-bullets li.active a,.filter-by.style5 ul li.selected a span{
+	color:#fff;
+}
+.main-color-import{
+	color:#fff; !important
+}
+
+.main-bg,.top-nav ul li li,.header-2 .top-nav > ul > li.selected > a,.header-2 > .container:before,.sticky-nav .top-nav > ul > li.selected > a,.head-border,.top-head.header-2 .top-nav > ul > li > a:before,.social-list-empty li a:after,
+.sticky-nav .top-nav > ul > li:hover > a,.heading:after,ul.social-list li a.main-bg:after,.steps-1 i:after,.responsive-menu > ul,.testimonials-1 .testimonials-img:before,.testimonials-1 .testimonials-img:after,.center-v-menu ul li:hover a,.center-v-menu ul li.active a,
+.center-v-menu ul li.active a:focus,.rect-angles:before,.rect-angles:after,.rect-angles span:before,.rect-angles span:after,.pricing-tbl:not(.style-2).selected,.pricing-tbl:not(.style-2):hover,.main-border.btn-outlined:hover,.top-head.minimal .top-nav > ul > li:hover > a,.steps-2 .step-title:after,
+.top-head.minimal .top-nav > ul > li.selected > a,.slick-dots li.slick-active button,.pagination>.active>a, .pagination>.active>a:focus, .pagination>.active>a:hover, .pagination>.active>span, .top-head.box-head .top-nav > ul > li >a:before,
+.pagination>.active>span:focus,.pagination>.active>span:hover,.tabs.bg-color .nav-tabs>li.active>a,.icon-bg.dark-bg:after,.icon-border.dark-bg:after,.accordion.shadowed h5.acc-head a:not(.collapsed),.tabs.bottom-border .nav-tabs>li.active>a:after,
+.icon-boxes-1 [class*="col-md-"]:before,.icon-boxes-1 [class*="col-md-"]:after,.filter-by.style2 ul li.selected a span,.filter-by.style3 ul li.selected a span,.filter-by.style4 ul li.selected a span,
+.list-grid a.selected,.heading.main .head-sep:before,.heading.main .head-sep:after,.slick-prev:hover, .slick-next:hover,#to-top:hover,.swiper-button:hover,.section-bullets li.active a:after,.top-head.box-head.light-head > .container:before,
+.top-head.box-head.dark-head > .container:before,.on-sale-inner{
+	background-color:#26abff;
+	color:#fff
+}
+
+.main-border,.team-box.box-1:hover .team-img,.side-nav li.dl-back a,.light-sub.top-nav ul li ul,.dark-sub.top-nav ul li ul,.tags li:hover a,.pagination>.active>a, .pagination>.active>a:focus, .pagination>.active>a:hover, 
+.pagination>.active>span, .pagination>.active>span:focus, .pagination>.active>span:hover,.accordion.colored.bottom-border h5.acc-head a,.tabs.bg-color .nav-tabs>li.active>a,.tabs.bottom.bg-color .nav-tabs, .tabs.bottom.bg-color .nav-tabs>li.active>a,
+.center-v-menu ul li.active a,.heading.style4,.form-control:focus{
+	border-color:#26abff
+}
+.tabs.top-border .nav-tabs>li.active>a,.heading.style3:before, .tabs.top-border .nav-tabs>li.active>a:focus, .tabs.top-border .nav-tabs>li.active>a:hover,.bo_ribbon.bottom:before,.bo_ribbon.bottom:after,.top-nav ul li ul li:first-child,.top-nav .mega-menu .mega-content{
+	border-top-color:#26abff
+}
+.tabs.bottom.top-border .nav-tabs>li.active>a, .tabs.bottom.top-border .nav-tabs>li.active>a:focus, .tabs.bottom.top-border .nav-tabs>li.active>a:hover,.tabs.bg-color .nav-tabs,.tabs.bg-color .nav-tabs>li.active>a,.bo_ribbon.top:before,.bo_ribbon.top:after,
+.accordion h5.acc-head a:not(.collapsed),.pagination.style2 > li > a, .pagination.style2 > li > span,.pagination.style3 > li > a, .pagination.style3 > li > span,.filter-by.style2,.filter-by.style3 ul,.toolsBar{
+	border-bottom-color:#26abff
+}
+.bo_ribbon.right:before,.bo_ribbon.right:after,.heading.main .head-sep u:before{
+	border-left-color:#26abff
+}
+.bo_ribbon.left:before,.bo_ribbon.left:after,.heading.main .head-sep u:after{
+	border-right-color:#26abff
+}
+
+.steps-1 h4:after{
+	border-left: 1px #26abff dashed;
+}
+.icon-box-2 .icon-desc.main-bg:after,.icon-box-3 .icon-desc.main-bg:before,.p-style3 figure .icon-links a:after{
+	border-color: #26abff transparent transparent transparent;
+}
+.breadcrumbs.style2 a.main-bg:before{
+	border-color: transparent transparent transparent #26abff;
+}
+.p-style3 figure .icon-links a.zoom:after{
+	border-color: transparent transparent #26abff transparent;
+}
+.team-box.box-1 .team-socials:after{
+	box-shadow: inset 0 -50px 0 0 #26abff;
+	color:#fff
+}
+.social-list li a.main-bg {
+    box-shadow: inset 0 0 0 1px #26abff;
+}
+
+.header-1:not(.sticky-nav) .top-nav > ul > li:hover > a > span:before,.skew-nav > ul > li:hover > a > span:before,.skew-nav > ul > li.selected > a > span:before,.header-1:not(.sticky-nav) .top-nav > ul > li.selected > a > span:before,
+.header-1:not(.sticky-nav) .top-search:after,.header-1:not(.sticky-nav) .top-cart:after,.main-gradient{
+	background: -webkit-linear-gradient(top, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0) 86%, rgba(0, 0, 0, 0.27) 100%);
+	background: linear-gradient(to bottom, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0) 86%, rgba(0, 0, 0, 0.27) 100%);
+	background-color: #26abff;
+}
+.btn.main-bg.btn-3d:hover{
+	-webkit-box-shadow:0 4px 0 #26abff;
+	box-shadow:0 4px 0 #26abff;
+}
+.icon-box-1 .box-number span.count-title:after{
+	background: -webkit-linear-gradient(left, rgba(0, 0, 0, 0.46) 0%, rgba(0, 0, 0, 0.14) 5%, rgba(0, 0, 0, 0.0) 9%, rgba(0, 0, 0, 0.13) 95%, rgba(0, 0, 0, 0.5) 100%);
+	background: linear-gradient(to right, rgba(0, 0, 0, 0.46) 0%, rgba(0, 0, 0, 0.14) 5%, rgba(0, 0, 0, 0) 9%, rgba(0, 0, 0, 0.13) 95%, rgba(0, 0, 0, 0.5) 100%);
+	background-color: #26abff;
+}
+
+
+
+
+
+/*
+------------- Darker Color ----------------- */
+.btn.main-bg.btn-3d{
+	-webkit-box-shadow:0 4px 0 #1d98e6;
+	box-shadow:0 4px 0 #1d98e6;
+}
+.darker-color,.team-box.box-1 .team-socials li a:hover,.btn.main-bg:hover,.footer-top .skew-btn:hover{
+	background-color: #1d98e6;
+	color:#fff
+}
+.header-1.skew .top-nav > ul > li:hover > a:before,.skew-nav > ul > li:hover > a:before, .header-1.skew .top-nav > ul > li.selected > a:before,.skew-nav > ul > li.selected > a:before, .header-1.skew .top-search > a:before, .header-1.skew .top-cart:before{
+	border-color: #1d98e6 transparent transparent transparent;
+}
+.header-1.skew .top-search:before, .header-1.skew .top-cart > a:before,.footer-top .skew-btn:after,.skew-nav > ul > li:hover > a:after,.skew-nav > ul > li.selected > a:after{
+	border-color: transparent transparent #1d98e6 transparent;
+}
+.icon-boxes-1:before{
+	border-color: transparent #1d98e6 transparent transparent;
+}
+.icon-boxes-1:after{
+	border-color: transparent transparent transparent #1d98e6;
+}

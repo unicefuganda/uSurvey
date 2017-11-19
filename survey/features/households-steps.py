@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from random import randint
 from datetime import date
-from time import sleep
 
 from lettuce import *
 
@@ -159,8 +158,13 @@ def given_i_have_an_investigator(step):
     world.ea = EnumerationArea.objects.create(name="EA")
     world.ea.locations.add(uganda)
 
-    world.investigator = Investigator.objects.create(name="Investigator ", mobile_number='987654321', age=20,
-                                                     level_of_education="Nursery", language="Luganda", ea=world.ea)
+    world.investigator = Investigator.objects.create(
+        name="Investigator ",
+        mobile_number='987654321',
+        age=20,
+        level_of_education="Nursery",
+        language="Luganda",
+        ea=world.ea)
 
 
 @step(u'Given I have 100 households')
@@ -168,8 +172,15 @@ def given_i_have_100_households(step):
     for i in xrange(100):
         random_number = str(randint(1, 99999))
         try:
-            HouseholdHead.objects.create(surname="head" + random_number, date_of_birth='1980-06-01', male=False, household=Household.objects.create(
-                investigator=world.investigator, location=world.investigator.location, uid=i, ea=world.investigator.ea))
+            HouseholdHead.objects.create(
+                surname="head" + random_number,
+                date_of_birth='1980-06-01',
+                male=False,
+                household=Household.objects.create(
+                    investigator=world.investigator,
+                    location=world.investigator.location,
+                    uid=i,
+                    ea=world.investigator.ea))
         except Exception:
             pass
 
@@ -230,12 +241,13 @@ def and_i_should_see_that_household_details_its_head_and_members(step):
 def and_i_have_a_member_for_that_household(step):
     world.household = Household.objects.get(uid=world.household_uid)
     fields_data = dict(surname='xyz', male=True, date_of_birth=date(
-        1980, 05, 01), household=world.household)
+        1980, 0o5, 0o1), household=world.household)
     HouseholdMember.objects.create(**fields_data)
 
 
 @step(u'Then I should see household member title and add household member link')
-def then_i_should_see_household_member_title_and_add_household_member_link(step):
+def then_i_should_see_household_member_title_and_add_household_member_link(
+        step):
     world.page = HouseholdDetailsPage(world.browser, world.household)
     world.page.validate_household_member_title_and_add_household_member_link()
 

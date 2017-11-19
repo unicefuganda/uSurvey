@@ -1,57 +1,90 @@
 {% extends "layout.html" %}
 {% block title %}
   {{ the_user.get_full_name }}'s details
+      <link href="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css" rel="stylesheet">
+
 {% endblock %}
 {% block content %}
-<h3 class="offset3">
-    {{ the_user.get_full_name|capfirst }}'s Details
-</h3>
-<dl class="details offset1">
-  <dt>
-    Username
-  </dt>
-  <dd>
-    {{ the_user.username }}
-  </dd>
-  <dt>
-    First name
-  </dt>
-  <dd>
-    {{ the_user.first_name}}
-  </dd>
-  <dt>
-    Last name
-  </dt>
-  <dd>
-    {{ the_user.last_name }}
-  </dd>
-  <dt>
-    Mobile number
-  </dt>
-  <dd>
-      {{ the_user.userprofile.mobile_number }}
-  </dd>
-  <dt>
-    Email
-  </dt>
-  <dd>
-    {{ the_user.email }}
-  </dd>
-  <dt>
-    Groups
-  </dt>
-  <dd>
-   {% for group in the_user.groups.all %}
+
+<style type="text/css">
+  .control-label{
+    font-weight: bold;
+  }
+  ._heading_color{
+    color: #034b94;
+  }
+</style>
+<div class="container">
+  <div class="row-fluid">
+      <form class="form-horizontal">
+        <fieldset>
+          <div id="legend">
+            <legend class="_heading_color">Profile</legend>
+          </div>
+     
+          <!-- Name -->
+          <div class="control-group">
+            <label class="control-label"  for="username">Username</label>
+            <div class="controls">
+              {{ the_user.username }}
+            </div>
+          </div>
+
+          <div class="control-group">
+            <label class="control-label"  for="username">First name</label>
+            <div class="controls">
+              {{ the_user.first_name}}
+            </div>
+          </div>
+
+          <div class="control-group">
+            <label class="control-label"  for="username">Last name</label>
+            <div class="controls">
+              {{ the_user.last_name }}
+            </div>
+          </div>
+
+          <div class="control-group">
+            <label class="control-label"  for="username">Mobile number</label>
+            <div class="controls">
+              {{ the_user.userprofile.mobile_number }}
+            </div>
+          </div>
+
+          <div class="control-group">
+            <label class="control-label"  for="username">Email</label>
+            <div class="controls">
+              {{ the_user.email }}
+            </div>
+          </div>
+
+          <div class="control-group">
+            <label class="control-label"  for="username">Groups</label>
+            <div class="controls">
+              {% for group in the_user.groups.all %}
     {{ group }}{% if not forloop.last %}, {% endif %}
    {% endfor %}
-  </dd>
-</dl>
-<div class="offset3">
-    {% if cancel_url %}
-        <a href="{{cancel_url}}" class="btn btn-inverse"><i class="icon-chevron-left icon-white"></i> Back</a>
-    {% else %}
-        <a href="javascript:window.history.back()" class="btn btn-inverse"><i class="icon-chevron-left icon-white"></i> Back</a>
-    {% endif %}
-    {% include 'users/_action_button.html' with button_size="" the_user=the_user %}
-</div>
+            </div>
+          </div>          
+        </fieldset>
+      </form>
+      <form class="form-horizontal">
+        <fieldset>          
+          <div class="control-group">
+            <div class="controls">
+              {% include 'users/_action_button.html' with button_size="" the_user=the_user %}
+            </div>
+          </div>     
+        </fieldset>
+      </form>
+      </div>
+    </div>
+    <style type="text/css">
+  .control-group {
+    margin-bottom: 10px !important;
+}
+.form-horizontal .control-label{
+  padding-top: 0px !important;
+}
+</style>
 {% endblock %}
