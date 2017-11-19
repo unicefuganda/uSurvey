@@ -15,7 +15,7 @@ services:
 
 # command to install dependencies
 install:
-  - pip install -U -r pip-requires.txt
+  - pip install -U -r pip-freeze.txt
   - pip install coveralls
   - sudo rm -rf /dev/shm && sudo ln -s /run/shm /dev/shm
 
