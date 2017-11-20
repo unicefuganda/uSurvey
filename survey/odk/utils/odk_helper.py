@@ -267,7 +267,6 @@ def process_xml(interviewer, xml_blob, media_files={}, request=None):
     submission.attachments.all().delete()
     submission.save_attachments(media_files)
     process_answers.delay(xml_blob, qset, access_channel, question_map, survey_allocation, submission)
-    # process_answers(xml_blob, qset, access_channel, question_map, survey_allocation, submission, media_files)
     return submission
 
 
