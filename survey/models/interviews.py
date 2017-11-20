@@ -621,14 +621,11 @@ class MultiChoiceAnswer(Answer):
 
     @classmethod
     def create(cls, interview, question, answer):
-        try:
-            if unicode(answer).isdigit():
-                answer = int(answer)
-                answer = question.options.get(order=answer)
-            else:
-                answer = question.options.get(text__iexact=answer)
-        except BaseException, ex:
-            raise ex
+        if unicode(answer).isdigit():
+            answer = int(answer)
+            answer = question.options.get(order=answer)
+        else:
+            answer = question.options.get(text__iexact=answer)
         return super(
             MultiChoiceAnswer,
             cls).create(
