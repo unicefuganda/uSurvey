@@ -82,3 +82,4 @@ Testing
 
 
 [![Build Status](https://travis-ci.org/unicefuganda/uSurvey.svg?branch=uSurvey)](https://travis-ci.org/unicefuganda/uSurvey)
+[![Coverage](https://coveralls.io/repos/unicefuganda/uSurvey/badge.png)](https://coveralls.io/repos/unicefuganda/uSurvey/badge.png)
