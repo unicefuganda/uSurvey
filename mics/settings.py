@@ -5,6 +5,7 @@ import phonenumbers
 import pycountry
 from collections import OrderedDict
 
+
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 REDIS_HOST = os.getenv('REDIS_HOST', 'localhost')
 REDIS_PORT = int(os.getenv('REDIS_PORT', 6379))
@@ -500,3 +501,4 @@ if 'test' in sys.argv:
     for key in CACHEOPS:
         CACHE_REFRESH_DURATION = 0
         CACHEOPS[key] = {'ops': (), 'timeout': CACHE_REFRESH_DURATION}
+

@@ -105,27 +105,24 @@ class Interview(BaseModel):
                 map(lambda (q_id, answer): _save_answer(interview, q_id, answer), survey_parameters.items())
 
         def _save_answer(interview, q_id, answer):
-            try:
-                question = question_map.get(q_id, None)
-                if question and answer:
-                    answer_class = Answer.get_class(question.answer_type)
-                    if question.answer_type in [AudioAnswer.choice_name(), ImageAnswer.choice_name(),
-                                                VideoAnswer.choice_name()]:
-                        media = media_files.get(answer, None)
-                        if hasattr(media, 'read'):
-                            answer = media
-                        else:
-                            # only file objects or the file contents
-                            answer = ContentFile(media, name=answer)
-                    try:
-                        old_answer = answer_class.objects.get(interview=interview, question=question)
-                        old_answer.update(answer)
-                    except answer_class.DoesNotExist:
-                        answer_class.create(interview, question, answer)
-                    except Exception, ex:
-                        logger.error('error saving %s, desc: %s' % (q_id, str(ex)))
-            except Exception, ex:
-                logger.error('error saving %s, desc: %s' % (q_id, str(ex)))
+            question = question_map.get(q_id, None)
+            if question and answer:
+                answer_class = Answer.get_class(question.answer_type)
+                if question.answer_type in [AudioAnswer.choice_name(), ImageAnswer.choice_name(),
+                                            VideoAnswer.choice_name()]:
+                    media = media_files.get(answer, None)
+                    if hasattr(media, 'read'):
+                        answer = media
+                    else:
+                        # only file objects or the file contents
+                        answer = ContentFile(media, name=answer)
+                try:
+                    old_answer = answer_class.objects.get(interview=interview, question=question)
+                    old_answer.update(answer)
+                except answer_class.DoesNotExist:
+                    answer_class.create(interview, question, answer)
+                except Exception, ex:
+                    logger.error('error saving %s, desc: %s' % (q_id, str(ex)))
         map(_save_record, answers)
         return interviews
 

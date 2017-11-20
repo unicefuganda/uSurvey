@@ -6,7 +6,6 @@ from survey.models import Survey, Batch, Interviewer, Backend, \
 from survey.services.results_download_service import ResultsDownloadService
 from survey.tests.base_test import BaseTest
 
-
 class ResultsDownloadServiceTest(BaseTest):
 
     def setUp(self):
