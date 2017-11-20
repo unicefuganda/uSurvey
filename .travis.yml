@@ -20,11 +20,13 @@ install:
   - sudo rm -rf /dev/shm && sudo ln -s /run/shm /dev/shm
 
 before_script:
+  - mkdir -p logs
+  - mkdir -p files/answerFiles
+  - mkdir -p files/submissions
   - sh -c "if [ '$DB' = 'pgsql' ]; then psql -c 'DROP DATABASE IF EXISTS mics_test;' -U postgres; fi"
   - psql -c 'create database mics_test;' -U postgres
   - cp mics/travis-settings.py mics/localsettings.py
   - cp survey/interviewer_configs.py.example survey/interviewer_configs.py
-  - python manage.py syncdb --noinput
   - python manage.py makemigrations
   - python manage.py migrate
   - export DISPLAY=:99.0
