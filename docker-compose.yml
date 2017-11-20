@@ -3,41 +3,33 @@ version: '2'
 services:
 
   usurvey_app:
-    environment:
-      # pick db details from environment variables
-      - DATABASE_URL=postgres://${USURVEY_DB_USER}:${USURVEY_DB_PASS}@db/${USURVEY_DB}
-      - REDIS_HOST=redis_server
-      - USURVEY_DB_HOST=db
-      - USURVEY_DB
-      - USURVEY_DB_USER
-      - USURVEY_DB_PASS
-      - EMAIL_HOST
-      - EMAIL_PORT
-      - EMAIL_HOST_USER
-      - EMAIL_HOST_PASSWORD
-      - DEFAULT_EMAIL_SENDER
-      - SHAPE_FILE_URI
-      - SHAPE_FILE_LOC_FIELD
-      - SHAPE_FILE_LOC_ALT_FIELD
-      - MAP_CENTER
-      - MAP_ADMIN_LEVEL
-      - MAP_ZOOM_LEVEL
-      - COUNTRY
-      - TIME_ZONE
-      - USURVEY_SECRET_KEY
-
-    image: antsmc2/usurvey
+    extends:
+      file: usurvey-apps.yml
+      service: usurvey_base
     command: gunicorn -b 0.0.0.0:3691 --workers=$USURVEY_APP_WORKERS  --max-requests $USURVEY_APP_MAX_REQUESTS --timeout $USURVEY_APP_TIMEOUT mics.wsgi
+    ports:
+      - "$USURVEY_APP_PORT:3691"
     depends_on:
       - redis_server
       - db
-    ports:
-      - "$USURVEY_APP_PORT:3691"
-    volumes:
-      - ./._docker_mapf:/src/survey/static/map_resources
-      - ./logs:/src/logs
-      - ./files/answerFiles:/src/files/answerFiles
-      - ./files/submissions:/src/files/submissions
+
+  background_task_workers:
+    extends:
+      file: usurvey-apps.yml
+      service: usurvey_base
+    command: ./manage.py rqworker default email results-queue ws-notice odk
+    depends_on:
+      - redis_server
+      - db
+
+  background_task_schedulers:
+    extends:
+      file: usurvey-apps.yml
+      service: usurvey_base
+    command: ./manage.py rqscheduler ws-notice
+    depends_on:
+      - redis_server
+      - db
 
   db:
     environment:
@@ -57,3 +49,6 @@ services:
     image: redis:alpine
     ports:
       - "$USURVEY_REDIS_PORT:6379"
+
+
+

@@ -1,3 +1,4 @@
+import os
 import string
 import time
 from django.core.files.base import ContentFile
@@ -818,8 +819,8 @@ class FileAnswerMixin(object):
     def create(cls, interview, question, answer, as_text=None, as_value=None):
         try:
             # answer is a file object
-            as_value = answer.name
-            as_text = answer.name
+            as_value = os.path.basename(answer.name)
+            as_text = os.path.basename(answer.name)
         except BaseException:
             as_text = ''
             as_value = ''
