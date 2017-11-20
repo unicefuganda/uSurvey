@@ -77,9 +77,15 @@ def process_answers(xml, qset, access_channel, question_map, survey_allocation, 
     :param interviewer:
     :param question_map:
     :param survey_allocation:
+    :param submission (e.g. odk submission)
+    :param media_files (optional dict to search for media files (otherwise it shall be searched in submission attachmt.
     :return:
     """
     try:
+        if not media_files:
+            # if media files is not supplied, take it from the ODK submission
+            media_files = {os.path.basename(attachment.media_file.name): attachment.media_file
+                           for attachment in submission.attachments.all()}
         survey_tree = _get_tree_from_blob(xml)
         answers_nodes = _get_answer_nodes(survey_tree, qset)
         created_interviews = []
@@ -260,8 +266,7 @@ def process_xml(interviewer, xml_blob, media_files={}, request=None):
     # refresh attachments
     submission.attachments.all().delete()
     submission.save_attachments(media_files)
-    smedia_files = {key: f.read() for key, f in media_files.items()}      # file objects don't serialize
-    process_answers.delay(xml_blob, qset, access_channel, question_map, survey_allocation, submission, smedia_files)
+    process_answers.delay(xml_blob, qset, access_channel, question_map, survey_allocation, submission)
     # process_answers(xml_blob, qset, access_channel, question_map, survey_allocation, submission, media_files)
     return submission
 
