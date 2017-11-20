@@ -234,7 +234,7 @@ def process_submission(interviewer, xml_file, media_files={}, request=None):
     """extracts and saves the collected data from associated xform.
     """
     # media_files = dict([(os.path.basename(f.name), f) for f in media_files])
-    return s_xml(interviewer, xml_file.read(), media_files=media_files, request=request)
+    return process_xml(interviewer, xml_file.read(), media_files=media_files, request=request)
 
 
 def process_xml(interviewer, xml_blob, media_files={}, request=None):
