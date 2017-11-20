@@ -20,6 +20,9 @@ install:
   - sudo rm -rf /dev/shm && sudo ln -s /run/shm /dev/shm
 
 before_script:
+  - mkdir -p logs
+  - mkdir -p files/submissions/
+  - mkdir -p files/answerFiles/
   - sh -c "if [ '$DB' = 'pgsql' ]; then psql -c 'DROP DATABASE IF EXISTS mics_test;' -U postgres; fi"
   - psql -c 'create database mics_test;' -U postgres
   - cp mics/travis-settings.py mics/localsettings.py
