@@ -171,7 +171,6 @@ class ODKTest(SurveyBaseTest):
     def test_submit_xform(self):
         self._create_ussd_non_group_questions(self.qset)
         xml = self._get_completed_xform('2', 'James', 'Y', '1')
-        # import pdb; pdb.set_trace()
         f = SimpleUploadedFile("surveyfile.xml", xml)
         url = reverse('odk_submit_forms')
         response = self._make_odk_request(url=url, data={'xml_submission_file': f}, raw=True)

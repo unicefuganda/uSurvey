@@ -28,6 +28,7 @@ DATABASES = {
         "USER": os.getenv('USURVEY_DB_USER', 'postgres'),
         "PASSWORD": os.getenv('USURVEY_DB_PASS', ''),
         "HOST": os.getenv('USURVEY_DB_HOST', 'localhost'),
+
     }
 
 }
@@ -482,12 +483,9 @@ LOG_DIR = os.path.join(BASE_DIR, 'logs')
 
 if 'test' in sys.argv:
     DEBUG = True
-    from django.test.utils import setup_test_environment
-    setup_test_environment()
     DATABASES = {
        "default": {
            "ENGINE": "django.db.backends.sqlite3",
-           "NAME": "testdb",
        }
     }
     FLOWS_REDIS_PATH_FORMAT = '/test/%s' % FLOWS_REDIS_PATH_FORMAT
@@ -497,9 +495,5 @@ if 'test' in sys.argv:
         CACHE_REFRESH_DURATION = 0
         CACHEOPS[key] = {'ops': (), 'timeout': CACHE_REFRESH_DURATION}
 
-try:
-    from .localsettings import *
-except ImportError:
-    pass
 
 
