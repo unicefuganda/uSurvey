@@ -15,6 +15,7 @@ from survey.models.questions import Question, QuestionFlow
 from survey.tests.base_test import BaseTest
 from survey.forms.batch import BatchForm
 from survey.forms.answer import SurveyAllocationForm, AddMoreLoopForm
+from survey.tests.models.survey_base_test import SurveyBaseTest
 
 
 class OnlineFlowsTest(BaseTest):
@@ -119,14 +120,11 @@ class OnlineFlowsTest(BaseTest):
         self.assertEquals(batch.all_questions[1].pk, last_param.pk)
         self.assertEquals(len(batch.all_questions), ParameterQuestion.objects.count() + BatchQuestion.objects.count())
 
-    def test_flow_with_group(self):
-        # create listing and questions
-        self.test_add_questions_to_batch()
-        survey = Survey.objects.create(name="sudrvey_namse",description="survey_descipdtiosn")
-        # survey = mommy.make(Survey)
-        batch = Batch.objects.first()
-        ea = EnumerationArea.objects.first()
-        questions = batch.all_questions
-        interviewer = mommy.make(Interviewer, name='test')
-        mommy.make(ODKAccess, interviewer=interviewer, user_identifier='test12')
-        survey_allocation = mommy.make(SurveyAllocation, survey=survey, allocation_ea=ea, interviewer=interviewer)
+
+
+# class USSDFlowTest(SurveyBaseTest):
+#
+#     def setUp(self):
+#         super(USSDFlowTest, self).setUp()
+#         ussd_url = reverse('ussd')
+

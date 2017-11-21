@@ -1,6 +1,7 @@
 __author__ = 'anthony <>'
 import random
 import re
+import string
 from django.db import models
 from django.db import transaction
 from django import template
@@ -21,12 +22,6 @@ class ListingTemplate(QuestionSet):
     @classmethod
     def verbose_name(cls):
         return 'Listing Form'
-
-
-class ListingQuestion(Question):
-
-    class Meta:
-        app_label = 'survey'
 
 
 class RandomizationCriterion(BaseModel):
@@ -54,8 +49,11 @@ class RandomizationCriterion(BaseModel):
     def params_display(self):
         params = []
         for arg in self.text_arguments:
-            if self.question.answer_type == MultiChoiceAnswer.choice_name():
-                params.append(self.question.options.get(order=arg.param).text)
+            if self.listing_question.answer_type == MultiChoiceAnswer.choice_name():
+                try:
+                    params.append(self.listing_question.options.get(order=arg.param).text)
+                except ValueError:
+                    params.append(arg.param)
             else:
                 params.append(arg.param)
 
@@ -64,9 +62,8 @@ class RandomizationCriterion(BaseModel):
     def passes_test(self, value):
         answer_class = Answer.get_class(self.listing_question.answer_type)
         method = getattr(answer_class, self.validation_test, None)
-        if method is None:
-            raise ValueError(
-                'unsupported validator defined on listing question')
+        if method not in answer_class.validators():
+            raise ValueError('unsupported validator defined on listing question')
         return method(value, *self.test_params)
 
     def qs_passes_test(self, value_key, queryset):
@@ -107,7 +104,7 @@ class ListingSample(BaseModel):
     @classmethod
     def get_or_create_samples(cls, survey, ea):
         if cls.samples(survey, ea).exists() is False:
-            from_survey = survey.preferred_listing if survey.preferred_listing else survey
+            from_survey = survey.preferred_listing or survey
             cls.generate_random_samples(from_survey, survey, ea)
         return cls.samples(survey, ea)
 
@@ -133,8 +130,7 @@ class ListingSample(BaseModel):
                                                                                                             flat=True)
         #valid_interviews = set(valid_interviews)
         # now get the interviews that meet the randomization criteria
-        for criterion in to_survey.randomization_criteria.all(
-        ):  # need to optimize this
+        for criterion in to_survey.randomization_criteria.all():  # need to optimize this
             answer_type = criterion.listing_question.answer_type
             if answer_type == MultiChoiceAnswer.choice_name():
                 value_key = 'value__text'
@@ -147,8 +143,11 @@ class ListingSample(BaseModel):
             }
             # if qs:
             # kwargs['interview__id__in'] = valid_interviews
-            valid_interviews = criterion.qs_passes_test(value_key, answer_class.objects.filter(
-                **kwargs). only('interview__id').values_list('interview__id', flat=True))
+            valid_interviews = criterion.qs_passes_test(value_key,
+                                                        answer_class.objects.filter(**kwargs
+                                                                                    ).only('interview__id'
+                                                                                           ).values_list(
+                                                            'interview__id', flat=True))
         valid_interviews = list(valid_interviews)
         random.shuffle(valid_interviews)
         random_samples = valid_interviews[:to_survey.sample_size]
@@ -163,7 +162,7 @@ class ListingSample(BaseModel):
 
     def get_display_label(self):
         survey = self.survey
-        naming_label = survey.random_sample_label
+        naming_label = survey.random_sample_label or ''
         interview = self.interview
         # get the exact answer type
         pattern = '{{ *([0-9a-zA-Z_]+) *}}'
@@ -172,18 +171,16 @@ class ListingSample(BaseModel):
         questions = listing_form.questions.filter(identifier__in=identifiers)
         context = {}
         for question in questions:
-            answer_class = Answer.get_class(question.answer_type)
+            # answer_class = Answer.get_class(question.answer_type)
             try:
-                answer = answer_class.objects.get(interview=interview, question=question)
-                context[question.identifier] = answer.value
-            except answer_class.DoesNotExist:
+                answer = Answer.objects.get(interview=interview, question=question)
+                context[question.identifier] = answer.as_text
+            except Answer.DoesNotExist:
                 pass
         question_context = template.Context(context)
         label = template.Template(html.escape(naming_label)).render(question_context)
         # now if label happens to be empty, just use the first response as label
         if not label:
-            try:
-                label = interview.answer.first().as_text
-            except:
-                pass
-        return label or interview.question_set.name
+            label = interview.answer.first().as_text
+        return string.capwords(label)
+

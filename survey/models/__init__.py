@@ -8,7 +8,7 @@ from survey.models.questions import (Question, QuestionSet, QuestionOption, Ques
 from survey.models.questions import QuestionSetChannel, QuestionLoop, FixedLoopCount, PreviousAnswerCount
 from survey.models.respondents import RespondentGroup, RespondentGroupCondition, GroupTestArgument
 from survey.models.batch_questions import BatchQuestion
-from survey.models.survey_listing import ListingQuestion, ListingTemplate, RandomizationCriterion, ListingSample
+from survey.models.survey_listing import ListingTemplate, RandomizationCriterion, ListingSample
 from survey.models.survey_listing import CriterionTestArgument
 from survey.models.question_templates import QuestionTemplate
 from survey.models.generics import TemplateQuestion, TemplateOption

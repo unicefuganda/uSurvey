@@ -3,7 +3,7 @@ from django.core.management import call_command
 from django.test import TestCase
 from survey.models import (InterviewerAccess, ODKAccess, USSDAccess, Interview, Interviewer, QuestionSetChannel,
                            EnumerationArea, Survey, SurveyAllocation, Question, QuestionSet, Batch, BatchQuestion,
-                           QuestionOption)
+                           QuestionOption, NonResponseAnswer)
 from survey.forms.question import get_question_form
 # import all question types
 from survey.models import (Answer, NumericalAnswer, TextAnswer, MultiChoiceAnswer, MultiSelectAnswer, GeopointAnswer,
@@ -186,6 +186,14 @@ class AnswersTest(SurveyBaseTest):
         # check answers attribute is date class
         date_question = Question.objects.filter(answer_type=DateAnswer.choice_name()).first()
         self.assertEquals(date_question.answers().first().__class__, DateAnswer)
+
+    def test_supported_answers_does_not_contain_abstract_model_nor_non_response(self):
+        supported_answers = Answer.supported_answers()
+        self.assertFalse(NonResponseAnswer in supported_answers)
+        for answer in supported_answers:
+            self.assertFalse(answer._meta.abstract)
+        self.assertIn(NumericalAnswer, supported_answers)
+        self.assertIn(AutoResponse, supported_answers)
 
 
 

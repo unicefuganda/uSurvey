@@ -245,7 +245,9 @@ class Answer(BaseModel):
 
     @classmethod
     def supported_answers(cls):
-        return Answer.__subclasses__()
+        supported = [cl for cl in Answer.__subclasses__() if cl not in [NonResponseAnswer, NumericalTypeAnswer]]
+        supported.extend([cl for cl in NumericalTypeAnswer.__subclasses__()])
+        return supported
 
     @classmethod
     def answer_types(cls):
@@ -264,7 +266,7 @@ class Answer(BaseModel):
         for cl in NumericalTypeAnswer.__subclasses__():
             if cl.choice_name() == verbose_name:
                 return cl
-        raise ValueError('unknown class')
+        raise ValueError('unknown class %s' % verbose_name)
 
     def to_text(self):
         return self.as_text

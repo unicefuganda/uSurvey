@@ -158,8 +158,7 @@ class SamplingCriterionForm(forms.ModelForm, FormOrderMixin):
         if self.data.get('listing_question', []):
             options = QuestionOption.objects.filter(
                 question__pk=self.data['listing_question'])
-            self.fields['options'].choices = [
-                (opt.text, opt.text) for opt in options]
+            self.fields['options'].choices = [(opt.text, opt.text) for opt in options]
 
     class Meta:
         exclude = []
@@ -220,7 +219,5 @@ class SamplingCriterionForm(forms.ModelForm, FormOrderMixin):
             criterion.arguments.create(
                 position=1, param=self.cleaned_data['max'])
         else:
-            criterion.arguments.create(
-                position=0, param=self.cleaned_data.get(
-                    'value', ''))
+            criterion.arguments.create(position=0, param=self.cleaned_data.get('value', ''))
         return criterion

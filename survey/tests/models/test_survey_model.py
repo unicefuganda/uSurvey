@@ -9,7 +9,7 @@ from survey.models import (Answer, MultiChoiceAnswer, MultiSelectAnswer, DateAns
 from survey.models import AnswerAccessDefinition, AutoResponse, NumericalAnswer, TextAnswer, \
     MultiChoiceAnswer, MultiSelectAnswer, ImageAnswer, GeopointAnswer, DateAnswer, AudioAnswer, VideoAnswer, \
     USSDAccess, ODKAccess, WebAccess                           
-from survey.models.survey_listing import ListingTemplate, ListingQuestion
+from survey.models.survey_listing import ListingTemplate
 
 
 class SurveyTest(TestCase):
@@ -18,7 +18,8 @@ class SurveyTest(TestCase):
         survey = Survey()
         fields = [str(item.attname) for item in survey._meta.fields]
         self.assertEqual(10, len(fields))
-        for field in ['id','created','modified','name','description','has_sampling','sample_size','listing_form_id','preferred_listing_id','random_sample_label']:
+        for field in ['id','created','modified','name','description','has_sampling','sample_size',
+                      'listing_form_id', 'preferred_listing_id', 'random_sample_label']:
             self.assertIn(field, fields)
 
     def test_store(self):
@@ -73,8 +74,9 @@ class SurveyTest(TestCase):
         survey = Survey.objects.create(
             name="survey name333", description="rajni survey33333")
         batch = Batch.objects.create(order=1, survey=survey)
-        survey_allocation = SurveyAllocation.objects.create(interviewer=self.investigator, survey=survey, allocation_ea=ea, stage=2,
-                                                            status=0)
+        survey_allocation = SurveyAllocation.objects.create(interviewer=self.investigator, survey=survey,
+                                                            allocation_ea=ea, stage=SurveyAllocation.DEALLOCATED,
+                                                            status=SurveyAllocation.PENDING)
         batch.open_for_location(kampala)
         self.assertTrue(survey.is_open())
 
@@ -97,8 +99,10 @@ class SurveyTest(TestCase):
         survey = Survey.objects.create(
             name="survey name333", description="rajni survey33333")
         batch = Batch.objects.create(order=1, survey=survey)
-        survey_allocation = SurveyAllocation.objects.create(interviewer=self.investigator, survey=survey, allocation_ea=ea, stage=2,
-                                                            status=0)
+        survey_allocation = SurveyAllocation.objects.create(interviewer=self.investigator, survey=survey,
+                                                            allocation_ea=ea,
+                                                            stage=SurveyAllocation.DEALLOCATED,
+                                                            status=SurveyAllocation.PENDING)
         self.assertFalse(survey.is_open())
 
     def test_survey_knows_it_is_closed(self):
@@ -120,58 +124,10 @@ class SurveyTest(TestCase):
         survey = Survey.objects.create(
             name="survey name up for close", description="rajni survey close")
         batch = Batch.objects.create(order=1, survey=survey)
-        survey_allocation = SurveyAllocation.objects.create(interviewer=self.investigator, survey=survey, allocation_ea=ea, stage=2,
-                                                            status=0)
+        survey_allocation = SurveyAllocation.objects.create(interviewer=self.investigator, survey=survey,
+                                                            allocation_ea=ea, stage=SurveyAllocation.DEALLOCATED,
+                                                            status=SurveyAllocation.PENDING)
         self.assertFalse(survey.is_open())
-
-    # def test_saves_survey_with_sample_size_from_form_if_has_sampling_is_true(self):
-    #     # form_data = {
-    #     #     'name': 'survey rajnikanth',
-    #     #     'description': 'survey description rajnikanth',
-    #     #     'has_sampling': True,
-    #     #     'sample_size': 10,
-    #     #     'type': True
-    #     # }
-    #     self.listing_form = mommy.make(ListingTemplate)
-    #     question1 = mommy.make(Question, qset=self.listing_form, answer_type=NumericalAnswer.choice_name())
-    #     question2 = mommy.make(Question, qset=self.listing_form, answer_type=TextAnswer.choice_name())
-    #     question3 = mommy.make(Question, qset=self.listing_form, answer_type=VideoAnswer.choice_name())
-    #     self.client.login(username='demo15', password='demo15')
-    #     form_data = {'name': 'survey demo15', 'description': 'survey description demo15',
-    #                       'has_sampling': True, 'sample_size': 10,
-    #                       'random_sample_label': 'q1 {{%s}} q2: {{%s}}' % (question1.identifier, question2.identifier)}
-    #     survey_form = SurveyForm(data=form_data)
-    #     Survey.save_sample_size(survey_form)
-    #     saved_survey = Survey.objects.filter(
-    #         name=form_data['name'], has_sampling=form_data['has_sampling'])
-    #     self.failUnless(saved_survey)
-    #     self.assertEqual(form_data['sample_size'], saved_survey[0].sample_size)
-
-    # def test_saves_survey_with_sample_size_zero_if_has_sampling_is_false(self):
-    #     # form_data = {
-    #     #     'name': 'survey rajnisuma',
-    #     #     'description': 'survey description rajnisuma',
-    #     #     'has_sampling': True,
-    #     #     'sample_size': 10,
-    #     #     'email_group' : "sudheer.s@dhanushinfotech.net",
-    #     #     'random_sample_label' : 
-    #     #     'type': True
-    #     # }
-    #     self.listing_form = mommy.make(ListingTemplate)
-    #     question1 = mommy.make(Question, qset=self.listing_form, answer_type=NumericalAnswer.choice_name())
-    #     question2 = mommy.make(Question, qset=self.listing_form, answer_type=TextAnswer.choice_name())
-    #     question3 = mommy.make(Question, qset=self.listing_form, answer_type=VideoAnswer.choice_name())
-    #     self.client.login(username='demo13', password='demo13')
-    #     form_data = {'name': 'survey demo13', 'description': 'survey description demo13',
-    #                       'has_sampling': True, 'sample_size': 10,
-    #                       'random_sample_label': 'q1 {{%s}} q2: {{%s}}' % (question1.identifier, question2.identifier)}
-
-    #     survey_form = SurveyForm(data=form_data)
-    #     Survey.save_sample_size(survey_form)
-    #     saved_survey = Survey.objects.filter(
-    #         name=form_data['name'], has_sampling=form_data['has_sampling'])
-    #     self.failUnless(saved_survey)
-    #     self.assertEqual(0, saved_survey[0].sample_size)
 
     def test_unicode_text(self):
         survey = Survey.objects.create(

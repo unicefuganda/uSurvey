@@ -17,6 +17,7 @@ from survey.models import Batch
 from survey.models.users import UserProfile
 from survey.utils import views_helper
 
+
 class SurveyViewTest(BaseTest):
 
     def setUp(self):
@@ -166,7 +167,8 @@ class SurveyViewTest(BaseTest):
         country = LocationType.objects.create(name='country', slug='country')
         kampala = Location.objects.create(name='Kampala', type=country)
         ea.locations.add(kampala)
-        investigator = Interviewer.objects.create(name='Investigator', ea=ea, gender='1', level_of_education='Primary', language='Eglish', weights=0)
+        investigator = Interviewer.objects.create(name='Investigator', ea=ea, gender='1', level_of_education='Primary',
+                                                  language='Eglish', weights=0)
         batch.open_for_location(kampala)
         response = self.client.get('/surveys/%s/delete/' % survey.id)
         self.assertRedirects(response, '/surveys/', status_code=302, target_status_code=200, msg_prefix='')
