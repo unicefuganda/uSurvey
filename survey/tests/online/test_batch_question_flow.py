@@ -121,10 +121,13 @@ class OnlineFlowsTest(BaseTest):
         self.assertEquals(len(batch.all_questions), ParameterQuestion.objects.count() + BatchQuestion.objects.count())
 
 
-
 # class USSDFlowTest(SurveyBaseTest):
 #
 #     def setUp(self):
 #         super(USSDFlowTest, self).setUp()
+#
+#     def test_ussd_flow(self):
 #         ussd_url = reverse('ussd')
+#         self.client.get(ussd_url)
+
 

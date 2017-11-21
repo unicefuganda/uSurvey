@@ -27,7 +27,6 @@ before_script:
   - psql -c 'create database mics_test;' -U postgres
   - cp mics/travis-settings.py mics/localsettings.py
   - cp survey/interviewer_configs.py.example survey/interviewer_configs.py
-  - python manage.py syncdb --noinput
   - python manage.py makemigrations
   - python manage.py migrate
   - export DISPLAY=:99.0

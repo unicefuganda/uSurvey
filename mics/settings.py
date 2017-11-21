@@ -479,11 +479,6 @@ LOG_DIR = os.path.join(BASE_DIR, 'logs')
 
 ##end USSD config ##
 # Importing server specific settings
-try:
-    from .localsettings import *
-except ImportError:
-    pass
-
 
 if 'test' in sys.argv:
     DEBUG = True
@@ -501,4 +496,10 @@ if 'test' in sys.argv:
     for key in CACHEOPS:
         CACHE_REFRESH_DURATION = 0
         CACHEOPS[key] = {'ops': (), 'timeout': CACHE_REFRESH_DURATION}
+
+try:
+    from .localsettings import *
+except ImportError:
+    pass
+
 
