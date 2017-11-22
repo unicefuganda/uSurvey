@@ -58,7 +58,7 @@ class IndicatorViewTest(SurveyBaseTest):
         data = self.variable_data.copy()
         data.update(kwargs)
         numeric_question = Question.objects.filter(answer_type=NumericalAnswer.choice_name(),
-                                                   qset__id=self.qset.id).first()
+                                                   qset__id=self.qset.id).last()
         data['test_question'] = numeric_question.id
         url = reverse('add_variable')
         response = self.client.get(url)
@@ -81,7 +81,7 @@ class IndicatorViewTest(SurveyBaseTest):
     def test_create_variable_from_existing_indicator(self):
         indicator, data = self._test_create_indicator()
         text_question = Question.objects.filter(answer_type=TextAnswer.choice_name(),
-                                                qset__id=self.qset.id).first()
+                                                qset__id=self.qset.id).last()
         data = self.variable_data.copy()
         data['test_question'] = text_question.id
         data['name'] = 'varaiabe_again'
@@ -124,7 +124,7 @@ class IndicatorViewTest(SurveyBaseTest):
 
     def test_edit_indicator_variable(self):
         self._test_create_indicator_variable()
-        variable = IndicatorVariable.objects.first()
+        variable = IndicatorVariable.objects.last()
         url = reverse('edit_indicator_variable', args=(variable.id, ))
         data = self.variable_data.copy()
         data['name'] = 'edited_variable_name_13'
@@ -141,7 +141,7 @@ class IndicatorViewTest(SurveyBaseTest):
 
     def test_get_edit_indicator_variable(self):
         self._test_create_indicator_variable()
-        variable = IndicatorVariable.objects.first()
+        variable = IndicatorVariable.objects.last()
         url = reverse('edit_indicator_variable', args=(variable.id, ))
         response = self.client.get(url)
         self.assertIn(response.status_code, [200, 302])
@@ -183,7 +183,7 @@ class IndicatorViewTest(SurveyBaseTest):
         indicator, data = self._test_create_indicator()
         url = reverse('view_indicator_variables', args=(indicator.id, ))
         response = self.client.get(url)
-        self.assertIn(indicator.variables.first(), response.context['variables'])
+        self.assertIn(indicator.variables.last(), response.context['variables'])
         # test the json verson
         url = reverse('indicator_variables')
         response = self.client.get(url, data={'id': indicator.id})
@@ -260,25 +260,24 @@ class IndicatorViewTest(SurveyBaseTest):
 
     def _bulk_answer_questions(self):
         answers = []
-        n_quest = Question.objects.filter(answer_type=NumericalAnswer.choice_name()).first()
-        t_quest = Question.objects.filter(answer_type=TextAnswer.choice_name()).first()
-        m_quest = Question.objects.filter(answer_type=MultiChoiceAnswer.choice_name()).first()
+        n_quest = Question.objects.filter(answer_type=NumericalAnswer.choice_name()).last()
+        t_quest = Question.objects.filter(answer_type=TextAnswer.choice_name()).last()
+        m_quest = Question.objects.filter(answer_type=MultiChoiceAnswer.choice_name()).last()
         # first is numeric, then text, then multichioice
-        answers = [{n_quest.id: 1, t_quest.id: 'Privet malishka, kach di la',  m_quest.id: 'Y'},
-                   {n_quest.id: 5, t_quest.id: 'Hey Boy', m_quest.id: 'Y'},
+        answers = [{n_quest.id: 5, t_quest.id: 'Hey Boy', m_quest.id: 'Y'},
                    {n_quest.id: 15, t_quest.id: 'Hey Girl!', m_quest.id: 'N'},
-                   {n_quest.id: 15, t_quest.id: 'Hey Part!'}
+                   {n_quest.id: 15, t_quest.id: 'Hey Part!'},
+                   {n_quest.id: 1, t_quest.id: 'Privet malishka, kach di la', m_quest.id: 'Y'},
                    ]
         question_map = {n_quest.id: n_quest, t_quest.id: t_quest, m_quest.id: m_quest}
-        interview = self.interview
         Interview.save_answers(self.qset, self.survey, self.ea,
                                self.access_channel, question_map, answers)
         # confirm that 11 answers has been created
         self.assertEquals(NumericalAnswer.objects.count(), 4)
         self.assertEquals(TextAnswer.objects.count(), 4)
         self.assertEquals(MultiChoiceAnswer.objects.count(), 3)
-        self.assertEquals(TextAnswer.objects.first().to_text().lower(), 'Privet malishka, kach di la'.lower())
-        m_answer = MultiChoiceAnswer.objects.first()
+        self.assertEquals(TextAnswer.objects.last().to_text().lower(), 'Privet malishka, kach di la'.lower())
+        m_answer = MultiChoiceAnswer.objects.last()
         self.assertEquals(m_answer.as_text.lower(), 'Y'.lower())
         self.assertEquals(m_answer.as_value,
                           str(QuestionOption.objects.get(text='Y', question__id=m_quest.id).order))
