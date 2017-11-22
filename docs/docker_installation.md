@@ -22,7 +22,7 @@ Quick Start
 
 * Clone the uSurvey Application from Github 
 
-        git clone https://github.com/unicefuganda/uSurvey.git -b dev
+        git clone https://github.com/unicefuganda/uSurvey.git
 
 
 * Enter the project directory 
