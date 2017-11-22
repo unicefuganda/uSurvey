@@ -11,6 +11,7 @@ function modify_input_names() {
 
         first_row = first_row.next();
         first_row_input = first_row.find("input[name=order_information]");
+        console.info('using: ' + first_row_input.val() );
         counter = counter + 1;
     }
 }

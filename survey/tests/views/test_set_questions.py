@@ -759,16 +759,48 @@ class SetQuestionViewTest(BaseTest):
 
     def _save_question(self, qset, data):
         current_count = Question.objects.count()
-        QuestionForm = get_question_form(BatchQuestion)
+        question_class = BatchQuestion
+        if qset.__class__ == Question:
+            question_class = Question
+        QuestionForm = get_question_form(question_class)
         question_form = QuestionForm(qset, data=data)
         self.assertTrue(question_form.is_valid())
         question = question_form.save()
         self.assertEquals(Question.objects.count(), current_count + 1)
         return question
 
-    def test_update_question_order(self):
+    def test_listing_update_question_order(self):
         import random
         qset = mommy.make(ListingTemplate)
+        self.qset_channels = mommy.make(QuestionSetChannel, qset=qset, channel=ODKAccess.choice_name())
+        self._create_ussd_non_group_questions(qset)
+        questions = list(Question.objects.all())
+        flow_questions = list(qset.flow_questions)
+        self.assertTrue(flow_questions[0].id, questions[0].id)
+        self.assertTrue(flow_questions[-1].id, questions[-1].id)
+        random.shuffle(questions)
+        data = {'order_information': ['%s-%s' % (idx, question.id) for idx, question in enumerate(questions)]}
+        url = reverse('qset_update_question_order_page', args=(qset.id, ))
+        response = self.client.post(url, data=data)
+        self.assertTrue(response.status_code in [200, 302])
+        # if successful first flow should be last
+        new_flow_questions = list(qset.flow_questions)
+        for idx, question in enumerate(new_flow_questions):
+            self.assertTrue(question.id, questions[idx].id)
+        # lets shuffle and try again
+        random.shuffle(questions)
+        data = {'order_information': ['%s-%s' % (idx, question.id) for idx, question in enumerate(questions)]}
+        url = reverse('qset_update_question_order_page', args=(qset.id,))
+        response = self.client.post(url, data=data)
+        self.assertTrue(response.status_code in [200, 302])
+        # if successful first flow should be last
+        new_flow_questions = list(qset.flow_questions)
+        for idx, question in enumerate(new_flow_questions):
+            self.assertTrue(question.id, questions[idx].id)
+
+    def test_batch_update_question_order(self):
+        import random
+        qset = mommy.make(Batch, survey=mommy.make(Survey))
         self.qset_channels = mommy.make(QuestionSetChannel, qset=qset, channel=ODKAccess.choice_name())
         self._create_ussd_non_group_questions(qset)
         questions = list(Question.objects.all())

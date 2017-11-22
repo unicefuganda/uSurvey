@@ -132,8 +132,8 @@
             </div><!-- /.modal-dialog -->
           </div><!-- /.modal -->
     {% endif %}
-    {% if batch %}
-        <form method="post" accept-charset="utf-8" action="{% url 'qset_update_question_order_page' batch.id %}">
+    {% if batch and batch.interviews.count == 0 %}
+        <form method="post" id="update_order_form" accept-charset="utf-8" action="{% url 'qset_update_question_order_page' batch.id %}">
         {% csrf_token %}
 
     {% endif %}
@@ -144,7 +144,7 @@
 <div class="paginate_msg col-md-2 pull-left" style="margin-left: -15px;mar">Total {{ page_obj.paginator.count }} entries. </div>
 <div class="col-md-8"></div>
 {% if batch and batch.interviews.count == 0 %}
-    <div class="col-md-2"><button style="margin-top: 20px;margin-right: -15px;float: right;" type="submit" href="#batch_{{batch.pk}}" data-toggle="modal" class="btn btn-primary  pull-right" name="save_button" {% if batch.has_loop or batch.has_skip %}onclick="return false;"{% endif %}>Update Question Order</button></div>
+    <div class="col-md-2"><button style="margin-top: 20px;margin-right: -15px;float: right;" type="submit" id="update_order_button" href="#batch_{{batch.pk}}" data-toggle="modal" class="btn btn-primary  pull-right" name="save_button" {% if batch.has_loop or batch.has_skip %}onclick="return false;"{% endif %}>Update Question Order</button></div>
       {% if batch.has_loop or batch.has_skip %}
             <div class="modal fade" id="batch_{{batch.pk}}" tabindex="-1" role="dialog"  aria-hidden="true">
                 <div class="modal-dialog">

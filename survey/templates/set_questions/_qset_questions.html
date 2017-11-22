@@ -81,8 +81,8 @@
                 {% else %}
                     {{ question.text }}
                 {% endif %}
-                {% if batch %}
-                    <input type="hidden" name="order_information" value="{{ forloop.counter }}-{{ question.id }}"/>
+                {% if batch and batch.interviews.count == 0 and not hide_actions %}
+                    <input type="hidden" class="order_information" name="order_information" value="{{ forloop.counter }}-{{ question.id }}"/>
                 {% endif %}
             </td>
             <td>

@@ -115,7 +115,7 @@ STATICFILES_FINDERS = (
     #    'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
 
-STATICFILES_STORAGE = 'contrib.storage.my_whitenoise.WhitenoiseErrorSquashingStorage'
+#STATICFILES_STORAGE = 'contrib.storage.my_whitenoise.WhitenoiseErrorSquashingStorage'
 
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = os.getenv('USURVEY_SECRET_KEY', '@#D&@*')
@@ -143,7 +143,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 MIDDLEWARE_CLASSES = [
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
+#    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',

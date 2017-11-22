@@ -515,6 +515,7 @@ def assign(request, qset_id):
 @permission_required('auth.can_view_batches')
 def update_orders(request, qset_id):
     batch = QuestionSet.get(id=qset_id)
+    # import pdb; pdb.set_trace()
     new_orders = request.POST.getlist('order_information', None)
     if len(new_orders) > 0:
         # wipe off present inline flows
@@ -525,9 +526,9 @@ def update_orders(request, qset_id):
             while len(inlines) > 0:
                 question = inlines.pop(0)
                 QuestionFlow.objects.filter(question=question).delete()
-            order_details = []
-            map(lambda order: order_details.append(order.split('-')), new_orders)
-            order_details = sorted(order_details, key=lambda detail: int(detail[0]))
+            order_details = [(idx, order.split('-')[-1]) for idx, order in enumerate(new_orders)]
+            # map(lambda order: order_details.append(order.split('-')), new_orders)
+            # order_details = sorted(order_details, key=lambda detail: int(detail[0]))
             # recreate the flows
             questions = batch.questions.all()
             if questions:  # so all questions can be fetched once and cached
