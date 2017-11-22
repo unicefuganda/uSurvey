@@ -27,8 +27,7 @@ def new(request):
         if enumeration_area_form.is_valid():
             enumeration_area_form.save()
             messages.success(request, "Enumeration Area successfully created.")
-            return HttpResponseRedirect(
-                reverse('enumeration_area_home', args=()))
+            return HttpResponseRedirect(reverse('enumeration_area_home', args=()))
         messages.error(request, "Enumeration area was not created.")
     request.breadcrumbs([
         ('Enumeration Areas', reverse('enumeration_area_home')),

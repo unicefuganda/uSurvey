@@ -527,8 +527,7 @@ def update_orders(request, qset_id):
                 QuestionFlow.objects.filter(question=question).delete()
             order_details = []
             map(lambda order: order_details.append(order.split('-')), new_orders)
-            order_details = sorted(
-                order_details, key=lambda detail: int(detail[0]))
+            order_details = sorted(order_details, key=lambda detail: int(detail[0]))
             # recreate the flows
             questions = batch.questions.all()
             if questions:  # so all questions can be fetched once and cached

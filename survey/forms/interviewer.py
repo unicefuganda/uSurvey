@@ -166,8 +166,7 @@ class USSDAccessForm(ModelForm):
             country_code = pycountry.countries.lookup(settings.COUNTRY).alpha_2
             identifier = phonenumbers.parse(identifier, country_code)
             if phonenumbers.is_valid_number_for_region(identifier, country_code):
-                self.cleaned_data[
-                    'user_identifier'] = identifier.national_number
+                self.cleaned_data['user_identifier'] = identifier.national_number
             else:
                 raise ValidationError('Invalid mobile number for your region')
         except phonenumbers.NumberParseException:

@@ -483,6 +483,7 @@ LOG_DIR = os.path.join(BASE_DIR, 'logs')
 
 if 'test' in sys.argv:
     DEBUG = True
+    COUNTRY = 'Uganda'
     DATABASES = {
        "default": {
            "ENGINE": "django.db.backends.sqlite3",

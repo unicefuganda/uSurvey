@@ -16,6 +16,7 @@ from survey.tests.base_test import BaseTest
 from survey.forms.batch import BatchForm
 from survey.forms.answer import SurveyAllocationForm, AddMoreLoopForm
 
+
 class OnlineFlowsTest(BaseTest):
     fixtures = ['enumeration_area', 'locations', 'location_types']
 

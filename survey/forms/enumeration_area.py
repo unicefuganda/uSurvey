@@ -26,10 +26,6 @@ class EnumerationAreaForm(ModelForm):
                 attrs={
                     "id": 'ea_name',
                     "class": 'enumeration_area'}),
-            'total_households': forms.TextInput(
-                {
-                    'id': 'total_households',
-                    "class": 'enumeration_area'}),
             'locations': forms.SelectMultiple(
                 attrs={
                     'class': 'multi-select enumeration_area',

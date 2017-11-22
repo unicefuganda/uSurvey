@@ -8,6 +8,7 @@ from survey.forms.question_module_form import QuestionModuleForm
 from survey.models import *
 from survey.utils.query_helper import get_filterset
 from survey.tests.base_test import BaseTest
+from survey.forms.question import get_question_form
 
 
 class SetQuestionViewTest(BaseTest):
@@ -248,68 +249,6 @@ class SetQuestionViewTest(BaseTest):
         response = self.client.get(reverse('questions_subquestion_json_page', kwargs={"question_id" : q_obj.id}))
         self.assertIn(response.status_code,[200,302])
 
-    # def test_get_prev_questions_for_question(self):
-    #     survey_obj = Survey.objects.create(
-    #         name='survey name2dddd444', description='survey descrpition2')
-    #     batch_obj = Batch.objects.create(
-    #         order=1, name="Batrchdddd A2", survey=survey_obj)
-    #     qset = QuestionSet.objects.get(pk=batch_obj.id)
-    #     self.rsp = ResponseValidation.objects.create(validation_test="validationtest", constraint_message="message")
-        
-
-    #     question1 = Question.objects.create(identifier='id_99', text="This is a question123.8",
-    #                                     answer_type='Numerical Answer', qset_id=qset.id,
-    #                                     response_validation_id=self.rsp.id)
-    #     QuestionOption.objects.create(
-    #         question=question1,
-    #         order=3,
-    #         text="q3"
-    #         )
-
-    #     question2 = Question.objects.create(identifier='id_49', text="This is a question123.8",
-    #                                     answer_type='Numerical Answer', qset_id=qset.id,
-    #                                     response_validation_id=self.rsp.id)
-    #     QuestionOption.objects.create(
-    #         question=question1,
-    #         order=4,
-    #         text="q4"
-    #         )
-        
-        
-
-    #     question3 = Question.objects.create(identifier='id_499', text="This is a question123.8",
-    #                                     answer_type='Numerical Answer', qset_id=qset.id,
-    #                                     response_validation_id=self.rsp.id)
-    #     QuestionOption.objects.create(
-    #         question=question1,
-    #         order=5,
-    #         text="q41"
-    #         )
-    #     QuestionFlow.objects.create(
-    #         name = 'a1',
-    #         desc = 'descq',
-    #         question = question1,
-    #         question_type = TextAnswer.choice_name(),
-    #         next_question = question2,
-    #         next_question_type = TextAnswer.choice_name()
-    #         )
-    #     QuestionFlow.objects.create(
-    #         name = 'a1',
-    #         desc = 'descq2',
-    #         question = question2,
-    #         question_type = TextAnswer.choice_name(),
-    #         next_question = question3,
-    #         next_question_type = TextAnswer.choice_name()
-    #         )
-    #     QuestionLoop.objects.create(
-    #         loop_starter = question1,
-    #         loop_ender = question3
-    #         )
-        
-    #     response = self.client.get(reverse('prev_inline_questions_json_page',
-    #                                        kwargs={"question_id" : question3.id}))
-    #     self.assertIn(response.status_code, [200, 302])        
-
     def test_delete(self):
         list_1 = ListingTemplate.objects.create(name="List b3fgfg")
         survey_obj = Survey.objects.create(
@@ -352,12 +291,12 @@ class SetQuestionViewTest(BaseTest):
         self.assertIn(response.status_code, [200, 302])
 
     def test_remove(self):
-        list_1 = ListingTemplate.objects.create(name="List b4")
-        qset = QuestionSet.get(pk=list_1.id)
+        qset = ListingTemplate.objects.create(name="List b4")
         q_obj = Question.objects.create(identifier='id_3', text="This is a question123.7",
                                         answer_type='Numerical Answer',
-                                        qset_id=qset.id, response_validation_id=self.rsp.id)
-        response = self.client.get(reverse('remove_qset_question_page', kwargs={"question_id" : list_1.id}))
+                                        qset=qset, response_validation_id=self.rsp.id)
+        response = self.client.get(reverse('remove_qset_question_page', kwargs={"question_id" : q_obj.id}))
+        self.assertFalse(Question.objects.filter(id=q_obj.id).exists())
         self.assertIn(response.status_code, [200, 302])
 
     def test_export_questions_in_qset(self):
@@ -650,84 +589,8 @@ class SetQuestionViewTest(BaseTest):
         url = reverse('qset_update_question_order_page', kwargs={"qset_id" : qset.id})
         response = self.client.post(url,data={"order_information": [batch_obj.id]})
         self.assertIn(response.status_code, [200, 302])
-        self.assertRedirects(response, expected_url= reverse('qset_questions_page', kwargs={"qset_id" : qset.id}), msg_prefix='')
-
-    # def test_qset_assign_questions_page_assign_(self):
-    #     listing_form = ListingTemplate.objects.create(name='l12xa11', description='desc1')
-    #     kwargs = {'name': 'saaurvey11uz11ww', 'description': 'survey description demo12',
-    #                       'has_sampling': True, 'sample_size': 10,'listing_form_id':listing_form.id}
-    #     survey_obj = Survey.objects.create(**kwargs)
-    #     batch_obj = Batch.objects.create(name='ab1900010w',description='d1', survey=survey_obj)
-    #     qset = QuestionSet.get(id=batch_obj.id)
-        
-    #     question1 = mommy.make(Question, qset=qset, answer_type=NumericalAnswer.choice_name())
-    #     investigator = Interviewer.objects.create(name="Investigator1",
-    #                                                    ea=self.ea,
-    #                                                    gender='1', level_of_education='Primary',
-    #                                                    language='Eglish', weights=0,date_of_birth='1987-01-01')
-    #     interview_obj =  Interview.objects.create(
-    #         interviewer = investigator,
-    #         ea = self.ea,
-    #         survey = survey_obj,
-    #         question_set = qset,
-    #         )
-    #     ans_data = {
-    #     "question_type" : "qt14",
-    #     "interview" : interview_obj,
-    #     "question": question1,
-    #     "identifier" : "identifier",
-    #     "as_text" : "as_text",
-    #     "as_value" : 1
-    #     }
-    #     option1_text = 'q8'
-    #     QuestionOption.objects.create(
-    #         question=question1,
-    #         order=1,
-    #         text=option1_text
-    #         )
-    #     ans_args = (interview_obj, question1, option1_text)
-    #     answer_class = Answer.get_class(question1.answer_type)
-    #     ans_obj = answer_class.create(*ans_args)
-    #     QuestionOption.objects.create(
-    #         question=question1,
-    #         order=1,
-    #         text="q8"
-    #         ) 
-    #     question2 = mommy.make(Question, qset=qset, answer_type=NumericalAnswer.choice_name())
-    #     QuestionOption.objects.create(
-    #         question=question1,
-    #         order=4,
-    #         text="q4"
-    #         )
-    #     QuestionFlow.objects.create(
-    #         name = 'a1',
-    #         desc = 'descq',
-    #         question = question2,
-    #         question_type = TextAnswer.choice_name(),
-    #         next_question = question1,
-    #         next_question_type = TextAnswer.choice_name()
-    #         )
-    #     loop_obj = QuestionLoop.objects.create(
-    #         loop_starter = question2,
-    #         loop_ender = question1
-    #         )
-    #     url = reverse('qset_assign_questions_page', kwargs={"qset_id" : qset.id})
-    #     response = self.client.get(url)
-    #     self.assertIn(response.status_code, [200, 302])
-    #     self.assertRedirects(response, expected_url= reverse('qset_questions_page', kwargs={"qset_id" : qset.id}), msg_prefix='')
-    #     # self.assertIn("Questions cannot be assigned \
-    #     #     interviews has already been conducted: %s."%batch_obj.name, response.cookies['messages'].__str__())
-
-        
-    #     batch_obj = Batch.objects.create(name='b1900010w11',description='d1', survey=survey_obj)
-    #     qset = QuestionSet.get(id=batch_obj.id)
-        
-    #     question1 = mommy.make(Question, qset=qset, answer_type=NumericalAnswer.choice_name())
-    #     url = reverse('qset_assign_questions_page', kwargs={"qset_id" : qset.id})
-    #     response = self.client.post(url, data={"identifier" : "identifier_demo"})
-    #     self.assertRedirects(response, expected_url= reverse('qset_questions_page', kwargs={"qset_id" : qset.id}), msg_prefix='')
-    #     self.assertIn("Questions successfully assigned to Batch: %s.\\"%batch_obj.name, response.cookies['messages'].__str__())
-    #     self.assertRedirects(response, expected_url= reverse('qset_questions_page', kwargs={"qset_id" : qset.id}), msg_prefix='')
+        self.assertRedirects(response, expected_url = reverse('qset_questions_page',
+                                                             kwargs={"qset_id" : qset.id}), msg_prefix='')
 
     def test_add_question_logic_page(self):
         listing_form = ListingTemplate.objects.create(name='lz1', description='desc1')
@@ -756,6 +619,7 @@ class SetQuestionViewTest(BaseTest):
         "next_question" : question2.id
         }
         response = self.client.post(url, data=logic_form)
+
     def test_remove_question_loop_page(self):
         listing_form = ListingTemplate.objects.create(name='lz2', description='desc1')
         kwargs = {'name': 'sz2', 'description': 'survey description demo12',
@@ -834,10 +698,10 @@ class SetQuestionViewTest(BaseTest):
         expcted_ouput = {"success": True, "created": {"text": "equals: 3", "id": 2}}
         self.assertEquals(json.loads(response.content), expcted_ouput)
         rsp_form = {
-            "min" :'fd',
-            "max" :'esdfds',
+            "min":'fd',
+            "max":'esdfds',
             "value":3,
-            "validation_test" : '0'
+            "validation_test": '0'
         }
 
         url = reverse('json_create_response_validation')
@@ -852,8 +716,76 @@ class SetQuestionViewTest(BaseTest):
         expcted_ouput = {}
         self.assertEquals(json.loads(response.content), expcted_ouput)
 
+    def _create_ussd_non_group_questions(self, qset=None):
+        if qset is None:
+            qset = self.qset
+        # numeric answer
+        data = {
+            'answer_type': NumericalAnswer.choice_name(),
+            'text': 'num text',
+            'identifier': 'num1_identifier',
+            'qset': qset.id
+        }
+        question = self._save_question(qset, data)
+        qset.refresh_from_db()  # qset is updated by question (start_question attribute is updated)
+        # since it's the first question saved it must reflect as first question of the question set
+        self.assertEquals(qset.start_question.id, question.id)
+        # text answer
+        data = {
+            'answer_type': TextAnswer.choice_name(),
+            'text': 'texts text',
+            'identifier': 'text1_identifier_',
+            'qset': qset.id
+        }
+        self._save_question(qset, data)
+        # Multichoice questions
+        data = {
+            'answer_type': MultiChoiceAnswer.choice_name(),
+            'text': 'multichoice answer text',
+            'identifier': 'multi1_choice_identifier_',
+            'qset': qset.id,
+            'options': ['Y', 'N']
+        }
+        self._save_question(qset, data)
+        # Auto questions
+        data = {
+            'answer_type': AutoResponse.choice_name(),
+            'text': 'auto answer text',
+            'identifier': 'auto1_identifier_',
+            'qset': qset.id,
+        }
+        self._save_question(qset, data)
+        qset.refresh_from_db()
 
+    def _save_question(self, qset, data):
+        current_count = Question.objects.count()
+        QuestionForm = get_question_form(BatchQuestion)
+        question_form = QuestionForm(qset, data=data)
+        self.assertTrue(question_form.is_valid())
+        question = question_form.save()
+        self.assertEquals(Question.objects.count(), current_count + 1)
+        return question
 
+    def test_update_question_order(self):
+        qset = mommy.make(ListingTemplate)
+        self.qset_channels = mommy.make(QuestionSetChannel, qset=qset, channel=ODKAccess.choice_name())
+        self._create_ussd_non_group_questions(qset)
+        questions = list(Question.objects.all())
+        last = questions.pop(-1)
+        first = questions.pop(0)
+        questions.insert(0, last)
+        questions.append(first)
+        flow_questions = list(qset.flow_questions)
+        self.assertTrue(flow_questions[0], first)
+        self.assertTrue(flow_questions[-1], last)
+        data = {'order_information': ['%s-%s' % (idx, question.id) for idx, question in enumerate(questions)]}
+        url = reverse('qset_update_question_order_page', args=(qset.id, ))
+        response = self.client.post(url, data=data)
+        self.assertTrue(response.status_code in [200, 302])
+        # if successful first flow should be last
+        new_flow_questions = list(qset.flow_questions)
+        self.assertTrue(flow_questions[0], last)
+        self.assertTrue(flow_questions[-1], first)
 
 
 

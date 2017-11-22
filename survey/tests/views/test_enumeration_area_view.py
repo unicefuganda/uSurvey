@@ -1,8 +1,9 @@
+from model_mommy import mommy
 from django.contrib.auth.models import User
 from django.test import Client
 from mock import patch
 from survey.models.locations import *
-from survey.models import Survey, EnumerationArea, Batch
+from survey.models import Survey, EnumerationArea, Batch, BatchLocationStatus
 from survey.tests.base_test import BaseTest
 from survey.views.enumeration_area import _process_form
 from django.utils.timezone import utc
@@ -59,10 +60,48 @@ class EAViewTest(BaseTest):
         self.survey = Survey.objects.create(name="Survey")
 
     def test_new_ea(self):
-        data = {'name': ['drishti'], 'District': [self.district.id],
-                'County': [self.county_1.id], 'Parish': [self.parish_1.id]}
-        response = self.client.post('/enumeration_area/new/', data=data)
+        locations = Location.country().get_leafnodes(False)
+        data = {'name': 'drishti', 'locations': list(locations.values_list('id', flat=True))}
+        url = reverse('new_enumeration_area_page')
+        response = self.client.post(url, data=data)
+        self.assertEqual(302, response.status_code)
+        self.assertTrue(EnumerationArea.objects.filter(name=data['name']).count(), 1)
+        ea = EnumerationArea.objects.filter(name=data['name']).first()
+        self.assertTrue(ea.locations.count(), len(locations))
+
+    def test_create_new_ea_with_incomplete_params_does_not_create(self):
+        data = {'name': 'drishti', }
+        url = reverse('new_enumeration_area_page')
+        response = self.client.post(url, data=data)
         self.assertEqual(200, response.status_code)
+        self.assertIn('Enumeration area was not created.', response.content)
+        survey = mommy.make(Survey)
+        survey2 = mommy.make(Survey, name='second')
+        survey3 = mommy.make(Survey, name='third')
+        batch1 = mommy.make(Batch, survey=survey)
+        batch2 = mommy.make(Batch, survey=survey2)
+        batch3 = mommy.make(Batch, survey=survey3)
+        url = reverse('batch_open_page', args=(batch1.id, ))
+        response = self.client.post(url, data={'location_id': Location.country().id})
+        self.assertTrue(BatchLocationStatus.objects.filter(batch=batch1).count(), 1)
+        url = reverse('batch_open_page', args=(batch2.id, ))
+        response = self.client.post(url, data={'location_id': Location.country().id})
+        self.assertTrue(BatchLocationStatus.objects.filter(batch=batch2).count(), 1)
+        locations = Location.country().get_leafnodes(False)
+        ea = mommy.make(EnumerationArea)
+        for location in locations:
+            ea.locations.add(location)
+        url = reverse('open_surveys_in_ea_area')
+        response = self.client.get(url, data={'ea_id': ea.id})
+
+    def test_location_sub_types(self):
+        url = reverse('location_sub_types')
+        data = {'type': Location.country().type.id}
+        import json
+        response = json.loads(self.client.get(url, data=data).content)
+        child_locations = Location.country().get_children()
+        for location_data in response['locations']:
+            self.assertTrue(child_locations.filter(id=location_data['id'], name=location_data['name']).count(), 1)
 
     def test_index_ea(self):
         response = self.client.get('/enumeration_area/')
@@ -80,3 +119,19 @@ class EAViewTest(BaseTest):
         x= EnumerationArea.objects.create(name="tremp")
         response = self.client.get(reverse('delete_enumeration_area', kwargs={'ea_id': x.id}))        
         self.assertIn(response.status_code, [200,302])
+
+    def test_edit_ea(self):
+        locations = Location.country().get_leafnodes(False)
+        ea = mommy.make(EnumerationArea)
+        for location in locations:
+            ea.locations.add(location)
+        url = reverse('edit_enumeration_area_page', args=(ea.id, ))
+        response = self.client.get(url)
+        self.assertTrue(response.status_code, 200)
+        data = {'name': 'EA edited', 'locations': list(locations.values_list('id', flat=True))[:1], }
+        response = self.client.post(url, data)
+        self.assertTrue(response.status_code, [200, 300])
+        ea.refresh_from_db()
+        self.assertTrue(ea.name, data['name'])
+
+

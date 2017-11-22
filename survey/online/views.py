@@ -32,8 +32,7 @@ def ussd_flow(request):
             if request.method == 'POST':
                 request.POST = request_data
             _response = respond(request)
-            response = settings.USSD_RESPONSE_FORMAT % {
-                'response': _response.content.strip()}
+            response = settings.USSD_RESPONSE_FORMAT % {'response': _response.content.strip()}
         else:
             response = 'Invalid mobile number for your region'
     except phonenumbers.NumberParseException:

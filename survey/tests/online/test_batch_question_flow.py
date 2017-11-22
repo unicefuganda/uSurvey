@@ -5,13 +5,15 @@ from django.core.cache import cache
 from django.conf import settings
 from copy import deepcopy
 from django.test.client import Client
+from django.template.loader import get_template
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 from survey.models import (Batch, Survey, NumericalAnswer, TextAnswer, DateAnswer, MultiChoiceAnswer, ODKAccess,
                            RespondentGroup, ParameterTemplate, EnumerationArea, Interviewer, SurveyAllocation,
-                           BatchQuestion, ParameterQuestion)
-from survey.models.surveys import Survey
+                           BatchQuestion, ParameterQuestion, Location)
+from survey.models import Survey, USSDAccess
 from survey.models.questions import Question, QuestionFlow
+from survey.online.views import respond
 from survey.tests.base_test import BaseTest
 from survey.forms.batch import BatchForm
 from survey.forms.answer import SurveyAllocationForm, AddMoreLoopForm
@@ -125,9 +127,56 @@ class USSDFlowTest(SurveyBaseTest):
 
     def setUp(self):
         super(USSDFlowTest, self).setUp()
+        self.ussd_access = USSDAccess.objects.create(interviewer=self.interviewer, user_identifier='312313800')
+        self._create_ussd_non_group_questions()
 
-    def test_ussd_flow(self):
+    def test_ussd_flow_invalid_msisdn_gives_error_msg(self):
         ussd_url = reverse('ussd')
-        self.client.get(ussd_url)
+        data = {settings.USSD_MOBILE_NUMBER_FIELD: '',
+                settings.USSD_MSG_FIELD: ''}
+        response = self.client.get(ussd_url, data=data)
+        self.assertEquals('Invalid mobile number', response.content)
+        data = {settings.USSD_MOBILE_NUMBER_FIELD: '+254795466275',
+                settings.USSD_MSG_FIELD: ''}
+        response = self.client.get(ussd_url, data=data)
+        self.assertEquals('Invalid mobile number for your region', response.content)
+
+    def test_ussd_flow_with_valid_msisdn(self):
+        ussd_url = reverse('ussd')
+        data = {settings.USSD_MOBILE_NUMBER_FIELD: self.ussd_access.user_identifier,
+                settings.USSD_MSG_FIELD: ''}
+        response = self.client.get(ussd_url, data=data)
+        # at this stage no open surveys yet even though there is survey allocation
+        template = get_template('interviews/no-open-survey.html')
+        self.assertIn(template.render({'access': self.ussd_access, 'display_format': 'text'}).strip(),
+                      response.content.strip())
+        # now open all locations
+        country = Location.country()
+        for location in country.get_children():
+            self.qset.open_for_location(location)
+        response = self.client.get(ussd_url, data=data)
+        # check this form requires user to select EA
+        self.assertIn(self.survey_allocation.allocation_ea.name.upper(), response.content.upper())
+        data[settings.USSD_MSG_FIELD] = 1
+        response = self.client.get(ussd_url, data=data)
+        self.assertIn(self.qset.start_question.text.upper(), response.content.upper())     # numeric answer
+        data[settings.USSD_MSG_FIELD] = 3
+        response = self.client.get(ussd_url, data=data)
+        flow_questions = self.qset.flow_questions
+        self.assertIn(flow_questions[1].text.upper(), response.content.upper())  # text answer
+
+        # class FakeRequest(object):
+        #     POST = data
+        #     method = 'POST'
+        #     def is_ajax(self):
+        #         return False
+        # response = respond(FakeRequest())
+        # import pdb; pdb.set_trace()
+        # self.assertEquals()
+
+
+
+
+
 
 

@@ -143,7 +143,7 @@ class OnlineHandler(object):
             answer_form = get_answer_form(interview, access)(initial=initial)
             session_data[LAST_QUESTION] = interview.last_question.id
             has_go_back = True
-        elif str(session_data[LAST_QUESTION]) == str(interview.last_question.id):
+        elif interview.last_question and str(session_data[LAST_QUESTION]) == str(interview.last_question.id):
             if INTERVIEW_PROMPT_ANSWER_FORM in session_data:
                 answer_form = session_data[INTERVIEW_PROMPT_ANSWER_FORM](request, access, data=request_data)
                 del session_data[INTERVIEW_PROMPT_ANSWER_FORM]
