@@ -767,25 +767,33 @@ class SetQuestionViewTest(BaseTest):
         return question
 
     def test_update_question_order(self):
+        import random
         qset = mommy.make(ListingTemplate)
         self.qset_channels = mommy.make(QuestionSetChannel, qset=qset, channel=ODKAccess.choice_name())
         self._create_ussd_non_group_questions(qset)
         questions = list(Question.objects.all())
-        last = questions.pop(-1)
-        first = questions.pop(0)
-        questions.insert(0, last)
-        questions.append(first)
         flow_questions = list(qset.flow_questions)
-        self.assertTrue(flow_questions[0], first)
-        self.assertTrue(flow_questions[-1], last)
+        self.assertTrue(flow_questions[0].id, questions[0].id)
+        self.assertTrue(flow_questions[-1].id, questions[-1].id)
+        random.shuffle(questions)
         data = {'order_information': ['%s-%s' % (idx, question.id) for idx, question in enumerate(questions)]}
         url = reverse('qset_update_question_order_page', args=(qset.id, ))
         response = self.client.post(url, data=data)
         self.assertTrue(response.status_code in [200, 302])
         # if successful first flow should be last
         new_flow_questions = list(qset.flow_questions)
-        self.assertTrue(flow_questions[0], last)
-        self.assertTrue(flow_questions[-1], first)
+        for idx, question in enumerate(new_flow_questions):
+            self.assertTrue(question.id, questions[idx].id)
+        # lets shuffle and try again
+        random.shuffle(questions)
+        data = {'order_information': ['%s-%s' % (idx, question.id) for idx, question in enumerate(questions)]}
+        url = reverse('qset_update_question_order_page', args=(qset.id,))
+        response = self.client.post(url, data=data)
+        self.assertTrue(response.status_code in [200, 302])
+        # if successful first flow should be last
+        new_flow_questions = list(qset.flow_questions)
+        for idx, question in enumerate(new_flow_questions):
+            self.assertTrue(question.id, questions[idx].id)
 
 
 

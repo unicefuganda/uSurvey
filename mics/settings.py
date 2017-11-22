@@ -9,7 +9,7 @@ from collections import OrderedDict
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 REDIS_HOST = os.getenv('REDIS_HOST', 'localhost')
 REDIS_PORT = int(os.getenv('REDIS_PORT', 6379))
-DEBUG = True
+DEBUG = False
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
