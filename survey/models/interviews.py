@@ -90,7 +90,7 @@ class Interview(BaseModel):
         """
         interviewer = access_channel.interviewer
         interviews = []
-        if reference_interview and (issubclass(reference_interview, Interview) is False):
+        if reference_interview and (isinstance(reference_interview, Interview) is False):
             reference_interview = Interview.get(id=reference_interview)
 
         def _save_record(record):

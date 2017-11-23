@@ -15,7 +15,7 @@ from django.test.client import Client
 from django.contrib.auth.models import User
 from survey.models import (InterviewerAccess, ODKAccess, USSDAccess, Interview, Interviewer, QuestionSetChannel,
                            EnumerationArea, Survey, SurveyAllocation, Question, QuestionSet, Batch, BatchQuestion,
-                           QuestionOption, ODKSubmission)
+                           QuestionOption, Survey, Batch, ODKSubmission)
 from survey.forms.question import get_question_form
 # import all question types
 from survey.models import (Answer, NumericalAnswer, TextAnswer, MultiChoiceAnswer, MultiSelectAnswer, GeopointAnswer,
@@ -131,6 +131,40 @@ class ODKTest(SurveyBaseTest):
         context = {'qset': self.qset.id, 'instance_id': random.randint(0, 1000),
                    'survey_allocation': self.survey_allocation.allocation_ea.name.encode('utf8'),
                    'answer1': answer1, 'answer2': answer2, 'answer3': answer3, 'answer4': answer4}
+        return completed % context
+
+    def _get_completed_sample_xform(self, ref_interview, answer1, answer2, answer3, answer4):
+        completed = b'''<qset id="%(qset)s" >
+                         <meta>
+                            <instanceID>%(instance_id)s</instanceID>
+                            <instanceName>%(instance_id)s-Name</instanceName>
+                        <creationDate />
+                        <locked />
+                         </meta>
+                         <submissions>
+                             <id />
+                             <dates>
+                                 <lastModified />
+                             </dates>
+                         </submissions>
+                           <surveyAllocation>%(survey_allocation)s</surveyAllocation>
+                           <qset1>
+                            <sampleData>
+                                <selectedSample>%(ref_interview)s</selectedSample>
+                            </sampleData>
+                            <questions>
+                                <groupQuestions></groupQuestions>
+                                <surveyQuestions>
+                                    <q1>%(answer1)s</q1><q2>%(answer2)s</q2><q3>%(answer3)s</q3><q4>%(answer4)s</q4>
+                                </surveyQuestions>
+                            </questions>
+                           </qset1>
+                       </qset>
+                       '''
+        context = {'qset': self.qset.id, 'instance_id': random.randint(0, 1000),
+                   'survey_allocation': self.survey_allocation.allocation_ea.name.encode('utf8'),
+                   'answer1': answer1, 'answer2': answer2, 'answer3': answer3, 'answer4': answer4,
+                   'ref_interview': ref_interview.id}
         return completed % context
 
     def _get_completed_xform2(self, answer1, answer2, answer3, answer4, answer5, answer6, answer7,
@@ -269,6 +303,33 @@ class ODKTest(SurveyBaseTest):
                     self.assertEquals(extracted_content, fa_content)   # fake audio
                 if fv_name in key:
                     self.assertEquals(extracted_content, fv_content)   # fake video
+
+    def test_submit_with_ref_interview_xform(self):
+        self._create_ussd_non_group_questions(self.qset)
+        interview = mommy.make(Interview, interviewer=self.interviewer, survey=self.survey, ea=self.ea,
+                               interview_channel=self.access_channel, question_set=self.qset)
+        xml = self._get_completed_sample_xform(interview, '2', 'James', 'Y', '1')
+        f = SimpleUploadedFile("surveyfile.xml", xml)
+        url = reverse('odk_submit_forms')
+        response = self._make_odk_request(url=url, data={'xml_submission_file': f}, raw=True)
+        self.assertTrue( 300 > response.status_code and response.status_code >= 200)
+        self.assertEquals(ODKSubmission.objects.count(), 1)
+        # not confirm that 4 responses were given
+        self.assertEquals(Answer.objects.count(), 4)
+        # check if the saved interview has current one as reference interview
+        self.assertEquals(Interview.objects.last().interview_reference, interview)
+        # now test the instances listpage
+        url = reverse('odk_submission_list')
+        # check all the if the
+        raj = self.assign_permission_to(User.objects.create_user('Rajni', 'rajni@kant.com', 'I_Rock'),
+                                        'can_view_aggregates')
+        client = Client()
+        client.login(username='Rajni', password='I_Rock')
+        response = client.get(url)
+        templates = [template.name for template in response.templates]
+        self.assertIn('odk/submission_list.html', templates)
+        self.assertEquals(response.context['submissions'].count(), 1)
+        # check instances list on ODK
 
     def _extract_zip(self, input_content):
         input_zip = StringIO(input_content)

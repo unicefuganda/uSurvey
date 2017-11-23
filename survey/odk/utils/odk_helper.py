@@ -100,6 +100,7 @@ def process_answers(xml, qset, access_channel, question_map, survey_allocation, 
                 # if for some reason more than one interview value is reflected, choose the first one
                 reference_interview = _get_nodes('./sampleData/selectedSample',
                                                  answers_node)[0].text.strip('-').split('-')[0]
+                reference_interview = Interview.objects.get(id=reference_interview)
             # map(lambda node: answers.extend(get_answers(node, qset, question_map)), question_answers_node.getchildren())
             # map(lambda node: survey_parameters.extend(get_answers(node, qset, question_map)),
             #     survey_parameters_node.getchildren())
