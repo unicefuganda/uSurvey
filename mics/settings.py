@@ -1,19 +1,20 @@
 # Django settings for mics project.
 import os
 import sys
+from collections import OrderedDict
+import ast
 import phonenumbers
 import pycountry
-from collections import OrderedDict
 
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 REDIS_HOST = os.getenv('REDIS_HOST', 'localhost')
 REDIS_PORT = int(os.getenv('REDIS_PORT', 6379))
-DEBUG = False
+DEBUG = ast.literal_eval(os.getenv('DEBUG', 'False'))
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
-    # ('Your Name', 'your_email@example.com'),
+    ('Anthony Anyanwu', 'antsmc2@gmail.com'),
 )
 
 PROJECT_TITLE = 'uSurvey'

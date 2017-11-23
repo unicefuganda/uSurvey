@@ -25,6 +25,7 @@ services:
       - COUNTRY
       - TIME_ZONE
       - USURVEY_SECRET_KEY
+      - DEBUG
 
     image: antsmc2/usurvey
     volumes:

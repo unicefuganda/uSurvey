@@ -48,7 +48,7 @@ def get_question_templates_form(model_class):
 
         class Meta:
             model = model_class
-            exclude = []
+            exclude = ['response_validation', ]
             widgets = {
                 'text': forms.Textarea(
                     attrs={
