@@ -11,6 +11,7 @@ from survey.models import (QuestionModule, Batch, Indicator, Survey, Question, Q
                            MultiChoiceAnswer, QuestionOption, ListingTemplate, Location, LocationType)
 from survey.tests.base_test import BaseTest
 from survey.tests.models.survey_base_test import SurveyBaseTest
+from survey.forms.indicator import IndicatorForm
 
 
 class IndicatorViewTest(SurveyBaseTest):
@@ -310,3 +311,15 @@ class IndicatorViewTest(SurveyBaseTest):
     def test_permission_for_question_modules(self):
         self.assert_restricted_permission_for(reverse('list_indicator_page'))
         self.assert_restricted_permission_for(reverse('new_indicator_page'))
+
+    def test_indicator_form_enforces_name_to_be_alphanumeric(self):
+        data = self.form_data
+        indicator_form = IndicatorForm(data=data)
+        indicator_form.is_valid()       # not so much interested if it is valid or not just want to create the cleaned
+        self.assertTrue(indicator_form.cleaned_data['name'], data['name'])
+        data['name'] = 'Men>4'
+        indicator_form = IndicatorForm(data=data)
+        indicator_form.is_valid()       # again not interested. just to confirm
+        self.assertNotIn('name', indicator_form.cleaned_data)
+
+

@@ -22,8 +22,6 @@ from django.utils.safestring import mark_safe
 from django.utils import html
 from survey.forms.logic import LogicForm
 
-store = redis.Redis()
-
 register = template.Library()
 
 
@@ -43,8 +41,6 @@ def next(value, arg):
         return None
 
 
-
-
 @register.filter
 def space_replace(value, search_string):
     return value.replace(search_string, ' ')
@@ -58,7 +54,6 @@ def replace_space(value, replace_string):
     :return:
     """
     return value.replace(' ', replace_string)
-
 
 
 @register.filter
@@ -149,12 +144,12 @@ def get_age(d):
 
 @register.filter
 def get_url_with_ids(args, url_name):
-    if not str(args).isdigit():
+    if isinstance(args, basestring) and (str(args).isdigit() is False):
         arg_list = [int(arg) for arg in args.split(',')]
         return reverse(url_name, args=arg_list)
-    if isinstance(args, dict):
-        reverse(url_name, kwargs=args)
-    return reverse(url_name, args=(args,))
+    if str(args).isdigit():
+        return reverse(url_name, args=(args, ))
+    return reverse(url_name, args=args, )
 
 
 @register.filter
@@ -217,17 +212,10 @@ def show_condition(flow):
     return ""
 
 
-@register.assignment_tag
-def get_login_message(request):
-    if request.GET.get('next').endswith(reverse('activate_super_powers_page')):
-        from django.contrib import messages
-        messages.warning(request, 'You need to re-login to activate power mode')
-
-
 @register.filter
 def access_channels(answer_type):
-    channels = AnswerAccessDefinition.objects.filter(
-        answer_type=answer_type).values_list('channel', flat=True).order_by('channel')
+    channels = AnswerAccessDefinition.objects.filter(answer_type=answer_type
+                                                     ).values_list('channel', flat=True).order_by('channel')
     return ",".join(channels)
 
 
@@ -247,8 +235,8 @@ def quest_validation_opts(batch):
 def validation_args(batch):
     args_map = {}
     for validator in Answer.validators():
-        args_map.update({validator.__name__.upper(): len(inspect.getargspec(
-            validator).args) - 2})  # validator is a class method, plus answer extra pram
+        # validator is a class method, plus answer extra pram
+        args_map.update({validator.__name__.upper(): len(inspect.getargspec(validator).args) - 2})
     return mark_safe(json.dumps(args_map))
 
 
@@ -262,31 +250,18 @@ def get_question_value(question, answers_dict):
     return answers_dict.get(question.pk)
 
 
-@register.filter
-def household_completed_percent(interviewer):
-    households = interviewer.households.all()
-    total = households.count()
-    completed = len([hld for hld in households.all(
-    ) if not hld.survey_completed() and hld.household_member.count() > 0])
-    if total > 0:
-        return "%s%%" % str(completed * 100 / total)
-
-
 @register.assignment_tag
 def get_answer(question, interview):
     @cached_as(question, interview)
     def _get_answer():
         answer_class = Answer.get_class(question.answer_type)
-        try:
-            if answer_class in [VideoAnswer, AudioAnswer, ImageAnswer]:
-                return mark_safe('<a href="{% url download_qset_attachment %s %s %}">Download</a>' % (question.pk,
-                                                                                                      interview.pk))
-            else:
-                answer = answer_class.objects.filter(interview=interview, question=question).last()
-                if answer:
-                    return answer.value
-        except answer_class.DoesNotExist:
-            return ''
+        if answer_class in [VideoAnswer, AudioAnswer, ImageAnswer]:
+            url_component = '%s %s' % (question.pk, interview.pk)
+            return mark_safe('<a href="{% url download_qset_attachment ' + url_component + ' %}">Download</a>')
+        else:
+            answer = answer_class.objects.filter(interview=interview, question=question).last()
+            if answer:
+                return answer.value
     return _get_answer()
 
 
@@ -295,28 +270,10 @@ def can_start_survey(interviewer):
     return SurveyAllocation.can_start_batch(interviewer)
 
 
-@register.filter
-def open_survey_in_current_loc(interviewer):
-    return len(Survey.currently_open_surveys(interviewer.location))
-
-
-@register.filter
-def households_for_open_survey(interviewer):
-    open_survey = Survey.currently_open_surveys(interviewer.location)
-    households = interviewer.households.filter(survey__in=open_survey).all()
-    return len([hs for hs in households if hs.get_head() is not None])
-
-
 @register.assignment_tag
 def build_question_text(text, context):
     context = template.Context(context)
     return template.Template(text).render(context)
-
-
-@register.filter
-def total_household_members(interviewer):
-    households = interviewer.households.all()
-    return sum([household.household_member.count() for household in households])
 
 
 @register.assignment_tag

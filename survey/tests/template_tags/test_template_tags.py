@@ -1,20 +1,24 @@
-from datetime import date
+from datetime import date, timedelta
 from django.test.client import Client
 from django.contrib.auth.models import User
 from django.db.models import Q
 from django.core.urlresolvers import reverse
+from django.core.cache import cache
 from model_mommy import mommy
 from django.test import TestCase
+from django.utils.safestring import mark_safe
+from django.test.client import RequestFactory
 from survey.models import *
 from survey.models.locations import *
 from survey.templatetags.template_tags import *
 from survey.models.questions import *
 from survey.models.respondents import (RespondentGroupCondition, GroupTestArgument,
                                        ParameterQuestion, SurveyParameterList, RespondentGroup,
-                                       ParameterTemplate)
+                                       ParameterTemplate,)
 
 
 class TemplateTagsTest(TestCase):
+    fixtures = ['answeraccessdefinition.json', ]
 
     def setUp(self):
         self.survey = mommy.make(Survey)
@@ -293,15 +297,169 @@ class TemplateTagsTest(TestCase):
     def test_trim(self):
         str1 = "survey_test"
         self.assertEquals(str1.strip(), trim(str1))
-    # def test_get_question_text(self):
-    #     self.assertIsNotNone(get_question_text(self.question))
 
-    # def test_get_name_references(self):
-    #     self.assertIsNotNone(get_name_references(self.qset))        
-    # def test_get_node_path(self):
-    #     self.assertIsNotNone(get_node_path(self.question))
+    def test_current(self):
+        d = [3, 5]
+        self.assertEquals(d[1], current(d, 1))
+        self.assertEquals(None, current(d, 7))
 
-    # def test_get_loop_aware_path(self):
-    #     self.assertIsNotNone(get_loop_aware_path(self.question))
+    def test_next(self):
+        d = [3, 5, 8]
+        self.assertEquals(d[2], next(d, 1))
+        self.assertEquals(None, next(d, 7))
+
+    def test_space_replace(self):
+        msg = 'hey|guys|how|are|you'
+        self.assertEquals('hey guys how are you', space_replace(msg, '|'))
+
+    def test_has_location_selected(self):
+
+        class Dummy(object):
+            has_loc = True
+
+            def has_location_selected(self, obj):
+                return self.has_loc
+
+        loc_data = Dummy()
+        # following tests is logical since is_location_selected only calls has_location_selected of loc_data
+        self.assertEquals("selected='selected'", is_location_selected(loc_data, {'me': 'you'}))
+        loc_data.has_loc = False
+        self.assertEquals(None, is_location_selected(loc_data, {'me': 'you'}))
     
+    def test_selected_ea(self):
+
+        class Dummy(object):
+            selected_ea = self.ea
+
+            def is_ea_selected(self, ea):
+                return self.selected_ea
+
+        loc_data = Dummy()
+        # following tests is logical since is_location_selected only calls has_location_selected of loc_data
+        self.assertEquals("selected='selected'", is_ea_selected(loc_data, self.ea))
+        ea2 = EnumerationArea.objects.create(name='testea2')
+        self.assertEquals(None, is_ea_selected(loc_data, ea2))
+
+    def test_is_radio(self):
+        field = 'radio-select'
+        self.assertEquals(is_radio(field), "")
+        field = 'radio'
+        self.assertEquals(is_radio(field), "radio_field")
+
+    def test_display_list(self):
+        l = [2, 4, 6]
+        self.assertEquals(', '.join([str(i) for i in l]), display_list(l))
+
+    def test_join_list(self):
+        l = ['me', 'you', 'us']
+        new_list = ['<span class="muted">%s</span>' % string.capwords(str(item)) for item in l]
+        self.assertEquals(mark_safe(' '.join(new_list)), join_list(l, ' '))
+
+    def test_get_callable_value(self):
+
+        def callable(x):
+            return str(x*x)
+        self.assertEquals(get_value(callable, 3), '9')
+
+    def test_cached_value(self):
+        cache.set('key', 8)
+        self.assertEquals(get_cached_result('key', 4), 8)
+        cache.delete('key')
+        self.assertEquals(get_cached_result('key', 4), 4)
+
+    def test_batches_enabled(self):
+
+        class Dummy(object):
+            enabled = True
+
+            def batches_enabled(self, ea):
+                return self.enabled
+        d = Dummy()
+        self.assertEquals('Enabled', batches_enabled(d, self.ea))
+        d.enabled = False
+        self.assertEquals('Not Enabled', batches_enabled(d, self.ea))
+
+    def test_get_age(self):
+        age = 10
+        d = date.today() - timedelta(days=365*age)
+        self.assertEquals(get_age(d), age-1)        # since starts from 0
+
+    def test_url_with_ids_using_dict(self):
+        d = (1, )
+        url = reverse('deactivate_user', args=d)
+        self.assertEquals(get_url_with_ids(d, 'deactivate_user'), url)
+
+    def test_concat_str(self):
+        l = ['hey', 'boy']
+        self.assertEquals(concat_strings(*l), ''.join(l))
+
+    def test_get_channels(self):
+        answer_type = NumericalAnswer.choice_name()
+        channels = AnswerAccessDefinition.objects.filter(answer_type=answer_type
+                                                         ).values_list('channel', flat=True).order_by('channel')
+        self.assertEquals(','.join(channels), access_channels(answer_type))
+
+    def test_quest_validation_opts(self):
+        batch = mommy.make(Batch)
+        import json
+        validation_options = json.loads(quest_validation_opts(batch))
+        for cls in Answer.__subclasses__():
+            options = validation_options[cls.choice_name()]
+            for idx, validator in enumerate(cls.validators()):
+                self.assertEquals(options[idx]['display'], validator.__name__)
+                self.assertEquals(options[idx]['value'], validator.__name__.upper())
+
+    def test_validation_args(self):
+        batch = mommy.make(Batch)
+        import json
+        args_dict = json.loads(validation_args(batch))
+        self.assertEquals(args_dict['EQUALS'], 1)
+        self.assertEquals(args_dict['BETWEEN'], 2)
+        self.assertEquals(args_dict['GREATER_THAN'], 1)
+        self.assertEquals(args_dict['LESS_THAN'], 1)
+
+    def test_get_question_value(self):
+        batch = mommy.make(Batch)
+        question = mommy.make(Question, qset=batch)
+        answers_dict = {question.pk: 'hey'}
+        self.assertEquals(get_question_value(question, answers_dict), 'hey')
+
+    def test_can_start_survey(self):
+        interviewer = mommy.make(Interviewer, name='intesg')
+        survey = mommy.make(Survey, has_sampling=False, name='testks')
+        mommy.make(SurveyAllocation, survey=survey, interviewer=interviewer, allocation_ea=self.ea)
+        self.assertEquals(can_start_survey(interviewer), True)
+
+    def test_is_relevant_sample(self):
+        interviewer = mommy.make(Interviewer, name='intesg')
+        survey = mommy.make(Survey, has_sampling=False, name='testks')
+        mommy.make(SurveyAllocation, survey=survey, interviewer=interviewer, allocation_ea=self.ea)
+        mommy.make(SurveyAllocation, survey=survey, interviewer=interviewer,
+                   allocation_ea=mommy.make(EnumerationArea))
+        assignments = interviewer.unfinished_assignments
+        ea_assignmts = assignments.filter(allocation_ea__id=self.ea.id)
+        odk_print = ' or '.join(["selected(/qset/surveyAllocation, '%s')" % a.allocation_ea.name for a in ea_assignmts])
+        self.assertEquals(is_relevant_sample(self.ea.id, assignments), odk_print)
+
+    def test_get_download_url(self):
+        rf = RequestFactory()
+        url_name = 'users_index'
+        url = reverse(url_name)
+        request = rf.get(url)
+        self.assertIn(url, get_download_url(request, url_name))
+
+    def test_get_download_url(self):
+        rf = RequestFactory()
+        url_name = 'deactivate_user'
+        url = reverse(url_name, args=(1, ))
+        request = rf.get(url)
+        self.assertIn(url, get_absolute_url(request, url_name, 1))
+        self.assertIn('http', get_absolute_url(request, url_name, 1))
+        self.assertIn(request.build_absolute_uri('/'), get_home_url(request))
+
+
+
+
+
+
 

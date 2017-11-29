@@ -1,3 +1,4 @@
+import re
 import random
 from django import forms
 from django import template
@@ -64,6 +65,13 @@ class IndicatorForm(ModelForm, FormOrderMixin):
                 self.instance.variables.values_list(
                     'id', flat=True))
         return IndicatorVariable.objects.filter(id__in=var_ids)
+
+    def clean_name(self):
+        name = self.cleaned_data['name']
+        if re.match('^[0-9a-zA-Z_-]+$', name):
+            return name
+        else:
+            raise ValidationError('Only numbers, alphabets, - and _ are allowed in indicator name')
 
     def clean(self):
         super(IndicatorForm, self).clean()

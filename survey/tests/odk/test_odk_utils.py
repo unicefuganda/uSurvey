@@ -9,6 +9,7 @@ from model_mommy import mommy
 import random
 from hashlib import md5
 from django.test import TestCase
+from django.utils.safestring import mark_safe
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
 from django.test.client import Client
@@ -17,6 +18,7 @@ from survey.models import (InterviewerAccess, ODKAccess, USSDAccess, Interview, 
                            EnumerationArea, Survey, SurveyAllocation, Question, QuestionSet, Batch, BatchQuestion,
                            QuestionOption, Survey, Batch, ODKSubmission)
 from survey.forms.question import get_question_form
+from survey.templatetags.template_tags import get_answer
 # import all question types
 from survey.models import (Answer, NumericalAnswer, TextAnswer, MultiChoiceAnswer, MultiSelectAnswer, GeopointAnswer,
                            ImageAnswer, AudioAnswer, VideoAnswer, DateAnswer, AutoResponse, Attachment)
@@ -283,7 +285,7 @@ class ODKTest(SurveyBaseTest):
             # not confirm that 4 responses were given
             self.assertEquals(Answer.objects.count(), len(answers))
             # now test the instances listpage
-            submission = ODKSubmission.objects.first()
+            submission = ODKSubmission.objects.last()
             url = reverse('download_submission_attachment', args=(submission.pk,))
             # check all the if the
             raj = self.assign_permission_to(User.objects.create_user('Rajni', 'rajni@kant.com', 'I_Rock'),
@@ -303,6 +305,19 @@ class ODKTest(SurveyBaseTest):
                     self.assertEquals(extracted_content, fa_content)   # fake audio
                 if fv_name in key:
                     self.assertEquals(extracted_content, fv_content)   # fake video
+            # now test get answer of template_tag
+            video_answer = VideoAnswer.objects.last()
+            text_answer = TextAnswer.objects.last()
+            interview = video_answer.interview
+            question = video_answer.question
+            url_component = '%s %s' % (question.pk, interview.pk)
+            # really not the best in the world
+            url_desc = mark_safe('<a href="{% url download_qset_attachment ' + url_component + ' %}">Download</a>')
+            self.assertEquals(url_desc, get_answer(question, interview))
+            self.assertEquals(get_answer(text_answer.question, text_answer.interview), text_answer.value)
+            # test case where answer does not exist
+            self.assertIn(get_answer(mommy.make(Question, qset=self.qset, answer_type=TextAnswer.choice_name()),
+                                     interview), ['', None])
 
     def test_submit_with_ref_interview_xform(self):
         self._create_ussd_non_group_questions(self.qset)

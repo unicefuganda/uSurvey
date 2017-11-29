@@ -8,6 +8,7 @@ from survey.tests.base_test import BaseTest
 from survey.models.base import BaseModel
 from survey.models import Question, QuestionSet
 from survey.models import Answer, MultiChoiceAnswer
+from survey.templatetags.template_tags import get_sample_data_display
 from survey.models.surveys import Survey
 from survey.models import Interview, SurveyAllocation, Interviewer, ListingSample
 from survey.models import ListingTemplate, RandomizationCriterion, CriterionTestArgument, ODKAccess, QuestionSetChannel
@@ -128,6 +129,8 @@ class RandomizationTest(SurveyBaseTest):
             except Answer.DoesNotExist:
                 expected_label = '%s' % first_text
             self.assertEquals(string.capwords(expected_label), sample.get_display_label())
+            self.assertEquals(get_sample_data_display(sample), sample.get_display_label())
+
 
     def test_create_randomization_criteria_with_bad_validation_test(self):
         m_question = self.qset.questions.filter(answer_type=MultiChoiceAnswer.choice_name()).first()
