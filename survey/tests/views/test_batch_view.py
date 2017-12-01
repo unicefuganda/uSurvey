@@ -2,13 +2,14 @@ from django.contrib.auth.models import User
 from django.test.client import Client
 from survey.models.locations import *
 from model_mommy import mommy
-from survey.models import  QuestionModule, Interviewer, EnumerationArea, QuestionTemplate, NumericalAnswer, TextAnswer, MultiChoiceAnswer, QuestionOption, ListingTemplate, QuestionLoop
+from survey.models import (QuestionModule, Interviewer, EnumerationArea, QuestionTemplate,
+                           NumericalAnswer, TextAnswer, MultiChoiceAnswer, QuestionOption,
+                           ListingTemplate, QuestionLoop)
 from survey.models.surveys import Survey
 from survey.models.questions import Question, QuestionFlow, QuestionSet
 from survey.models.batch import Batch
 from survey.tests.base_test import BaseTest
-from survey.forms.batch import BatchForm
-from survey.forms.question_set import get_question_set_form
+from survey.forms.question_set import get_question_set_form, BatchForm
 from survey.forms import *
 from django.core.urlresolvers import reverse
 import json

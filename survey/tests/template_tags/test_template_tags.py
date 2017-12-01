@@ -9,6 +9,7 @@ from django.test import TestCase
 from django.utils.safestring import mark_safe
 from django.test.client import RequestFactory
 from survey.models import *
+from survey.context_processor import CachedValue
 from survey.models.locations import *
 from survey.templatetags.template_tags import *
 from survey.models.questions import *
@@ -456,6 +457,11 @@ class TemplateTagsTest(TestCase):
         self.assertIn(url, get_absolute_url(request, url_name, 1))
         self.assertIn('http', get_absolute_url(request, url_name, 1))
         self.assertIn(request.build_absolute_uri('/'), get_home_url(request))
+        # just as a bonus add test context processor
+        cache.set('key', 'me')
+        response = self.client.get('/')
+        self.assertIn('cached_value', response.context)
+        self.assertEquals(response.context['cached_value'].key, 'me')
 
 
 

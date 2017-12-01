@@ -1,11 +1,12 @@
 from django.test import TestCase
-from survey.forms.batch import BatchForm
+from survey.forms.question_set import BatchForm
 from survey.models.locations import *
 from survey.models import EnumerationArea
 from survey.models import Interviewer
 from survey.models.access_channels import *
 from survey.models.batch import Batch
 from survey.models.surveys import Survey
+
 
 class BatchFormTest(TestCase):
     

@@ -4,7 +4,7 @@ import phonenumbers
 from django.core.cache import cache
 
 
-class CachedValue:
+class CachedValue(object):
 
     def __getattr__(self, key):
         key = key.replace('__', '/')

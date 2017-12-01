@@ -1,14 +1,12 @@
 from django.contrib.auth.models import User
 from django.test import Client
 from survey.forms.question_module_form import QuestionModuleForm
-# from survey.forms.question_set import QuestionSetForm, BatchForm
 from model_mommy import mommy
 from survey.forms import *
 from survey.models import *
 from survey.models.batch import *
 from survey.tests.base_test import BaseTest
-from survey.forms.batch import BatchForm
-from survey.forms.question_set import get_question_set_form
+from survey.forms.question_set import get_question_set_form, BatchForm
 from survey.views.question_set import QuestionSetView
 import json
 

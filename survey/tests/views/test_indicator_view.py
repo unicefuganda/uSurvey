@@ -71,7 +71,7 @@ class IndicatorViewTest(SurveyBaseTest):
         response = self.client.post(url, data=data)
         self.assertIn(response.status_code, [200, 302])
         self.assertEquals(IndicatorVariable.objects.count(), variable_count+1)
-        data['name'] = 'variable2'
+        data['name'] = 'variablesd2'
         data['max'] = '1000'
         data['min'] = '0'
         variable_count = IndicatorVariable.objects.count()

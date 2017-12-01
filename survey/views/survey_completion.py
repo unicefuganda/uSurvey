@@ -1,7 +1,6 @@
 import json
 import ast
 from django.contrib import messages
-from django.utils.datastructures import SortedDict
 from django.contrib.auth.decorators import login_required, permission_required
 from django.core.serializers.json import DjangoJSONEncoder
 from django.http import HttpResponse
@@ -10,7 +9,6 @@ from django.db.models import Count
 from survey.models import Location, LocationType, Indicator,\
     Answer, QuestionOption
 from survey.forms.enumeration_area import LocationsFilterForm as LocFilterForm
-from survey.forms.filters import LocationFilterForm
 from survey.models import Survey, Interviewer, SurveyAllocation,\
     Batch, EnumerationArea, Interview
 from survey.utils.views_helper import contains_key, is_not_digit_nor_empty

@@ -13,7 +13,7 @@ from survey.models import (QuestionModule, Interviewer,  EnumerationArea, Questi
 from survey.models.surveys import Survey
 from survey.models.questions import Question, QuestionFlow
 from survey.tests.base_test import BaseTest
-from survey.forms.batch import BatchForm
+from survey.forms.question_set import BatchForm
 from survey.forms.answer import SurveyAllocationForm, AddMoreLoopForm
 
 

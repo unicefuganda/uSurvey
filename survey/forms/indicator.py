@@ -18,7 +18,7 @@ from survey.forms.form_helper import Icons
 class IndicatorForm(ModelForm, FormOrderMixin):
     survey = forms.ModelChoiceField(queryset=Survey.objects.all(), empty_label='Select Survey')
     question_set = forms.ModelChoiceField(queryset=QuestionSet.objects.none(), empty_label='Select Question set')
-    variables = forms.ModelMultipleChoiceField(queryset=IndicatorVariable.objects.none())
+    variables = forms.ModelMultipleChoiceField(queryset=IndicatorVariable.objects.none(), required=False)
 
     def __init__(self, *args, **kwargs):
         super(IndicatorForm, self).__init__(*args, **kwargs)
@@ -49,8 +49,7 @@ class IndicatorForm(ModelForm, FormOrderMixin):
                     'title': 'Delete Variable'}}
         self.fields['formulae'].icons = {'check': {'id': 'validate', 'title': 'Validate'}, }
         if self.data.get('survey'):
-            self.fields['question_set'].queryset = Survey.get(
-                pk=self.data['survey']).qsets
+            self.fields['question_set'].queryset = Survey.get(pk=self.data['survey']).qsets
         self.fields['name'].label = 'Indicator'
         self.order_fields(['survey', 'question_set', 'name',
                            'description', 'variables', 'formulae'])
@@ -77,12 +76,6 @@ class IndicatorForm(ModelForm, FormOrderMixin):
         super(IndicatorForm, self).clean()
         question_set = self.cleaned_data.get('question_set', None)
         survey = self.cleaned_data.get('survey', None)
-        if question_set and survey.qsets.filter(
-                id=question_set.id).exists() is False:
-            message = "Question set %s does not belong to the selected Survey." % (
-                question_set.name)
-            self._errors['batch'] = self.error_class([message])
-            del self.cleaned_data['question_set']
         return self.cleaned_data
 
     def clean_formulae(self):
@@ -100,17 +93,10 @@ class IndicatorForm(ModelForm, FormOrderMixin):
         exclude = []
 
     def save(self, commit=True, *args, **kwargs):
-        instance = super(
-            IndicatorForm,
-            self).save(
-            commit=commit,
-            *
-            args,
-            **kwargs)
+        instance = super(IndicatorForm, self).save(commit=commit, *args, **kwargs)
         if commit:
             self.cleaned_data['variables'].update(indicator=instance)
-            instance.variables.exclude(
-                id__in=self.data.getlist('variables')).delete()
+            instance.variables.exclude(id__in=self.data.getlist('variables')).delete()
             IndicatorVariable.objects.filter(indicator__isnull=True).delete()
         return instance
 
@@ -181,15 +167,10 @@ class IndicatorVariableForm(ModelForm, FormOrderMixin):
             raise forms.ValidationError(
                 'unsupported validator defined on test question')
         if validation_test == 'between':
-            if self.cleaned_data.get(
-                    'min', False) is False or self.cleaned_data.get(
-                    'max', False) is False:
-                raise forms.ValidationError(
-                    'min and max values required for between condition')
+            if self.cleaned_data.get('min', None) is None or self.cleaned_data.get('max', None) is None:
+                raise forms.ValidationError('min and max values required for between condition')
         elif self.cleaned_data.get('value', False) is False:
-            raise forms.ValidationError(
-                'Value is required for %s' %
-                validation_test)
+            raise forms.ValidationError('Value is required for %s' % validation_test)
         if test_question.answer_type in [
                 MultiChoiceAnswer.choice_name(),
                 MultiSelectAnswer]:

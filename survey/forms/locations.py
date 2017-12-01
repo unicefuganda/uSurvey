@@ -51,8 +51,7 @@ class LocationForm(ModelForm):
         cleaned_data = super(LocationForm, self).clean()
         locations_with_same_attributes = Location.objects.filter(
             **cleaned_data)
-        if locations_with_same_attributes and not self.editing_instance(
-                cleaned_data):
+        if locations_with_same_attributes and not self.editing_instance(cleaned_data):
             raise ValidationError('This location already exists.')
         return cleaned_data
 

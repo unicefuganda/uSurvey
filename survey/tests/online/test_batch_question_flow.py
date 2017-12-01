@@ -15,7 +15,7 @@ from survey.models import Survey, USSDAccess
 from survey.models.questions import Question, QuestionFlow
 from survey.online.views import respond
 from survey.tests.base_test import BaseTest
-from survey.forms.batch import BatchForm
+from survey.forms.question_set import BatchForm
 from survey.forms.answer import SurveyAllocationForm, AddMoreLoopForm
 from survey.tests.models.survey_base_test import SurveyBaseTest
 

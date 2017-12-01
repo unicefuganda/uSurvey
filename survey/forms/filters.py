@@ -1,6 +1,7 @@
 from datetime import datetime
 from django.conf import settings
 from django import forms
+from django.utils import timezone
 from survey.models import RespondentGroup, QuestionModule, Question, Batch, Survey, EnumerationArea, Location, \
     LocationType, Indicator, BatchQuestion, Interview, QuestionSet, ListingTemplate
 MAX_NUMBER_OF_QUESTION_DISPLAYED_PER_PAGE = 1000
@@ -62,28 +63,6 @@ class BatchQuestionFilterForm(QuestionFilterForm):
             self.fields[field].widget.attrs['readonly'] = True
             self.fields[field].widget.attrs['disabled'] = True
 
-    def _query_dict(self, questions):
-        query_dict = None
-        if self.is_valid():
-            query_dict = {'group': self.cleaned_data['groups'],
-                          'module': self.cleaned_data['modules'],
-                          'answer_type': self.cleaned_data['question_types']}
-            for key, val in query_dict.items():
-                if val == 'All' or not val:
-                    del query_dict[key]
-        if query_dict is None:
-            query_dict = {
-                'group__in': [
-                    key for key,
-                    val in self.fields['groups'].choices if not val == 'All'],
-                'module__in': [
-                    key for key,
-                    val in self.fields['modules'].choices if not val == 'All'],
-                'answer_type__in': [
-                    key for key,
-                    val in self.fields['question_types'].choices if not val == 'All']}
-        return query_dict
-
 
 class IndicatorFilterForm(forms.Form):
     survey = forms.ChoiceField(label='Survey', widget=forms.Select(
@@ -108,28 +87,6 @@ class IndicatorFilterForm(forms.Form):
         map(lambda qset: question_sets.append((qset.id, qset.name)), qsets)
         map(lambda survey: all_surveys.append((survey.id, survey.name)), Survey.objects.all())
         return all_surveys, question_sets
-
-
-class LocationFilterForm(forms.Form):
-    survey = forms.ModelChoiceField(
-        queryset=Survey.objects.all().order_by('name'), empty_label='----')
-    batch = forms.ModelChoiceField(
-        queryset=Batch.objects.none(), empty_label='----')
-    location = forms.ModelChoiceField(
-        queryset=Location.objects.all(),
-        widget=forms.HiddenInput(),
-        required=False)
-    ea = forms.ModelChoiceField(
-        queryset=None, widget=forms.HiddenInput(), required=False)
-
-    def __init__(self, *args, **kwargs):
-        super(LocationFilterForm, self).__init__(*args, **kwargs)
-        if self.data.get('survey'):
-            survey = Survey.objects.get(id=self.data['survey'])
-            self.fields[
-                'batch'].queryset = survey.batches.all().order_by('name')
-            self.fields['ea'].queryset = EnumerationArea.objects.filter(
-                survey_allocations__survey=survey)
 
 
 class SurveyBatchFilterForm(forms.Form):
@@ -164,8 +121,8 @@ class SurveyBatchFilterForm(forms.Form):
 class BatchOpenStatusFilterForm(forms.Form):
     OPEN = 1
     CLOSED = 2
-    status = forms.ChoiceField(label='Status', widget=forms.Select(), choices=[(
-        0, '-- All Status --'), (OPEN, 'Open'), (CLOSED, 'Closed')], required=False)
+    status = forms.ChoiceField(label='Status', widget=forms.Select(), choices=[(0, '-- All Status --'), (OPEN, 'Open'),
+                                                                               (CLOSED, 'Closed')], required=False)
 
     def __init__(self, batch, *args, **kwargs):
         super(BatchOpenStatusFilterForm, self).__init__(*args, **kwargs)
@@ -179,10 +136,8 @@ class BatchOpenStatusFilterForm(forms.Form):
         except forms.ValidationError:
             pass
         prime_location_type = LocationType.largest_unit()
-        locations = Location.objects.filter(
-            type=prime_location_type).order_by('name')
-        batch_location_ids = self.batch.open_locations.values_list(
-            'location_id', flat=True)
+        locations = Location.objects.filter(type=prime_location_type).order_by('name')
+        batch_location_ids = self.batch.open_locations.values_list('location_id', flat=True)
         if status and status == self.OPEN:
             return locations.filter(id__in=batch_location_ids)
         elif status and status == self.CLOSED:
@@ -214,10 +169,8 @@ class UsersFilterForm(forms.Form):
         except forms.ValidationError:
             pass
         if status:
-            return User.objects.filter(
-                is_active=(
-                    status == self.ACTIVE)).exclude(
-                is_superuser=True).order_by('first_name')
+            return User.objects.filter(is_active=(status == self.ACTIVE)).exclude(is_superuser=True
+                                                                                  ).order_by('first_name')
         return User.objects.exclude(is_superuser=True).order_by('first_name')
 
 
@@ -287,8 +240,7 @@ class SurveyResultsFilterForm(forms.Form):
                 survey__id=self.data['survey'])
         elif 'question_set' in disabled_fields and (self.data.get('question_set', None)
                                                     and model_class == ListingTemplate):
-            self.fields['survey'].queryset = Survey.objects.filter(
-                listing_form__id=self.data['question_set'])
+            self.fields['survey'].queryset = Survey.objects.filter(listing_form__id=self.data['question_set'])
 
     def get_interviews(self, interviews=Interview.objects):
         kwargs = {}
@@ -297,7 +249,8 @@ class SurveyResultsFilterForm(forms.Form):
         if self.data.get('question_set', None):
             kwargs['question_set__id'] = self.data['question_set']
         if self.data.get('from_date', None):
-            kwargs['created__gte'] = datetime.strptime(self.data['from_date'], settings.DATE_FORMAT)
+            kwargs['created__gte'] = timezone.make_aware(datetime.strptime(self.data['from_date'],
+                                                                           settings.DATE_FORMAT))
         if self.data.get('to_date', None):
-            kwargs['created__lt'] = datetime.strptime(self.data['to_date'], settings.DATE_FORMAT)
+            kwargs['created__lt'] = timezone.make_aware(datetime.strptime(self.data['to_date'], settings.DATE_FORMAT))
         return interviews.filter(**kwargs)

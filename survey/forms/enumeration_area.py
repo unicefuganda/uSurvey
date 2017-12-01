@@ -54,10 +54,9 @@ class LocationsFilterForm(Form):
         for location_type in LocationType.in_between():
             kw = {'type': location_type}
             parent_selection = data.get(location_type.parent.name, None)
-            if (locations and parent_selection) or location_type == largest_unit:
+            if (locations and parent_selection) or location_type == largest_unit:       # might need to refactor this
                 if parent_selection:
-                    last_selected_pk = data.get(
-                        location_type.name, None) or parent_selection
+                    last_selected_pk = data.get(location_type.name, None) or parent_selection
                     kw['parent__pk'] = parent_selection
                 locations = Location.objects.filter(**kw).only('id', 'name').order_by('name')
             else:
@@ -71,7 +70,7 @@ class LocationsFilterForm(Form):
             self.fields[location_type.name].empty_label = '-- Select %s --' % location_type.name
             self.fields[location_type.name].widget.attrs['class'] = 'location_filter ea_filters chzn-select'
             # self.fields[location_type.name].widget.attrs['style'] = 'width: 100px;'
-        if last_selected_pk:
+        if Location.objects.exists() and last_selected_pk:
             self.last_location_selected = Location.objects.get(pk=last_selected_pk)
         if include_ea:
             if self.last_location_selected:
@@ -121,10 +120,3 @@ def get_leaf_locs(loc=None, ea=None):
     else:
         return Location.objects.none()
 
-#
-#     def save(self, commit=True, **kwargs):
-#         batch = super(EnumerationAreaForm, self).save(commit=commit)
-#         bc = BatchChannel.objects.filter(batch=batch)
-#         bc.delete()
-#         for val in kwargs['access_channels']:
-#            BatchChannel.objects.create(batch=batch, channel=val)

@@ -16,8 +16,7 @@ from survey.models import QuestionLoop
 from survey.models import QuestionOption
 from survey.models import Answer
 from survey.models import ResponseValidation
-from survey.forms.question import get_question_form  # , QuestionFlowForm
-from survey.forms.batch import BatchQuestionsForm
+from survey.forms.question import get_question_form, BatchQuestionForm  # , QuestionFlowForm
 from survey.services.export_questions import get_question_as_dump
 from survey.utils.query_helper import get_filterset
 from survey.views.custom_decorators import not_allowed_when_batch_is_open
