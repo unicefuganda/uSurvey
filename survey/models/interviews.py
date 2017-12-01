@@ -74,7 +74,7 @@ class Interview(BaseModel):
         return ''
 
     @classmethod
-    def save_answers(cls, qset, survey, ea, access_channel, question_map, answers, survey_parameters=None,
+    def save_answers(cls, qset, survey, ea, access_channel, question_map, answers, survey_parameters={},
                      reference_interview=None, media_files={}):
         """Used to save a dictionary list of answers. keys in each answer dict must be keys in the question map
         :param qset:
@@ -88,6 +88,8 @@ class Interview(BaseModel):
         :param media_files: Any media files available. Required for file related answers (Image, audio and video)
         :return:
         """
+        # at least make sure this qset is covered
+        question_map.update({question.id: question for question in qset.all_questions})
         interviewer = access_channel.interviewer
         interviews = []
         if reference_interview and (isinstance(reference_interview, Interview) is False):

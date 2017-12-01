@@ -2,13 +2,8 @@ from model_mommy import mommy
 import random
 from django.core.management import call_command
 from survey.tests.base_test import BaseTest, Base
-from survey.models import (InterviewerAccess, ODKAccess, USSDAccess, Interview, Interviewer, QuestionSetChannel,
-                           EnumerationArea, Survey, SurveyAllocation, Question, QuestionSet, Batch, BatchQuestion,
-                           QuestionOption)
+from survey.models import *
 from survey.forms.question import get_question_form
-# import all question types
-from survey.models import (Answer, NumericalAnswer, TextAnswer, MultiChoiceAnswer, MultiSelectAnswer, GeopointAnswer,
-                           ImageAnswer, AudioAnswer, VideoAnswer, DateAnswer, AutoResponse)
 
 
 class SurveyBaseTest(BaseTest):
@@ -30,6 +25,7 @@ class SurveyBaseTest(BaseTest):
         self.access_channel = mommy.make(ODKAccess, interviewer=self.interviewer)
         # create the access channel
         self.qset_channels = mommy.make(QuestionSetChannel, qset=self.qset, channel=self.access_channel.choice_name())
+        self.qset_channels1 = mommy.make(QuestionSetChannel, qset=self.qset1, channel=self.access_channel.choice_name())
         self.interview = mommy.make(Interview, interviewer=self.interviewer, survey=self.survey, ea=self.ea,
                                     interview_channel=self.access_channel, question_set=self.qset)
 
@@ -53,6 +49,54 @@ class SurveyBaseTest(BaseTest):
             'text': 'texts text',
             'identifier': 'text1_identifier_%s' % random.randint(1, 100),
             'qset': qset.id
+        }
+        self._save_question(qset, data)
+        # Multichoice questions
+        data = {
+            'answer_type': MultiChoiceAnswer.choice_name(),
+            'text': 'multichoice answer text',
+            'identifier': 'multi1_choice_identifier_%s' % random.randint(1, 100),
+            'qset': qset.id,
+            'options': ['Y', 'N']
+        }
+        self._save_question(qset, data)
+        # Auto questions
+        data = {
+            'answer_type': AutoResponse.choice_name(),
+            'text': 'auto answer text',
+            'identifier': 'auto1_identifier_%s' % random.randint(1, 100),
+            'qset': qset.id,
+        }
+        self._save_question(qset, data)
+        self.qset.refresh_from_db()
+
+    def _create_ussd_group_questions(self, qset=None):
+        if qset is None:
+            qset = self.qset
+        group = mommy.make(RespondentGroup)
+        param_question = mommy.make(ParameterTemplate, answer_type=NumericalAnswer.choice_name(),
+                                    identifier='param-question')
+        condition = mommy.make(RespondentGroupCondition, validation_test='greater_than',
+                               test_question=param_question, respondent_group=group)
+        mommy.make(GroupTestArgument, group_condition=condition, param=7, position=1)
+        # numeric answer
+        data = {
+            'answer_type': NumericalAnswer.choice_name(),
+            'text': 'num text',
+            'identifier': 'num1_identifier_%s' % random.randint(1, 100),
+            'qset': qset.id
+        }
+        question = self._save_question(qset, data)
+        qset.refresh_from_db()  # qset is updated by question (start_question attribute is updated)
+        # since it's the first question saved it must reflect as first question of the question set
+        self.assertEquals(qset.start_question.id, question.id)
+        # text answer
+        data = {
+            'answer_type': TextAnswer.choice_name(),
+            'text': 'texts text group',
+            'identifier': 'text1_identifier_%s' % random.randint(1, 100),
+            'qset': qset.id,
+            'group': group.id,
         }
         self._save_question(qset, data)
         # Multichoice questions
@@ -129,12 +173,12 @@ class SurveyBaseTest(BaseTest):
         self.qset.refresh_from_db()
 
     def _save_question(self, qset, data):
-        current_count = Question.objects.count()
+        current_count = Question.objects.filter(qset=qset).count()
         QuestionForm = get_question_form(BatchQuestion)
         question_form = QuestionForm(qset, data=data)
         self.assertTrue(question_form.is_valid())
         question = question_form.save()
-        self.assertEquals(Question.objects.count(), current_count + 1)
+        self.assertEquals(Question.objects.filter(qset=qset).count(), current_count + 1)
         return question
 
 

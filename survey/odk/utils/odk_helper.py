@@ -115,7 +115,8 @@ def process_answers(xml, qset, access_channel, question_map, survey_allocation, 
                 created_interviews.append(non_response.interview)
             else:
                 question_answers_node = _get_nodes('./questions/surveyQuestions', answers_node)[0]
-                answers = get_answers(question_answers_node, qset, question_map, _get_default_date_created(survey_tree))
+                answers = get_answers(question_answers_node, qset, question_map,
+                                      _get_default_date_created(survey_tree))
                 survey_parameters = None
                 if hasattr(qset, 'parameter_list'):
                     survey_parameters_node = _get_nodes('./questions/groupQuestions', answers_node)[0]
@@ -262,7 +263,7 @@ def process_xml(interviewer, xml_blob, media_files={}, request=None):
                                                   question_set=qset, ea=survey_allocation.allocation_ea,
                                                   form_id=form_id, xml=xml_blob, instance_id=instance_id,
                                                   instance_name=instance_name)
-    question_map = dict([(str(q.pk), q) for q in qset.flow_questions])
+    question_map = dict([(str(q.pk), q) for q in qset.all_questions])
     access_channel = ODKAccess.objects.filter(interviewer=interviewer).first()
     # refresh attachments
     submission.attachments.all().delete()

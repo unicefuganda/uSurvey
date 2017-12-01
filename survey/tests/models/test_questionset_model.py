@@ -32,5 +32,5 @@ class QuestionSetTest(SurveyBaseTest):
         self.assertEquals(Question.objects.filter(qset__name__icontains=self.qset.name).count(), 8)
         self.assertEquals(QuestionSet.objects.filter(name__icontains=self.qset.name).count(), 2)
         self.assertEquals(QuestionSetChannel.objects.filter(qset__id=self.qset.id).count(),
-                          QuestionSetChannel.objects.exclude(qset__id=self.qset.id,
-                                                             qset__name__icontains=self.qset.name).count())
+                          QuestionSetChannel.objects.exclude(qset__id=self.qset.id
+                                                             ).filter(qset__name__icontains=self.qset.name).count())

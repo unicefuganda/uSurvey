@@ -14,14 +14,9 @@ from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
 from django.test.client import Client
 from django.contrib.auth.models import User
-from survey.models import (InterviewerAccess, ODKAccess, USSDAccess, Interview, Interviewer, QuestionSetChannel,
-                           EnumerationArea, Survey, SurveyAllocation, Question, QuestionSet, Batch, BatchQuestion,
-                           QuestionOption, Survey, Batch, ODKSubmission)
+from survey.models import *
 from survey.forms.question import get_question_form
 from survey.templatetags.template_tags import get_answer
-# import all question types
-from survey.models import (Answer, NumericalAnswer, TextAnswer, MultiChoiceAnswer, MultiSelectAnswer, GeopointAnswer,
-                           ImageAnswer, AudioAnswer, VideoAnswer, DateAnswer, AutoResponse, Attachment)
 from survey.tests.models.survey_base_test import SurveyBaseTest
 
 
@@ -104,6 +99,20 @@ class ODKTest(SurveyBaseTest):
         survey_tree = etree.fromstring(response.content)
         path = '/qset/qset%s/questions/surveyQuestions/q%s' % (self.qset.id, self.qset.questions.first().id)
         self.assertIn(path, response.content)
+
+    def test_select_batch_with_group_odk_question(self):
+        self._create_ussd_group_questions()
+        url = reverse('download_odk_batch_form', args=(self.qset.id, ))
+        response = self._make_odk_request(url=url)
+        self.assertEquals(response.status_code, 200)
+        survey_tree = etree.fromstring(response.content)
+        path = '/qset/qset%s/questions/surveyQuestions/q%s' % (self.qset.id, self.qset.questions.first().id)
+        self.assertIn(path, response.content)
+        param_question = self.qset.parameter_list.questions.last()
+        group_path = '/qset/qset%s/questions/groupQuestions/q%s' % (self.qset.id, param_question.id)
+        self.assertIn(group_path, response.content)
+        # a check to confirm the group condition is printed. Might need to improve this more.
+        self.assertIn('%s &gt; 7' % group_path, response.content)
 
     def _get_completed_xform(self, answer1, answer2, answer3, answer4):
         completed = b'''<qset id="%(qset)s" >
@@ -203,6 +212,50 @@ class ODKTest(SurveyBaseTest):
                    'answer5': answer5, 'answer6': answer6, 'answer7': answer7, 'answer8': answer8,
                    'answer9': answer9, 'answer10': answer10, }
         return completed % context
+
+    def _get_groups_completed_xform(self, param_answer, answer1, answer2, answer3, answer4):
+        param_question = self.qset.parameter_list.questions.last()
+        completed = b'''<qset id="%(qset)s" >
+                         <meta>
+                            <instanceID>%(instance_id)s</instanceID>
+                            <instanceName>%(instance_id)s-Name</instanceName>
+                        <creationDate />
+                        <locked />
+                         </meta>
+                         <submissions>
+                             <id />
+                             <dates>
+                                 <lastModified />
+                             </dates>
+                         </submissions>
+                           <surveyAllocation>%(survey_allocation)s</surveyAllocation>
+                           <qset1>
+                            <questions>
+                                <groupQuestions><q%(param_id)s>%(param_answer)s</q%(param_id)s></groupQuestions>
+                                <surveyQuestions>
+                                    <q1>%(answer1)s</q1><q2>%(answer2)s</q2><q4>%(answer3)s</q4><q5>%(answer4)s</q5>
+                                </surveyQuestions>
+                            </questions>
+                           </qset1>
+                       </qset>
+                       '''
+        context = {'qset': self.qset.id, 'instance_id': random.randint(0, 1000),
+                   'param_answer': param_answer, 'param_id': param_question.id,
+                   'survey_allocation': self.survey_allocation.allocation_ea.name.encode('utf8'),
+                   'answer1': answer1, 'answer2': answer2, 'answer3': answer3, 'answer4': answer4}
+        return completed % context
+
+    def test_submit_group_xform(self):
+        self._create_ussd_group_questions(self.qset)
+        xml = self._get_groups_completed_xform('10', '2', 'James', 'Y', '1')
+        f = SimpleUploadedFile("surveyfile.xml", xml)
+        url = reverse('odk_submit_forms')
+        response = self._make_odk_request(url=url, data={'xml_submission_file': f}, raw=True)
+        self.assertTrue( 300 > response.status_code and response.status_code >= 200)
+        self.assertEquals(ODKSubmission.objects.count(), 1)
+        # not confirm that 5 responses were given (including param question)
+        self.assertEquals(Answer.objects.count(), len(self.qset.all_questions))
+        # now test the instances listpage
 
     def test_submit_xform(self):
         self._create_ussd_non_group_questions(self.qset)

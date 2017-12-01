@@ -150,7 +150,7 @@ def form_list(request):
     """ This is where ODK Collect gets its download list.
     """
     interviewer = request.user
-    #get_object_or_404(Interviewer, mobile_number=username, odk_token=token)
+    # get_object_or_404(Interviewer, mobile_number=username, odk_token=token)
     # to do - Make fetching households more e
     assignments = get_survey_allocation(interviewer)
     if assignments.count():

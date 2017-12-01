@@ -10,6 +10,7 @@ from survey.tests.base_test import BaseTest
 from survey.forms.respondent_group import GroupForm
 from django.core.urlresolvers import reverse
 
+
 class RespondentViewTest(BaseTest):
 
     def setUp(self):
@@ -71,45 +72,12 @@ class RespondentViewTest(BaseTest):
         self.assertEquals(response.context['title'], 'Edit Group')
         self.assertEquals(response.context['button_label'], 'Save')
         self.assertEquals(response.context['condition_title'], 'New Eligibility Criteria')
-        # self.assertIsInstance(response.context['group_form'], GroupForm)
-
-    # def test_group_does_not_exist(self):
-    #     g1 = RespondentGroup.objects.create(name='g1s',description='dess')
-    #     # message = "Group does not exist."
-    #     response = self.client.get(reverse('respondent_groups_edit',kwargs={"group_id":456789}))
-    #     # url = reverse('respondent_groups_edit',kwargs={"group_id":g1.id})
-
-    #     # response = self.client.get(url)
-    #     self.assertIn(response.status_code, [200,302])
-    #     self.assertIn('Group does not exist.', response.cookies['messages'].__str__())
-    #     self.assertRedirects(response, expected_url=reverse['respondent_groups_page'], msg_prefix='')
-
-    #     # self.assertEquals(message,response.cookies['message'].value)
 
     def test_should_throw_error_if_deleting_non_existing_group(self):
         message = "Group does not exist."
         url = reverse('respondent_groups_delete',kwargs={"group_id":50011})
         response = self.client.get(url)
         self.assertEquals(message,response.cookies['message'].value)
-
-    # @patch('django.contrib.messages.success')
-    # def test_create_group_onpost(self, success_message):
-    #     form_data = self.form_data
-    #     g = RespondentGroup.objects.filter(name=form_data['name'])
-    #     self.failIf(g)
-    #     response = self.client.post(reverse('new_respondent_groups_page'), data=form_data)
-    #     self.assertEquals(response.status_code, 302)
-    #     # self.rsp = RespondentGroup.objects.create(name="G-1")
-    #     # g = RespondentGroup.objects.get(name=self.rsp)
-    #     # self.failUnless(g.id)
-    #     for key in ['name','description']:
-    #         value = getattr(g, key)
-    #         self.assertEqual(form_data[key], str(value))
-    #     glist = Interviewer.objects.filter(name=g)
-    #     self.failUnless(glist)
-    #     self.assertEquals(
-    #         glist[0].description, form_data['description'])
-    #     assert success_message.called
 
     @patch('django.contrib.messages.warning')
     def test_failure_group_onpost(self, success_message):
@@ -124,39 +92,7 @@ class RespondentViewTest(BaseTest):
         url = reverse('respondent_groups_edit',kwargs={"group_id":500})
         self.assert_restricted_permission_for(url)
 
-    # def test_delete_should_delete_the_group(self):
-    #     pt = ParameterTemplate.objects.create(templatequestion_ptr_id=1)
-    #     glo= RespondentGroup.objects.create(name='gdaf',description='deasfds')
-    #     response = self.client.get(reverse('respondent_groups_delete'),kwargs={"group_id":pt.id})
-    #     # self.assertIn('Group successfully deleted.', response.cookies['messages'].__str__())
-    #     # self.assertRedirects(response, expected_url= reverse('respondent_groups_page', kwargs={"group_id" : g.id}), msg_prefix='')
-    #     self.assertIn(response.status_code, [200,302])
-
-        # url = reverse('respondent_groups_delete',kwargs={"group_id":g.id})
-        # response = self.client.get(url)        
-        # self.assertRedirects(response, expected_url=reverse('respondent_groups_delete'), status_code=302,
-        #                      target_status_code=200, msg_prefix='')
-
     def test_should_throw_error_if_deleting_non_existing_group(self):
         message = "Group does not exist."
         url = reverse('respondent_groups_delete',kwargs={"group_id":500})
         self.assert_object_does_not_exist(url, message)
-
-    # def test_delete_should_delete_the_groupcondition(self):
-    #     rg = RespondentGroup.objects.create(name='rg1_c', description='blah')
-    #     p = ParameterTemplate.objects.create(id=1)
-    #     self.failUnless(p.id)
-    #     p = ParameterTemplate.objects.all()[0]
-    #     rgc = RespondentGroupCondition.objects.create(respondent_group_id=rg,test_question=p.id,validation_test='abcd')
-    #     g = RespondentGroup.objects.get(name='rg1_c')
-    #     self.failUnless(rgc.id)
-    #     self.failUnless(g.id)
-    #     url = reverse('delete_condition_page',kwargs={"condition_id":rgc.id})
-    #     response = self.client.get(url)
-    #     self.assertRedirects(
-    #         response, reverse('respondent_groups_page'), status_code=302, target_status_code=200, msg_prefix='')
-    
-    # def test_should_throw_error_if_deleting_non_existing_groupcondition(self):
-    #     message = "Group does not exist."
-    #     url = reverse('delete_condition_page',kwargs={"condition_id":99999})
-    #     self.assert_object_does_not_exist(url, message)
