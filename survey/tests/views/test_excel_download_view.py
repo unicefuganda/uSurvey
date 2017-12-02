@@ -1,21 +1,19 @@
 from datetime import date, datetime
+import django_rq
+from model_mommy import mommy
 from django.template.defaultfilters import slugify
 from django.test import TestCase
 from django.test.client import Client
 from django.contrib.auth.models import User, Group, Permission
 from django.contrib.contenttypes.models import ContentType
-from survey.models.locations import *
-from survey.forms.filters import SurveyBatchFilterForm
-from survey.models import EnumerationArea, QuestionModule
-from survey.models.batch import Batch
-from survey.models.backend import Backend
-from survey.models.interviewer import Interviewer
-from survey.models.questions import Question, QuestionOption
-from survey.models.surveys import Survey
-from survey.tests.base_test import BaseTest
 from django.http.request import QueryDict, MultiValueDict
-import django_rq
 from django.core.urlresolvers import reverse
+from survey.forms.filters import SurveyBatchFilterForm
+from survey.forms.logic import LogicForm
+from survey.models import *
+from survey.services.export_questions import *
+from survey.tests.base_test import BaseTest
+from survey.tests.models.survey_base_test import SurveyBaseTest
 
 
 class ExcelDownloadViewTest(BaseTest):
@@ -43,94 +41,6 @@ class ExcelDownloadViewTest(BaseTest):
     def test_restricted_permssion(self):
         self.assert_restricted_permission_for(
             '/aggregates/download_spreadsheet')
-
-    # def test_excel_download(self):
-    #     country = LocationType.objects.create(name='Country', slug='country')
-    #     uganda = Location.objects.create(name="Uganda", type=country)
-    #     # LocationTypeDetails.objects.create(
-    #     #     country=uganda, location_type=country)
-    #     district_type = LocationType.objects.create(
-    #         name="Districttype", slug='districttype', parent=country)
-    #     county_type = LocationType.objects.create(
-    #         name="Countytype", slug='countytype', parent=district_type)
-    #     subcounty_type = LocationType.objects.create(
-    #         name="subcountytype", slug='subcountytype', parent=county_type)
-    #     parish_type = LocationType.objects.create(
-    #         name="Parishtype", slug='parishtype', parent=county_type)
-    #     district = Location.objects.create(
-    #         name="district1", parent=uganda, type=district_type)
-    #     county_1 = Location.objects.create(
-    #         name="county1", parent=district, type=county_type)
-    #     subcounty_1 = Location.objects.create(
-    #         name="subcounty_1", parent=county_1, type=subcounty_type)
-    #     parish_1 = Location.objects.create(
-    #         name="parish_1", parent=subcounty_1, type=parish_type)
-    #     survey = Survey.objects.create(name='survey name', description='survey descrpition',
-    #                                         sample_size=10)
-    #     batch = Batch.objects.create(order=1, name="Batch A", survey=survey)
-    #     client = Client()
-    #     raj = User.objects.create_user('Rajni', 'rajni@kant.com', 'I_Rock')
-    #     user_without_permission = User.objects.create_user(
-    #         username='useless', email='rajni@kant.com', password='I_Suck')
-    #     some_group = Group.objects.create(name='some group')
-    #     auth_content = ContentType.objects.get_for_model(Permission)
-    #     permission, out = Permission.objects.get_or_create(
-    #         codename='can_view_aggregates', content_type=auth_content)
-    #     some_group.permissions.add(permission)
-    #     some_group.user_set.add(raj)
-    #     self.client.login(username='Rajni', password='I_Rock')
-    #     # url = '/aggregates/spreadsheet_report/?District=&County=&Subcounty=&Parish=&survey=%d&batch=%d&multi_option=1&action=Download+Spreadsheet' % (
-    #     #     survey.id, batch.id)
-    #     # response = self.client.get(url)
-    #     # self.client.get(reverse('excel_report'))
-    #     # self.assertIn(response.status_code, [200,302])
-    #     rq_queues = django_rq.get_queue('results-queue')
-    #     keys = rq_queues.connection.keys()
-    #     self.assertIn('rq:workers', keys)
-
-    # def test_email(self):
-    #     country = LocationType.objects.create(name='Country', slug='country')
-    #     uganda = Location.objects.create(name="Uganda", type=country)
-    #     # LocationTypeDetails.objects.create(
-    #     #     country=uganda, location_type=country)
-    #     district_type = LocationType.objects.create(
-    #         name="Districttype", slug='districttype', parent=country)
-    #     county_type = LocationType.objects.create(
-    #         name="Countytype", slug='countytype', parent=district_type)
-    #     subcounty_type = LocationType.objects.create(
-    #         name="subcountytype", slug='subcountytype', parent=county_type)
-    #     parish_type = LocationType.objects.create(
-    #         name="Parishtype", slug='parishtype', parent=county_type)
-    #     district = Location.objects.create(
-    #         name="district1", parent=uganda, type=district_type)
-    #     county_1 = Location.objects.create(
-    #         name="county1", parent=district, type=county_type)
-    #     subcounty_1 = Location.objects.create(
-    #         name="subcounty_1", parent=county_1, type=subcounty_type)
-    #     parish_1 = Location.objects.create(
-    #         name="parish_1", parent=subcounty_1, type=parish_type)
-    #     survey = Survey.objects.create(name='survey nam1e', description='survey descrpition',
-    #                                         sample_size=10)
-    #     batch = Batch.objects.create(order=11, name="Batch 1A", survey=survey)
-    #     client = Client()
-    #     raj = User.objects.create_user('Rajni', 'rajni@kant.com', 'I_Rock')
-    #     user_without_permission = User.objects.create_user(
-    #         username='useless', email='rajni@kant.com', password='I_Suck')
-    #     some_group = Group.objects.create(name='some group')
-    #     auth_content = ContentType.objects.get_for_model(Permission)
-    #     permission, out = Permission.objects.get_or_create(
-    #         codename='can_view_aggregates', content_type=auth_content)
-    #     some_group.permissions.add(permission)
-    #     some_group.user_set.add(raj)
-    #     self.client.login(username='Rajni', password='I_Rock')
-    #     # url = '/aggregates/spreadsheet_report/?District=&County=&Subcounty=&Parish=&survey=%d&batch=%d&multi_option=1&action=Email+Spreadsheet' % (
-    #     #     survey.id, batch.id)
-    #     # response = self.client.get(url)
-    #     # self.client.get(reverse('excel_report'))
-    #     # self.assertIn(response.status_code, [200,302])
-    #     keys = django_rq.get_queue('results-queue').connection.keys()
-    #     self.assertIn('rq:workers', keys)
-    #     self.assertNotIn("testkey", keys)
 
 
 class ReportForCompletedInvestigatorTest(BaseTest):
@@ -178,3 +88,49 @@ class ReportForCompletedInvestigatorTest(BaseTest):
         self.assertEqual(200, response.status_code)
         templates = [template.name for template in response.templates]
         self.assertIn('aggregates/download_interviewer.html', templates)
+
+
+class ExportQuestionServiceExtra(SurveyBaseTest):
+    # 10, 13-15, 18-27, 30-34, 50-62, 80-94
+
+    def test__get_questions(self):
+        self._create_ussd_non_group_questions()
+        question = mommy.make(Question, qset=self.qset1)
+        e_service = ExportQuestionsService(batch=self.qset)
+        self.assertEquals(len(e_service.questions), self.qset.questions.count())
+        e_service = ExportQuestionsService()
+        self.assertTrue(len(e_service.questions) > self.qset.questions.count())
+
+    def test_format_questions(self):
+        self._create_ussd_group_questions()
+        e_service = ExportQuestionsService(batch=self.qset)
+        content = e_service.formatted_responses()
+        self.assertIn(e_service.HEADERS, content)
+        for idx, question in enumerate(self.qset.flow_questions):
+            if question.group:
+                self.assertIn(question.text, content[idx+1])
+
+    def test_get_batch_question_as_dump(self):
+        self._create_ussd_group_questions()
+        numeric_question = Question.objects.filter(answer_type=NumericalAnswer.choice_name()).first()
+        last_question = Question.objects.last()
+        test_condition = 'equals'
+        test_param = '15'
+        form_data = {
+            'action': LogicForm.SKIP_TO,
+            'next_question': last_question.id,
+            'condition': test_condition,
+            'value': test_param
+        }
+        logic_form = LogicForm(numeric_question, data=form_data)
+        self.assertTrue(logic_form.is_valid())
+        logic_form.save()
+        content = get_batch_question_as_dump(self.qset.flow_questions)
+        for idx, question in enumerate(self.qset.flow_questions):
+            self.assertIn(question.identifier, content[idx+1])
+
+    def test_get_question_as_dump(self):
+        self._create_ussd_non_group_questions()
+        content = get_batch_question_as_dump(self.qset.flow_questions)
+        for idx, question in enumerate(self.qset.flow_questions):
+            self.assertIn(question.identifier, content[idx+1])

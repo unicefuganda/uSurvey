@@ -23,7 +23,7 @@ class QuestionFilterForm(forms.Form):
             map(lambda question_type: question_type_choices.append(
                 question_type), [(name, name) for name in qset.answer_types])
         self.fields['question_types'].choices = question_type_choices
-        self.fields['question_types'].choices.insert(0,('','---- Select ----'))
+        #self.fields['question_types'].choices.insert(0,('','---- Select ----'))
         for field in read_only:
             self.fields[field].widget.attrs['readonly'] = True
             self.fields[field].widget.attrs['disabled'] = True

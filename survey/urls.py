@@ -540,10 +540,6 @@ urlpatterns = patterns(
         'survey.views.question_template.filter',
         name='filter_question_list'),
     url(
-        r'^questions/(?P<batch_id>\d+)/new/$',
-        'survey.views.set_questions.new',
-        name='new_batch_question_page'),
-    url(
         r'^qset/questions/(?P<qset_id>\d+)/new/$',
         'survey.views.set_questions.new',
         name='new_qset_question_page'),

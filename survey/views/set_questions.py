@@ -16,7 +16,7 @@ from survey.models import QuestionLoop
 from survey.models import QuestionOption
 from survey.models import Answer
 from survey.models import ResponseValidation
-from survey.forms.question import get_question_form, BatchQuestionForm  # , QuestionFlowForm
+from survey.forms.question import get_question_form, BatchQuestionForm, QuestionForm  # , QuestionFlowForm
 from survey.services.export_questions import get_question_as_dump
 from survey.utils.query_helper import get_filterset
 from survey.views.custom_decorators import not_allowed_when_batch_is_open
@@ -78,8 +78,7 @@ def _save_subquestion(request, batch_id, instance=None):
     QuestionForm = get_question_form(batch.question_model())
     questionform = QuestionForm(batch, instance=instance)
     if request.method == 'POST':
-        questionform = QuestionForm(
-            batch, data=request.POST, instance=instance)
+        questionform = QuestionForm(batch, data=request.POST, instance=instance)
         if questionform.is_valid():
             if instance:
                 zombify = False
@@ -296,8 +295,7 @@ def new(request, qset_id):
 def insert(request, prev_quest_id):
     prev_question = Question.get(pk=prev_quest_id)
     batch = QuestionSet.get(pk=prev_question.qset.pk)
-    response, context = _render_question_view(
-        request, batch, prev_question=prev_question)
+    response, context = _render_question_view(request, batch, prev_question=prev_question)
     context['prev_question'] = prev_question
     return response or render(request, 'set_questions/new.html', context)
 
@@ -498,8 +496,7 @@ def assign(request, qset_id):
             page_name = 'Batch'
         request.breadcrumbs(breadcrumbs)
     context = {
-        'batch_questions_form': unicode(
-            BatchQuestionsForm()),
+        'batch_questions_form': QuestionForm(batch),
         'batch': batch,
         'button_label': 'Save',
         'id': 'assign-question-to-batch-form',

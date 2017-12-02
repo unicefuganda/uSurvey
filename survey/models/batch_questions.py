@@ -28,8 +28,6 @@ class BatchQuestion(Question):
 def update_parameter_list(batch_question):
     # check if this group has been previously assigned to this Question set.
     from survey.models import Batch
-    if batch_question.group and RespondentGroup.objects.filter(
-            questions__qset__id=batch_question.qset.id,
-            id=batch_question.group.id).exists():
-        SurveyParameterList.update_parameter_list(
-            Batch.get(pk=batch_question.qset.pk))
+    if batch_question.group and RespondentGroup.objects.filter(questions__qset__id=batch_question.qset.id,
+                                                               id=batch_question.group.id).exists():
+        SurveyParameterList.update_parameter_list(Batch.get(pk=batch_question.qset.pk))

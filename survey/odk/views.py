@@ -194,7 +194,6 @@ def download_xform(request, batch_id):
     ea_samples = {}
     assignments = get_survey_allocation(interviewer)
     if assignments and survey.has_sampling:
-        assignments.update(stage=SurveyAllocation.SURVEY)
         for assignment in assignments:
             if assignment.sample_size_reached():            # only randomize eas that has reached sample size
                 ea = assignment.allocation_ea
@@ -206,7 +205,8 @@ def download_xform(request, batch_id):
                     pass
                 ea_samples[ea.pk] = ListingSample.samples(survey, ea)
             else:
-                raise NotEnoughData('You have not submitted enough listing data')
+                return OpenRosaResponseNotAllowed('You have not submitted enough listing data')
+        assignments.update(stage=SurveyAllocation.SURVEY)
     return _get_qset_response(
         request,
         interviewer,

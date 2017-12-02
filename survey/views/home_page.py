@@ -70,11 +70,10 @@ def edit(request):
 
 
 @login_required
-@permission_required('can_have_super_powers')
+@permission_required('auth.can_have_super_powers')
 def activate_super_powers(request):
     # activate super powers for settings.SUPER_POWERS_DURATION
-    if views_helper.activate_super_powers(
-            request):
+    if views_helper.activate_super_powers(request):
         messages.info(
             request,
             'Super Powers activated! You would now be\
@@ -91,7 +90,7 @@ def activate_super_powers(request):
 
 
 @login_required
-@permission_required('can_have_super_powers')
+@permission_required('auth.can_have_super_powers', raise_exception=True)
 def deactivate_super_powers(request):
     views_helper.deactivate_super_powers(request)
     messages.info(request, 'Super powers deactivated!')
@@ -104,12 +103,14 @@ def home_success_story_list(request):
                   'main/home_success_story_list.html',
                   {'ss_list': ss_list})
 
+
 @login_required
 def success_story_list(request):
     ss_list = SuccessStories.objects.all()
     return render(request,
                   'home/success_story_list.html',
                   {'ss_list': ss_list})
+
 
 @login_required
 def success_story_delete(request, id=None):
@@ -136,8 +137,6 @@ def success_story_form(request, id=None, instance=None):
             else:
                 messages.info(request, 'Success story have been saved')
             return HttpResponseRedirect(reverse('success_story_list'))
-        else:
-            print form.errors
     else:
         form = SuccessStoriesForm(instance=instance)
     return render(request, 'home/success_story_form.html', {'form': form})
@@ -148,7 +147,7 @@ def custom_400(request):
 
 
 def custom_403(request):
-    return HttpResponseRedirect(reverse('.'))
+    return HttpResponseRedirect(request.path)
 
 
 def custom_404(request):

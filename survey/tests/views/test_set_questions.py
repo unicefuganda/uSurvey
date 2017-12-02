@@ -3,12 +3,15 @@ from model_mommy import mommy
 from django.contrib.auth.models import User
 from model_mommy import mommy
 from django.test.client import Client
+from django.test.client import RequestFactory
 from django.core.urlresolvers import reverse
 from survey.forms.question_module_form import QuestionModuleForm
 from survey.models import *
 from survey.utils.query_helper import get_filterset
 from survey.tests.base_test import BaseTest
 from survey.forms.question import get_question_form
+from survey.tests.models.survey_base_test import SurveyBaseTest
+from survey.views.set_questions import remove_loop
 
 
 class SetQuestionViewTest(BaseTest):
@@ -117,20 +120,6 @@ class SetQuestionViewTest(BaseTest):
 
         qset = QuestionSet.get(pk=batch_obj.id)
         response = self.client.get(reverse('add_qset_subquestion_page', kwargs={"batch_id" : batch_obj.id}))
-        #print response.content
-        # self.assertIn(response.status_code, [200, 302])
-        # templates = [ template.name for template in response.templates ]
-        # self.assertIn('set_questions/_add_question.html', templates)
-        # module_obj = QuestionModule.objects.create(name='test')
-        # qset_obj = QuestionSet.objects.create(name="Females")
-        # rsp_obj = ResponseValidation.objects.create(validation_test="validationtest",constraint_message="message")
-        # data = {"qset_id" :qset_obj.id,  "identifier" : '', "text": "hello","answer_type":'',
-        #         "response_validation_id": self.rsp.id }
-        # response = self.client.post(reverse('add_qset_subquestion_page', kwargs={"batch_id" : batch_obj.id}),data=data)
-        # self.assertIn(response.status_code, [200, 302])
-        # self.client.post(reverse('add_qset_subquestion_page', kwargs={"batch_id" : batch_obj.id}),data={})
-        # self.assertIn(response.status_code, [200, 302])
-
         qset = QuestionSet.get(pk=list_1.id)
         response = self.client.get(reverse('add_qset_subquestion_page', kwargs={"batch_id" : qset.id}))
         self.assertIn(response.status_code, [200, 302])
@@ -826,6 +815,210 @@ class SetQuestionViewTest(BaseTest):
         new_flow_questions = list(qset.flow_questions)
         for idx, question in enumerate(new_flow_questions):
             self.assertTrue(question.id, questions[idx].id)
+
+    def test_create_sub_question(self):
+        qset = mommy.make(ListingTemplate)
+        question = mommy.make(Question, qset=qset)
+        qset.start_question = question
+        qset.save()
+        mommy.make(QuestionSetChannel, qset=qset, channel=ODKAccess.choice_name())
+        url = reverse('add_batch_subquestion_page', args=(qset.id, ))
+        data = {
+            'answer_type': TextAnswer.choice_name(),
+            'text': 'sub question',
+            'identifier': 'text1_identifier_subqestion',
+            'qset': qset.id
+        }
+        response = self.client.post(url, HTTP_X_REQUESTED_WITH='XMLHttpRequest', data=data)
+        self.assertEquals(response.status_code, 200)
+        response_data = json.loads(response.content)
+        self.assertEquals(response_data['text'], data['text'])
+        sub_question = qset.questions.last()
+        # now edit subquestion with previous question
+        url = reverse('edit_batch_subquestion_page', args=(qset.id, sub_question.id))
+        new_data = {
+            'answer_type': TextAnswer.choice_name(),
+            'text': 'Edited sub question',
+            'identifier': 'text1_identifier_subqestion',
+            'qset': qset.id
+        }
+        response = self.client.post(url, HTTP_X_REQUESTED_WITH='XMLHttpRequest', data=new_data)
+        self.assertEquals(response.status_code, 200)
+        response_data = json.loads(response.content)
+        self.assertEquals(response_data['text'], new_data['text'])
+        self.assertEquals(Question.objects.filter(qset=qset, identifier='text1_identifier_subqestion').count(), 1)
+
+
+class SetQuestionsViewExtra(SurveyBaseTest):
+
+    def setUp(self):
+        super(SetQuestionsViewExtra, self).setUp()
+        self.user = self.assign_permission_to(User.objects.create_user('demo12', 'demo12@kant.com', 'demo12'),
+                                        'can_view_batches')
+        self.client.login(username='demo12', password='demo12')
+
+    def test_get_previous_questions_for_question(self):
+        self._create_ussd_non_group_questions()
+        questions = Question.objects.order_by('created')
+        self.assertEquals(questions.count(), 4)
+        question = questions[2]
+        url = reverse('prev_inline_questions_json_page', args=(question.id, ))
+        response = self.client.get(url)
+        response_data = json.loads(response.content)
+        for entry in response_data:
+            self.assertTrue(questions.exclude(id__in=[questions[2].id,
+                                                      questions[3].id]).filter(id=entry["id"]).exists())
+
+    def test_remove_loop(self):
+        self._create_ussd_group_questions()
+        loop = mommy.make(QuestionLoop, loop_starter=Question.objects.first(),
+                          loop_ender=Question.objects.last())
+        self.assertTrue(QuestionLoop.objects.exists())
+        url = reverse('remove_question_loop_page', args=(loop.id, ))
+        response = self.client.get(url)
+        self.assertFalse(QuestionLoop.objects.exists())
+
+    def test_remove_loop_view_direct(self):
+        self._create_ussd_group_questions()
+        loop = mommy.make(QuestionLoop, loop_starter=Question.objects.first(),
+                          loop_ender=Question.objects.last())
+        self.assertTrue(QuestionLoop.objects.exists())
+        url = reverse('remove_question_loop_page', args=(loop.id,))
+        request = RequestFactory().get(url)
+        request.user = self.user
+        remove_loop(request, loop.id)
+        self.assertFalse(QuestionLoop.objects.exists())
+
+    def test_get_existing_response_validation_json(self):
+        validation = mommy.make(ResponseValidation, validation_test='equals')
+        arg = mommy.make(TextArgument, validation=validation, param=3, position=1)
+        validation2 = mommy.make(ResponseValidation, validation_test='between')
+        arg = mommy.make(TextArgument, validation=validation, param=12, position=1)
+        arg = mommy.make(TextArgument, validation=validation, param=17, position=2)
+        url = reverse('get_response_validations')
+        response = self.client.get(url, data={'answer_type': TextAnswer.choice_name()})
+        self.assertEquals(response.status_code, 200)
+        response_data = json.loads(response.content)
+        self.assertNotIn(validation2.id, response_data)
+        self.assertIn(validation.id, response_data)
+
+    def test_get_answer_validations(self):
+        url = reverse('get_answer_validations')
+        response = self.client.get(url, data={'answer_type': NumericalAnswer.choice_name()})
+        self.assertEquals(response.status_code, 200)
+        response_data = json.loads(response.content)
+        self.assertEquals(len(response_data), len(NumericalAnswer.validators()))
+        numeric_validators = [v.__name__ for v in NumericalAnswer.validators()]
+        for name in response_data:
+            self.assertIn(name, numeric_validators)
+
+    def test_add_to_question_library_with_multichoice(self):
+        qset = self.qset
+        data = {
+            'answer_type': MultiChoiceAnswer.choice_name(),
+            'text': 'multichoice answer text',
+            'identifier': 'multi1_choice_identifier',
+            'qset': qset.id,
+            'options': ['Y', 'N'],
+            'add_to_lib_button': '1'
+
+        }
+        url = reverse('new_qset_question_page', args=(self.qset.id, ))
+        response = self.client.post(url, data=data)
+        self.qset.refresh_from_db()
+        self.assertTrue(TemplateOption.objects.exists())
+        self.assertFalse(TemplateOption.objects.exclude(text__in=data['options']).exists())
+
+    def test_attempt_create_invalid_multichoice_fails(self):
+        qset = self.qset
+        data = {
+            'answer_type': MultiChoiceAnswer.choice_name(),
+            'text': 'multichoice answer text',
+            'identifier': 'multi1_choice_identifier',
+            'qset': qset.id,
+            'add_to_lib_button': '1'
+        }
+        url = reverse('new_qset_question_page', args=(self.qset.id,))
+        response = self.client.post(url, data=data)
+        self.assertFalse(response.context['questionform'].is_valid())
+
+    def test_insert_set_question(self):
+        self._create_ussd_non_group_questions()
+        questions = self.qset.flow_questions
+        self.assertEquals(len(questions), 4)
+        question = questions[2]
+        shifted = questions[3]
+        url = reverse('insert_qset_question_page', args=(questions[2].id, ))
+        data = {
+            'answer_type': TextAnswer.choice_name(),
+            'text': 'insert_data',
+            'identifier': 'insert_text1_identifier',
+            'qset': self.qset.id,
+
+        }
+        response = self.client.post(url, data=data)
+        questions = self.qset.flow_questions
+        self.assertEquals(len(questions), 5)
+        self.assertEquals(questions[3].identifier, data['identifier'])
+        self.assertEquals(questions[4], shifted)
+
+    def test_get_assign_question_page(self):
+        url = reverse('qset_assign_questions_page', args=(self.qset.id, ))
+        response = self.client.get(url)
+        self.assertEquals(response.status_code, 302)        # self.qset is already assigned to interview in super setup
+        qset = self.qset1
+        url = reverse('qset_assign_questions_page', args=(qset.id, ))
+        response = self.client.get(url)
+        self.assertEquals(response.status_code, 200)
+
+    def test_get_assign_to_new_qset(self):
+        temp = mommy.make(QuestionTemplate)
+        temp2 = mommy.make(QuestionTemplate)
+        temp3 = mommy.make(QuestionTemplate)
+        qset = self.qset1
+        url = reverse('qset_assign_questions_page', args=(qset.id, ))
+        response = self.client.get(url)
+        self.assertEquals(response.status_code, 200)
+        data = dict()
+        data['identifier'] = [temp.identifier, temp2.identifier]
+        old_count = qset.questions.count()
+        response = self.client.post(url, data=data)
+        self.assertEquals(qset.questions.count(), old_count + 2)
+        self.assertFalse(qset.questions.filter(identifier=temp3.identifier).exists())
+
+    def test_get_assign_to_old_qset(self):
+        temp = mommy.make(QuestionTemplate)
+        temp2 = mommy.make(QuestionTemplate)
+        temp3 = mommy.make(QuestionTemplate)
+        qset = self.qset1
+        self._create_ussd_non_group_questions(qset)
+        url = reverse('qset_assign_questions_page', args=(qset.id, ))
+        response = self.client.get(url)
+        self.assertEquals(response.status_code, 200)
+        data = dict()
+        data['identifier'] = [temp.identifier, temp2.identifier]
+        old_count = qset.questions.count()
+        response = self.client.post(url, data=data)
+        self.assertEquals(qset.questions.count(), old_count + 2)
+        self.assertFalse(qset.questions.filter(identifier=temp3.identifier).exists())
+
+    def test_attempt_delete_question_with_answer(self):
+        self._create_ussd_non_group_questions()
+        question = Question.objects.filter(answer_type=NumericalAnswer.choice_name()).first()
+        mommy.make(NumericalAnswer, question=question, interview=self.interview)
+        url = reverse('remove_qset_question_page', args=(question.id, ))
+        response = self.client.get(url)
+        self.assertEquals(response.status_code, 302)
+        self.assertTrue(Question.objects.filter(id=question.id).exists())
+
+
+
+
+
+
+
+
+
 
 
 

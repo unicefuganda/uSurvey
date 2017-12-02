@@ -15,7 +15,9 @@ from django.core.urlresolvers import reverse
 from django.test.client import Client
 from django.contrib.auth.models import User
 from survey.models import *
+from survey.odk.utils.odk_helper import OpenRosaResponseNotAllowed
 from survey.forms.question import get_question_form
+from survey.forms.logic import LogicForm
 from survey.templatetags.template_tags import get_answer
 from survey.tests.models.survey_base_test import SurveyBaseTest
 
@@ -412,7 +414,7 @@ class ODKTest(SurveyBaseTest):
         self._create_ussd_non_group_questions(listing_form)
         self.survey.has_sampling = True
         self.survey.listing_form = listing_form
-        self.survey.sample_size = 2
+        self.survey.sample_size = 3
         self.survey.save()
         return listing_form
 
@@ -435,6 +437,38 @@ class ODKTest(SurveyBaseTest):
         # now try to download batch form
         url = reverse('download_odk_batch_form', args=(self.qset.id, ))
         response = self._make_odk_request(url=url)
-        import pdb; pdb.set_trace()
+        self.assertTrue(isinstance(response, OpenRosaResponseNotAllowed))
 
+    def test_submit_invalid_answer_only_exempts_wrong_answer_xform(self):
+        self._create_ussd_non_group_questions(self.qset)
+        interview = mommy.make(Interview, interviewer=self.interviewer, survey=self.survey, ea=self.ea,
+                               interview_channel=self.access_channel, question_set=self.qset)
+        xml = self._get_completed_sample_xform(interview, '2', 'James', 'Yol', '1')     # yol is invalid answer
+        f = SimpleUploadedFile("surveyfile.xml", xml)
+        url = reverse('odk_submit_forms')
+        response = self._make_odk_request(url=url, data={'xml_submission_file': f}, raw=True)
+        self.assertTrue( 300 > response.status_code and response.status_code >= 200)
+        self.assertEquals(ODKSubmission.objects.count(), 1)
+        # not confirm that 3 responses were given
+        self.assertEquals(Answer.objects.count(), 3)
 
+    def test_download_question_with_flow(self):
+        self._create_ussd_non_group_questions()
+        numeric_question = Question.objects.filter(answer_type=NumericalAnswer.choice_name()).first()
+        last_question = Question.objects.last()
+        test_condition = 'equals'
+        test_param = '15'
+        form_data = {
+            'action': LogicForm.SKIP_TO,
+            'next_question': last_question.id,
+            'condition': test_condition,
+            'value': test_param
+        }
+        logic_form = LogicForm(numeric_question, data=form_data)
+        self.assertTrue(logic_form.is_valid())
+        logic_form.save()
+        self.assertEquals(QuestionFlow.objects.filter(question=numeric_question,
+                                                      next_question=last_question).count(), 1)
+        url = reverse('download_odk_batch_form', args=(self.qset.id,))
+        response = self._make_odk_request(url=url)
+        self.assertIn("/qset/qset1/questions/surveyQuestions/q1 = '15'", response.content)

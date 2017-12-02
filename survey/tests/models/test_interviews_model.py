@@ -141,6 +141,15 @@ class InterviewsTest(SurveyBaseTest):
         self.assertEquals(MultiChoiceAnswer.objects.first().as_text.lower(), 'Y'.lower())
         self.assertEquals(MultiChoiceAnswer.objects.first().as_value, str(QuestionOption.objects.get(text='Y').order))
 
+    def test_respond_on_closed_interview(self):
+        self.interview.closure_date = timezone.now()
+        self.interview.save()
+        self.assertEquals(self.interview.respond(), None)
+
+    def test_respond_start_question_interview(self):
+        self._create_ussd_group_questions()
+        self.assertEquals(self.interview.respond(),
+                          self.qset.start_question.display_text(channel=ODKAccess.choice_name()))
 
 
 

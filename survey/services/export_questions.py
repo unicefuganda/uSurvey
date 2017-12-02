@@ -9,18 +9,18 @@ class ExportQuestionsService:
     def __init__(self, batch=None):
         self.questions = self._get_questions(batch)
 
-    def _get_questions(self, batch):
+    def _get_questions(self, batch=None):
         if batch:
-            return batch.questions.all()
+            return batch.flow_questions
         return Question.objects.all()
 
     def formatted_responses(self):
         _formatted_responses = [self.HEADERS]
         for question in self.questions:
-            if question.group:
+            if hasattr(question, 'group'):
                 text = '%s, %s, %s' % (
                     question.text.replace('\r\n', ' '),
-                    question.group.name,
+                    question.group,
                     question.answer_type.upper())
                 _formatted_responses.append(text)
                 self._append_options(question, _formatted_responses)
@@ -56,8 +56,8 @@ def get_batch_question_as_dump(questions):
         question.answer_type.upper(),
         '|'.join([opt.to_text for opt in question.options.all()]),
         get_logic_print(question),
-        question.group.name,
-        question.module.name)),
+        question.group,
+        question.module)),
         questions)
     return _formatted_responses
 
