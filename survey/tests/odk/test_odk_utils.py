@@ -416,26 +416,25 @@ class ODKTest(SurveyBaseTest):
         self.survey.save()
         return listing_form
 
-    def test_odk_with_sampled_survey(self):
+    def test_submit_insufficient_form_for_listing(self):
         listing_form = self._prep_listing()
-        interview = mommy.make(Interview, interviewer=self.interviewer, survey=self.survey, ea=self.ea,
-                               interview_channel=self.access_channel, question_set=self.qset)
         response = self._make_odk_request()
         url = reverse('download_odk_listing_form')
         self.assertIn(listing_form.name, response.content)
-
-    def test_submit_insufficient_form_for_listing(self):
-        listing_form = self._prep_listing()
-        url = reverse('download_odk_listing_form')
+        self.assertIn(url, response.content)
         # download listing form
         response = self._make_odk_request(url=url)
         xml = self._get_completed_xform('2', 'James', 'Y', '1', qset=listing_form)
         f = SimpleUploadedFile("surveyfile.xml", xml)
         url = reverse('odk_submit_forms')
         response = self._make_odk_request(url=url, data={'xml_submission_file': f}, raw=True)
-        import pdb; pdb.set_trace()
         self.assertTrue( 300 > response.status_code and response.status_code >= 200)
         self.assertEquals(ODKSubmission.objects.count(), 1)
         # not confirm that 5 responses were given (including param question)
-        self.assertEquals(Answer.objects.count(), len(self.qset.all_questions))
+        self.assertEquals(Answer.objects.count(), len(listing_form.all_questions))
+        # now try to download batch form
+        url = reverse('download_odk_batch_form', args=(self.qset.id, ))
+        response = self._make_odk_request(url=url)
+        import pdb; pdb.set_trace()
+
 
