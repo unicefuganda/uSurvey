@@ -174,7 +174,10 @@ class SurveyBaseTest(BaseTest):
 
     def _save_question(self, qset, data):
         current_count = Question.objects.filter(qset=qset).count()
-        QuestionForm = get_question_form(BatchQuestion)
+        if qset.__class__ == Batch:
+            QuestionForm = get_question_form(BatchQuestion)
+        else:
+            QuestionForm = get_question_form(Question)
         question_form = QuestionForm(qset, data=data)
         self.assertTrue(question_form.is_valid())
         question = question_form.save()

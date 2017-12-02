@@ -114,7 +114,9 @@ class ODKTest(SurveyBaseTest):
         # a check to confirm the group condition is printed. Might need to improve this more.
         self.assertIn('%s &gt; 7' % group_path, response.content)
 
-    def _get_completed_xform(self, answer1, answer2, answer3, answer4):
+    def _get_completed_xform(self, answer1, answer2, answer3, answer4, qset=None):
+        if qset is None:
+            qset = self.qset
         completed = b'''<qset id="%(qset)s" >
                          <meta>
                             <instanceID>%(instance_id)s</instanceID>
@@ -129,17 +131,17 @@ class ODKTest(SurveyBaseTest):
                              </dates>
                          </submissions>
                            <surveyAllocation>%(survey_allocation)s</surveyAllocation>
-                           <qset1>
+                           <qset%(qset)s>
                             <questions>
                                 <groupQuestions></groupQuestions>
                                 <surveyQuestions>
                                     <q1>%(answer1)s</q1><q2>%(answer2)s</q2><q3>%(answer3)s</q3><q4>%(answer4)s</q4>
                                 </surveyQuestions>
                             </questions>
-                           </qset1>
+                           </qset%(qset)s>
                        </qset>
                        '''
-        context = {'qset': self.qset.id, 'instance_id': random.randint(0, 1000),
+        context = {'qset': qset.id, 'instance_id': random.randint(0, 1000),
                    'survey_allocation': self.survey_allocation.allocation_ea.name.encode('utf8'),
                    'answer1': answer1, 'answer2': answer2, 'answer3': answer3, 'answer4': answer4}
         return completed % context
@@ -229,14 +231,14 @@ class ODKTest(SurveyBaseTest):
                              </dates>
                          </submissions>
                            <surveyAllocation>%(survey_allocation)s</surveyAllocation>
-                           <qset1>
+                           <qset%(qset)s>
                             <questions>
                                 <groupQuestions><q%(param_id)s>%(param_answer)s</q%(param_id)s></groupQuestions>
                                 <surveyQuestions>
                                     <q1>%(answer1)s</q1><q2>%(answer2)s</q2><q4>%(answer3)s</q4><q5>%(answer4)s</q5>
                                 </surveyQuestions>
                             </questions>
-                           </qset1>
+                           </qset%(qset)s>
                        </qset>
                        '''
         context = {'qset': self.qset.id, 'instance_id': random.randint(0, 1000),
@@ -403,3 +405,37 @@ class ODKTest(SurveyBaseTest):
         input_zip = StringIO(input_content)
         input_zip = ZipFile(input_zip)
         return {name: input_zip.read(name) for name in input_zip.namelist()}
+
+    def _prep_listing(self):
+        listing_form = mommy.make(ListingTemplate, name='test_listing')
+        mommy.make(QuestionSetChannel, qset=listing_form, channel=self.access_channel.choice_name())
+        self._create_ussd_non_group_questions(listing_form)
+        self.survey.has_sampling = True
+        self.survey.listing_form = listing_form
+        self.survey.sample_size = 2
+        self.survey.save()
+        return listing_form
+
+    def test_odk_with_sampled_survey(self):
+        listing_form = self._prep_listing()
+        interview = mommy.make(Interview, interviewer=self.interviewer, survey=self.survey, ea=self.ea,
+                               interview_channel=self.access_channel, question_set=self.qset)
+        response = self._make_odk_request()
+        url = reverse('download_odk_listing_form')
+        self.assertIn(listing_form.name, response.content)
+
+    def test_submit_insufficient_form_for_listing(self):
+        listing_form = self._prep_listing()
+        url = reverse('download_odk_listing_form')
+        # download listing form
+        response = self._make_odk_request(url=url)
+        xml = self._get_completed_xform('2', 'James', 'Y', '1', qset=listing_form)
+        f = SimpleUploadedFile("surveyfile.xml", xml)
+        url = reverse('odk_submit_forms')
+        response = self._make_odk_request(url=url, data={'xml_submission_file': f}, raw=True)
+        import pdb; pdb.set_trace()
+        self.assertTrue( 300 > response.status_code and response.status_code >= 200)
+        self.assertEquals(ODKSubmission.objects.count(), 1)
+        # not confirm that 5 responses were given (including param question)
+        self.assertEquals(Answer.objects.count(), len(self.qset.all_questions))
+

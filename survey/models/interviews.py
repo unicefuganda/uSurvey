@@ -114,11 +114,8 @@ class Interview(BaseModel):
                 if question.answer_type in [AudioAnswer.choice_name(), ImageAnswer.choice_name(),
                                             VideoAnswer.choice_name()]:
                     media = media_files.get(answer, None)
-                    if hasattr(media, 'read'):
-                        answer = media
-                    else:
-                        # only file objects or the file contents
-                        answer = ContentFile(media, name=answer)
+                    # only file objects or the file contents
+                    answer = ContentFile(media, name=answer)
                 try:
                     old_answer = answer_class.objects.get(interview=interview, question=question)
                     old_answer.update(answer)

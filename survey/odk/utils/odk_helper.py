@@ -89,10 +89,10 @@ def process_answers(xml, qset, access_channel, question_map, survey_allocation, 
         survey_tree = _get_tree_from_blob(xml)
         answers_nodes = _get_answer_nodes(survey_tree, qset)
         created_interviews = []
+        survey = survey_allocation.survey
         for answers_node in answers_nodes:
             # answers = []
             survey_parameters = []
-            survey = survey_allocation.survey
             reference_interview = None          # typically used if
             if _get_nodes('./sampleData/selectedSample', answers_node):
                 # the following looks ugly but ./sampleData/selectedSample is calculated in xform by a concat of
@@ -123,9 +123,6 @@ def process_answers(xml, qset, access_channel, question_map, survey_allocation, 
                     # survey paramaters does not have any single repeat
                     survey_parameters = get_answers(survey_parameters_node, qset, question_map,
                                                     _get_default_date_created(survey_tree))[0]
-                if survey_allocation.stage in [None, SurveyAllocation.LISTING] and \
-                        survey.has_sampling and survey.sample_size > len(answers):
-                    raise NotEnoughData()
                 created_interviews.extend(Interview.save_answers(qset, survey, survey_allocation.allocation_ea,
                                                                  access_channel, question_map, answers,
                                                                  survey_parameters=survey_parameters,

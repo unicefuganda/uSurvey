@@ -196,8 +196,7 @@ def download_xform(request, batch_id):
     if assignments and survey.has_sampling:
         assignments.update(stage=SurveyAllocation.SURVEY)
         for assignment in assignments:
-            if assignment.sample_size_reached(
-            ):            # only randomize eas that has reached sample size
+            if assignment.sample_size_reached():            # only randomize eas that has reached sample size
                 ea = assignment.allocation_ea
                 listing_survey = survey.preferred_listing or survey
                 try:
@@ -206,6 +205,8 @@ def download_xform(request, batch_id):
                 except ListingSample.SamplesAlreadyGenerated:
                     pass
                 ea_samples[ea.pk] = ListingSample.samples(survey, ea)
+            else:
+                raise NotEnoughData('You have not submitted enough listing data')
     return _get_qset_response(
         request,
         interviewer,
@@ -299,15 +300,6 @@ def submission(request):
         response['Location'] = request.build_absolute_uri(request.path)
         logger.debug('sending: ')
         return response
-    except NotEnoughData:
-        desc = settings.ODK_UPLOADED_DATA_BELOW_SAMPLE_SIZE
-        audit_log(Actions.SUBMISSION_REQUESTED, request.user, interviewer,
-                  _("Failed attempted to submit XML for form for interviewer: \
-                    '%(interviewer)s'. desc: '%(desc)s'") % {
-                      "interviewer": interviewer.name,
-                      "desc": desc
-                  }, {'desc': desc}, request, logging.WARNING)
-        return OpenRosaRequestForbidden(desc)
     except Exception, ex:
         audit_log(Actions.SUBMISSION_REQUESTED, request.user, interviewer,
                   _("Failed attempted to submit XML for form for interviewer:\
