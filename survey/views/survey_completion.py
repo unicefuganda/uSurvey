@@ -130,33 +130,19 @@ def json_summary(request):
 
 # @login_required
 # @permission_required('auth.can_view_aggregates')
-# def survey_parameters(request):
-#     indicator = get_object_or_404(Indicator, pk=request.GET['indicator'])
-#     parameters = []
-#     try:
-#         map(lambda opt: parameters.append(
-#         {'id': opt.id, 'name': opt.text}), indicator.parameter.options.all())
-#     except Exception as e:
-#         pass
-#     return HttpResponse(json.dumps(parameters),
+# def survey_indicators(request):
+#     survey = get_object_or_404(Survey, pk=request.GET['survey'])
+#     indicators = []
+#     indicators_list = Indicator.objects.filter(survey=survey)
+#     map(lambda indicator: indicators.append(
+#                 {
+#                     'id': indicator.id,
+#                     'name': indicator.name
+#                 }),
+#                 indicators_list
+#                 )
+#     return HttpResponse(json.dumps(indicators),
 #                         content_type='application/json')
-
-
-@login_required
-@permission_required('auth.can_view_aggregates')
-def survey_indicators(request):
-    survey = get_object_or_404(Survey, pk=request.GET['survey'])
-    indicators = []    
-    indicators_list = Indicator.objects.filter(survey=survey)
-    map(lambda indicator: indicators.append(
-                {
-                    'id': indicator.id,
-                    'name': indicator.name
-                }),
-                indicators_list
-                )
-    return HttpResponse(json.dumps(indicators),
-                        content_type='application/json')
 
 
 @login_required

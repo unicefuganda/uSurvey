@@ -261,4 +261,4 @@ class SurveyViewTest(BaseTest):
         # views_helper.activate_super_powers()
         response = self.client.get(wipe_off_url)
         # confirm interview was not deleted.
-        self.assertEquals(Interview.objects.filter(id=interview.id).count(), 1)
+        self.assertEquals(Interview.objects.filter(id=interview.id).count(), 0)

@@ -64,25 +64,17 @@ VALIDATED = 2
 
 
 def activate_super_powers(request):
+    cache.set(
+        '%s:%s' %
+        (request.user.pk,
+         settings.SUPER_POWERS_KEY),
+        data={
+            'started': timezone.now(),
+            'status': PENDING_VALIDATION},
+        timeout=settings.SUPER_POWERS_DURATION)
     if get_super_powers_details(request) is None:
-        cache.set(
-            '%s:%s' %
-            (request.user.pk,
-             settings.SUPER_POWERS_KEY),
-            data={
-                'started': timezone.now(),
-                'status': PENDING_VALIDATION},
-            timeout=settings.SUPER_POWERS_DURATION)
         return False
     else:
-        cache.set(
-            '%s:%s' %
-            (request.user.pk,
-             settings.SUPER_POWERS_KEY),
-            data={
-                'started': timezone.now(),
-                'status': VALIDATED},
-            timeout=settings.SUPER_POWERS_DURATION)
         return True
 
 

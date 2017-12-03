@@ -142,10 +142,10 @@ urlpatterns = patterns(
         r'^aggregates/spreadsheet_report/$',
         'survey.views.excel.download',
         name='excel_report'),
-    url(
-        r'^aggregates/spreadsheet_results/(?P<batch_id>\d+)/$',
-        'survey.views.excel.download_results',
-        name='download_export_results'),
+    # url(
+    #     r'^aggregates/spreadsheet_results/(?P<batch_id>\d+)/$',
+    #     'survey.views.excel.download_results',
+    #     name='download_export_results'),
     url(
         r'^aggregates/download_spreadsheet',
         'survey.views.excel.download',
@@ -249,10 +249,6 @@ urlpatterns = patterns(
         r'^qset/(?P<qset_id>\d+)/update_question_orders/$',
         'survey.views.set_questions.update_orders',
         name='qset_update_question_order_page'),
-    url(
-        r'^batches/(?P<batch_id>\d+)/update_question_orders/$',
-        'survey.views.batch.update_orders',
-        name='update_question_order_page'),
     url(
         r'^batches/(?P<batch_id>\d+)/questions/$',
         'survey.views.set_questions.index',
@@ -369,10 +365,10 @@ urlpatterns = patterns(
         r'^batches/list_all_questions/$',
         'survey.views.batch.list_all_questions',
         name='list_all_questions'),
-    url(
-        r'^batches/list_batch_questions/$',
-        'survey.views.batch.list_batch_questions',
-        name='list_batch_questions'),
+    # url(
+    #     r'^batches/list_batch_questions/$',
+    #     'survey.views.batch.list_batch_questions',
+    #     name='list_batch_questions'),
     url(
         r'^qset/qset_identifiers/$',
         'survey.views.question_set.identifiers',
@@ -469,10 +465,6 @@ urlpatterns = patterns(
         r'^survey/survey_indicators/json/$',
         'survey.views.survey_completion.indicators_json',
         name='survey_indicators'),
-    # url(
-    #     r'^survey/survey_parameters/json/$',
-    #     'survey.views.survey_completion.survey_parameters',
-    #     name='survey_parameters'),
     url(
         r'^surveys/(?P<survey_id>\d+)/batches/(?P<batch_id>\d+)/delete/$',
         'survey.views.batch.delete',

@@ -165,47 +165,6 @@ def delete(request, survey_id, batch_id):
             )))
 
 
-@permission_required('auth.can_view_batches')
-def update_orders(request, batch_id):
-    batch = Batch.objects.get(id=batch_id)
-    new_orders = request.POST.getlist('order_information', None)
-    if len(new_orders) > 0:
-        # wipe off present inline flows
-        inlines = batch.questions_inline()
-        if inlines:
-            start_question = inlines.pop(0)
-            question = start_question
-            for next_question in inlines:
-                QuestionFlow.objects.filter(
-                    question=question, next_question=next_question).delete()
-                question = next_question
-            order_details = []
-            map(lambda order: order_details.append(order.split('-')), new_orders)
-            order_details = sorted(
-                order_details, key=lambda detail: int(detail[0]))
-            # recreate the flows
-            questions = batch.questions.all()
-            if questions:  # so all questions can be fetched once and cached
-                question_id = order_details.pop(0)[1]
-                start_question = questions.get(pk=question_id)
-                for order, next_question_id in order_details:
-                    QuestionFlow.objects.create(
-                        question=questions.get(
-                            pk=question_id), next_question=questions.get(
-                            pk=next_question_id))
-                    question_id = next_question_id
-                batch.start_question = start_question
-                batch.save()
-            # now remove any loop associated with this batch
-            QuestionLoop.objects.filter(loop_starter__qset__id=batch_id).delete()
-            success_message = "Question orders successfully\
-            updated for batch: %s." % batch.name.capitalize()
-            messages.success(request, success_message)
-    else:
-        messages.error(request, 'No questions orders were updated.')
-    return HttpResponseRedirect("/batches/%s/questions/" % batch_id)
-
-
 @login_required
 def check_name(request, survey_id):
     response = Batch.objects.filter(
@@ -244,22 +203,22 @@ def list_all_questions(request):
     #             batch.survey.pk,
     #         )))
 
-
-@permission_required('auth.can_view_batches')
-def list_batch_questions(request):
-    batch_id = request.GET.get('id', None)
-    batch = Batch.get(pk=batch_id)
-    if request.is_ajax():
-        json_dump = json.dumps(
-            [{'id': q.id, 'identifier': q.identifier}
-                for q in batch.flow_questions], cls=DjangoJSONEncoder)
-        return HttpResponse(json_dump, content_type='application/json')
-    return HttpResponseRedirect(
-        reverse(
-            'batch_index_page',
-            args=(
-                batch.survey.pk,
-            )))
+#
+# @permission_required('auth.can_view_batches')
+# def list_batch_questions(request):
+#     batch_id = request.GET.get('id', None)
+#     batch = Batch.get(pk=batch_id)
+#     if request.is_ajax():
+#         json_dump = json.dumps(
+#             [{'id': q.id, 'identifier': q.identifier}
+#                 for q in batch.flow_questions], cls=DjangoJSONEncoder)
+#         return HttpResponse(json_dump, content_type='application/json')
+#     return HttpResponseRedirect(
+#         reverse(
+#             'batch_index_page',
+#             args=(
+#                 batch.survey.pk,
+#             )))
 
 
 def activate_non_response(request, batch_id):

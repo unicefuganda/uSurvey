@@ -1,3 +1,4 @@
+from model_mommy import mommy
 from django.test.client import Client
 from django.contrib.auth.models import User
 from survey.models.batch import Batch
@@ -30,10 +31,26 @@ class QuestionsTemplateViewsTest(BaseTest):
         self.failUnlessEqual(response.status_code, 200)
 
     def test_add(self):
-        data = { 'text': [self.question_1.text],
-                'module': [self.module.id], 'answer_type': ['Numerical Answer']}
-        response = self.client.post(reverse('new_question_library'), data=data)
-        self.failUnlessEqual(response.status_code, 200)
+        url = reverse('new_question_library')
+        response = self.client.get(url)
+        self.assertIn('questionform', response.context)
+        data = {'text': 'lib test text', 'identifier': 'test_identifier',
+                'module': self.module.id, 'answer_type': 'Numerical Answer'}
+        response = self.client.post(url, data=data)
+        self.failUnlessEqual(response.status_code, 302)
+        template = QuestionTemplate.objects.filter(text=data['text']).first()
+        self.assertTrue(QuestionTemplate.objects.filter(text=data['text']).exists())
+        created_question = QuestionTemplate.objects.filter(text=data['text']).first()
+        url = reverse('edit_%s' % QuestionTemplate.resolve_tag(), args=(template.id, ))
+        data['text'] = 'edited entry'
+        response = self.client.post(url, data=data)
+        self.assertTrue(QuestionTemplate.objects.filter(text=data['text']).count(), 1)
+
+    def test_delete_template_question(self):
+        question = mommy.make(QuestionTemplate)
+        url = reverse('delete_question_template_page', args=(question.id, ))
+        response = self.client.get(url)
+        self.assertFalse(QuestionTemplate.objects.filter(id=question.id).exists())
 
     def test_filter(self):
         response = self.client.get(reverse('filter_question_list'))

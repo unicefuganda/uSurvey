@@ -150,9 +150,11 @@ class QuestionSetView(object):
             qset.delete()
         return HttpResponseRedirect('%s_home' % self.model.resolve_tag())
 
+
 @permission_required('auth.can_view_batches')
 def delete(request, question_id, batch_id):
-    qset = get_object_or_404(QuestionSet, pk=question_id)
+    # would need to refactor this later
+    qset = get_object_or_404(QuestionSet, pk=batch_id)
 
     if qset.interviews.exists():
         messages.error(
@@ -172,9 +174,12 @@ def delete(request, question_id, batch_id):
 
 
 def delete_qset_listingform(request, question_id):
-    qset = get_object_or_404(QuestionSet, pk=question_id)
+    question = get_object_or_404(Question, pk=question_id)
+    qset = question.qset
+    if qset.name == 'demo-test':
+        import pdb; pdb.set_trace()
     if qset.interviews.exists():
-        msg = "%s cannot be deleted because it already has interviews." %qset.verbose_name()
+        msg = "%s cannot be deleted because it already has interviews." % qset.verbose_name()
         messages.error(
             request,msg)
     else:
@@ -284,6 +289,7 @@ def _view_qset_data(request, model_class, interviews,title, disabled_fields=[]):
                 max_rows=items_per_page))
     return render(request, 'question_set/view_all_data.html', context)
 
+
 @login_required
 @permission_required('auth.can_view_aggregates')
 def listing_entries(request, qset_id):
@@ -320,13 +326,6 @@ def identifiers(request):
             if int(question.id) == int(last_question_id):
                 break
             identifiers.add(question.identifier)
-        # try:
-        #     qset = Batch.get(pk=qset.pk)
-        #     if hasattr(qset, 'parameter_list'):
-        #         identifiers.union(qset.parameter_list.questions.values_list\
-            #('identifier', flat=True))
-        # except Batch.DoesNotExist:
-        #     pass
         json_dump = json.dumps(list(identifiers))
     return HttpResponse(json_dump, content_type='application/json')
 

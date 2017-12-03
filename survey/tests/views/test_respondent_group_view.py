@@ -1,4 +1,5 @@
 import json
+from model_mommy import mommy
 from django.test.client import Client
 from mock import *
 from django.contrib.auth.models import User, Group
@@ -96,3 +97,9 @@ class RespondentViewTest(BaseTest):
         message = "Group does not exist."
         url = reverse('respondent_groups_delete',kwargs={"group_id":500})
         self.assert_object_does_not_exist(url, message)
+
+    def test_delete_respondent_condition(self):
+        condition = mommy.make(RespondentGroupCondition)
+        url = reverse('delete_condition_page', args=(condition.id, ))
+        response = self.client.get(url)
+        self.assertFalse(RespondentGroupCondition.objects.filter(id=condition.id).exists())

@@ -26,26 +26,25 @@ from survey.forms.enumeration_area import LocationsFilterForm
 def send_mail(composer):
     composer.send_mail()
 
-
-@login_required
-@permission_required('auth.can_view_aggregates')
-def download_results(request, batch_id):
-    redis_key = settings.DOWNLOAD_CACHE_KEY % {
-        'user_id': request.user.id, 'batch_id': batch_id}
-    download = cache.get(redis_key)
-    if download:
-        response = HttpResponse(content_type='text/csv')
-        response[
-            'Content-Disposition'] = 'attachment;\
-            filename="%s.csv"' % download['filename']
-        writer = csv.writer(response)
-        data = download['data']
-        #contents = data[0]
-        for row in data:
-            writer.writerow(row)
-        return response
-    else:
-        return HttpResponseNotFound()
+#
+# @login_required
+# @permission_required('auth.can_view_aggregates')
+# def download_results(request, batch_id):
+#     redis_key = settings.DOWNLOAD_CACHE_KEY % {'user_id': request.user.id, 'batch_id': batch_id}
+#     download = cache.get(redis_key)
+#     if download:
+#         response = HttpResponse(content_type='text/csv')
+#         response[
+#             'Content-Disposition'] = 'attachment;\
+#             filename="%s.csv"' % download['filename']
+#         writer = csv.writer(response)
+#         data = download['data']
+#         #contents = data[0]
+#         for row in data:
+#             writer.writerow(row)
+#         return response
+#     else:
+#         return HttpResponseNotFound()
 
 
 @login_required

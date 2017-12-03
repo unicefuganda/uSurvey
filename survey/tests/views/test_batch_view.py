@@ -217,30 +217,30 @@ class BatchViewsTest(BaseTest):
         response = self.client.post(reverse('activate_non_response_page', kwargs={'batch_id':self.batch.id}), data={"non_response_location_id" : self.abim.id})
         self.assertIn(response.status_code, [200, 302])
         self.assertEqual(response.content, '""')
-
-    def test_list_batch_questions(self):
-        survey_obj = Survey.objects.create(name="s211", description="desc1")
-        batch_obj = Batch.objects.create(order=1, name="b2", description='bdesc' ,survey=survey_obj)
-        qset =  QuestionSet.get(pk=batch_obj.id)
-        question1 = mommy.make(Question, qset=qset, answer_type=TextAnswer.choice_name())
-        question2 = mommy.make(Question, qset=qset, answer_type=TextAnswer.choice_name())
-        url = reverse('list_batch_questions')
-        url = url + "?id=%s"%batch_obj.id
-        response = self.client.get(url, data={"id": batch_obj.id})
-        self.assertIn(response.status_code, [200, 302])
-        response = self.client.get(reverse('batch_index_page', kwargs={"survey_id" : survey_obj.id}))
-
-    def test_list_batch_questions(self):
-        survey_obj = Survey.objects.create(name="s21111", description="desc1")
-        batch_obj = Batch.objects.create(order=1, name="b21", description='bdesc' ,survey=survey_obj)
-        qset =  QuestionSet.get(pk=batch_obj.id)
-        question1 = mommy.make(Question, qset=qset, answer_type=TextAnswer.choice_name())
-        question2 = mommy.make(Question, qset=qset, answer_type=TextAnswer.choice_name())
-        url = reverse('list_all_questions')
-        url = url + "?id=%s"%batch_obj.id
-        response = self.client.get(url, data={"id": batch_obj.id})
-        self.assertIn(response.status_code, [200, 302])
-        response = self.client.get(reverse('batch_index_page', kwargs={"survey_id" : survey_obj.id}))
+    #
+    # def test_list_batch_questions(self):
+    #     survey_obj = Survey.objects.create(name="s211", description="desc1")
+    #     batch_obj = Batch.objects.create(order=1, name="b2", description='bdesc' ,survey=survey_obj)
+    #     qset =  QuestionSet.get(pk=batch_obj.id)
+    #     question1 = mommy.make(Question, qset=qset, answer_type=TextAnswer.choice_name())
+    #     question2 = mommy.make(Question, qset=qset, answer_type=TextAnswer.choice_name())
+    #     url = reverse('list_batch_questions')
+    #     url = url + "?id=%s"%batch_obj.id
+    #     response = self.client.get(url, data={"id": batch_obj.id})
+    #     self.assertIn(response.status_code, [200, 302])
+    #     response = self.client.get(reverse('batch_index_page', kwargs={"survey_id" : survey_obj.id}))
+    #
+    # def test_list_batch_questions(self):
+    #     survey_obj = Survey.objects.create(name="s21111", description="desc1")
+    #     batch_obj = Batch.objects.create(order=1, name="b21", description='bdesc' ,survey=survey_obj)
+    #     qset =  QuestionSet.get(pk=batch_obj.id)
+    #     question1 = mommy.make(Question, qset=qset, answer_type=TextAnswer.choice_name())
+    #     question2 = mommy.make(Question, qset=qset, answer_type=TextAnswer.choice_name())
+    #     url = reverse('list_all_questions')
+    #     url = url + "?id=%s"%batch_obj.id
+    #     response = self.client.get(url, data={"id": batch_obj.id})
+    #     self.assertIn(response.status_code, [200, 302])
+    #     response = self.client.get(reverse('batch_index_page', kwargs={"survey_id" : survey_obj.id}))
 
     def test_list_batches(self):
         survey_obj = Survey.objects.create(name="s21111", description="desc1")
@@ -263,55 +263,6 @@ class BatchViewsTest(BaseTest):
         url = url+"?name=%s"%batch_obj.name
         response = self.client.get(url)
         self.assertIn(response.status_code, [200, 302])
-
-    def test_update_question_order_page(self):
-        listing_form = ListingTemplate.objects.create(name='l12', description='desc1')
-        kwargs = {'name': 'survey11', 'description': 'survey description demo12',
-                          'has_sampling': True, 'sample_size': 10,'listing_form_id':listing_form.id}
-        survey_obj = Survey.objects.create(**kwargs)
-        batch_obj = Batch.objects.create(name='b1',description='d1', survey=survey_obj)
-        qset = QuestionSet.get(id=batch_obj.id)
-        question1 = mommy.make(Question, qset=qset, answer_type=NumericalAnswer.choice_name())
-        QuestionOption.objects.create(
-            question=question1,
-            order=1,
-            text="q7"
-            ) 
-        question2 = mommy.make(Question, qset=qset, answer_type=NumericalAnswer.choice_name())
-        QuestionOption.objects.create(
-            question=question1,
-            order=4,
-            text="q4"
-            )
-        QuestionFlow.objects.create(
-            name = 'a1',
-            desc = 'descq',
-            question = question2,
-            question_type = TextAnswer.choice_name(),
-            next_question = question1,
-            next_question_type = TextAnswer.choice_name()
-            )
-        QuestionLoop.objects.create(
-            loop_starter = question2,
-            loop_ender = question1
-            )
-        
-        url = reverse('update_question_order_page', kwargs={"batch_id" : batch_obj.id})
-        response = self.client.post(url,data={"order_information": [batch_obj.id]})
-        self.assertIn(response.status_code, [200, 302])
-
-    def test_update_question_order_page_on_empty(self):
-        listing_form = ListingTemplate.objects.create(name='l12', description='desc1')
-        kwargs = {'name': 'survey11', 'description': 'survey description demo12',
-                          'has_sampling': True, 'sample_size': 10,'listing_form_id':listing_form.id}
-        survey_obj = Survey.objects.create(**kwargs)
-        batch_obj = Batch.objects.create(name='b1',description='d1', survey=survey_obj)
-        qset = QuestionSet.get(id=batch_obj.id)
-        
-        url = reverse('update_question_order_page', kwargs={"batch_id" : batch_obj.id})
-        response = self.client.post(url,data={"order_information": []})
-        self.assertIn(response.status_code, [200, 302])
-        self.assertIn("No questions orders were updated.", response.cookies['messages'].__str__())
 
     def test_batch_close_page(self):
         listing_form = ListingTemplate.objects.create(name='l12', description='desc1')

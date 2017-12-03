@@ -2,6 +2,9 @@ import string
 from model_mommy import mommy
 from datetime import datetime
 from django_rq import job
+from django.test.client import Client
+from django.core.urlresolvers import reverse
+from django.test.client import RequestFactory
 from django.contrib.auth.models import User
 from django.utils import timezone
 from dateutil.parser import parse as extract_date
@@ -17,6 +20,7 @@ from survey.utils.decorators import static_var
 from survey.tests.base_test import BaseTest
 from survey.forms.answer import SurveyAllocationForm, AddMoreLoopForm
 from .survey_base_test import SurveyBaseTest
+from survey.utils.views_helper import activate_super_powers
 
 
 class InterviewsTest(SurveyBaseTest):
@@ -117,6 +121,15 @@ class InterviewsTest(SurveyBaseTest):
         self.assertEquals(Interview.interviews_in(location2, include_self=True).count(), 0)
         self.assertEquals(Interview.interviews_in(location2, survey=self.survey, include_self=True).count(), 0)
 
+    def _load_other_client(self):
+        self.client = Client()
+        User.objects.create_user(username='useless', email='demo3@kant.com', password='I_Suck')
+        user = User.objects.create_user('demo13', 'demo3@kant.com', 'demo13')
+        self.assign_permission_to(user, 'can_have_super_powers')
+        self.assign_permission_to(user, 'can_view_users')
+        self.client.login(username='demo13', password='demo13')
+        return user
+
     def test_bulk_answer_questions(self):
         self._create_ussd_non_group_questions(self.qset)
         answers = []
@@ -140,6 +153,15 @@ class InterviewsTest(SurveyBaseTest):
         self.assertEquals(TextAnswer.objects.first().to_text().lower(), 'Hey Man'.lower())
         self.assertEquals(MultiChoiceAnswer.objects.first().as_text.lower(), 'Y'.lower())
         self.assertEquals(MultiChoiceAnswer.objects.first().as_value, str(QuestionOption.objects.get(text='Y').order))
+        # now test wipe data
+        request = RequestFactory().get('.')
+        request.user = self._load_other_client()
+        activate_super_powers(request)
+        url = reverse('wipe_survey_data', args=(self.survey.id,))
+        answer_count = Answer.objects.count()
+        self.assertTrue(answer_count > 0)
+        response = self.client.get(url)
+        self.assertEquals(Answer.objects.count(), 0)
 
     def test_respond_on_closed_interview(self):
         self.interview.closure_date = timezone.now()
@@ -150,6 +172,7 @@ class InterviewsTest(SurveyBaseTest):
         self._create_ussd_group_questions()
         self.assertEquals(self.interview.respond(),
                           self.qset.start_question.display_text(channel=ODKAccess.choice_name()))
+
 
 
 

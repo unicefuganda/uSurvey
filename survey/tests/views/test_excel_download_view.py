@@ -134,3 +134,51 @@ class ExportQuestionServiceExtra(SurveyBaseTest):
         content = get_batch_question_as_dump(self.qset.flow_questions)
         for idx, question in enumerate(self.qset.flow_questions):
             self.assertIn(question.identifier, content[idx+1])
+
+
+class DownloadExcelExtra(SurveyBaseTest):
+
+    def setUp(self):
+        super(DownloadExcelExtra, self).setUp()
+        self.client = Client()
+        User.objects.create_user(username='useless', email='demo3@kant.com', password='I_Suck')
+        user = User.objects.create_user('demo13', 'demo3@kant.com', 'demo13')
+        self.assign_permission_to(user, 'can_view_aggregates')
+        self.assign_permission_to(user, 'can_view_users')
+        self.client.login(username='demo13', password='demo13')
+
+    def test_email_excel(self):
+        self._create_ussd_non_group_questions(self.qset)
+        answers = []
+        n_quest = Question.objects.get(answer_type=NumericalAnswer.choice_name())
+        t_quest = Question.objects.get(answer_type=TextAnswer.choice_name())
+        m_quest = Question.objects.get(answer_type=MultiChoiceAnswer.choice_name())
+        # first is numeric, then text, then multichioice
+        answers = [{n_quest.id: 1, t_quest.id: 'Hey Man', m_quest.id: 'Y'},
+                   {n_quest.id: 5, t_quest.id: 'Hey Boy', m_quest.id: 'Y'},
+                   {n_quest.id: 15, t_quest.id: 'Hey Girl!', m_quest.id: 'N'},
+                   {n_quest.id: 15, t_quest.id: 'Hey Part!'}
+                   ]
+        question_map = {n_quest.id: n_quest, t_quest.id: t_quest, m_quest.id: m_quest}
+        interview = self.interview
+        Interview.save_answers(self.qset, self.survey, self.ea,
+                               self.access_channel, question_map, answers)
+        # confirm that 11 answers has been created
+        self.assertEquals(NumericalAnswer.objects.count(), 4)
+        self.assertEquals(TextAnswer.objects.count(), 4)
+        self.assertEquals(MultiChoiceAnswer.objects.count(), 3)
+        self.assertEquals(TextAnswer.objects.first().to_text().lower(), 'Hey Man'.lower())
+        self.assertEquals(MultiChoiceAnswer.objects.first().as_text.lower(), 'Y'.lower())
+        self.assertEquals(MultiChoiceAnswer.objects.first().as_value, str(QuestionOption.objects.get(text='Y').order))
+        url = reverse('excel_report')
+        data = {'survey': self.survey.id, 'batch': self.qset.id, 'multi_option': SurveyBatchFilterForm.AS_TEXT,
+                'action': 'Email Spreadsheet'}
+        response = self.client.get(url, follow=True, data=data)
+        self.assertTrue(response.context['a_form'].is_valid())
+        self.assertIn('Email would be sent to', response.content)
+        # not test the zip download
+        data = {'survey': self.survey.id, 'batch': self.qset.id, 'multi_option': SurveyBatchFilterForm.AS_TEXT,
+                'action': 'Download'}       # really anything would do
+        response = self.client.get(url, follow=True, data=data)
+        self.assertEquals(response['content-type'], 'application/zip')
+        self.assertIn('%s.zip' % self.qset.name, response['content-disposition'])

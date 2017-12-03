@@ -146,7 +146,7 @@ def clone_survey(request, survey_id):
 
 
 @login_required
-@permission_required('can_have_super_powers')
+@permission_required('auth.can_have_super_powers')
 def wipe_survey_data(request, survey_id):
     from survey.models import Interview
     from survey.utils import views_helper

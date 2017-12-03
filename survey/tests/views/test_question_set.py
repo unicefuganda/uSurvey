@@ -10,6 +10,7 @@ from survey.forms.question_set import get_question_set_form, BatchForm
 from survey.views.question_set import QuestionSetView
 import json
 
+
 class QuestionSetViewTest(BaseTest):
     def setUp(self):
         self.client = Client()
@@ -495,7 +496,7 @@ class QuestionSetViewTest(BaseTest):
                                                        ea=self.ea,
                                                        gender='1', level_of_education='Primary',
                                                        language='Eglish', weights=0,date_of_birth='1987-01-01')
-        interview_obj =  Interview.objects.create(
+        interview_obj = Interview.objects.create(
             interviewer = investigator,
             ea = self.ea,
             survey = survey_obj,
@@ -534,22 +535,51 @@ class QuestionSetViewTest(BaseTest):
             loop_starter = question2,
             loop_ender = question1
             )
-
-
         url = reverse('delete_qset_listingform', kwargs={"question_id" : qset.id})
         response = self.client.get(url)
         self.assertIn(response.status_code, [200, 302])
-        self.assertIn("Question Set cannot be deleted because it already has interviews.\\", response.cookies['messages'].__str__())
+        self.assertIn("Question Set cannot be deleted because it already has interviews.",
+                      str(response.cookies['messages']))
 
-        listing_form = ListingTemplate.objects.create(name='demo', description='desc1')
-        url = reverse('delete_qset_listingform', kwargs={"question_id" : listing_form.id})
+    def test_edit_question_set(self):
+        survey = mommy.make(Survey)
+        qset = mommy.make(Batch, survey=survey, name='sample tst')
+        data = {'name': 'editied name', 'description': 'test description',
+                'survey': survey.id, 'access_channels': ODKAccess.choice_name()}
+        url = reverse('edit_%s_page' % Batch.resolve_tag(), args=(qset.id, ))
+        response = self.client.post(url, data=data)
+        self.assertFalse(Batch.objects.filter(name=qset.name).exists())
+        self.assertTrue(Batch.objects.filter(name=data['name']).exists())
+
+    def test_delete_qset(self):
+        qset = mommy.make(QuestionSet)
+        question = mommy.make(Question, qset=qset)
+        url = reverse('delete_qset', args=(question.id, qset.id))
         response = self.client.get(url)
-        self.assertIn(response.status_code, [200, 302])
-        self.assertIn("Listing form successfully deleted.", response.cookies['messages'].__str__())
+        self.assertFalse(QuestionSet.objects.filter(id=qset.id).exists())
+        self.assertFalse(Question.objects.filter(id=question.id).exists())
 
-
-        url = reverse('delete_qset_listingform', kwargs={"question_id" : 999})
+    def test_delete_qset_listingform(self):
+        qset = mommy.make(QuestionSet)
+        question = mommy.make(Question, qset=qset)
+        qset.start_question = question
+        qset.save()
+        url = reverse('delete_qset_listingform', args=(question.id, ))
+        response = self.client.get(url)
+        self.assertFalse(QuestionSet.objects.filter(id=qset.id).exists())
+        url = reverse('delete_qset_listingform', kwargs={"question_id": 999})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 404)
 
-            
+    def test_question_identifiers(self):
+        qset = mommy.make(QuestionSet)
+        question = mommy.make(Question, qset=qset)
+        qset.start_question = question
+        qset.save()
+        question2 = mommy.make(Question, qset=qset)
+        mommy.make(QuestionFlow, question=question, next_question=question2)
+        url = reverse('qset_identifiers')
+        response = self.client.get(url, data={'id': qset.id, 'q_id': question2.id})
+        data = json.loads(response.content)
+        self.assertIn(question.identifier, data)
+
