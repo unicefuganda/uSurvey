@@ -117,11 +117,7 @@ class Interview(BaseModel):
                         media = media_files.get(answer, None)
                         # only file objects or the file contents
                         answer = ContentFile(media, name=answer)
-                    try:
-                        old_answer = answer_class.objects.get(interview=interview, question=question)
-                        old_answer.update(answer)
-                    except answer_class.DoesNotExist:
-                        answer_class.create(interview, question, answer)
+                    answer_class.create(interview, question, answer)
             except Exception, ex:
                 logger.error('error saving %s, desc: %s' % (q_id, str(ex)))
         map(_save_record, answers)
@@ -136,25 +132,26 @@ class Interview(BaseModel):
         :param channel:
         :return: Returns next question if any
         """
+        qset = self.question_set.to_exact
         if self.is_closed():
             return
-        if self.last_question is None or (self.last_question and reply is None):
-            self.last_question = self.question_set.start_question
-            self.save()
-            return self.last_question.display_text(channel=channel, context=answers_context)
         next_question = None
-        if self.has_started:
+        if self.has_started and reply:
             # save reply
             answer_class = Answer.get_class(self.last_question.answer_type)
             answer_class.create(self, self.last_question, reply)
             # compute nnext
             next_question = self.last_question.next_question(reply)
-        else:
-            next_question = self.question_set.start_question
+        elif self.has_started is False:
+            self.last_question = qset.g_first_question
+            self.save()
+            reply = None        # ignore the initial message
+        if self.has_started and reply is None:
+            return self.last_question.display_text(channel=channel, context=answers_context)
         # now confirm the question is applicable
         if next_question and AnswerAccessDefinition.is_valid(channel, next_question.answer_type) is False:
             # if not get next line question
-            next_question = self.question_set.next_inline(self.last_question, channel=channel)
+            next_question = qset.next_inline(self.last_question, channel=channel)
         response_text = None
         if next_question:
             self.last_question = next_question
@@ -211,13 +208,10 @@ class Answer(BaseModel):
 
     @classmethod
     def create(cls, interview, question, answer, as_text=None, as_value=None):
-        try:  # check if text and value is convertable to strings
-            if as_text is None:
-                as_text = cls.prep_text(unicode(answer)[:200])
-            if as_value is None:
-                as_value = cls.prep_value(unicode(answer)[:200])
-        except BaseException:
-            pass
+        if as_text is None:
+            as_text = cls.prep_text(unicode(answer)[:200])
+        if as_value is None:
+            as_value = cls.prep_value(unicode(answer)[:200])
         return cls.objects.create(
             question=question,
             value=answer,
@@ -533,19 +527,9 @@ class NumericalAnswer(NumericalTypeAnswer):
 
     @classmethod
     def create(cls, interview, question, answer):
-        try:
-            value = int(answer)
-            text_value = cls.prep_value(value)    # zero fill to 1billion
-        except Exception:
-            raise
-        return super(
-            NumericalAnswer,
-            cls).create(
-            interview,
-            question,
-            answer,
-            as_text=value,
-            as_value=text_value)
+        value = int(answer)
+        text_value = cls.prep_value(value)    # zero fill to 1billion
+        return super(NumericalAnswer, cls).create(interview, question, answer, as_text=value, as_value=text_value)
 
     class Meta:
         app_label = 'survey'
@@ -573,15 +557,12 @@ class AutoResponse(NumericalTypeAnswer):
         :param answer:
         :return:
         """
-        try:
-            value = int(answer)
-            prefix = 'flow-test'
-            if interview.interview_channel:
-                prefix = interview.interview_channel.user_identifier
-            # zero fill to 1billion
-            text_value = '%s-%s' % (prefix, cls.prep_value(value))
-        except Exception:
-            raise
+        value = int(answer)
+        prefix = 'flow-test'
+        if interview.interview_channel:
+            prefix = interview.interview_channel.user_identifier
+        # zero fill to 1billion
+        text_value = '%s-%s' % (prefix, cls.prep_value(value))
         return super(
             AutoResponse,
             cls).create(
@@ -639,14 +620,11 @@ class MultiChoiceAnswer(Answer):
             as_value=answer.order)
 
     def update(self, answer):
-        try:
-            if unicode(answer).isdigit():
-                answer = int(answer)
-                answer = self.question.options.get(order=answer)
-            else:
-                answer = self.question.options.get(text__iexact=answer)
-        except BaseException:
-            pass
+        if unicode(answer).isdigit():
+            answer = int(answer)
+            answer = self.question.options.get(order=answer)
+        else:
+            answer = self.question.options.get(text__iexact=answer)
         self.as_text = answer.text
         self.as_value = answer.order
         self.value = answer
@@ -728,7 +706,7 @@ class MultiSelectAnswer(Answer):
 
     @classmethod
     def equals(cls, answer, txt):
-        return answer.text.lower() == txt.lower()
+        return answer.lower() == txt.lower()
 
 
 class DateAnswer(Answer):
@@ -819,14 +797,9 @@ class DateAnswer(Answer):
 class FileAnswerMixin(object):
     @classmethod
     def create(cls, interview, question, answer, as_text=None, as_value=None):
-        try:
             # answer is a file object
-            as_value = os.path.basename(answer.name)
-            as_text = os.path.basename(answer.name)
-        except BaseException:
-            as_text = ''
-            as_value = ''
-            pass
+        as_value = os.path.basename(answer.name)
+        as_text = os.path.basename(answer.name)
         return cls.objects.create(
             question=question,
             value=answer,
@@ -837,7 +810,7 @@ class FileAnswerMixin(object):
             as_value=as_value)
 
 
-class AudioAnswer(Answer, FileAnswerMixin):
+class AudioAnswer(FileAnswerMixin, Answer):
     value = models.FileField(upload_to=settings.ANSWER_UPLOADS, null=True)
 
     class Meta:
@@ -848,11 +821,8 @@ class AudioAnswer(Answer, FileAnswerMixin):
     def validators(cls):
         return []
 
-    def to_text(self):
-        return ''
 
-
-class VideoAnswer(Answer, FileAnswerMixin):
+class VideoAnswer(FileAnswerMixin, Answer):
     value = models.FileField(upload_to=settings.ANSWER_UPLOADS, null=True)
 
     class Meta:
@@ -863,11 +833,8 @@ class VideoAnswer(Answer, FileAnswerMixin):
     def validators(cls):
         return []
 
-    def to_text(self):
-        return ''
 
-
-class ImageAnswer(Answer, FileAnswerMixin):
+class ImageAnswer(FileAnswerMixin, Answer):
     value = models.FileField(upload_to=settings.ANSWER_UPLOADS, null=True)
 
     class Meta:
@@ -877,9 +844,6 @@ class ImageAnswer(Answer, FileAnswerMixin):
     @classmethod
     def validators(cls):
         return []
-
-    def to_text(self):
-        return ''
 
 
 class GeopointAnswer(Answer):
@@ -910,10 +874,7 @@ class GeopointAnswer(Answer):
 
     @classmethod
     def validators(cls):
-        return [cls.equals]
-
-    def to_text(self):
-        return ''
+        return [cls.equals, ]
 
 
 class NonResponseAnswer(BaseModel):

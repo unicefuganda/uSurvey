@@ -55,6 +55,9 @@ class USSDSerializable(object):
 
 def get_answer_form(interview, access=None):
     question = interview.last_question
+    if not question:
+        interview.last_question = interview.question_set.to_exact.g_first_question
+        question = interview.last_question
     answer_class = Answer.get_class(question.answer_type)
     if access is None:
         access = InterviewerAccess.get(id=interview.interview_channel.id)
@@ -84,7 +87,7 @@ def get_answer_form(interview, access=None):
             if question.answer_type == GeopointAnswer.choice_name():
                 model_field = get_form_field_no_validation(forms.CharField)
                 self.fields['value'] = model_field(label='Answer', widget=forms.TextInput(
-                    attrs={'placeholder': 'Lat[space4]Long[space4' 'Altitude[space4]Precision'}))
+                    attrs={'placeholder': 'Lat[space]Long[space]Altitude[space]Precision'}))
             if question.answer_type == MultiChoiceAnswer.choice_name():
                 self.fields['value'] = forms.ChoiceField(choices=[(opt.order, opt.text) for opt
                                                                   in question.options.all()], widget=forms.RadioSelect)
@@ -169,8 +172,7 @@ def get_answer_form(interview, access=None):
                 return self.cleaned_data['value']
 
         def save(self, *args, **kwargs):
-            return answer_class.create(
-                interview, question, self.cleaned_data['value'])
+            return answer_class.create(interview, question, self.cleaned_data['value'])
 
     return AnswerForm
 

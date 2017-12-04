@@ -97,14 +97,16 @@ class Interviewer(BaseModel):
         return relativedelta(timezone.now().date(), self.date_of_birth).years
 
     def completed_batch_or_survey(self, survey, batch):
+        """This method is old, might not be supported in future versions"""
         if survey and not batch:
-            return self.total_households_completed(survey) > 0
-        return self.total_households_batch_completed(batch) > 0
+            return self.interviews.filter(survey=survey).exists()
+        return self.interviews.filter(survey=survey, question_set=batch).exists()
 
     def locations_in_hierarchy(self):
-        locs = self.ea.locations.all()  # this should evaluate to country
-        if locs:
-            return locs[0].get_ancestors(
+        assignments = self.assignments
+        if assignments.exists():
+            ea = assignments.last().allocation_ea
+            return ea.locations.last().get_ancestors(
                 include_self=True).exclude(
                 parent__isnull=True)
         else:
@@ -248,13 +250,3 @@ class SurveyAllocation(BaseModel):
         return Interview.objects.filter(survey__in=[survey, self.survey],
                                         ea=self.allocation_ea).count() >= self.survey.sample_size
 
-    def batches_enabled(self):
-        if self.is_valid():
-            if self.survey.has_sampling:
-                if self.interviewer.present_households(
-                        self.survey).count() < self.survey.sample_size:
-                    return False
-            return True
-        else:
-            raise ValidationError(
-                'Interviewer not assigned to EA: ' % self.allocation_ea)

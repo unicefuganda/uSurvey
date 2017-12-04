@@ -8,6 +8,7 @@ from django.test.client import Client
 from django.template.loader import get_template
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
+from django.test.client import RequestFactory
 from survey.models import (Batch, Survey, NumericalAnswer, TextAnswer, DateAnswer, MultiChoiceAnswer, ODKAccess,
                            RespondentGroup, ParameterTemplate, EnumerationArea, Interviewer, SurveyAllocation,
                            BatchQuestion, ParameterQuestion, Location)
@@ -165,14 +166,13 @@ class USSDFlowTest(SurveyBaseTest):
         flow_questions = self.qset.flow_questions
         self.assertIn(flow_questions[1].text.upper(), response.content.upper())  # text answer
 
-        # class FakeRequest(object):
-        #     POST = data
-        #     method = 'POST'
-        #     def is_ajax(self):
-        #         return False
-        # response = respond(FakeRequest())
-        # import pdb; pdb.set_trace()
-        # self.assertEquals()
+    def test_ussd_flow_no_uid(self):
+        url = reverse('ussd')
+        data = {'format': 'text'}
+        request = RequestFactory().get(url, data=data)
+        response = respond(request)
+        self.assertEquals(response.status_code, 200)
+
 
 
 

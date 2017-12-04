@@ -59,19 +59,18 @@ class Question(CloneableMixin, GenericQuestion):
             question=self).count()
 
     def delete(self, using=None):
-        '''
+        """
         Delete related answers before deleting this object
         :param using:
         :return:
-        '''
+        """
         answer_class = Answer.get_class(self.answer_type)
         answer_class.objects.filter(question=self).delete()
         return super(Question, self).delete(using=using)
 
-    def display_text(self, channel=None, context={}):
+    def display_text(self, channel=USSDAccess.choice_name(), context={}):
         text = self.text
-        if channel and channel == USSDAccess.choice_name(
-        ) and self.answer_type == MultiChoiceAnswer.choice_name():
+        if channel == USSDAccess.choice_name() and self.answer_type == MultiChoiceAnswer.choice_name():
             extras = []
             # append question options
             for option in self.options.all().order_by('order'):
@@ -85,13 +84,8 @@ class Question(CloneableMixin, GenericQuestion):
         resulting_flow = None
         for flow in flows:
             if flow.validation_test:
-
                 test_values = [arg.param for arg in flow.text_arguments]
-                if getattr(
-                        answer_class,
-                        flow.validation_test)(
-                        reply,
-                        *test_values) is True:
+                if getattr(answer_class, flow.validation_test)(reply, *test_values) is True:
                     resulting_flow = flow
                     break
             else:
@@ -107,7 +101,7 @@ class Question(CloneableMixin, GenericQuestion):
         return self.qset.upcoming_inlines(self)
 
     def upcoming_question(self):
-        return self.qset.next_inline()
+        return self.qset.next_inline(self)
 
     def upcoming_flow_questions(self):
         questions = OrderedSet()
@@ -170,11 +164,6 @@ class Question(CloneableMixin, GenericQuestion):
         flow_questions = qset.flow_questions
         return qset.questions.exclude(pk__in=[q.pk for q in flow_questions])
 
-    def hierarchical_result_for(self, location_parent, survey):
-        locations = location_parent.get_children().order_by('name')[:10]
-        answers = self.multichoiceanswer.all()
-        return self._format_answer(locations, answers, survey)
-
     @property
     def loop_story(self):
         return self.qset.get_loop_story().get(self.id, [])
@@ -210,6 +199,7 @@ class QuestionFlow(CloneableMixin, BaseModel):
     def validation_test(self, test):
         if self.validation:
             self.validation.validation_test = test
+            self.validation.save()
         else:
             self.validation = ResponseValidation.objects.create(validation_test=test)
 
@@ -291,9 +281,9 @@ class QuestionSet(CloneableMixin, BaseModel):   # can be qset, listing, responde
 
     def __unicode__(self):
         return "%s" % self.name
-
-    def can_be_deleted(self):
-        return True, ''
+    #
+    # def can_be_deleted(self):
+    #     return True, ''
 
     @property
     def auto_fields(self):
@@ -338,16 +328,6 @@ class QuestionSet(CloneableMixin, BaseModel):   # can be qset, listing, responde
         return QuestionFlow.objects.filter(
             question__qset__pk=self.pk,
             desc=LogicForm.SKIP_TO).exists()
-
-    def non_response_enabled(self, ea):
-        locations = []
-        ea_locations = ea.locations.all()
-        if ea_locations:
-            map(lambda loc: locations.extend(
-                loc.get_ancestors(include_self=True)), ea_locations)
-        return self.open_locations.filter(
-            non_response=True, location__pk__in=[
-                location.pk for location in locations]).exists()
 
     def inline_flows(self):
         return QuestionFlow.objects.filter(
@@ -464,13 +444,6 @@ class QuestionSet(CloneableMixin, BaseModel):   # can be qset, listing, responde
                 # more than quest subquestion deep for present implemnt
             return flow_questions
         return _flow_questions()
-
-    def activate_non_response_for(self, location):
-        self.open_locations.filter(location=location).update(non_response=True)
-
-    def deactivate_non_response_for(self, location):
-        self.open_locations.filter(
-            location=location).update(non_response=False)
 
     @classmethod
     def index_breadcrumbs(cls, **kwargs):

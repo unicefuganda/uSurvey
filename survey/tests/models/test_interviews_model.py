@@ -171,7 +171,159 @@ class InterviewsTest(SurveyBaseTest):
     def test_respond_start_question_interview(self):
         self._create_ussd_group_questions()
         self.assertEquals(self.interview.respond(),
-                          self.qset.start_question.display_text(channel=ODKAccess.choice_name()))
+                          self.qset.g_first_question.display_text(channel=ODKAccess.choice_name()))
+
+
+class InterviewsTestExtra(SurveyBaseTest):
+    def test_first_question_is_loop_first(self):
+        self._create_ussd_group_questions()
+        # test first question is group first
+        self.assertEquals(self.interview.respond(),
+                          self.qset.g_first_question.display_text(channel=ODKAccess.choice_name(), context={}))
+        # test running again gives same results
+        self.assertEquals(self.interview.respond(),
+                          self.qset.g_first_question.display_text(channel=ODKAccess.choice_name(), context={}))
+
+    def test_interviews_in_exclude_self(self):
+        location = self.ea.locations.first()
+        interviews = Interview.interviews_in(location.parent)
+        self.assertTrue(interviews.filter(id=self.interview.id).exists())
+
+    def test_answers_unicode_rep(self):
+        self._create_ussd_non_group_questions()
+        n_question = Question.objects.filter(answer_type=NumericalAnswer.choice_name()).first()
+        answer = NumericalAnswer.create(self.interview, n_question, 1)
+        self.assertEquals(str(answer.as_text), unicode(answer))
+        # test update (since numeric makes use of thr parent implementation)
+        answer.update(2)
+        self.assertEquals(answer.as_value, 2)
+        # just test to label also :)
+        self.assertEquals(answer.to_label(), 2)
+        #test to pretty_print
+        self.assertEquals(str(answer.pretty_print()), '2')
+
+    def test_get_answer_class_with_doesnt_exist(self):
+        self.assertRaises(ValueError, Answer.get_class, 'Fake_Anwer')
+
+    def _prep_answers(self):
+        self._create_test_non_group_questions(self.qset)
+        answers = []
+        n_quest = Question.objects.get(answer_type=NumericalAnswer.choice_name())
+        t_quest = Question.objects.get(answer_type=TextAnswer.choice_name())
+        m_quest = Question.objects.get(answer_type=MultiChoiceAnswer.choice_name())
+        # first is numeric, then text, then multichioice
+        answers = [{n_quest.id: 1, t_quest.id: 'Hey Man', m_quest.id: 'Y'},
+                   {n_quest.id: 5, t_quest.id: 'Our Hey Boy', m_quest.id: 'Y'},
+                   {n_quest.id: 27, t_quest.id: 'Hey Girl!', m_quest.id: 'N'},
+                   {n_quest.id: 12, t_quest.id: 'Hey Raster!', m_quest.id: 'N'},
+                   {n_quest.id: 19, t_quest.id: 'This bad boy'}
+                   ]
+        question_map = {n_quest.id: n_quest, t_quest.id: t_quest, m_quest.id: m_quest}
+        interview = self.interview
+        interviews = Interview.save_answers(self.qset, self.survey, self.ea,
+                                            self.access_channel, question_map, answers)
+        # confirm that 11 answers has been created
+        self.assertEquals(NumericalAnswer.objects.count(), 5)
+        self.assertEquals(TextAnswer.objects.count(), 5)
+        self.assertEquals(MultiChoiceAnswer.objects.count(), 4)
+        self.assertEquals(TextAnswer.objects.first().to_text().lower(), 'Hey Man'.lower())
+        self.assertEquals(MultiChoiceAnswer.objects.first().as_text.lower(), 'Y'.lower())
+        multichoice = MultiChoiceAnswer.objects.first()
+        self.assertEquals(multichoice.as_value,
+                          str(QuestionOption.objects.get(text='Y', question=multichoice.question).order))
+        return Interview.objects.filter(id__in=[i.id for i in interviews])
+
+    def test_answer_qs_filters(self):
+        interviews = self._prep_answers()
+        fetched_interviews = Answer.fetch_contains('answer__as_value', 'Hey', qs=interviews)    # 4 intervies meet this
+        self.assertEquals(fetched_interviews.count(), 4)
+        fetched_interviews = Answer.fetch_starts_with('answer__as_value', 'Hey', qs=interviews)  # 3 intervies meet this
+        self.assertEquals(fetched_interviews.count(), 3)
+        fetched_interviews = Answer.fetch_ends_with('answer__as_value', 'boy', qs=interviews)  # 2 intervies meet this
+        self.assertEquals(fetched_interviews.count(), 2)
+        fetched_answers = Answer.fetch_contains('as_value', 'boy')  # 2 intervies meet this
+        self.assertEquals(fetched_answers.count(), 2)
+        fetched_answers = Answer.fetch_starts_with('as_value', 'This')  # 1 intervies meet this
+        self.assertEquals(fetched_answers.count(), 1)
+        fetched_answers = Answer.fetch_ends_with('as_value', 'boy')  # 2 intervies meet this
+        self.assertEquals(fetched_answers.count(), 2)
+
+    def test_odk_answer_methods(self):
+        # test odk contain
+        path = '/qset/qset1/surveyQuestions/q1'
+        value = 'me doing somthing'
+        self.assertEquals(Answer.odk_contains(path, value), "regex(%s, '.*(%s).*')" % (path, value))
+        self.assertEquals(Answer.odk_starts_with(path, value), "regex(%s, '^(%s).*')" % (path, value))
+        self.assertEquals(Answer.odk_ends_with(path, value), "regex(%s, '.*(%s)$')" % (path, value))
+        value = 4
+        upperlmt = 10
+        self.assertEquals(Answer.odk_greater_than(path, value), "%s &gt; '%s'" % (path, value))
+        self.assertEquals(Answer.odk_less_than(path, value), "%s &lt; '%s'" % (path, value))
+        self.assertEquals(Answer.odk_between(path, value, upperlmt),
+                          "(%s &gt; '%s') and (%s &lt;= '%s')" % (path, value, path, upperlmt))
+        self.assertEquals(NumericalAnswer.odk_less_than(path, value), "%s &lt; %s" % (path, value))
+        self.assertEquals(NumericalAnswer.odk_between(path, value, upperlmt),
+                          "(%s &gt; %s) and (%s &lt;= %s)" % (path, value, path, upperlmt))
+        value = '20-07-2017'
+        self.assertEquals(DateAnswer.odk_greater_than(path, value),
+                          "%s &gt; %s" % (path, DateAnswer.to_odk_date(value)))
+        self.assertEquals(DateAnswer.odk_less_than(path, value),
+                          "%s &lt; %s" % (path, DateAnswer.to_odk_date(value)))
+        upperlmt = '25-08-2017'
+        self.assertEquals(DateAnswer.odk_between(path, value, upperlmt),
+                          "(%s &gt; %s) and (%s &lt;= %s)" % (path,
+                                                              DateAnswer.to_odk_date(value),
+                                                              path, DateAnswer.to_odk_date(upperlmt)))
+
+    def test_answer_value_methods(self):
+        value = 'me doing somthing'
+        test_answer1 = 'nothing good'
+        self.assertFalse(Answer.equals(test_answer1, value))
+        self.assertTrue(Answer.equals(value, value))
+        self.assertTrue(Answer.starts_with(value, 'me d'))
+        self.assertFalse(Answer.ends_with(value, 'no thing'))
+        self.assertTrue(Answer.ends_with(value, 'somthing'))
+        self.assertFalse(Answer.greater_than(5, 9))
+        self.assertTrue(Answer.greater_than(9, 5))
+        self.assertTrue(Answer.less_than(5, 9))
+        self.assertFalse(Answer.less_than(9, 5))
+        self.assertFalse(Answer.between(9, 5, 7))
+        self.assertTrue(Answer.between(9, 5, 11))
+        self.assertTrue(Answer.passes_test('17 > 10'))
+        self.assertFalse(NumericalAnswer.greater_than(5, 9))
+        self.assertTrue(NumericalAnswer.greater_than(9, 5))
+        self.assertTrue(NumericalAnswer.less_than(5, 9))
+        self.assertFalse(NumericalAnswer.less_than(9, 5))
+        self.assertFalse(NumericalAnswer.between(9, 5, 7))
+        self.assertTrue(NumericalAnswer.between(9, 5, 11))
+        self.assertFalse(TextAnswer.equals(test_answer1, value))
+        self.assertTrue(TextAnswer.equals(value, value))
+        self.assertFalse(MultiChoiceAnswer.equals(test_answer1, value))
+        self.assertTrue(MultiChoiceAnswer.equals(value, value))
+        self.assertFalse(MultiSelectAnswer.equals(test_answer1, value))
+        self.assertTrue(MultiSelectAnswer.equals(value, value))
+        self.assertFalse(DateAnswer.greater_than('12-09-2017', '12-09-2017'))
+        self.assertTrue(DateAnswer.greater_than('13-09-2017', '12-09-2017'))
+        self.assertFalse(DateAnswer.less_than('18-09-2017', '12-09-2017'))
+        self.assertTrue(DateAnswer.less_than('13-09-2017', '17-09-2017'))
+        self.assertFalse(DateAnswer.between('18-09-2017', '12-09-2017',  '16-09-2017'))
+        self.assertTrue(DateAnswer.between('14-09-2017', '12-09-2017',  '16-09-2017'))
+
+    def test_other_answer_methods(self):
+        interviews = self._prep_answers()
+        m_answer = MultiChoiceAnswer.objects.last()
+        self.assertEqual(m_answer.pretty_print(as_label=False), m_answer.value.text)
+        self.assertEqual(m_answer.pretty_print(as_label=True), m_answer.value.order)
+        multiselect_question = Question.objects.filter(answer_type=MultiSelectAnswer.choice_name()).last()
+        MultiSelectAnswer.create(self.interview, multiselect_question, 'Y N')
+        self.assertEqual(MultiSelectAnswer.objects.count(), 1)
+        multiselect = MultiSelectAnswer.objects.last()
+        self.assertEqual(multiselect.to_text(), ' and '.join(['Y', 'N']))
+        self.assertEqual(multiselect.to_label(), ' and '.join(['1', '2']))
+        self.assertEqual(multiselect.pretty_print(as_label=False), multiselect.to_text())
+        self.assertEqual(multiselect.pretty_print(as_label=True), multiselect.to_label())
+
+
 
 
 
