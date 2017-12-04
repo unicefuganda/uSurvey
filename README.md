@@ -1,5 +1,7 @@
 uSurvey
 =======
+[![Build Status](https://travis-ci.org/unicefuganda/uSurvey.svg?branch=uSurvey)](https://travis-ci.org/unicefuganda/uSurvey)
+[![Coverage Status](https://coveralls.io/repos/github/unicefuganda/uSurvey/badge.svg?branch=uSurvey)](https://coveralls.io/github/unicefuganda/uSurvey?branch=uSurvey)
 
 uSurvey is an innovative data collection tool designed to provide statistically representative real time estimates of a given indicator. It runs on USSD (Unstructured Supplementary Service Data) interactive secured channel and on ODK (Open Data Kit), for off-line data collection in locations with intermittent mobile network connections.
 
@@ -80,6 +82,3 @@ Testing
 
         python manage.py test
 
-
-[![Build Status](https://travis-ci.org/unicefuganda/uSurvey.svg?branch=uSurvey)](https://travis-ci.org/unicefuganda/uSurvey)
-[![Coverage](https://coveralls.io/repos/unicefuganda/uSurvey/badge.png)](https://coveralls.io/repos/unicefuganda/uSurvey/badge.png)
