@@ -2,6 +2,7 @@
 from survey.models.locations import Location
 from survey.models import BaseModel
 from django.db import models
+from django.conf import settings
 from survey.models.surveys import Survey
 from survey.models.batch import BatchLocationStatus
 

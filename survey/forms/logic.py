@@ -233,16 +233,10 @@ class LoopingForm(forms.ModelForm, FormOrderMixin):
                 int(self.cleaned_data.get('repeat_count', ''))
             except ValueError:
                 raise ValidationError('repeat count is required')
-        if repeat_logic == self.PREVIOUS_ANSWER_COUNT and not self.cleaned_data.get(
-                'previous_numeric_values', False):
+            except TypeError:
+                raise ValidationError('repeat count is required')
+        if repeat_logic == self.PREVIOUS_ANSWER_COUNT and not self.cleaned_data.get('previous_numeric_values', False):
             raise ValidationError('No previous answer selected')
-        # check for overlapping loops between start and end
-        # start_question = self.cleaned_data['loop_starter']
-        # end_question = self.cleaned_data['loop_ender']
-        # QuestionFlow.objects.filter(Q(question__in=start_question.qset.inlines_between(start_question, end_question))|
-        #                             Q(next_question__in=start_question.qset.inlines_between(start_question,
-        #                                                                                     end_question)),
-        # desc__in=[LogicForm.SKIP_TO, LogicForm.END_INTERVIEW]).exist():
 
         return self.cleaned_data
 

@@ -196,20 +196,13 @@ class SurveyAllocation(BaseModel):
         :param count:
         :return:
         """
-        try:
-            allocation = cls.get_allocation_details(interviewer)
-            if allocation:
-                return allocation[count].survey
-        except cls.DoesNotExist:
-            return None
+        allocation = cls.get_allocation_details(interviewer)
+        if allocation:
+            return allocation[count].survey
 
     @classmethod
     def get_allocation_details(cls, interviewer):
-        try:
-            return cls.objects.filter(interviewer=interviewer,
-                                      status=cls.PENDING).order_by('created')
-        except cls.DoesNotExist:
-            return None
+        return cls.objects.filter(interviewer=interviewer, status=cls.PENDING).order_by('created')
 
     def min_eas_is_covered(self, loc):
         pass

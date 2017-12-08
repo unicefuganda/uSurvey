@@ -1,10 +1,10 @@
+import csv
+import string
+import datetime
 from django.core.management.base import BaseCommand
 from survey.models import Location, LocationType, EnumerationArea
 from django.template.defaultfilters import slugify
-import csv
-import string
 from django.db import transaction
-import datetime
 
 
 class Command(BaseCommand):

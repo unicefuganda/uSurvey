@@ -174,13 +174,24 @@ class OnlineFlowsTest(BaseTest):
         eas = EnumerationArea.objects.all()[:2]
         odk_token = 'odk-pass'
         odk_id = 'odk-user'
-        interviewer_data = {'name': 'Test interviewer', 'date_of_birth': '17-07-1981',
-                            'ea': eas.values_list('id', flat=True), 'survey': survey.id,
-                            'odk_token': odk_token, 'user_identifier': odk_id, 'ussd_access-TOTAL_FORMS': 0,
-                            'ussd_access-INITIAL_FORMS': 0, 'ussd_access-MIN_NUM_FORMS': 0,
-                            'ussd_access-MAX_NUM_FORMS': 0, 'gender': Interviewer.MALE,
-                            'level_of_education': Interviewer.LEVEL_OF_EDUCATION_CHOICES[0][0],
-                            'language': Interviewer.LANGUAGES_CHOICES[0][0]}
+        ussd_id = u'771828293'
+        interviewer_data ={u'is_active': [u'on'], u'ea': eas.values_list('id', flat=True),
+                          u'ussd_access-0-interviewer': [u''],
+         u'ussd_access-TOTAL_FORMS': [u'1'], u'ussd_access-0-user_identifier': ussd_id, u'odk_token': '1234',
+         u'save_button': [u''], u'level_of_education': [u'Primary'], u'ussd_access-0-is_active': [u'on'],
+         u'ussd_access-INITIAL_FORMS': [u'0'], u'name': [u'James'], u'language': [u'English'], u'gender': [u'1'],
+         u'ussd_access-MAX_NUM_FORMS': [u'1000'], u'user_identifier': odk_id, u'ussd_access-MIN_NUM_FORMS': [u'0'],
+         u'date_of_birth': [u'05-01-1983'], u'survey': survey.id, u'ussd_access-0-intervieweraccess_ptr': [u''],
+         u'ussd_access-0-DELETE': [u'']}
+        # interviewer_data = {'name': 'Test interviewer', 'date_of_birth': '17-07-1981',
+        #                     'ea': eas.values_list('id', flat=True), 'survey': survey.id,
+        #                     'odk_token': odk_token, 'user_identifier': odk_id, 'ussd_access-TOTAL_FORMS': 1,
+        #                     'ussd_access-INITIAL_FORMS': 1, 'ussd_access-MIN_NUM_FORMS': 0,
+        #                     'ussd_access-user_identifier': '+256312313800', 'access-0-intervieweraccess_ptr': '',
+        #                     'ussd_access-0-interviewer': '',
+        #                     'ussd_access-MAX_NUM_FORMS': 1, 'gender': Interviewer.MALE,
+        #                     'level_of_education': Interviewer.LEVEL_OF_EDUCATION_CHOICES[0][0],
+        #                     'language': Interviewer.LANGUAGES_CHOICES[0][0]}
         demo = self.assign_permission_to(User.objects.create_user('demo123', 'demo12@kant1.com', 'demo123'),
                                          'can_view_interviewers')
         client = Client()
@@ -219,7 +230,7 @@ class OnlineFlowsTest(BaseTest):
         response = self.client.post(interviewer_online_flow_url, data=answer_data)  # should taje back to ques 1
         self.assertEqual(response.status_code, 200)
         self.assertIn(inlines[1].text, response.content)
-        # second question is text
+        # second question is textld share
         answer_data['value'] = 'good'
         response = self.client.post(interviewer_online_flow_url, data=answer_data)
         self.assertEqual(response.status_code, 200)

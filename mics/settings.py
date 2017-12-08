@@ -479,6 +479,8 @@ NON_RESPONSE_REASONS = {
 
 LOG_DIR = os.path.join(BASE_DIR, 'logs')
 
+EA_NAME = os.path.join('VERBOSE_EA_NAME', 'Enumeration Area')
+
 ##end USSD config ##
 # Importing server specific settings
 

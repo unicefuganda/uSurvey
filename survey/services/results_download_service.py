@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 from django.core.mail import EmailMessage
 from django.conf import settings
@@ -34,20 +35,16 @@ class ResultComposer:
         subject = 'Completion report for %s' % attachment_name
         text = 'Completion report for %s. Date: %s' % (
             attachment_name, datetime.now())
-        try:
-            mail = EmailMessage(subject, text, settings.DEFAULT_EMAIL_SENDER, [
-                                self.user.email, ])
-            results_df = self.get_interview_answers()
-            f = StringIO.StringIO()
-            # exclude interview id
-            data = results_df.to_csv(f, columns=results_df.columns[1:])
-            f.seek(0)
-            mail.attach(attachment_name, f.read(), 'text/csv')
-            f.close()
-            sent = mail.send()
-        except Exception as ex:
-            #print 'error while sending mail: %s', str(ex)
-            pass
+        mail = EmailMessage(subject, text, settings.DEFAULT_EMAIL_SENDER, [
+                            self.user.email, ])
+        results_df = self.results_download_service.get_interview_answers()
+        f = StringIO.StringIO()
+        # exclude interview id
+        data = results_df.to_csv(f, columns=results_df.columns[1:])
+        f.seek(0)
+        mail.attach(attachment_name, f.read(), 'text/csv')
+        f.close()
+        sent = mail.send()
 
 
 class ResultsDownloadService(object):
@@ -57,16 +54,8 @@ class ResultsDownloadService(object):
     page_start = 0
     items_per_page = None
 
-    def __init__(
-            self,
-            batch,
-            survey=None,
-            restrict_to=None,
-            interviews=None,
-            multi_display=AS_TEXT,
-            page_index=0,
-            items_per_page=None,
-            follow_ref=False):
+    def __init__(self, batch, survey=None, restrict_to=None, interviews=None, multi_display=AS_TEXT, page_index=0,
+                 items_per_page=None, follow_ref=True):
         self.batch = batch
         self.survey = survey
         self.locations = []
@@ -113,47 +102,44 @@ class ResultsDownloadService(object):
             for i in range(LocationType.objects.count() - 2):
                 parent_loc = '%s__parent' % parent_loc
                 interview_list_args.insert(2, '%s__name' % parent_loc)      # insert after closure date
+            header_names = ['Uploaded', 'Completion Date']
+            location_names = list(LocationType.objects.get(parent__isnull=True
+                                                           ).get_descendants(include_self=False
+                                                                             ).values_list('name', flat=True))
+            header_names.extend(location_names)
+            header_names.extend(['EA', 'interviewer__name', 'id'])
+            if self.follow_ref:
+                header_names.append('interview_reference_id')
             interview_query_args = list(interview_list_args)
             interview_queryset = self.interviews.values_list(*interview_query_args)
             if self.items_per_page:
-                interview_queryset = interview_queryset[
-                    self.page_start:
-                    self.page_start + self.items_per_page]
+                interview_queryset = interview_queryset[self.page_start: self.page_start + self.items_per_page]
             try:
-                interviews_df = to_df(
-                    interview_queryset, date_cols=['created', 'closure_date'])
+                interviews_df = to_df(interview_queryset, date_cols=['created', 'closure_date'])
             except EmptyResultSet:
                 interviews_df = pd.DataFrame(columns=interview_query_args)
+            interviews_df.columns = header_names
+            reports_df = pd.DataFrame(columns=interviews_df.columns)
             if self.follow_ref:
-                ref_answers_report_df = self._get_answer_df(
-                    interviews_df['interview_reference_id'])
-                reports_df = interviews_df.join(
-                    ref_answers_report_df, on='id', how='outer')
+                good_ref_interviews = interviews_df[interviews_df['interview_reference_id'].notnull()]
+                if not good_ref_interviews.empty:   # only do the following when there is a value here
+                    ref_answers_report_df = self._get_answer_df(good_ref_interviews['interview_reference_id'],
+                                                                result_id_label='interview_reference_id')
+                    reports_df = interviews_df.join(ref_answers_report_df, on='interview_reference_id', how='outer')
             answers_report_df = self._get_answer_df(interviews_df['id'])
-            reports_df = interviews_df.join(
-                answers_report_df, on='id', how='outer')
-            header_names = ['Uploaded', 'Completion Date']
-            location_names = list(
-                LocationType.objects.
-                get(parent__isnull=True).get_descendants(
-                    include_self=False))
-            header_names.extend(location_names)
-            header_names.extend(['EA', 'interviewer__name', ])
-            if self.follow_ref:
-                header_names.extend(list(ref_answers_report_df.columns)[1:])
-            report_columns = header_names[2:] + [           # adding uploaded and completion date after other columns
-                q.identifier for q in self.batch.all_questions
-                if q.identifier in reports_df.columns] + ['Uploaded', 'Completion Date']
-            header_names.extend(list(reports_df.columns)[len(header_names):])
-            reports_df.columns = header_names
-            other_sort_fields = [
-                identifier for identifier in
-                self.batch.auto_fields.values_list(
-                    'identifier',
-                    flat=True) if identifier in header_names]
-            reports_df = reports_df.sort_values(
-                ['Uploaded', 'Completion Date' ] + location_names + other_sort_fields)
+            reports_df = reports_df.join(answers_report_df, on='id', how='outer')
+            # adding uploaded and completion date after other columns
+            report_columns = list(reports_df.columns[2:]) + ['Uploaded', 'Completion Date']
+            other_sort_fields = [identifier for identifier in
+                                 self.batch.auto_fields.values_list('identifier',
+                                                                     flat=True) if identifier in header_names]
+            reports_df = reports_df.sort_values(['Uploaded', 'Completion Date'] + location_names + other_sort_fields)
             reports_df = reports_df[report_columns]
+            # now clean up
+            if 'id' in reports_df.columns:
+                del reports_df['id']
+            if 'interview_reference_id' in reports_df.columns:
+                del reports_df['interview_reference_id']
             try:
                 reports_df.Created = reports_df.Created.dt.tz_convert(settings.TIME_ZONE)
             except BaseException:
@@ -162,7 +148,7 @@ class ResultsDownloadService(object):
             return reports_df
         return _get_interview_answers()
 
-    def _get_answer_df(self, interview_ids):
+    def _get_answer_df(self, interview_ids, result_id_label='id'):
         answer_query_args = ['interview__id', 'identifier', ]
         value = 'as_text'
         if self.multi_display == self.AS_LABEL:
@@ -172,13 +158,13 @@ class ResultsDownloadService(object):
             interview__id__in=interview_ids).values_list(
             *answer_query_args)
         try:
-            answer_columns = ['id', 'identifier', value]
+            answer_columns = [result_id_label, 'identifier', value]
             answers_df = to_df(answers_queryset)
-            answers_df.columns = ['id', 'identifier', value]
+            answers_df.columns = [result_id_label, 'identifier', value]
         except EmptyResultSet:
             answers_df = pd.DataFrame(columns=answer_columns)
         # not get pivot table of interview_id, identifier and question value
-        return answers_df.pivot(index='id', columns='identifier', values=value)
+        return answers_df.pivot(index=result_id_label, columns='identifier', values=value)
 
     def generate_interview_reports(self):
         return self.get_interview_answers()

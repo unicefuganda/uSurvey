@@ -174,7 +174,7 @@ class QuestionFlow(CloneableMixin, BaseModel):
                         for validator in Answer.validators()]
     question = models.ForeignKey(Question, related_name='flows')
     question_type = models.CharField(max_length=100)
-    validation = models.ForeignKey(ResponseValidation, null=True, blank=True)
+    validation = models.ForeignKey(ResponseValidation, null=True, blank=True, related_name='flows')
     # if validation passes, classify this flow response as having this value
     name = models.CharField(max_length=200, null=True, blank=True)
     # this would provide a brief description of this flow
@@ -582,15 +582,15 @@ def inline_questions(question, flows):
     return questions
 
 
-def inline_flows(question, qflows):
-    flows = []
-    try:
-        qflow = qflows.get(question=question, validation__isnull=True)
-        flows.append(qflow)
-        flows.extend(inline_questions(qflow.next_question, flows))
-    except QuestionFlow.DoesNotExist:
-        pass
-    return flows
+# def inline_flows(question, qflows):
+#     flows = []
+#     try:
+#         qflow = qflows.get(question=question, validation__isnull=True)
+#         flows.append(qflow)
+#         flows.extend(inline_questions(qflow.next_question, flows))
+#     except QuestionFlow.DoesNotExist:
+#         pass
+#     return flows
 
 
 class QuestionSetChannel(CloneableMixin, BaseModel):

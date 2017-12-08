@@ -10,7 +10,7 @@ while true;
         case $yn in
             [Yy]* ) docker-compose run usurvey_app ./manage.py clear_locations; break;;
             [Nn]* ) exit;;
-            * ) echo "Please answer yes or no.";;
+            * ) echo "Please answer with y or n.";;
         esac
     done
 

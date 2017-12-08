@@ -40,6 +40,7 @@ class IndicatorViewTest(SurveyBaseTest):
                                              'can_view_batches')
         self.assign_permission_to(self.raj, 'can_view_investigators')
         self.assign_permission_to(self.raj, 'can_view_household_groups')
+        self.assign_permission_to(self.raj, 'can_view_aggregates')
         self.client.login(username='demo4', password='demo4')
 
     def _test_create_indicator(self):
@@ -321,5 +322,8 @@ class IndicatorViewTest(SurveyBaseTest):
         indicator_form = IndicatorForm(data=data)
         indicator_form.is_valid()       # again not interested. just to confirm
         self.assertNotIn('name', indicator_form.cleaned_data)
+
+    def test_get_indicator_json(self):
+        url = reverse('survey_indicators')
 
 

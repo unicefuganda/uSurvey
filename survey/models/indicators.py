@@ -38,17 +38,6 @@ class Indicator(BaseModel):
         """
         return QuestionSet.get(id=self.question_set.id)
 
-    def get_matching_interviews(self, batch, loc):
-        pass
-
-    def compute_for_next_location_type_in_the_hierarchy(
-            self, current_location):
-        locations = current_location.get_children()
-        data = {}
-        for location in locations:
-            data[location] = self.compute_for_location(location)
-        return data
-
     @classmethod
     def get_variables(cls, formulae):
         pattern = '{{ *([0-9a-zA-Z_]+) *}}'
@@ -116,10 +105,6 @@ class Indicator(BaseModel):
         variable = self.variables.get(name__iexact=variable_name)
         return variable.get_variable_aggregates(base_location, report_level=report_level)
 
-    def get_variable_value(self, locations, variable_name):
-        variable = self.variables.get(name__iexact=variable_name)
-        return variable.get_valid_qs(locations).count()
-
 
 class IndicatorVariable(BaseModel):
     """This is used to store parameters used for indicator calculations.
@@ -140,25 +125,6 @@ class IndicatorVariable(BaseModel):
     class Meta:
         app_label = 'survey'
         unique_together = ['name', 'indicator']
-
-    def get_valid_qs(self, locations):
-        """Return the queryset valid according to this indicator variable
-        :param locations:
-        :return:
-        """
-        indicator = self.indicator
-        ikwargs = {'ea__locations__in': locations,
-                   'question_set__pk': indicator.question_set.pk,
-                   'survey__pk': indicator.survey.pk}
-        interviews = Interview.objects.filter(**ikwargs)
-        for criterion in self.criteria.all():
-            kwargs = dict()
-            kwargs['answer__question__identifier__iexact'] = criterion.test_question.identifier
-            # be careful here regarding multiple validation tests with same name (e.g a__gt=2, a__gt=10)
-            kwargs.update(Answer.get_validation_queries(criterion.validation_test, 'as_value',
-                                                        namespace='answer__', *criterion.prepped_args))
-            interviews = interviews.filter(**kwargs)
-        return interviews.distinct('id')
 
     def get_variable_aggregates(self, base_location, report_level=1):
         indicator = self.indicator
@@ -210,14 +176,15 @@ class IndicatorVariableCriteria(BaseModel):
     def test_params(self):
         return [t.param for t in self.test_arguments]
 
-    def params_display(self):
-        params = []
-        for arg in self.text_arguments:
-            if self.question.answer_type == MultiChoiceAnswer.choice_name():
-                params.append(self.question.options.get(order=arg.param).text)
-            else:
-                params.append(arg.param)
-        return params
+    # might revisit later
+    # def params_display(self):
+    #     params = []
+    #     for arg in self.text_arguments:
+    #         if self.question.answer_type == MultiChoiceAnswer.choice_name():
+    #             params.append(self.question.options.get(order=arg.param).text)
+    #         else:
+    #             params.append(arg.param)
+    #     return params
 
     @property
     def test_arguments(self):

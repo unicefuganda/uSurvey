@@ -56,10 +56,7 @@ def _create_or_edit(
     odk_access_form = ODKAccessForm(instance=odk_instance)
     if request.method == 'POST':
         interviewer_form = InterviewerForm(eas, data=request.POST, instance=interviewer)
-        ussd_access_form = USSDAccessFormSet(
-            request.POST,
-            prefix='ussd_access',
-            instance=interviewer)
+        ussd_access_form = USSDAccessFormSet(request.POST, prefix='ussd_access', instance=interviewer)
         odk_access_form = ODKAccessForm(request.POST, instance=odk_instance)
         if interviewer_form.is_valid() and odk_access_form.is_valid():
             interviewer = interviewer_form.save()

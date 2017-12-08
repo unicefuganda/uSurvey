@@ -19,7 +19,6 @@ def save_interview(row, interviewer, odk_access, survey, qset, questions, eas={}
                                                                            row[question.identifier]),
             questions)
     except Exception, ex:
-        #print 'ex: ', str(ex)
         pass
 
 

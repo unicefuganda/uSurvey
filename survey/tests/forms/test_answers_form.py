@@ -97,7 +97,25 @@ class AnswerFormExtra(SurveyBaseTest):
         form.save()
         self.assertTrue(NumericalAnswer.objects.count(), 1)
 
-        """ 176, 209,
-            227, 229, 239-241, 252-253, 259-260, 263, 294-296, 326-334,
-            337-338, 341-344, 347-350, 356-361, 364-365, 368-371, 374-377
+        """ 124, 205, 223-224, 234-236, 247-248, 254-255, 258, 289-291, 321-329, 332-333, 
+        336-339, 342-345, 351-356, 359-360, 363-366, 369-372
             """
+    def test_answer_form_with_wrong_option(self):
+        self._create_test_non_group_questions(self.qset)
+        interview = self.interview
+        geo_question = Question.objects.filter(answer_type=GeopointAnswer.choice_name()).last()
+        interview.last_question = geo_question
+        interview.save()
+        data = {'value': 'something else 2 4'}
+        AnswerForm = get_answer_form(interview)
+        form = AnswerForm(data=data)
+        self.assertIn('lat[space]long[space]altitude[space]precision', form.errors['value'][0])
+
+    def test_loop_answer_for_ussd(self):
+        ussd_id = '7182829393'
+        mommy.make(USSDAccess, interviewer=self.interviewer, user_identifier=ussd_id)
+        self._create_test_non_group_questions(self.qset)
+        first = Question.objects.first()
+        last = Question.objects.last()
+        mommy.make(QuestionLoop, loop_starter=first, loop_ender=last)
+
