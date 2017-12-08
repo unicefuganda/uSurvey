@@ -119,20 +119,20 @@ class ResultsDownloadService(object):
             except EmptyResultSet:
                 interviews_df = pd.DataFrame(columns=interview_query_args)
             interviews_df.columns = header_names
-            reports_df = pd.DataFrame(columns=interviews_df.columns)
+            reports_df = interviews_df
             if self.follow_ref:
                 good_ref_interviews = interviews_df[interviews_df['interview_reference_id'].notnull()]
                 if not good_ref_interviews.empty:   # only do the following when there is a value here
                     ref_answers_report_df = self._get_answer_df(good_ref_interviews['interview_reference_id'],
                                                                 result_id_label='interview_reference_id')
-                    reports_df = interviews_df.join(ref_answers_report_df, on='interview_reference_id', how='outer')
+                    reports_df = reports_df.join(ref_answers_report_df, on='interview_reference_id', how='outer')
             answers_report_df = self._get_answer_df(interviews_df['id'])
             reports_df = reports_df.join(answers_report_df, on='id', how='outer')
             # adding uploaded and completion date after other columns
             report_columns = list(reports_df.columns[2:]) + ['Uploaded', 'Completion Date']
             other_sort_fields = [identifier for identifier in
                                  self.batch.auto_fields.values_list('identifier',
-                                                                     flat=True) if identifier in header_names]
+                                                                    flat=True) if identifier in header_names]
             reports_df = reports_df.sort_values(['Uploaded', 'Completion Date'] + location_names + other_sort_fields)
             reports_df = reports_df[report_columns]
             # now clean up

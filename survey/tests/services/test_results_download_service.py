@@ -1,3 +1,4 @@
+from model_mommy import mommy
 from datetime import date
 from survey.models.locations import *
 from survey.models import *
@@ -8,8 +9,8 @@ from survey.tests.models.survey_base_test import SurveyBaseTest
 
 class ResultsDownloadServiceTest(SurveyBaseTest):
 
-    def _prep_answers(self):
-        self._create_test_non_group_questions(self.qset)
+    def _prep_answers(self, qset):
+        self._create_test_non_group_questions(qset)
         answers = []
         n_quest = Question.objects.get(answer_type=NumericalAnswer.choice_name())
         t_quest = Question.objects.get(answer_type=TextAnswer.choice_name())
@@ -23,7 +24,7 @@ class ResultsDownloadServiceTest(SurveyBaseTest):
                    ]
         question_map = {n_quest.id: n_quest, t_quest.id: t_quest, m_quest.id: m_quest}
         interview = self.interview
-        interviews = Interview.save_answers(self.qset, self.survey, self.ea,
+        interviews = Interview.save_answers(qset, self.survey, self.ea,
                                             self.access_channel, question_map, answers)
         # confirm that 11 answers has been created
         self.assertEquals(NumericalAnswer.objects.count(), 5)
@@ -37,22 +38,37 @@ class ResultsDownloadServiceTest(SurveyBaseTest):
         return Interview.objects.filter(id__in=[i.id for i in interviews])
 
     def test_reference_interview_report(self):
-        self._prep_answers()
+        listing_form = mommy.make(ListingTemplate)
+        mommy.make(QuestionSetChannel, qset=listing_form, channel=self.access_channel.choice_name())
+        self.survey.has_sampling = True
+        self.survey.listing_form = listing_form
+        self.survey.save()
+        interviews = self._prep_answers(listing_form)
+        rs = ResultsDownloadService(listing_form, survey=self.survey, follow_ref=True)
+        reports_df = rs.generate_interview_reports()
+        for idx, interview in enumerate(interviews):
+            for answer in interview.answer.all():
+                # since this ref_interview only captured one row of information, so this is valid
+                self.assertEquals(answer.as_text, reports_df[answer.question.identifier][idx])
+        self.assertEquals(reports_df['EA'][0], self.ea.name)
+        for location in self.ea.locations.first().get_ancestors().exclude(id=Location.country().id):
+            self.assertEquals(reports_df[location.type.name][0], location.name)
         ref_interview = Interview.objects.last()
-        self._create_ussd_non_group_questions(self.qset1)
+        self._create_ussd_non_group_questions(self.qset)
         n_quest = Question.objects.filter(answer_type=NumericalAnswer.choice_name(),
-                                          qset=self.qset1).last()
+                                          qset=self.qset).last()
         t_quest = Question.objects.filter(answer_type=TextAnswer.choice_name(),
-                                          qset=self.qset1).last()
+                                          qset=self.qset).last()
         m_quest = Question.objects.filter(answer_type=MultiChoiceAnswer.choice_name(),
-                                          qset=self.qset1).last()
+                                          qset=self.qset).last()
         answers = [{n_quest.id: 27, t_quest.id: 'Test Ref', m_quest.id: 'N'},
                    ]
         question_map = {n_quest.id: n_quest, t_quest.id: t_quest, m_quest.id: m_quest}
-        interviews = Interview.save_answers(self.qset1, self.survey, self.ea,
+        Interview.objects.filter(question_set=self.qset).delete()
+        interviews = Interview.save_answers(self.qset, self.survey, self.ea,
                                             self.access_channel, question_map, answers,
                                             reference_interview=ref_interview)
-        rs = ResultsDownloadService(self.qset1, survey=self.survey, follow_ref=True)
+        rs = ResultsDownloadService(self.qset, survey=self.survey, follow_ref=True)
         reports_df = rs.generate_interview_reports()
         for answer in ref_interview.answer.all():
             # since this ref_interview only captured one row of information, so this is valid

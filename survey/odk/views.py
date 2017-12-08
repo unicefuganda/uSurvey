@@ -114,8 +114,7 @@ def instances_form_list(request):
     """
     interviewer = request.user
     assignments = interviewer.unfinished_assignments
-    submissions = ODKSubmission.objects.filter(status=ODKSubmission.COMPLETED,
-                                               ea__in=[a.allocation_ea for a in assignments],
+    submissions = ODKSubmission.objects.filter(ea__in=[a.allocation_ea for a in assignments],
                                                survey=assignments.first().survey)  # pick irrespective of status
     # now exclude any question already being used as a sample sample
     listing_interviews = ListingSample.objects.values_list(
@@ -203,9 +202,13 @@ def download_xform(request, batch_id):
                         listing_survey, survey, ea)
                 except ListingSample.SamplesAlreadyGenerated:
                     pass
-                ea_samples[ea.pk] = ListingSample.samples(survey, ea)
+                samples = ListingSample.samples(survey, ea)
+                if samples:
+                    ea_samples[ea.pk] = samples
             else:
                 return OpenRosaResponseNotAllowed('You have not submitted enough listing data')
+        if not ea_samples:
+            return OpenRosaResponseNotAllowed('You have not submitted any data meeting Listing criteria')
         assignments.update(stage=SurveyAllocation.SURVEY)
     return _get_qset_response(
         request,
