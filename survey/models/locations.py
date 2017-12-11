@@ -18,10 +18,6 @@ class Point(BaseModel):
     def __unicode__(self):
         return "%s, %s" % (self.latitude, self.longitude)
 
-    def __repr__(self):
-        return '<%s: %s>' %\
-            (type(self).__name__, self)
-
 
 class LocationType(MPTTModel, BaseModel):
     name = models.CharField(max_length=200, unique=True)
@@ -54,6 +50,8 @@ class LocationType(MPTTModel, BaseModel):
             root_node = cls.objects.get(parent=None)
             return root_node.get_children()[0]
         except cls.DoesNotExist:
+            return None
+        except IndexError:
             return None
 
     @classmethod

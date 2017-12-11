@@ -2,9 +2,11 @@ __author__ = 'anthony <>'
 import random
 import re
 import string
+from cacheops import cached_as
 from django.db import models
 from django.db import transaction
 from django import template
+from django.conf import settings
 from django.utils import html
 from survey.models.base import BaseModel
 from survey.models.questions import Question, QuestionSet
@@ -122,43 +124,62 @@ class ListingSample(BaseModel):
         """
         if cls.samples(to_survey, ea).exists():
             raise cls.SamplesAlreadyGenerated('Samples already generated')
-
-        if to_survey.has_sampling is False or from_survey.has_sampling is False:
-            raise ValueError('Either source or destination survey does not support sampling')
-        valid_interviews = from_survey.interviews.filter(ea=ea,     # the listed interviews in the ea
-                                                         question_set=from_survey.listing_form).values_list('id',
-                                                                                                            flat=True)
-        #valid_interviews = set(valid_interviews)
-        # now get the interviews that meet the randomization criteria
-        for criterion in to_survey.randomization_criteria.all():  # need to optimize this
-            answer_type = criterion.listing_question.answer_type
-            if answer_type == MultiChoiceAnswer.choice_name():
-                value_key = 'value__text'
-            else:
-                value_key = 'value'
-            answer_class = Answer.get_class(answer_type)
-            kwargs = {
-                'question': criterion.listing_question,
-                'interview__id__in': valid_interviews,
-            }
-            # if qs:
-            # kwargs['interview__id__in'] = valid_interviews
-            valid_interviews = criterion.qs_passes_test(value_key,
-                                                        answer_class.objects.filter(**kwargs
-                                                                                    ).only('interview__id'
-                                                                                           ).values_list(
-                                                            'interview__id', flat=True))
-        valid_interviews = list(valid_interviews)
-        random.shuffle(valid_interviews)
-        random_samples = valid_interviews[:to_survey.sample_size]
-        samples = []
-        for interview_id in random_samples:
-            samples.append(
-                ListingSample(
-                    survey=to_survey,
-                    interview_id=interview_id))
+        samples = cls.get_possible_samples(from_survey, to_survey, ea)
         with transaction.atomic():
             ListingSample.objects.bulk_create(samples)
+
+    @classmethod
+    def get_possible_samples(cls, from_survey, to_survey, ea):
+        """
+        This method is different from generate_random_samples in that it is used more like a peek function
+        to see if a survey possibly have enough samples meeting required criteria
+        :param from_survey:
+        :param to_survey:
+        :param ea:
+        :return:
+        """
+        from survey.models import EnumerationArea
+
+        @cached_as(Survey.objects.filter(id__in=[from_survey.id, to_survey.id]),
+                   EnumerationArea.objects.filter(id=ea.id), timeout=int(settings.CACHE_REFRESH_DURATION/10))
+        def _get_possible_samples():
+
+            if to_survey.has_sampling is False or from_survey.has_sampling is False:
+                raise ValueError('Either source or destination survey does not support sampling')
+            valid_interviews = from_survey.interviews.filter(ea=ea,     # the listed interviews in the ea
+                                                             question_set=from_survey.listing_form
+                                                             ).values_list('id', flat=True)
+            #valid_interviews = set(valid_interviews)
+            # now get the interviews that meet the randomization criteria
+            for criterion in to_survey.randomization_criteria.all():  # need to optimize this
+                answer_type = criterion.listing_question.answer_type
+                if answer_type == MultiChoiceAnswer.choice_name():
+                    value_key = 'value__text'
+                else:
+                    value_key = 'value'
+                answer_class = Answer.get_class(answer_type)
+                kwargs = {
+                    'question': criterion.listing_question,
+                    'interview__id__in': valid_interviews,
+                }
+                # if qs:
+                # kwargs['interview__id__in'] = valid_interviews
+                valid_interviews = criterion.qs_passes_test(value_key,
+                                                            answer_class.objects.filter(**kwargs
+                                                                                        ).only('interview__id'
+                                                                                               ).values_list(
+                                                                'interview__id', flat=True))
+            valid_interviews = list(valid_interviews)
+            random.shuffle(valid_interviews)
+            random_samples = valid_interviews[:to_survey.sample_size]
+            samples = []
+            for interview_id in random_samples:
+                samples.append(
+                    ListingSample(
+                        survey=to_survey,
+                        interview_id=interview_id))
+            return samples
+        return _get_possible_samples()
 
     def get_display_label(self):
         survey = self.survey

@@ -235,11 +235,11 @@ class SurveyAllocation(BaseModel):
         return self.status == self.PENDING and self.interviewer.ea == self.allocation_ea
 
     def sample_size_reached(self):
-        from survey.models import Interview
-        survey = self.survey.preferred_listing
+        from survey.models import ListingSample
+        survey = self.survey.preferred_listing or self.survey
         if self.survey.preferred_listing:
             survey = self.survey.preferred_listing
         # more than one interviewer can result in the sample size for that EA
-        return Interview.objects.filter(survey__in=[survey, self.survey],
-                                        ea=self.allocation_ea).count() >= self.survey.sample_size
+        return len(ListingSample.get_possible_samples(survey, self.survey,
+                                                      self.allocation_ea)) >= self.survey.sample_size
 

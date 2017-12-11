@@ -112,10 +112,10 @@ urlpatterns = patterns(
         r'^interviewers/(?P<interviewer_id>\d+)/edit/$',
         'survey.views.interviewer.edit_interviewer',
         name="edit_interviewer_page"),
-    url(
-        r'^interviewers/check_mobile_number',
-        'survey.views.interviewer.check_mobile_number',
-        name="check_mobile_number"),
+    # url(
+    #     r'^interviewers/check_mobile_number',
+    #     'survey.views.interviewer.check_mobile_number',
+    #     name="check_mobile_number"),
     url(
         r'^ussd/simulator',
         permission_required(

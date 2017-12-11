@@ -136,23 +136,17 @@ def list_interviewers(request):
 @login_required
 @permission_required('survey.view_completed_survey')
 def show_completion_summary(request, interviewer_id):
-    interviewer = Interviewer.objects.get(pk=interviewer_id)
-    request.breadcrumbs([
-        ('Interviewers', reverse('interviewers_page')),
-    ])
-    return render(request,
-                  'interviewers/completion_summary.html',
-                  {'interviewer': interviewer})
+    return HttpResponseRedirect(reverse('interviewers_page'))
 
 
-@login_required
-def check_mobile_number(request):
-    response = Interviewer.objects.filter(
-        mobile_number=request.GET['mobile_number']).exists()
-    return HttpResponse(
-        json.dumps(
-            not response),
-        content_type="application/json")
+# @login_required
+# def check_mobile_number(request):
+#     response = Interviewer.objects.filter(
+#         mobile_number=request.GET['mobile_number']).exists()
+#     return HttpResponse(
+#         json.dumps(
+#             not response),
+#         content_type="application/json")
 
 
 @permission_required('auth.can_view_interviewers')
@@ -164,79 +158,55 @@ def show_interviewer(request, interviewer_id):
 
 @permission_required('auth.can_view_interviewers')
 def block_interviewer(request, interviewer_id):
-    try:
-        interviewer = Interviewer.objects.get(id=interviewer_id)
-        interviewer.ussd_access.update(is_active=False)
-        interviewer.odk_access.update(is_active=False)
-        interviewer.is_blocked = True
-        interviewer.save()
-        messages.success(
-            request, "Interviewer USSD Access successfully blocked.")
-    except Interviewer.DoesNotExist:
-        messages.error(request, "Interviewer does not exist.")
+    interviewer = get_object_or_404(Interviewer, id=interviewer_id)
+    interviewer.ussd_access.update(is_active=False)
+    interviewer.odk_access.update(is_active=False)
+    interviewer.is_blocked = True
+    interviewer.save()
+    messages.success(request, "Interviewer USSD Access successfully blocked.")
     return HttpResponseRedirect(reverse('interviewers_page'))
 
 
 @permission_required('auth.can_view_interviewers')
 def unblock_interviewer(request, interviewer_id):
-    try:
-        interviewer = Interviewer.objects.get(id=interviewer_id)
-        interviewer.ussd_access.update(is_active=True)
-        interviewer.odk_access.update(is_active=True)
-        interviewer.is_blocked = False
-        interviewer.save()
-        messages.success(
-            request, "Interviewer USSD Access successfully unblocked.")
-    except Interviewer.DoesNotExist:
-        messages.error(request, "Interviewer does not exist.")
+    interviewer = get_object_or_404(Interviewer, id=interviewer_id)
+    interviewer.ussd_access.update(is_active=True)
+    interviewer.odk_access.update(is_active=True)
+    interviewer.is_blocked = False
+    interviewer.save()
+    messages.success(request, "Interviewer USSD Access successfully unblocked.")
     return HttpResponseRedirect(reverse('interviewers_page'))
 
 
 @permission_required('auth.can_view_interviewers')
 def block_ussd(request, interviewer_id):
-    try:
-        interviewer = Interviewer.objects.get(id=interviewer_id)
-        interviewer.ussd_access.update(is_active=False)
-        messages.success(
-            request, "Interviewer USSD Access successfully blocked.")
-    except Interviewer.DoesNotExist:
-        messages.error(request, "Interviewer does not exist.")
+    interviewer = get_object_or_404(Interviewer, id=interviewer_id)
+    interviewer.ussd_access.update(is_active=False)
+    messages.success(request, "Interviewer USSD Access successfully blocked.")
     return HttpResponseRedirect(reverse('interviewers_page'))
 
 
 @permission_required('auth.can_view_interviewers')
 def unblock_ussd(request, interviewer_id):
-    try:
-        interviewer = Interviewer.objects.get(id=interviewer_id)
-        interviewer.ussd_access.update(is_active=True)
-        messages.success(
-            request, "Interviewer USSD Access successfully unblocked.")
-    except Interviewer.DoesNotExist:
-        messages.error(request, "Interviewer does not exist.")
+    interviewer = get_object_or_404(Interviewer, id=interviewer_id)
+    interviewer.ussd_access.update(is_active=True)
+    messages.success(request, "Interviewer USSD Access successfully unblocked.")
     return HttpResponseRedirect(reverse('interviewers_page'))
 
 
 @permission_required('auth.can_view_interviewers')
 def block_odk(request, interviewer_id):
-    try:
-        interviewer = Interviewer.objects.get(id=interviewer_id)
-        interviewer.odk_access.update(is_active=False)
-        messages.success(
-            request, "Interviewer USSD Access successfully blocked.")
-    except Interviewer.DoesNotExist:
-        messages.error(request, "Interviewer does not exist.")
+    interviewer = get_object_or_404(Interviewer, id=interviewer_id)
+    interviewer.odk_access.update(is_active=False)
+    messages.success(request, "Interviewer USSD Access successfully blocked.")
     return HttpResponseRedirect(reverse('interviewers_page'))
 
 
 @permission_required('auth.can_view_interviewers')
 def unblock_odk(request, interviewer_id):
-    try:
-        interviewer = Interviewer.objects.get(id=interviewer_id)
-        interviewer.odk_access.update(is_active=True)
-        messages.success(
-            request, "Interviewer USSD Access successfully unblocked.")
-    except Interviewer.DoesNotExist:
-        messages.error(request, "Interviewer does not exist.")
+    interviewer = get_object_or_404(Interviewer, id=interviewer_id)
+    interviewer.odk_access.update(is_active=True)
+    messages.success(request, "Interviewer USSD Access successfully unblocked.")
     return HttpResponseRedirect(reverse('interviewers_page'))
 
 
