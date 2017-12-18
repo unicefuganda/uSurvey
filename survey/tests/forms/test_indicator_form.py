@@ -88,3 +88,22 @@ class IndicatorFormTest(TestCase):
         self.assertIn('min', form.errors['__all__'][0])
         self.assertIn('max', form.errors['__all__'][0])
 
+    def test_indicator_variable_criteria_form(self):
+        qset = mommy.make(Batch, survey=self.survey)
+        question = mommy.make(Question, qset=qset, answer_type=MultiChoiceAnswer.choice_name())
+        mommy.make(QuestionOption, question=question, order=1, text='Y')
+        mommy.make(QuestionOption, question=question, order=2, text='N')
+        qset.start_question = question
+        qset.save()
+        indicator_variable = mommy.make(IndicatorVariable, name='test_variable')
+        indicator_variable2 = mommy.make(IndicatorVariable, name='test_variable2')
+        indicator = mommy.make(Indicator, question_set=qset, survey=self.survey)
+        data = {'validation_test': 'equals', 'test_question': question.id,
+                'description': 'something', 'name': 'test var'}
+        variable_form = IndicatorVariableForm(indicator, data=data)
+        self.assertFalse(variable_form.is_valid(), True)
+        data['options'] = 1
+        variable_form = IndicatorVariableForm(indicator, data=data)
+        self.assertTrue(variable_form.is_valid(), True)
+
+

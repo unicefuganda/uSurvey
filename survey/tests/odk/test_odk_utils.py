@@ -249,6 +249,104 @@ class ODKTest(SurveyBaseTest):
                    'answer1': answer1, 'answer2': answer2, 'answer3': answer3, 'answer4': answer4}
         return completed % context
 
+    def _get_non_response_xml(self, answer1, answer2, answer3, answer4):
+        completed = b'''<qset id="%(qset)s" >
+                         <meta>
+                            <instanceID>%(instance_id)s</instanceID>
+                            <instanceName>%(instance_id)s-Name</instanceName>
+                        <creationDate />
+                        <locked />
+                         </meta>
+                         <submissions>
+                             <id />
+                             <dates>
+                                 <lastModified />
+                             </dates>
+                         </submissions>
+                         <nqrc>1</nqrc>
+                         <nqr>OTHER</nqr>
+                         <nqr_other>Just tired</nqr_other>
+                           <surveyAllocation>%(survey_allocation)s</surveyAllocation>
+                           <qset%(qset)s>
+                            <questions>
+                                <groupQuestions></groupQuestions>
+                                <surveyQuestions>
+                                    <q1>%(answer1)s</q1><q2>%(answer2)s</q2><q4>%(answer3)s</q4><q5>%(answer4)s</q5>
+                                </surveyQuestions>
+                            </questions>
+                           </qset%(qset)s>
+                       </qset>
+                       '''
+        context = {'qset': self.qset.id, 'instance_id': random.randint(0, 1000),
+                   'survey_allocation': self.survey_allocation.allocation_ea.name.encode('utf8'),
+                   'answer1': answer1, 'answer2': answer2, 'answer3': answer3, 'answer4': answer4}
+        return completed % context
+
+    def _get_loop_xml(self, answer1, answer2, answer3, answer4):
+        completed = b'''<qset id="%(qset)s" >
+                         <meta>
+                            <instanceID>%(instance_id)s</instanceID>
+                            <instanceName>%(instance_id)s-Name</instanceName>
+                        <creationDate />
+                        <locked />
+                         </meta>
+                         <submissions>
+                             <id />
+                             <dates>
+                                 <lastModified />
+                             </dates>
+                         </submissions>
+                           <surveyAllocation>%(survey_allocation)s</surveyAllocation>
+                           <qset%(qset)s>
+                            <questions>
+                                <groupQuestions></groupQuestions>
+                                <surveyQuestions>
+                                    <q1>%(answer1)s</q1>
+                                    <q2q4>
+                                        <id1 />
+                                        <creationDate>12-10-2017</creationDate>
+                                        <q2>%(answer2)s</q2><q3>%(answer3)s</q3><q4>%(answer4)s</q4>
+                                    </q2q4>
+                                </surveyQuestions>
+                            </questions>
+                           </qset%(qset)s>
+                       </qset>
+                       '''
+        context = {'qset': self.qset.id, 'instance_id': random.randint(0, 1000),
+                   'survey_allocation': self.survey_allocation.allocation_ea.name.encode('utf8'),
+                   'answer1': answer1, 'answer2': answer2, 'answer3': answer3, 'answer4': answer4}
+        return completed % context
+
+    def test_submit_loop_xform(self):
+        self._create_ussd_non_group_questions(self.qset)
+        all_questions = self.qset.all_questions
+        mommy.make(QuestionLoop, loop_starter=all_questions[1], loop_ender=all_questions[-1])
+        country = Location.country()
+        for location in country.get_children():
+            self.qset.activate_non_response_for(location)
+        xml = self._get_loop_xml('2', 'James', 'Y', '1')
+        f = SimpleUploadedFile("surveyfile.xml", xml)
+        url = reverse('odk_submit_forms')
+        response = self._make_odk_request(url=url, data={'xml_submission_file': f}, raw=True)
+        self.assertTrue( 300 > response.status_code and response.status_code >= 200)
+        self.assertEquals(ODKSubmission.objects.count(), 1)
+        # not confirm that 5 responses were given (including param question)
+        self.assertEquals(Answer.objects.count(), 4)
+
+    def test_submit_non_response_xform(self):
+        self._create_ussd_non_group_questions(self.qset)
+        country = Location.country()
+        for location in country.get_children():
+            self.qset.activate_non_response_for(location)
+        xml = self._get_non_response_xml('2', 'James', 'Y', '1')
+        f = SimpleUploadedFile("surveyfile.xml", xml)
+        url = reverse('odk_submit_forms')
+        response = self._make_odk_request(url=url, data={'xml_submission_file': f}, raw=True)
+        self.assertTrue( 300 > response.status_code and response.status_code >= 200)
+        self.assertEquals(ODKSubmission.objects.count(), 1)
+        # not confirm that 5 responses were given (including param question)
+        self.assertEquals(NonResponseAnswer.objects.count(), 1)
+
     def test_submit_group_xform(self):
         self._create_ussd_group_questions(self.qset)
         xml = self._get_groups_completed_xform('10', '2', 'James', 'Y', '1')

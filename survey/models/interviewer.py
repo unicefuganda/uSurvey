@@ -208,7 +208,7 @@ class SurveyAllocation(BaseModel):
         pass
 
     def open_batches(self):
-        return [batch for batch in self.survey.batches.all() if
+        return [batch for batch in self.survey.batches.order_by('name') if
                 batch.is_open_for(self.allocation_ea.locations.all()[0])]
 
     @classmethod

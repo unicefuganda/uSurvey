@@ -1,6 +1,7 @@
 from model_mommy import mommy
 from django.template.defaultfilters import slugify
 from django.test import TestCase
+from django.test.client import RequestFactory
 from django import forms
 from survey.forms.answer import *
 from survey.forms.form_helper import get_form_field_no_validation
@@ -97,9 +98,6 @@ class AnswerFormExtra(SurveyBaseTest):
         form.save()
         self.assertTrue(NumericalAnswer.objects.count(), 1)
 
-        """ 124, 205, 223-224, 234-236, 247-248, 254-255, 258, 289-291, 321-329, 332-333, 
-        336-339, 342-345, 351-356, 359-360, 363-366, 369-372
-            """
     def test_answer_form_with_wrong_option(self):
         self._create_test_non_group_questions(self.qset)
         interview = self.interview
@@ -111,11 +109,21 @@ class AnswerFormExtra(SurveyBaseTest):
         form = AnswerForm(data=data)
         self.assertIn('lat[space]long[space]altitude[space]precision', form.errors['value'][0])
 
-    def test_loop_answer_for_ussd(self):
-        ussd_id = '7182829393'
-        mommy.make(USSDAccess, interviewer=self.interviewer, user_identifier=ussd_id)
-        self._create_test_non_group_questions(self.qset)
-        first = Question.objects.first()
-        last = Question.objects.last()
-        mommy.make(QuestionLoop, loop_starter=first, loop_ender=last)
+    # def test_loop_answer_for_ussd(self):
+    #     ussd_id = '7182829393'
+    #     ussd_access = mommy.make(USSDAccess, interviewer=self.interviewer, user_identifier=ussd_id)
+    #     self._create_test_non_group_questions(self.qset)
+    #     first = Question.objects.first()
+    #     last = Question.objects.last()
+    #     mommy.make(QuestionLoop, loop_starter=first, loop_ender=last)
+    #     request = RequestFactory().get('/')
+    #     # first check if the loop form value uses numeric input
+    #     data = {'uid': ussd_id}
+    #     form = AddMoreLoopForm(data=)
+    #
+    # def test_add_loop_form_uses_numeric_widget(self):
+    #     """ 124, 205, 223-224, 234-236, 247-248, 254-255, 258, 289-291, 321-329, 332-333,
+    #     336-339, 342-345, 351-356, 359-360, 363-366, 369-372
+    #         """
+    #     AddMoreLoopForm9d
 

@@ -131,17 +131,17 @@ def edit(request, user_id, mode=''):
             'mode': mode,
             'user_id': user.id}
     return response or render(request, 'users/new.html', context_variables)
-
-
-@login_required
-@permission_required('auth.can_view_users')
-def show(request, user_id):
-    user = User.objects.filter(id=user_id)
-    if not user.exists():
-        messages.error(request, "User not found.")
-        return HttpResponseRedirect("/users/")
-    return render(request, 'users/show.html',
-                  {'the_user': user[0], 'cancel_url': '/users/'})
+#
+#
+# @login_required
+# @permission_required('auth.can_view_users')
+# def show(request, user_id):
+#     user = User.objects.filter(id=user_id)
+#     if not user.exists():
+#         messages.error(request, "User not found.")
+#         return HttpResponseRedirect("/users/")
+#     return render(request, 'users/show.html',
+#                   {'the_user': user[0], 'cancel_url': '/users/'})
 
 
 def _set_is_active(user, status, request):

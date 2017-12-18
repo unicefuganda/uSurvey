@@ -72,6 +72,7 @@ def get_answer_form(interview, access=None):
 
         def __init__(self, *args, **kwargs):
             super(AnswerForm, self).__init__(*args, **kwargs)
+            self.question = question
             # self.fields['uid'] = forms.CharField(initial=access.user_identifier, widget=forms.HiddenInput)
             if question.answer_type == DateAnswer.choice_name():
                 self.fields['value'] = forms.DateField(
@@ -345,12 +346,34 @@ class ReferenceInterviewForm(BaseSelectInterview, USSDSerializable):
         return mark_safe('<br />'.join(text))
 
 
+class SelectBatchOrListingForm(BaseSelectInterview, USSDSerializable):
+    LISTING = '1'
+    BATCH = '2'
+
+    def __init__(self, request, access, *args, **kwargs):
+        super(SelectBatchOrListingForm, self).__init__(request, access, *args, **kwargs)
+        self.fields['value'] = forms.ChoiceField()
+        self.fields['value'].choices = [(self.LISTING, 'Listing'), (self.BATCH, 'Batch')]
+        self.fields['value'].label = 'Continue Listing or Start Batch'
+
+    def render_extra_ussd(self):
+        text = []
+        map(lambda choice: text.append('%s: %s' % choice), self.fields['value'].choices)
+        return mark_safe('\n'.join(text))
+
+    def render_extra_ussd_html(self):
+        text = []
+        map(lambda choice: text.append('%s: %s' % choice), self.fields['value'].choices)
+        return mark_safe('<br />'.join(text))
+
+
 class SelectBatchForm(BaseSelectInterview, USSDSerializable):
 
-    def __init__(self, request, access, survey, *args, **kwargs):
+    def __init__(self, request, access, survey_allocation, *args, **kwargs):
         super(SelectBatchForm, self).__init__(request, access, *args, **kwargs)
+        survey = survey_allocation.survey
         self.survey = survey
-        self.batches = survey.batches.all().order_by('name')
+        self.batches = survey_allocation.open_batches()
         self.fields['value'] = forms.ChoiceField()
         self.fields['value'].choices = [(idx + 1, batch.name) for idx, batch in enumerate(self.batches)]
         self.fields['value'].label = 'Select Batch'

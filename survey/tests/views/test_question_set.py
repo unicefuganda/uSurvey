@@ -53,10 +53,16 @@ class QuestionSetViewTest(BaseTest):
     def test_delete_should_delete_the_question(self):
         survey_obj = mommy.make(Survey)
         batch = Batch.objects.create(order=1, name="Batch ABC", survey=survey_obj)
+        interview = mommy.make(Interview, question_set=batch, survey=survey_obj, ea=self.ea)
         qset = QuestionSet.get(id=batch.id)
         response = self.client.get(reverse('delete_qset', kwargs={"question_id":qset.id, "batch_id":survey_obj.id}))
+        self.assertTrue(QuestionSet.objects.filter(id=batch.id).exists())
+        interview.delete()          # now try after remobing the interview
+        response = self.client.get(reverse('delete_qset', kwargs={"question_id": qset.id, "batch_id": survey_obj.id}))
+        self.assertFalse(QuestionSet.objects.filter(id=batch.id).exists())
         self.assertIn('Question Set Deleted Successfully', response.cookies['messages'].__str__())
-        self.assertRedirects(response, expected_url= reverse('batch_index_page', kwargs={"survey_id" : survey_obj.id}), msg_prefix='')
+        self.assertRedirects(response, expected_url= reverse('batch_index_page', kwargs={"survey_id" : survey_obj.id}),
+                             msg_prefix='')
     
     def test_delete_should_throws_404(self):
         response = self.client.get(reverse('delete_qset', kwargs={"question_id":999, "batch_id":999}))

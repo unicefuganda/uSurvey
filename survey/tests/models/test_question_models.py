@@ -50,6 +50,42 @@ class QuestionModelTest(SurveyBaseTest):
         p.save()
         self.assertTrue(PreviousAnswerCount.objects.exists())
 
+    def test_inlines_between(self):
+        self._create_ussd_non_group_questions()
+        all_questions = self.qset.all_questions
+        between = self.qset.inlines_between(all_questions[0], all_questions[-1])
+        between = [q.id for q in between]
+        # self.assertNotIn(all_questions[0].id, between)
+        self.assertNotIn(all_questions[-1].id, between)
+        for question in all_questions[:-1]:
+            self.assertIn(question.id, between)
+
+    def test_clone_qset(self):
+        self._create_ussd_non_group_questions()
+        self.qset.name = 'something good'
+        self.qset.save()
+        all_questions = self.qset.all_questions
+        validation = mommy.make(ResponseValidation, validation_test='greater_than')
+        mommy.make(TextArgument, validation=validation, position=1, param=23)
+        question = mommy.make(Question, qset=self.qset, answer_type=NumericalAnswer.choice_name())
+        mommy.make(QuestionFlow, question=all_questions[1], next_question=question,
+                   validation=validation)
+        cloned_batch = self.qset.deep_clone()
+        all_questions1 = cloned_batch.all_questions
+        all_questions2 = self.qset.all_questions
+        for idx, question in enumerate(all_questions1):
+            self.assertEquals(all_questions1[idx].identifier, all_questions2[idx].identifier)
+
+    def test_inline_flow(self):
+        self._create_ussd_non_group_questions()
+        all_questions = self.qset.all_questions
+        self.assertEquals(len(all_questions[0].flows.first().test_arguments), 0)
+
+
+
+
+
+
 
 
 

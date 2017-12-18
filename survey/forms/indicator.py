@@ -169,16 +169,16 @@ class IndicatorVariableForm(ModelForm, FormOrderMixin):
         if validation_test == 'between':
             if self.cleaned_data.get('min', None) is None or self.cleaned_data.get('max', None) is None:
                 raise forms.ValidationError('min and max values required for between condition')
-        elif self.cleaned_data.get('value', False) is False:
-            raise forms.ValidationError('Value is required for %s' % validation_test)
-        if test_question.answer_type in [
+        elif test_question.answer_type in [
                 MultiChoiceAnswer.choice_name(),
                 MultiSelectAnswer]:
-            if self.cleaned_data.get('options', False) is False:
+            if not self.cleaned_data.get('options', False):
                 raise forms.ValidationError(
                     'No option selected for %s' %
                     test_question.identifier)
             self.cleaned_data['value'] = self.cleaned_data['options']
+        elif self.cleaned_data.get('value', False) is False:
+            raise forms.ValidationError('Value is required for %s' % validation_test)
         return self.cleaned_data
 
     def save(self, *args, **kwargs):

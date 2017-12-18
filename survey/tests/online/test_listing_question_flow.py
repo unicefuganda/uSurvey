@@ -249,6 +249,3 @@ class OnlineFlowsTest(BaseTest):
         response = self.client.post(interviewer_online_flow_url, data=answer_data)
         self.assertEqual(response.status_code, 200)
         self.assertEquals(response.context['template_file'], "interviews/completed.html")
-
-    def test_conditional_flow(self):
-        pass

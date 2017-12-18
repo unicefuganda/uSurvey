@@ -466,3 +466,5 @@ class UsersViewTest(BaseTest):
         self.assertEquals(response.status_code, 200)
         self.assertEquals(response.get('content-type'), 'text/csv')
         self.assertIn('%s'%form_data['first_name'], response.content)
+
+

@@ -1,14 +1,14 @@
 #!/usr/bin/env python
 __author__ = 'anthony <antsmc2@gmail.com>'
-from django.utils import timezone
+from collections import defaultdict
 from collections import OrderedDict
 from copy import deepcopy
+from django.utils import timezone
 from django.conf import settings
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.core.urlresolvers import reverse
-from survey.models import (InterviewerAccess, QuestionLoop, QuestionSet, Answer, Question, QuestionOption,
-                           SurveyAllocation, AnswerAccessDefinition, ODKAccess, Interviewer, Interview)
+from survey.models import *
 from survey.forms.answer import (get_answer_form, UserAccessForm, UssdTimeoutForm,
                                  SurveyAllocationForm, SelectBatchForm, AddMoreLoopForm)
 from .utils import get_entry, set_entry, delete_entry
@@ -23,6 +23,7 @@ REF_INTERVIEW = 'ref_interview'
 INTERVIEW = 'interview'
 ANSWERS = 'answers'
 COUNT = 'count'
+NO_LOOP = -1
 PROMPT_USER_LOOP = 'prompt_user_loop'
 INTERVIEW_PROMPT_ANSWER_FORM = 'specific_answer_form'
 PENDING_USER_ACTION = -1
@@ -39,7 +40,7 @@ def show_only_answer_form(request):
 
 def restart(request, access_id):
     access = InterviewerAccess.get(id=access_id)
-    delete_entry(access)
+    set_entry(access, REQUEST_SESSION, {})
     return HttpResponseRedirect(reverse('online_interviewer_view'))
 
 
@@ -61,13 +62,8 @@ class OnlineHandler(object):
         slogger.debug('fetched: %s. session data: %s' % (access.user_identifier, session_data))
         response = self.respond(request, session_data)
         slogger.debug('the session %s, data: %s' % (access.user_identifier, session_data))
-        if session_data:
-            set_entry(access, REQUEST_SESSION, session_data)
-            slogger.debug('updated: %s session data: %s' % (access.interviewer, session_data))
-        else:
-            # session data has been cleared then remove the session space
-            delete_entry(access)
-            slogger.debug('removed: %s session data' % access.id)
+        set_entry(access, REQUEST_SESSION, session_data)
+        slogger.debug('updated: %s session data: %s' % (access.interviewer, session_data))
         return response
 
     def respond(self, request, session_data):
@@ -80,39 +76,49 @@ class OnlineHandler(object):
             return self.start_interview(request, session_data)
 
     def _save_answers(self, request, session_data, navigation_interview):
-        answers = session_data[ANSWERS]
+        answers_info = session_data[ANSWERS]
         reference_interview = session_data.get(REF_INTERVIEW, None)
         qset = QuestionSet.get(pk=navigation_interview.question_set.pk)
         question_map = dict([(q.identifier, q) for q in qset.all_questions])
         survey = navigation_interview.survey
         ea = navigation_interview.ea
+        answers = []
+        self._build_update_answers(answers_info.values(), {}, answers)      # updates the answers
         Interview.save_answers(qset, survey, ea, navigation_interview.interview_channel, question_map, answers,
                                reference_interview=reference_interview)
 
-    def _update_answer(self, request, session_data, question, answer):
-        if session_data[LOOPS][COUNT].keys():       # basically check if there are ongoing loops
-            session_data[ANSWERS][-1].update({question.identifier: answer})
-        else:
-            map(lambda answer_dict: answer_dict.update({question.identifier: answer}), session_data[ANSWERS])
+    @classmethod
+    def _build_update_answers(cls, answers_infos, answer_parts, answers):
+        answers_infos = deepcopy(answers_infos)
+        answers_info = answers_infos.pop(0)
+        has_more = len(answers_infos) > 0
+        for answer_dict in answers_info:
+            answer_parts = deepcopy(answer_parts)
+            answer_parts.update(answer_dict)
+            if has_more:
+                cls._build_update_answers(answers_infos, answer_parts, answers)
+            else:
+                answers.append(answer_parts)
 
-    def _add_loop_answer_entry(self, request, loop, session_data):
-        """Each loop entry is stored as in seperate row for ease of reporting
-        :param request:
-        :param session_data:
-        :return:
-        """
-        last_answer_dict = session_data[ANSWERS][-1]
-        loop_answers_row = deepcopy(last_answer_dict)
-        # clear entries belonging to this loop, to avoid old loop responses on a new loop
-        map(lambda question: loop_answers_row.update({question.identifier: ''}), loop.loop_questions())
-        session_data[ANSWERS].append(loop_answers_row)
+    @classmethod
+    def _update_answer(cls, request, session_data, question, answer):
+        if question.answer_type == AutoResponse.choice_name() and hasattr(question, 'loop_started') is False:
+            session_data[LOOPS][COUNT]['flat'] = int(answer)
+        if question.loop_story:
+            current_loop_id = question.loop_story[-1].id
+        else:
+            current_loop_id = NO_LOOP
+        if current_loop_id not in session_data[ANSWERS] or hasattr(question, 'loop_started'):
+            session_data[ANSWERS][current_loop_id].append({})
+        session_data[ANSWERS][current_loop_id][-1].update({question.identifier: answer})
 
     def init_responses(self, request, interview, session_data):
         #interview.save()
         session_data[INTERVIEW] = deepcopy(interview)    # This interview is only used for question navigation purposes
         session_data[LAST_QUESTION] = None
         session_data[PREVIOUS_QUESTIONS] = []
-        session_data[ANSWERS] = [{}, ]
+        session_data[ANSWERS] = defaultdict(list)
+        # session_data[ANSWERS][NO_LOOP] = OrderedDict()
         session_data[LOOPS] = {COUNT: OrderedDict(), }
         return self.respond(request, session_data)
 
@@ -130,8 +136,14 @@ class OnlineHandler(object):
         access = self.access
         request_data = request.GET if request.method == 'GET' else request.POST
         has_go_back = 'has-go-back' in request_data
-        if hasattr(interview.last_question, 'loop_started'):
+        if hasattr(interview.last_question, 'loop_started') \
+                and interview.last_question.answer_type == AutoResponse.choice_name():
             initial = {'value': session_data[LOOPS][COUNT].get(interview.last_question.loop_started.id, 1)}
+            if 'value' in request_data:
+                request_data = request_data.copy()
+                request_data['value'] = initial['value']
+        elif interview.last_question.answer_type == AutoResponse.choice_name():
+            initial = {'value': session_data[LOOPS][COUNT].get('flat', 0) + 1}
             if 'value' in request_data:
                 request_data = request_data.copy()
                 request_data['value'] = initial['value']
@@ -161,8 +173,10 @@ class OnlineHandler(object):
                 if next_question is None:
                     interview.closure_date = timezone.now()
                     session_data[LAST_QUESTION] = None
+                    # update the session data since the value changed
                     if interview.test_data is False:
                         self._save_answers(request, session_data, interview)    # save when entire questions are asked
+                    session_data[INTERVIEW] = interview
                 else:
                     # do not include same question following itself
                     if interview.last_question and \
@@ -222,12 +236,19 @@ class OnlineHandler(object):
         elif hasattr(interview.last_question, 'loop_ended'):
             loop = interview.last_question.loop_ended
             count = session_data[LOOPS][COUNT].get(loop.id, 1)
+            # if
             loop_next = None
             if loop.repeat_logic in [QuestionLoop.FIXED_REPEATS, QuestionLoop.PREVIOUS_QUESTION]:
                 if loop.repeat_logic == QuestionLoop.FIXED_REPEATS:
                     max_val = loop.fixedloopcount.value
                 if loop.repeat_logic == QuestionLoop.PREVIOUS_QUESTION:
-                    max_val = loop.previousanswercount.get_count(interview)
+                    loop_count_question = loop.previousanswercount.value
+                    if loop_count_question.loop_story:
+                        current_loop_id = loop_count_question.loop_story[-1].id
+                    else:
+                        current_loop_id = NO_LOOP
+                    # last answer entry
+                    max_val = int(session_data[ANSWERS][current_loop_id][-1][loop_count_question.identifier])
                 if max_val > count:
                     loop_next = loop.loop_starter
             else:   # user selected loop
@@ -253,7 +274,6 @@ class OnlineHandler(object):
             elif loop_next:     # not prompt
                 # update answers with new loop row
                 session_data[LOOPS][COUNT][loop.id] = count + 1
-                self._add_loop_answer_entry(request, loop, session_data)     # add another entry every extra loop
             elif loop.id in session_data[LOOPS][COUNT]:
                 del session_data[LOOPS][COUNT][loop.id]
             return loop_next
@@ -291,8 +311,13 @@ class OnlineHandler(object):
                         # we are interested in the qset param list with same identifier name as condition.test_question
                         test_question = qset.parameter_list.questions.get(identifier=condition.test_question.identifier)
                         param_value = ''            # use answer.as value
-                        if session_data[ANSWERS][-1].get(test_question.identifier, None):    # last answer entry
-                            param_value = session_data[ANSWERS][-1][test_question.identifier]
+                        if test_question.loop_story:
+                            current_loop_id = question.loop_story[-1].id
+                        else:
+                            current_loop_id = NO_LOOP
+                        # last answer entry
+                        if session_data[ANSWERS][current_loop_id][-1].get(test_question.identifier, None):
+                            param_value = session_data[ANSWERS][current_loop_id][-1][test_question.identifier]
                         answer_class = Answer.get_class(condition.test_question.answer_type)
                         validator = getattr(answer_class, condition.validation_test, None)
                         if validator is None:

@@ -1011,6 +1011,16 @@ class SetQuestionsViewExtra(SurveyBaseTest):
         self.assertEquals(response.status_code, 302)
         self.assertTrue(Question.objects.filter(id=question.id).exists())
 
+    def test_remove_loop(self):
+        self._create_ussd_non_group_questions()
+        all_questions = self.qset.all_questions
+        loop = mommy.make(QuestionLoop, loop_starter=all_questions[1], loop_ender=all_questions[-1])
+        url = reverse('remove_question_loop_page', args=(loop.id, ))
+        self.assertEquals(QuestionLoop.objects.count(), 1)
+        response = self.client.get(url)
+        self.assertEquals(QuestionLoop.objects.count(), 0)
+
+
 
 
 

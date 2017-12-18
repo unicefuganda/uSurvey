@@ -62,11 +62,7 @@ def _get_tree(xml_file):
 def _get_nodes(search_path, tree=None, xml_string=None):
     if tree is None:
         tree = etree.fromstring(xml_string)
-    try:
-        return tree.xpath(search_path)
-    except Exception, ex:
-        logger.error('Error retrieving path: %s, Desc: %s' %
-                     (search_path, str(ex)))
+    return tree.xpath(search_path)
 
 
 @job('odk', connection=get_connection())
@@ -105,13 +101,13 @@ def process_answers(xml, qset, access_channel, question_map, survey_allocation, 
             # map(lambda node: survey_parameters.extend(get_answers(node, qset, question_map)),
             #     survey_parameters_node.getchildren())
             # now check if non response exists and is selected
-            if _get_nodes(NON_RESPONSE_CONFIRMATION_PATH,
-                          survey_tree) and int(_get_nodes(NON_RESPONSE_CONFIRMATION_PATH, survey_tree)[0].text) > 0:
+            if _get_nodes(NON_RESPONSE_CONFIRMATION_PATH, survey_tree) and \
+                            int(_get_nodes(NON_RESPONSE_CONFIRMATION_PATH, survey_tree)[0].text) > 0:
                 answer = _get_nodes(NON_RESPONSE_PATH, survey_tree)[0].text
                 if answer.upper() == 'OTHER':        # user selected non respons
                     answer = _get_nodes(NON_RESPONSE_OTHERS_PATH, survey_tree)[0].text
-                non_response = save_non_response(survey_tree, qset, survey, survey_allocation,
-                                                 access_channel, answer, reference_interview)
+                non_response = save_non_response(survey_tree, qset, survey, survey_allocation, access_channel, answer,
+                                                 reference_interview)
                 created_interviews.append(non_response.interview)
             else:
                 question_answers_node = _get_nodes('./questions/surveyQuestions', answers_node)[0]
@@ -142,8 +138,10 @@ def process_answers(xml, qset, access_channel, question_map, survey_allocation, 
 
 def save_non_response(survey_tree, qset, survey, survey_allocation, access_channel, answer, reference_interview):
     interviewer = survey_allocation.interviewer
-    extracted_date = extract_date(_get_nodes(CREATION_DATE_PATH, tree=survey_tree)[0].text, dayfirst=False)
-    closure_date = extracted_date.replace(tzinfo=timezone.now().tzinfo)
+    closure_date = timezone.now()
+    if _get_nodes(CREATION_DATE_PATH, tree=survey_tree) and _get_nodes(CREATION_DATE_PATH, tree=survey_tree)[0].text:
+        extracted_date = extract_date(_get_nodes(CREATION_DATE_PATH, tree=survey_tree)[0].text, dayfirst=False)
+        closure_date = extracted_date.replace(tzinfo=timezone.now().tzinfo)
     interview = Interview.objects.create(survey=survey, question_set=qset, ea=survey_allocation.allocation_ea,
                                          interviewer=interviewer, interview_channel=access_channel,
                                          closure_date=closure_date,
@@ -266,6 +264,7 @@ def process_xml(interviewer, xml_blob, media_files={}, request=None):
     submission.attachments.all().delete()
     submission.save_attachments(media_files)
     process_answers.delay(xml_blob, qset, access_channel, question_map, survey_allocation, submission)
+    #process_answers(xml_blob, qset, access_channel, question_map, survey_allocation, submission)
     return submission
 
 

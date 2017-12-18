@@ -7,10 +7,9 @@ from django.shortcuts import render
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse
 from survey.models import SurveyAllocation
-from survey.forms.answer import\
-    (UserAccessForm, SurveyAllocationForm, SelectBatchForm, AddMoreLoopForm, ReferenceInterviewForm)
-from .online_handler import OnlineHandler,\
-    show_only_answer_form, get_display_format, INTERVIEW_PROMPT_ANSWER_FORM
+from survey.forms.answer import (UserAccessForm, SurveyAllocationForm, SelectBatchForm,
+                                 AddMoreLoopForm, ReferenceInterviewForm, SelectBatchOrListingForm)
+from .online_handler import OnlineHandler, show_only_answer_form, get_display_format, INTERVIEW_PROMPT_ANSWER_FORM
 
 
 def ussd_flow(request):
@@ -103,7 +102,8 @@ class OnlineInterview(OnlineHandler):
                 batch collection, else skip this step and \
                 select available listing/batch
         3. Move to interview questions.
-        This func is expected to be called only when survey is open
+        This func is expected to be called only when survey is open.
+        To do: Refactor this function soon. Though it's currently well tested.
         :param self:
         :param request:
         :param session_data:
@@ -113,22 +113,44 @@ class OnlineInterview(OnlineHandler):
         interviewer = access.interviewer
         request_data = request.GET if request.method == 'GET' else request.POST
         context = {}
+        if '_started_batch' in session_data:
+            interview = session_data['_started_batch']
+            survey_allocation = session_data['_started_batch_assignment']
+            interview_form = SelectBatchOrListingForm(request, access, data=request_data)
+            del session_data['_started_batch']
+            del session_data['_started_batch_assignment']
+            if interview_form.is_valid():
+                if interview_form.cleaned_data['value'] == SelectBatchOrListingForm.LISTING:
+                    return self._initiate_listing(request, interview, interview.survey, session_data)
+                else:
+                    # okay to start the batch, you need to choosing the sampled interview
+                    session_data['_ref_interview'] = interview
+                    session_data['_ref_interview_assignment'] = survey_allocation
+                    survey = survey_allocation.survey
+                    interview_form = ReferenceInterviewForm(request, access, survey, survey_allocation.allocation_ea)
+                    session_data['interview'] = None
+                    return self._render_init_form(request, interview_form)
         if '_ref_interview' in session_data:
             # if the user is trying to select a random sample...
             interview = session_data['_ref_interview']
+            survey_allocation = session_data['_ref_interview_assignment']
             interview_form = ReferenceInterviewForm(request, access, interview.survey, interview.ea, data=request_data)
             if interview_form.is_valid():
                 session_data['ref_interview'] = interview_form.cleaned_data['value']
                 del session_data['_ref_interview']
+                del session_data['_ref_interview_assignment']
+                if survey_allocation.open_batches() > 0:
+                    return self._attempt_batch(request, interview, interview.survey, session_data, survey_allocation)
             else:
-                return self._render_init_form( request, interview_form)
+                return self._render_init_form(request, interview_form)
         if '_interview' in session_data:
             # basically if the user is trying to select a batch
             survey = session_data['_interview'].survey
+            survey_allocation = session_data['_interview_assignment']
             interview_form = SelectBatchForm(
                 request,
                 access,
-                survey,
+                survey_allocation,
                 data=request_data)
             if interview_form.is_valid():
                 batch = interview_form.cleaned_data['value']
@@ -139,10 +161,7 @@ class OnlineInterview(OnlineHandler):
                 return self.init_responses(request, interview, session_data)
         elif 'interview' in session_data:
             # though the interview value might be None
-            interview_form = SurveyAllocationForm(
-                request,
-                access,
-                data=request_data)
+            interview_form = SurveyAllocationForm(request, access, data=request_data)
             if interview_form.is_valid():
                 interview = interview_form.save(commit=False)
                 interview.interviewer = interviewer
@@ -154,25 +173,33 @@ class OnlineInterview(OnlineHandler):
                     # batch not yet ready
                     # go straight to listing form
                     return self._initiate_listing(request, interview, survey, session_data)
-                elif interview.survey.has_sampling and 'ref_interview' not in session_data:
-                    # basically request the interviewer to choose listing form if before starting batch questions
-                    session_data['_ref_interview'] = interview
-                    interview_form = ReferenceInterviewForm(request, access, survey, survey_allocation.allocation_ea)
+                elif interview.survey.has_sampling and 'started_batch' not in session_data:
+                    # ask if user should start batch or not
+                    session_data['_started_batch'] = interview
+                    session_data['_started_batch_assignment'] = survey_allocation
+                    interview_form = SelectBatchOrListingForm(request, access)
                 elif survey_allocation.open_batches() > 0:   # ready for batch collection
                     # ask user to select the batch if batch is more than one
-                    if len(survey_allocation.open_batches()) > 1:
-                        session_data['_interview'] = interview
-                        # semi formed, ask user to choose batch
-                        interview_form = SelectBatchForm(request, access, survey)
-                    else:
-                        batch = survey_allocation.open_batches()[0]
-                        interview.question_set = batch
-                        interview.last_question = batch.g_first_question
-                        return self.init_responses(request, interview, session_data)
+                    return self._attempt_batch(request, interview, survey, session_data, survey_allocation)
+                # might need to show message when no batch is open
         else:
             interview_form = SurveyAllocationForm(request, access)
         session_data['interview'] = None
         return self._render_init_form(request, interview_form)
+
+    def _attempt_batch(self, request, interview, survey, session_data, survey_allocation):
+        if len(survey_allocation.open_batches()) > 1:
+            session_data['_interview_assignment'] = survey_allocation
+            session_data['_interview'] = interview
+            # semi formed, ask user to choose batch
+            interview_form = SelectBatchForm(request, interview.interview_channel, survey_allocation)
+            session_data['interview'] = None
+            return self._render_init_form(request, interview_form)
+        else:
+            batch = survey_allocation.open_batches()[0]
+            interview.question_set = batch
+            interview.last_question = batch.g_first_question
+            return self.init_responses(request, interview, session_data)
 
     def _initiate_listing(self, request, interview, survey, session_data):
         listing_form = survey.listing_form

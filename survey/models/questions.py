@@ -633,8 +633,7 @@ class PreviousAnswerCount(LoopCount):
 
     def get_count(self, interview):
         #  previous question must be numeric
-        return NumericalAnswer.objects.filter(
-            interview=interview, question=self.value).last().value
+        return NumericalAnswer.objects.filter(interview=interview, question=self.value).last().value
 
     def odk_get_count(self, interview):
         raise Exception('need to do!')  # to do
