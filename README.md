@@ -35,6 +35,7 @@ The easiest way to be up and running with uSurvey is to use the docker setup.
         
 
     **This step performs the following activities:**
+    
         1. Creates path where database files are stored on host machine
         2. Loads the necessary Permissions categories.
         3. Creates a super user to enable you login to uSurvey (requires you to supply login credentials)
