@@ -245,19 +245,6 @@ def manage_loop(request, question_id):
     return render(request, "set_questions/loop.html", context)
 
 
-def remove_loop(request, loop_id):
-    question_loop = get_object_or_404(QuestionLoop, pk=loop_id)
-    start_question = question_loop.start_question
-    question_loop.delete()
-    messages.success(request, 'Loop removed succesfully')
-    return HttpResponseRedirect(
-        reverse(
-            'qset_questions_page',
-            args=(
-                start_question.qset.pk,
-            )))
-
-
 @permission_required('auth.can_view_batches')
 def delete_logic(request, flow_id):
     flow = get_object_or_404(QuestionFlow, pk=flow_id)

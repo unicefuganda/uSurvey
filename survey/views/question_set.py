@@ -139,7 +139,7 @@ class QuestionSetView(object):
         context.update(extra_context)
         return render(request, template_name, context)
 
-    @permission_required('auth.can_view_batches')
+    @method_decorator(permission_required('auth.can_view_batches'))
     def delete(self, request, qset):
         if qset.interviews.exists():
             messages.error(
@@ -148,36 +148,26 @@ class QuestionSetView(object):
                 self.model.verbose_name())
         else:
             qset.delete()
+            messages.info(request,  "%s Successfully deleted!." % self.model.verbose_name())
         return HttpResponseRedirect('%s_home' % self.model.resolve_tag())
 
 
 @permission_required('auth.can_view_batches')
 def delete(request, question_id, batch_id):
-    # would need to refactor this later
-    qset = get_object_or_404(QuestionSet, pk=batch_id)
-
-    if qset.interviews.exists():
-        messages.error(
-            request,
-            "%s cannot be deleted because it already has interviews." %
-        qset.verbose_name())
+    # todo: Should remove question_id from this parameters :(
+    qset = QuestionSet.get(pk=batch_id)
+    view = QuestionSetView(qset.__class__)
+    if qset.__class__ == Batch:
+        survey = qset.survey
+        view.delete(request, qset)
+        return HttpResponseRedirect(reverse('batch_index_page', args=(survey.id, )))
     else:
-        messages.success(request, "Question Set Deleted Successfully")
-        qset.delete()
-    return HttpResponseRedirect(
-        reverse(
-            'batch_index_page',
-            args=(
-                batch_id
-            )
-        ))
+        return view.delete(request, qset)
 
 
 def delete_qset_listingform(request, question_id):
     question = get_object_or_404(Question, pk=question_id)
     qset = question.qset
-    if qset.name == 'demo-test':
-        import pdb; pdb.set_trace()
     if qset.interviews.exists():
         msg = "%s cannot be deleted because it already has interviews." % qset.verbose_name()
         messages.error(

@@ -83,20 +83,28 @@ class RespondentViewTest(BaseTest):
     @patch('django.contrib.messages.warning')
     def test_failure_group_onpost(self, success_message):
         form_data = self.form_data
-        form_data['name']  = ''
+        form_data['name'] = ''
         response = self.client.post(reverse('new_respondent_groups_page'), data=form_data)
         self.assertEqual(response.status_code, 200)
 
     def test_restricted_permission(self):
         self.assert_restricted_permission_for(reverse('new_respondent_groups_page'))
         self.assert_restricted_permission_for(reverse('respondent_groups_page'))
-        url = reverse('respondent_groups_edit',kwargs={"group_id":500})
+        url = reverse('respondent_groups_edit', kwargs={"group_id": 500})
         self.assert_restricted_permission_for(url)
 
     def test_should_throw_error_if_deleting_non_existing_group(self):
         message = "Group does not exist."
-        url = reverse('respondent_groups_delete',kwargs={"group_id":500})
-        self.assert_object_does_not_exist(url, message)
+        url = reverse('respondent_groups_delete', kwargs={"group_id": 500})
+        response = self.client.get(url)
+        self.assertTrue(response.status_code, 404)
+
+    def test_deleting_existing_group(self):
+        group = mommy.make(RespondentGroup)
+        self.assertTrue(RespondentGroup.objects.filter(id=group.id).exists())
+        url = reverse('respondent_groups_delete', kwargs={"group_id": group.id})
+        response = self.client.get(url)
+        self.assertFalse(RespondentGroup.objects.filter(id=group.id).exists())
 
     def test_delete_respondent_condition(self):
         condition = mommy.make(RespondentGroupCondition)

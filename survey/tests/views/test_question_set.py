@@ -60,13 +60,9 @@ class QuestionSetViewTest(BaseTest):
         interview.delete()          # now try after remobing the interview
         response = self.client.get(reverse('delete_qset', kwargs={"question_id": qset.id, "batch_id": survey_obj.id}))
         self.assertFalse(QuestionSet.objects.filter(id=batch.id).exists())
-        self.assertIn('Question Set Deleted Successfully', response.cookies['messages'].__str__())
+        self.assertIn('Successfully deleted', response.cookies['messages'].__str__())
         self.assertRedirects(response, expected_url= reverse('batch_index_page', kwargs={"survey_id" : survey_obj.id}),
                              msg_prefix='')
-    
-    def test_delete_should_throws_404(self):
-        response = self.client.get(reverse('delete_qset', kwargs={"question_id":999, "batch_id":999}))
-        self.assertEqual(response.status_code, 404)
 
     def test_search_questionset(self):
         survey_obj = mommy.make(Survey)
@@ -258,7 +254,6 @@ class QuestionSetViewTest(BaseTest):
         url = reverse('download_qset_attachment', kwargs={"interview_id": interview_obj.id, "question_id":question1.id})
         response = self.client.get(url)
         self.assertIn(response.status_code, [200, 302])
-
 
     def test_clone_qset_page(self):
         listing_form = ListingTemplate.objects.create(
@@ -588,4 +583,16 @@ class QuestionSetViewTest(BaseTest):
         response = self.client.get(url, data={'id': qset.id, 'q_id': question2.id})
         data = json.loads(response.content)
         self.assertIn(question.identifier, data)
+
+    def test_not_allowed_to_delete_qset_with_interview(self):
+        qset = mommy.make(QuestionSet)
+        question = mommy.make(Question, qset=qset)
+        qset.start_question = question
+        qset.save()
+        interview = mommy.make(Interview, question_set=qset)
+        self.assertTrue(QuestionSet.objects.filter(id=qset.id).exists())
+        url = reverse('delete_qset_listingform', args=(question.id,))
+        response = self.client.get(url)
+        self.assertTrue(QuestionSet.objects.filter(id=qset.id).exists())
+        self.assertIn(response.status_code, [302, 200])
 

@@ -217,30 +217,6 @@ class BatchViewsTest(BaseTest):
         response = self.client.post(reverse('activate_non_response_page', kwargs={'batch_id':self.batch.id}), data={"non_response_location_id" : self.abim.id})
         self.assertIn(response.status_code, [200, 302])
         self.assertEqual(response.content, '""')
-    #
-    # def test_list_batch_questions(self):
-    #     survey_obj = Survey.objects.create(name="s211", description="desc1")
-    #     batch_obj = Batch.objects.create(order=1, name="b2", description='bdesc' ,survey=survey_obj)
-    #     qset =  QuestionSet.get(pk=batch_obj.id)
-    #     question1 = mommy.make(Question, qset=qset, answer_type=TextAnswer.choice_name())
-    #     question2 = mommy.make(Question, qset=qset, answer_type=TextAnswer.choice_name())
-    #     url = reverse('list_batch_questions')
-    #     url = url + "?id=%s"%batch_obj.id
-    #     response = self.client.get(url, data={"id": batch_obj.id})
-    #     self.assertIn(response.status_code, [200, 302])
-    #     response = self.client.get(reverse('batch_index_page', kwargs={"survey_id" : survey_obj.id}))
-    #
-    # def test_list_batch_questions(self):
-    #     survey_obj = Survey.objects.create(name="s21111", description="desc1")
-    #     batch_obj = Batch.objects.create(order=1, name="b21", description='bdesc' ,survey=survey_obj)
-    #     qset =  QuestionSet.get(pk=batch_obj.id)
-    #     question1 = mommy.make(Question, qset=qset, answer_type=TextAnswer.choice_name())
-    #     question2 = mommy.make(Question, qset=qset, answer_type=TextAnswer.choice_name())
-    #     url = reverse('list_all_questions')
-    #     url = url + "?id=%s"%batch_obj.id
-    #     response = self.client.get(url, data={"id": batch_obj.id})
-    #     self.assertIn(response.status_code, [200, 302])
-    #     response = self.client.get(reverse('batch_index_page', kwargs={"survey_id" : survey_obj.id}))
 
     def test_list_batches(self):
         survey_obj = Survey.objects.create(name="s21111", description="desc1")
@@ -310,8 +286,8 @@ class BatchViewsTest(BaseTest):
         survey_obj = Survey.objects.create(**kwargs)
         batch_obj = Batch.objects.create(name='b133',description='d1', survey=survey_obj)
         qset = QuestionSet.get(id=batch_obj.id)
-        url = reverse('batch_all_locs', kwargs={"batch_id" : batch_obj.id})
-        response = self.client.post(url, data={"action" : "close all"})
+        url = reverse('batch_all_locs', kwargs={"batch_id": batch_obj.id})
+        response = self.client.post(url, data={"action": "close all"})
         self.assertIn(response.status_code, [200, 302])
 
     def test_batch_show_page(self):
@@ -323,11 +299,20 @@ class BatchViewsTest(BaseTest):
         qset = QuestionSet.get(id=batch_obj.id)
         
         url = reverse('batch_show_page', kwargs={"batch_id" : batch_obj.id, "survey_id" :survey_obj.id})
-        url = url + "?q=%s"%batch_obj.name
+        url = url + "?q=%s" % batch_obj.name
         response = self.client.get(url, data={"status" : "Open"})
         self.assertIn(response.status_code, [200, 302])
-        #self.assertRedirects(response, expected_url= reverse('batch_show_page', kwargs={"survey_id" : self.survey.id, "batch_id": batch_obj.id}), msg_prefix='')
-    
+
+    def test_list_all_questions(self):
+        url = reverse('list_all_questions')
+        self.batch.start_question = mommy.make(Question, qset=self.batch)
+        q2 = mommy.make(Question, qset=self.batch)
+        q3 = mommy.make(Question, qset=self.batch)
+        mommy.make(QuestionFlow, question=self.batch.start_question, next_question=q2)
+        mommy.make(QuestionFlow, question=q2, next_question=q3)
+        response = self.client.get(url, data={'id': self.batch.id})
+        questions_data = json.loads(response.content)
+        for question in self.batch.all_questions:
+            self.assertIn({'id': question.id, 'identifier': question.identifier}, questions_data)
 
 
-        

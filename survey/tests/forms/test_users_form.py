@@ -46,38 +46,6 @@ class UserFormTest(TestCase):
         self.assertEquals(
             user_profile[0].mobile_number, data1['mobile_number'])
 
-    # def test_NaN_mobile_numbers(self):
-    #     data2 = {
-    #         'username': 'rajniissd',
-    #         'password1': 'kantssd',
-    #         'password2': 'kantssd',
-    #         'last_name': 'Rajnissd',
-    #         'email': 'raj@ni.kantssd',
-    #         'mobile_number': 'asdf',
-    #     }
-    #     form_data = self.form_data
-    #     form_data['mobile_number'] = 'not a number'
-    #     user_form = UserForm(form_data)
-    #     # self.assertFalse(user_form.is_valid())
-    #     message = "Enter a number."
-    #     self.assertEquals(user_form.errors['mobile_number'], [message])
-
-    # def test_Negative_mobile_numbers(self):
-    #     # form_data = self.form_data1
-    #     data5 = {
-    #         'username': 'rajniissd',
-    #         'password1': 'kantssd',
-    #         'password2': 'kantssd',
-    #         'last_name': 'Rajnissd',
-    #         'email': 'raj@ni.kantssd',
-    #         'mobile_number': '546789123',
-    #     }
-    #     form_data['mobile_number'] = -123456786
-    #     user_form = UserForm(form_data)
-    #     # self.assertFalse(user_form.is_valid())
-    #     message = "Ensure this value is greater than or equal to 100000000."
-    #     self.assertEquals(user_form.errors['mobile_number'], [message])
-
     def test_number_of_digits_in_mobile_number(self):
         form_data = self.form_data
         number_of_length_greater_than_9 = 1234567555890
@@ -176,35 +144,6 @@ class EditUserFormTest(TestCase):
         self.assertEquals(
             user_profile[0].mobile_number, form_data['mobile_number'])
 
-    # def test_NaN_mobile_number(self):
-    #     user_data = self.user_data
-    #     form_data = dict(user_data, **{'mobile_number': 'not a number'})
-    #     user_form = EditUserForm(data=form_data, user=self.user_to_be_edited,
-    #                              instance=self.user_to_be_edited, initial=self.initial)
-    #     self.assertFalse(user_form.is_valid())
-    #     message = "Enter a number."
-    #     self.assertEquals(user_form.errors['mobile_number'], [message])
-
-    # def test_Negative_mobile_number(self):
-    #     user_data = self.user_data
-    #     form_data = dict(user_data, **{'mobile_number': -123456789})
-    #     user_form = EditUserForm(data=form_data, user=self.user_to_be_edited,
-    #                              instance=self.user_to_be_edited, initial=self.initial)
-    #     self.assertFalse(user_form.is_valid())
-    #     message = "Ensure this value is greater than or equal to 100000000."
-    #     self.assertEquals(user_form.errors['mobile_number'], [message])
-
-    # def test_number_of_digits_in_mobile_number(self):
-    #     number_of_length_greater_than_9 = 1234567890
-    #     user_data = self.user_data
-    #     form_data = dict(
-    #         user_data, **{'mobile_number': number_of_length_greater_than_9})
-    #     user_form = EditUserForm(data=form_data, user=self.user_to_be_edited,
-    #                              instance=self.user_to_be_edited, initial=self.initial)
-    #     self.assertFalse(user_form.is_valid())
-    #     message = "Ensure that there are no more than 9 digits in total."
-    #     self.assertEquals(user_form.errors['mobile_number'], [message])
-
     def test_email_already_used(self):
         user_data = self.user_data
         form_data = dict(user_data, **self.initial)
@@ -230,18 +169,6 @@ class EditUserFormTest(TestCase):
         self.assertFalse(user_form.is_valid())
         message = "This mobile_number already exist with: some_other_name"
         self.assertEquals(user_form.errors['mobile_number'], [message])
-
-    # def test_clean_username_should_not_work_if_user_does_not_exist_yet__this_form_is_for_editing_only(self):
-    #     user_data = self.user_data
-    #     form_data = dict(user_data, **self.initial)
-    #     form_data['username'] = 'some_non_existant_username'
-    #     user = User.objects.filter(username=form_data['username'])
-    #     self.failIf(user)
-    #     user_form = EditUserForm(data=form_data, user=self.user_to_be_edited,
-    #                              instance=self.user_to_be_edited, initial=self.initial)
-    #     self.assertFalse(user_form.is_valid())
-    #     message = "username cannot be changed."
-    #     self.assertEquals(user_form.errors['username'], [message])
 
     def test_clean_username_should_not_work_if_user_uses_other_existing_usernames_ie_no_changing_other_people_accounts(self):
         user_data = self.user_data
@@ -366,6 +293,7 @@ class UserProfileFormTest(TestCase):
         self.form_data = {
             'mobile_number': '791234567',
         }
+
     def test_valid(self):
         user_profile_form = UserProfileForm(self.form_data)
         self.assertTrue(user_profile_form.is_valid())

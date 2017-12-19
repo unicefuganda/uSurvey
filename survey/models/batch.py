@@ -26,11 +26,6 @@ class Batch(QuestionSet):
         app_label = 'survey'
         ordering = ('modified', 'created')
 
-    def save(self, *args, **kwargs):
-        last_order = Batch.objects.aggregate(Max('order'))['order__max']
-        self.order = last_order + 1 if last_order else 1
-        super(Batch, self).save(*args, **kwargs)
-
     def __unicode__(self):
         return "%s" % self.name
 
@@ -81,11 +76,6 @@ class Batch(QuestionSet):
         map(lambda loc: eas.update(loc.enumeration_areas.all()), locations)
         return eas
 
-    def other_surveys_with_open_batches_in(self, location):
-        batch_ids = location.open_batches.all().exclude(
-            batch__survey=self.survey).values_list('batch', flat=True)
-        return Survey.objects.filter(batch__id__in=batch_ids)
-
     def open_for_location(self, location):
         invalidate_obj(location)
         return self.open_locations.get_or_create(batch=self, location=location)
@@ -115,7 +105,9 @@ class Batch(QuestionSet):
 
     def activate_non_response_for(self, location):
         invalidate_obj(location)
-        self.open_locations.filter(location=location).update(non_response=True)
+        obj, _ = self.open_locations.get_or_create(batch=self, location=location)
+        obj.non_response=True
+        obj.save()
 
     def deactivate_non_response_for(self, location):
         invalidate_obj(location)
@@ -123,6 +115,8 @@ class Batch(QuestionSet):
             location=location).update(non_response=False)
 
     def save(self, *args, **kwargs):
+        last_order = Batch.objects.aggregate(Max('order'))['order__max']
+        self.order = last_order + 1 if last_order else 1
         super(Batch, self).save(*args, **kwargs)
         if self.pk:
             from survey.models import SurveyParameterList

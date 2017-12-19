@@ -97,21 +97,6 @@ class Survey(CloneableMixin, BaseModel):
         return Interview.objects.filter(
             survey=self, question_set__pk=qset.pk).count()
 
-    def bulk_enable_batches(self, eas):
-        register = []
-        for ea in eas:
-            register.append(BatchCommencement(survey=self, ea=ea))
-        BatchCommencement.objects.bulk_create(register)
-
-    def bulk_disable_batches(self, eas):
-        return self.commencement_registry.filter(ea__in=eas).delete()
-
-    def enable_batches(self, ea):
-        return BatchCommencement.objects.create(survey=self, ea=ea)
-
-    def disable_batches(self, ea):
-        return self.commencement_registry.filter(ea=ea).delete()
-
     def deep_clone(self):
         from survey.models import Batch
         import random

@@ -52,16 +52,14 @@ class NotEnoughData(ValueError):
 
 def _get_tree_from_blob(blob_contents):
     return etree.fromstring(blob_contents)
-
-
-def _get_tree(xml_file):
-    return etree.fromstring(xml_file.read())
+#
+#
+# def _get_tree(xml_file):
+#     return etree.fromstring(xml_file.read())
 
 
 # either tree or xml_string must be defined
-def _get_nodes(search_path, tree=None, xml_string=None):
-    if tree is None:
-        tree = etree.fromstring(xml_string)
+def _get_nodes(search_path, tree):
     return tree.xpath(search_path)
 
 
@@ -139,8 +137,8 @@ def process_answers(xml, qset, access_channel, question_map, survey_allocation, 
 def save_non_response(survey_tree, qset, survey, survey_allocation, access_channel, answer, reference_interview):
     interviewer = survey_allocation.interviewer
     closure_date = timezone.now()
-    if _get_nodes(CREATION_DATE_PATH, tree=survey_tree) and _get_nodes(CREATION_DATE_PATH, tree=survey_tree)[0].text:
-        extracted_date = extract_date(_get_nodes(CREATION_DATE_PATH, tree=survey_tree)[0].text, dayfirst=False)
+    if _get_nodes(CREATION_DATE_PATH, survey_tree) and _get_nodes(CREATION_DATE_PATH, survey_tree)[0].text:
+        extracted_date = extract_date(_get_nodes(CREATION_DATE_PATH, survey_tree)[0].text, dayfirst=False)
         closure_date = extracted_date.replace(tzinfo=timezone.now().tzinfo)
     interview = Interview.objects.create(survey=survey, question_set=qset, ea=survey_allocation.allocation_ea,
                                          interviewer=interviewer, interview_channel=access_channel,
@@ -156,8 +154,8 @@ def get_answers(node, qset, question_map, completion_date):
     inline_record = {}
     for e in node.getchildren():
         if e.getchildren():
-            if _get_nodes('./creationDate', tree=e):
-                completion_date = extract_date(_get_nodes('./creationDate', tree=e)[0].text, dayfirst=False)
+            if _get_nodes('./creationDate', e):
+                completion_date = extract_date(_get_nodes('./creationDate', e)[0].text, dayfirst=False)
             loop_answers = get_answers(e, qset, question_map, completion_date)
             _update_loop_answers(inline_record, loop_answers)
             answers.extend(loop_answers)
@@ -190,15 +188,15 @@ def _get_answer_nodes(tree, qset):
 
 
 def _get_instance_id(survey_tree):
-    return _get_nodes(INSTANCE_ID_PATH, tree=survey_tree)[0].text
+    return _get_nodes(INSTANCE_ID_PATH, survey_tree)[0].text
 
 
 def _get_instance_name(survey_tree):
-    return _get_nodes(INSTANCE_NAME_PATH, tree=survey_tree)[0].text
+    return _get_nodes(INSTANCE_NAME_PATH, survey_tree)[0].text
 
 
 def _get_default_date_created(survey_tree):
-    date_string = _get_nodes(DEFAULT_DATE_CREATED_PATH, tree=survey_tree)[0].text
+    date_string = _get_nodes(DEFAULT_DATE_CREATED_PATH, survey_tree)[0].text
     if date_string:
         return extract_date(date_string, dayfirst=False)
     else:
@@ -206,25 +204,21 @@ def _get_default_date_created(survey_tree):
 
 
 def _get_form_id(survey_tree):
-    return _get_nodes(FORM_ID_PATH, tree=survey_tree)[0]
+    return _get_nodes(FORM_ID_PATH, survey_tree)[0]
 
 
 def _get_submission_id(survey_tree):
-    return _get_nodes(SUBMISSIONS_ID_PATH, tree=survey_tree)[0].text
+    return _get_nodes(SUBMISSIONS_ID_PATH, survey_tree)[0].text
 
 
 def _get_qset(survey_tree):
-    pk = _get_nodes(FORM_ID_PATH, tree=survey_tree)[0]
+    pk = _get_nodes(FORM_ID_PATH, survey_tree)[0]
     return QuestionSet.get(pk=pk)
 
 
 def _get_allocation(interviewer, survey_tree):
-    ea_name = _get_nodes(FORM_ASSIGNMENT_PATH, tree=survey_tree)[0].text
+    ea_name = _get_nodes(FORM_ASSIGNMENT_PATH, survey_tree)[0].text
     return interviewer.unfinished_assignments.get(allocation_ea__name=ea_name)
-
-
-def _get_form_type(survey_tree):
-    return int(_get_nodes(FORM_TYPE_PATH, tree=survey_tree)[0].text)
 
 
 def process_submission(interviewer, xml_file, media_files={}, request=None):
@@ -244,15 +238,12 @@ def process_xml(interviewer, xml_blob, media_files={}, request=None):
     survey_allocation = _get_allocation(interviewer, survey_tree)
     # since interviewers may have downloaded this submission file before, fetch old instance if exists
     if submission_id:
-        try:
-            submission = ODKSubmission.objects.get(id=submission_id)
-            if ListingSample.objects.filter(interview__in=submission.interviews.all()).exists():
-                raise ValueError('Cannot update Listing with existing batches')
-            submission.xml = xml_blob       # update the xml
-            submission.save()
-        except ODKSubmission.DoesNotExist:
-            submission_id = None
-    if not submission_id:
+        submission = ODKSubmission.objects.get(id=submission_id)
+        if ListingSample.objects.filter(interview__in=submission.interviews.all()).exists():
+            raise ValueError('Cannot update Listing with existing batches')
+        submission.xml = xml_blob       # update the xml
+        submission.save()
+    else:
         # first things first. save the submission incase all else background task fails... enables recover
         submission = ODKSubmission.objects.create(interviewer=interviewer, survey=survey_allocation.survey,
                                                   question_set=qset, ea=survey_allocation.allocation_ea,
@@ -266,10 +257,6 @@ def process_xml(interviewer, xml_blob, media_files={}, request=None):
     process_answers.delay(xml_blob, qset, access_channel, question_map, survey_allocation, submission)
     #process_answers(xml_blob, qset, access_channel, question_map, survey_allocation, submission)
     return submission
-
-
-def get_survey(interviewer):
-    return SurveyAllocation.get_allocation(interviewer)
 
 
 def get_survey_allocation(interviewer):
@@ -387,8 +374,6 @@ def http_digest_interviewer_auth(func):
                         return func(request, *args, **kwargs)
             except ODKAccess.DoesNotExist:
                 return OpenRosaResponseNotFound()
-            except Exception, err:
-                return OpenRosaResponseBadRequest()
         response = HttpResponseNotAuthorized()
         response['www-authenticate'] = digestor.get_digest_challenge()
         return response

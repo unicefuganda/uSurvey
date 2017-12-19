@@ -31,6 +31,14 @@ class InterviewerTest(SurveyBaseTest):
     def test_get_allocation_details(self):
         self.assertEquals(SurveyAllocation.get_allocation(self.interviewer), self.survey)
 
+    def test_generate_completion_report(self):
+        report = self.survey.generate_completion_report(batch=self.qset)
+        interviewer = self.interviewer
+        test_entry = ','.join([interviewer.name, ','.join(interviewer.access_ids)])
+        report_entry = report.pop()
+        self.assertIn(test_entry, ','.join(report_entry))
+
+
 
 class SurveyAllocationTest(SurveyBaseTest):
 

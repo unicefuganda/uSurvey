@@ -1,5 +1,6 @@
 import json
 from django.core.exceptions import ObjectDoesNotExist
+from django.shortcuts import get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.contrib import messages
@@ -22,16 +23,16 @@ def index(request):
                   {'groups': groups, 'request': request})
 
 
-def _process_condition_form(request, condition_form):
-    if condition_form.is_valid():
-        condition_form.save()
-        messages.success(request, 'Condition successfully added.')
-        redirect_url = '/conditions/'
-    else:
-        messages.error(request, 'Condition not added: %s' %
-                       condition_form.non_field_errors()[0])
-        redirect_url = '/conditions/new/'
-    return HttpResponseRedirect(redirect_url)
+# def _process_condition_form(request, condition_form):
+#     if condition_form.is_valid():
+#         condition_form.save()
+#         messages.success(request, 'Condition successfully added.')
+#         redirect_url = '/conditions/'
+#     else:
+#         messages.error(request, 'Condition not added: %s' %
+#                        condition_form.non_field_errors()[0])
+#         redirect_url = '/conditions/new/'
+#     return HttpResponseRedirect(redirect_url)
 
 
 def _process_groupform(request, group_form, action):
@@ -99,26 +100,14 @@ def edit_group(request, group_id):
 
 @permission_required('auth.can_view_household_groups')
 def delete_group(request, group_id):
-    try:
-        member_group = RespondentGroup.objects.get(id=group_id)
-        # member_group.remove_related_questions()
-        member_group.delete()
-        messages.success(request, "Group successfully deleted.")
-    except Exception as err:
-        pass
-        messages.success(request, "Group does not exist.")
-    return HttpResponseRedirect("/groups/")
+    get_object_or_404(RespondentGroup, id=group_id).delete()
+    messages.success(request, "Group successfully deleted.")
+    return HttpResponseRedirect(reverse('respondent_groups_page'))
 
 
 @permission_required('auth.can_view_household_groups')
 def delete_condition(request, condition_id):
-    try:
-        respondent_group_condition = RespondentGroupCondition.objects.filter(
-            id=condition_id).values_list("respondent_group__id")
-        respondent_group_condition[0][0]
-        RespondentGroupCondition.objects.get(id=condition_id).delete()
-    except Exception as err:
-        pass
+    get_object_or_404(RespondentGroupCondition, id=condition_id).delete()
     messages.success(request, "Criteria successfully deleted.")
     # return HttpResponseRedirect("/conditions/")
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))

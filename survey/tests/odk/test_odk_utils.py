@@ -15,7 +15,7 @@ from django.core.urlresolvers import reverse
 from django.test.client import Client
 from django.contrib.auth.models import User
 from survey.models import *
-from survey.odk.utils.odk_helper import OpenRosaResponseNotAllowed
+from survey.odk.utils.odk_helper import OpenRosaResponseNotAllowed, OpenRosaServerError, OpenRosaResponseNotFound
 from survey.forms.question import get_question_form
 from survey.forms.logic import LogicForm
 from survey.templatetags.template_tags import get_answer
@@ -32,9 +32,12 @@ class ODKTest(SurveyBaseTest):
     def _save_ussd_compatible_questions(self):
         self._create_ussd_non_group_questions()
 
-    def _make_odk_request(self, url=reverse('odk_survey_forms_list'), data=None, content_type=None, raw=False):
-        username = self.odk_user.user_identifier
-        password = self.odk_user.odk_token
+    def _make_odk_request(self, url=reverse('odk_survey_forms_list'), data=None, content_type=None, raw=False,
+                          odk_user=None):
+        if odk_user is None:
+            odk_user = self.odk_user
+        username = odk_user.user_identifier
+        password = odk_user.odk_token
         auth_headers = {}
         if content_type:
             auth_headers['content_type'] = content_type
@@ -254,7 +257,7 @@ class ODKTest(SurveyBaseTest):
                          <meta>
                             <instanceID>%(instance_id)s</instanceID>
                             <instanceName>%(instance_id)s-Name</instanceName>
-                        <creationDate />
+                        <creationDate>02-10-2017</creationDate>
                         <locked />
                          </meta>
                          <submissions>
@@ -282,12 +285,59 @@ class ODKTest(SurveyBaseTest):
                    'answer1': answer1, 'answer2': answer2, 'answer3': answer3, 'answer4': answer4}
         return completed % context
 
+    def _get_xml_with_issue(self, answer1, answer2, answer3, answer4):
+        completed = b'''<qset id="%(qset)s" >
+                         <meta>
+                            <instanceID>%(instance_id)s</instanceID>
+                            <instanceName>%(instance_id)s-Name</instanceName>
+                        <creationDate>02-10js-2017</creationDate>
+                        <locked />
+                         </meta>
+                         <submissions>
+                             <id>93939</id>
+                             <dates>
+                                 <lastModified />
+                             </dates>
+                         </submissions>
+                           <surveyAllocation>%(survey_allocation)s</surveyAllocation>
+                           <qset%(qset)s>
+                            <questions>
+                                <groupQuestions></groupQuestions>
+                                <surveyQuestions>
+                                    <q1>%(answer1)s</q1><q2>%(answer2)s</q2><q4>%(answer3)s</q4><q5>%(answer4)s</q5>
+                                </surveyQuestions>
+                            </questions>
+                           </qset%(qset)s>
+                       </qset>
+                       '''
+        context = {'qset': 829, 'instance_id': random.randint(0, 1000),
+                   'survey_allocation': self.survey_allocation.allocation_ea.name.encode('utf8'),
+                   'answer1': answer1, 'answer2': answer2, 'answer3': answer3, 'answer4': answer4}
+        return completed % context
+
+    def test_submit_xform_with_issue_returns_openrosaerror(self):
+        self._create_ussd_non_group_questions(self.qset)
+        all_questions = self.qset.all_questions
+        mommy.make(QuestionLoop, loop_starter=all_questions[1], loop_ender=all_questions[-1])
+        country = Location.country()
+        for location in country.get_children():
+            self.qset.activate_non_response_for(location)
+        xml = self._get_xml_with_issue('2', 'James', 'Y', '1')
+        f = SimpleUploadedFile("surveyfile.xml", xml)
+        url = reverse('odk_submit_forms')
+        response = self._make_odk_request(url=url, data={'xml_submission_file': f}, raw=True)
+        self.assertEquals( response.status_code, 500)
+        self.assertEquals(ODKSubmission.objects.count(), 0)
+        self.assertTrue(isinstance(response, OpenRosaServerError))
+        # not confirm that 5 responses were given (including param question)
+        self.assertEquals(Answer.objects.count(), 0)
+
     def _get_loop_xml(self, answer1, answer2, answer3, answer4):
         completed = b'''<qset id="%(qset)s" >
                          <meta>
                             <instanceID>%(instance_id)s</instanceID>
                             <instanceName>%(instance_id)s-Name</instanceName>
-                        <creationDate />
+                            <creationDate>12-10-2017</creationDate>
                         <locked />
                          </meta>
                          <submissions>
@@ -324,6 +374,9 @@ class ODKTest(SurveyBaseTest):
         country = Location.country()
         for location in country.get_children():
             self.qset.activate_non_response_for(location)
+        # confirm all eas are all non response enabled
+        for ea in EnumerationArea.objects.all():
+            self.assertTrue(self.qset.non_response_enabled(ea))
         xml = self._get_loop_xml('2', 'James', 'Y', '1')
         f = SimpleUploadedFile("surveyfile.xml", xml)
         url = reverse('odk_submit_forms')
@@ -537,6 +590,52 @@ class ODKTest(SurveyBaseTest):
         response = self._make_odk_request(url=url)
         self.assertTrue(isinstance(response, OpenRosaResponseNotAllowed))
 
+    def test_submit_sufficient_form_for_listing(self):
+        listing_form = self._prep_listing()
+        response = self._make_odk_request()
+        url = reverse('download_odk_listing_form')
+        self.assertIn(listing_form.name, response.content)
+        self.assertIn(url, response.content)
+        # download listing form
+        response = self._make_odk_request(url=url)
+        xml = self._get_completed_xform('2', 'James', 'Y', '1', qset=listing_form)
+        f = SimpleUploadedFile("surveyfile.xml", xml)
+        url = reverse('odk_submit_forms')
+        response = self._make_odk_request(url=url, data={'xml_submission_file': f}, raw=True)
+        self.assertTrue( 300 > response.status_code and response.status_code >= 200)
+        self.assertEquals(ODKSubmission.objects.count(), 1)
+        # not confirm that 5 responses were given (including param question)
+        self.assertEquals(Answer.objects.count(), len(listing_form.all_questions))
+        xml = self._get_completed_xform('7', 'Rita', 'Y', '12', qset=listing_form)
+        f = SimpleUploadedFile("surveyfile.xml", xml)
+        url = reverse('odk_submit_forms')
+        response = self._make_odk_request(url=url, data={'xml_submission_file': f}, raw=True)
+        self.assertTrue(300 > response.status_code and response.status_code >= 200)
+        self.assertEquals(ODKSubmission.objects.count(), 2)
+        # not confirm that 5 responses were given (including param question)
+        self.assertEquals(Answer.objects.count(), len(listing_form.all_questions)*2)
+        xml = self._get_completed_xform('8', 'Sam', 'N', '11', qset=listing_form)
+        f = SimpleUploadedFile("surveyfile.xml", xml)
+        url = reverse('odk_submit_forms')
+        response = self._make_odk_request(url=url, data={'xml_submission_file': f}, raw=True)
+        self.assertTrue(300 > response.status_code and response.status_code >= 200)
+        self.assertEquals(ODKSubmission.objects.count(), 3)
+        # not confirm that 5 responses were given (including param question)
+        self.assertEquals(Answer.objects.count(), len(listing_form.all_questions)*3)
+        xml = self._get_completed_xform('12', 'Ray', 'N', '8', qset=listing_form)
+        f = SimpleUploadedFile("surveyfile.xml", xml)
+        url = reverse('odk_submit_forms')
+        response = self._make_odk_request(url=url, data={'xml_submission_file': f}, raw=True)
+        self.assertTrue(300 > response.status_code and response.status_code >= 200)
+        self.assertEquals(ODKSubmission.objects.count(), 4)
+        # not confirm that 5 responses were given (including param question)
+        self.assertEquals(Answer.objects.count(), len(listing_form.all_questions) * 4)
+        # now try to download batch form
+        url = reverse('download_odk_batch_form', args=(self.qset.id, ))
+        response = self._make_odk_request(url=url)
+        self.assertIn('Select Sample', response.content)
+        self.assertIn(self.qset.name, response.content)
+
     def test_submit_invalid_answer_only_exempts_wrong_answer_xform(self):
         self._create_ussd_non_group_questions(self.qset)
         interview = mommy.make(Interview, interviewer=self.interviewer, survey=self.survey, ea=self.ea,
@@ -570,3 +669,17 @@ class ODKTest(SurveyBaseTest):
         url = reverse('download_odk_batch_form', args=(self.qset.id,))
         response = self._make_odk_request(url=url)
         self.assertIn("/qset/qset1/questions/surveyQuestions/q1 = '15'", response.content)
+
+    def test_odk_user_who_does_not_exist_gives_openrosa_404(self):
+        self._create_ussd_non_group_questions(self.qset)
+        odk_access= ODKAccess(interviewer=self.interviewer, user_identifier='someguy', odk_token='12iw')
+        # use unsaved access
+        xml = self._get_completed_xform('2', 'James', 'Yol', '1')     # yol is invalid answer
+        f = SimpleUploadedFile("surveyfile.xml", xml)
+        url = reverse('odk_submit_forms')
+        response = self._make_odk_request(url=url, data={'xml_submission_file': f}, raw=True, odk_user=odk_access)
+        self.assertEquals(response.status_code, 404)
+        self.assertEquals(ODKSubmission.objects.count(), 0)
+        # not confirm that 3 responses were given
+        self.assertEquals(Answer.objects.count(), 0)
+        self.assertTrue(isinstance(response, OpenRosaResponseNotFound))

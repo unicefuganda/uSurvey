@@ -16,9 +16,7 @@ from django.core.urlresolvers import reverse
 
 @permission_required('auth.can_view_batches')
 def index(request, model_class=QuestionTemplate):
-    '''
-        show all library questions
-    '''
+    """show all library questions"""
     question_filter_form = QuestionFilterForm(data=request.GET or None)
     questions = question_filter_form.filter(model_class.objects.all())
     search_fields = ['identifier', 'text', ]
