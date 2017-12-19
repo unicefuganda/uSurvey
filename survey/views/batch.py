@@ -1,5 +1,6 @@
 import json
 from django.core.serializers.json import DjangoJSONEncoder
+from django.shortcuts import get_object_or_404
 from django.shortcuts import render
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseRedirect
@@ -152,17 +153,9 @@ def _add_success_message(request, action_str):
 
 @permission_required('auth.can_view_batches')
 def delete(request, survey_id, batch_id):
-    try:
-        batch = Batch.get(id=batch_id)
-        QuestionSetView(model_class=Batch).delete(request, batch)
-    except Exception as e:
-        messages.warning(request, str(e))
-    return HttpResponseRedirect(
-        reverse(
-            'batch_index_page',
-            args=(
-                batch.survey.id,
-            )))
+    batch = get_object_or_404(Batch, id=batch_id)
+    QuestionSetView(model_class=Batch).delete(request, batch)
+    return HttpResponseRedirect(reverse('batch_index_page', args=(batch.survey.id,)))
 
 
 @login_required

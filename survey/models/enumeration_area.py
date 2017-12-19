@@ -62,7 +62,7 @@ class EnumerationArea(BaseModel):
         right = selected_location.rght - 1
         kwargs = {'locations__lft__gte': left, 'locations__lft__lte': right,
                   'locations__level__gt': selected_location.level}
-        return cls.objects.filter(**kwargs).distinct('name')
+        return cls.objects.filter(**kwargs).distinct()
 
 #     def validate_unique(self, *args, **kwargs):
 #         super(EnumerationArea, self).validate_unique(*args, **kwargs)

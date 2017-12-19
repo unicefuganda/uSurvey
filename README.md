@@ -9,76 +9,57 @@ The system has been designed to collect a wide range of data for the structured 
 
 Official documentation is available on [http://usurvey.readthedocs.io/](http://usurvey.readthedocs.io/).
 
-Installation
-------------
-* Postgres, redis-server should be running
 
-* It helps to install python-dev, libxml2-dev, libxslt1-dev, zlib1g-dev and libffi-dev (for a debian based system, the command would be *sudo apt-get install python-dev libxml2-dev libxslt1-dev zlib1g-dev libffi-dev*)
+Quick Start
+-----------
 
-* Also install libblas-dev liblapack-dev libatlas-base-dev gfortran (for a debian based system, the command would be sudo apt-get install libblas-dev liblapack-dev libatlas-base-dev gfortran )
+The easiest way to be up and running with uSurvey is to use the docker setup.
 
-* Execute the following commands from your installation directory:
+
+* Clone the uSurvey Application from Github 
 
         git clone https://github.com/unicefuganda/uSurvey.git
 
-        cd uSurvey/mics
 
-        cp travis-settings.py localsettings.py
-        (adjust localsettings.py for db and test_db setup)
+* Enter the project directory 
 
-        cd ../survey
+        cd uSurvey
 
-        cp interviewer_configs.py.example interviewer_configs.py
-
-        cd ..
-
-        mkvirtualenv uSurvey
-
-        pip install -U -r pip-requires.txt
-
-        python manage.py syncdb --noinput
-
-        python manage.py makemigrations
+* Update the database entries in ``.env`` file found in the project directory
         
-        python manage.py migrate
+* Run the following commands in the project directory:
 
-        python manage.py createsuperuser
-        (to create the initial user access)
+        chmod +x docker_setup_linux.sh
 
-        python manage.py load_parameters
+        ./docker_setup_linux.sh
+        
 
-Before using the system
------------------------
-       
-* Before using the setup, you need to load data for administrative divisions of the required country.
+    **This step performs the following activities:**
+        1. Creates path where database files are stored on host machine
+        2. Loads the necessary Permissions categories.
+        3. Creates a super user to enable you login to uSurvey (requires you to supply login credentials)
+        4. Attempts to setup up the map for your country
 
-* To load administrative divisions into the system, run the following commands:
+* Once done, enter the following address on your browser to be sure uSurvey is properly setup:
+    
+    
+    http://localhost:8071/
+    
+    
+What next
+---------
 
-        python manage.py import_location [LOCATION_FILE_CSV]
+You would need to load the administrative divisions data for the country you have made your setup for.
+    
+See the uSurvey documentation for further information:
 
-> The first line of the csv file shall be taken as file header. 
+[http://usurvey.readthedocs.io/](http://usurvey.readthedocs.io/)
 
-> The file header is expected to contain names as per the administrative division in a comma separated format. In addition, there can be an additional header for enumeration area. This header should be named *EAName*. Sample file for Uganda is included in the project directory as administrative_divisions.csv.example.
-
-
-Starting up
------------
-
-* Make sure you configure appropriate ports in the supervisord.conf file.
-
-* Start the system using supervisor:
-
-        supervisord -c supervisord.conf
-
-> In supervisord.conf, the configuration under [program:odk-server] is required to serve ODK requests, while the configuration under [program:django-interface-server] is for serving other requests.
-
-
-==
 
 Testing
 -------
 
 * run test as follows:
 
-        python manage.py test
+    python manage.py test
 

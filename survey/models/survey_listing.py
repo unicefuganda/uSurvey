@@ -31,11 +31,7 @@ class RandomizationCriterion(BaseModel):
                         for validator in Answer.validators()]
     survey = models.ForeignKey(Survey, related_name='randomization_criteria')
     listing_question = models.ForeignKey(Question, related_name='criteria')
-    validation_test = models.CharField(
-        max_length=200,
-        choices=VALIDATION_TESTS,
-        null=True,
-        blank=True)
+    validation_test = models.CharField(max_length=200, choices=VALIDATION_TESTS, )
 
     class Meta:
         app_label = 'survey'

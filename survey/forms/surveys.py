@@ -42,18 +42,11 @@ class SurveyForm(ModelForm, FormOrderMixin):
             self.fields['preferred_listing'].widget.attrs[
                 'disabled'] = 'disabled'
         preferred_listings = [('', '------ Create new -------'), ]
-        try:
-            listing_forms = ListingTemplate.objects.values_list(
-                'pk', flat=True).order_by('id')
-            survey_listings = Interview.objects.filter(question_set__pk__in=listing_forms
-                                                       ).only('survey').distinct('survey').order_by('survey__name')
-            preferred_listings.extend(
-                set([(l.survey.pk, l.survey.name) for l in survey_listings]))
-            self.fields['preferred_listing'].choices = preferred_listings
-            self.fields['preferred_listing'].widget = forms.SelectMultiple(
-                attrs={'class': 'chzn-select'})
-        except Exception as err:
-            pass
+        listing_forms = ListingTemplate.objects.values_list('pk', flat=True).order_by('id')
+        survey_listings = [survey.name for survey in Survey.objects.all() if survey.interviews.exists()]
+        preferred_listings.extend(set([(l.survey.pk, l.survey.name) for l in survey_listings]))
+        self.fields['preferred_listing'].choices = preferred_listings
+        self.fields['preferred_listing'].widget = forms.Select(attrs={'class': 'chzn-select'})
         self.fields['email_group'].help_text = 'These users shall receive email notifications from this survey'
         self.order_fields(['name',
                            'description',
@@ -171,10 +164,7 @@ class SamplingCriterionForm(forms.ModelForm, FormOrderMixin):
 
     def clean(self):
         super(SamplingCriterionForm, self).clean()
-        validation_test = self.cleaned_data.get('validation_test', None)
-        if validation_test is None:
-            raise ValidationError('This field is Required')
-            return self.cleaned_data['validation_test']
+        validation_test = self.cleaned_data['validation_test']
         listing_question = self.cleaned_data.get('listing_question', None)
         if listing_question:
             answer_class = Answer.get_class(listing_question.answer_type)

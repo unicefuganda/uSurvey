@@ -1,7 +1,10 @@
 from django.test import TestCase
 from django.contrib.auth.models import User, Group, Permission
 from django.contrib.contenttypes.models import ContentType
+from django.test.client import RequestFactory, Client
+from django.core.urlresolvers import reverse
 from survey.forms.users import *
+from survey.forms.password_mgt import uSurveyPasswordResetForm
 from survey.models.users import UserProfile
 
 
@@ -293,6 +296,8 @@ class UserProfileFormTest(TestCase):
         self.form_data = {
             'mobile_number': '791234567',
         }
+        self.client = Client()
+        self.client.login(username='demo8', password='demo8')
 
     def test_valid(self):
         user_profile_form = UserProfileForm(self.form_data)
@@ -303,3 +308,24 @@ class UserProfileFormTest(TestCase):
         self.failUnless(user_profile.id)
         user_profile_retrieved = UserProfile.objects.get(user=user)
         self.assertEqual(user_profile_retrieved, user_profile)
+
+    def test_password_reset_form(self):
+        data = {
+            'username': 'rajniiss',
+            'password1': 'kantss',
+            'password2': 'kantss',
+            'last_name': 'Rajniss',
+            'email': 'raj@ni.kantss',
+            'mobile_number': '791204563',
+        }
+
+        user_form = UserForm(data)
+        self.assertTrue(user_form.is_valid())
+        user = user_form.save()
+        password = 'pet12'
+        pdata = {'email': data['email'], }
+        url = reverse('password_reset')
+        self.client.login(username=data['username'], password=data['password1'])
+        response = self.client.post(url, data=pdata)
+        self.assertEquals(response.status_code, 302)
+        self.assertIn(reverse('email_sent_page'), response.url)

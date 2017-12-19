@@ -170,7 +170,7 @@ urlpatterns = patterns(
         name="password_reset"),
     url(
         r'^user/password/reset/done/$',
-        'django.contrib.auth.views.password_reset_done'),
+        'django.contrib.auth.views.password_reset_done', name='email_sent_page'),
     url(
         r'^user/password/reset/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>.+)/$',
         'django.contrib.auth.views.password_reset_confirm',

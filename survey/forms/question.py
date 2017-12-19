@@ -78,7 +78,8 @@ def get_question_form(model_class):
                 qset = QuestionSet.get(id=self.qset.pk)
                 identifiers = group.parameter_questions().values_list('identifier', flat=True)
                 existing_identifiers = Question.objects.filter(identifier__in=identifiers,
-                                                               qset__pk=self.qset.pk).values_list('identifier', flat=True)
+                                                               qset__pk=self.qset.pk).values_list('identifier',
+                                                                                                  flat=True)
                 if existing_identifiers.exists():
                     raise ValidationError(
                         '%s already exist in this %s. '
@@ -91,7 +92,8 @@ def get_question_form(model_class):
                     if existing_identifiers.exists():
                         raise ValidationError(
                             '%s already exist as a listing question for this %s. '
-                            'Consider creating a question with modified identifier name and using skip logic in your %s' %
+                            'Consider creating a question with modified identifier name '
+                            'and using skip logic in your %s' %
                             (','.join(existing_identifiers), qset.verbose_name(), qset.verbose_name()))
             return group
 

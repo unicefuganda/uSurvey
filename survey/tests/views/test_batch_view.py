@@ -15,6 +15,7 @@ from django.core.urlresolvers import reverse
 import json
 questionSetForm = get_question_set_form(QuestionSet)
 
+
 class BatchViewsTest(BaseTest):
     def setUp(self):        
         self.client = Client()
@@ -314,5 +315,17 @@ class BatchViewsTest(BaseTest):
         questions_data = json.loads(response.content)
         for question in self.batch.all_questions:
             self.assertIn({'id': question.id, 'identifier': question.identifier}, questions_data)
+
+    def test_delete_batch_which_does_not_exist(self):
+        url = reverse('delete_batch', args=(7374, 234))
+        response = self.client.get(url)
+        self.assertEquals(response.status_code, 404)
+
+    def test_list_ajax_batches(self):
+        url = reverse("list_batches")
+        response = self.client.get(url, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        batch_data = json.loads(response.content)
+        for batch in Batch.objects.values('id', 'name'):
+            self.assertIn(batch, batch_data)
 
 

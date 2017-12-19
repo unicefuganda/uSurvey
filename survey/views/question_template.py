@@ -1,5 +1,6 @@
 import json
 from django.core.serializers.json import DjangoJSONEncoder
+from django.shortcuts import get_object_or_404
 from django.shortcuts import render
 from django.contrib import messages
 from django.http import HttpResponseRedirect, HttpResponse,\
@@ -99,22 +100,16 @@ def _render_question_view(request, model_class, instance=None):
 
 @permission_required('auth.can_view_batches')
 def add(request, model_class=QuestionTemplate):
-    '''
-        create all library questions
-    '''
+    """create all library questions"""
     response, context = _render_question_view(request, model_class)
     return response or render(request, 'question_templates/new.html', context)
 
 
 @permission_required('auth.can_view_batches')
 def edit(request, question_id):
-    '''
-        Modify library question
-    '''
-    try:
-        question = TemplateQuestion.get(pk=question_id)
-    except TemplateQuestion.DoesNotExist:
-        return HttpResponseNotFound()
+    """ Modify library question"""
+    question = get_object_or_404(TemplateQuestion, pk=question_id)
+    question = TemplateQuestion.get(pk=question.pk)
     response, context = _render_question_view(
         request, model_class=question.__class__, instance=question)
     return response or render(request, 'question_templates/new.html', context)
@@ -122,19 +117,13 @@ def edit(request, question_id):
 
 @permission_required('auth.can_view_batches')
 def delete(request, question_id):
-    '''Delete library question
-    '''
-    try:
-        try:
-            question = TemplateQuestion.get(pk=question_id)
-            model_class = question.__class__
-        except TemplateQuestion.DoesNotExist:
-            return HttpResponseNotFound()
-        identifier = question.identifier
-        question.delete()
-        messages.success(request, 'Question Deleted question %s.' % identifier)
-    except Exception:
-        messages.error(request, 'Unable to delete question %s.' % identifier)
+    """Delete library question"""
+    question = get_object_or_404(TemplateQuestion, pk=question_id)
+    question = TemplateQuestion.get(pk=question.pk)
+    model_class = question.__class__
+    identifier = question.identifier
+    question.delete()
+    messages.success(request, 'Question Deleted question %s.' % identifier)
     return HttpResponseRedirect(reverse('show_%s' % model_class.resolve_tag()))
 
 
