@@ -33,7 +33,7 @@ phonenumbers
 django-cacheops
 django-macros
 django-cloneable
-numpy
+numpy>=1.14.0rc1
 pandas
 django-debug-toolbar
 asteval

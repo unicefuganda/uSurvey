@@ -50,7 +50,7 @@ The easiest way to be up and running with uSurvey is to use the docker setup.
 What next
 ---------
 
-You would need to load the administrative divisions data for the country you have made your setup for.
+You'll need to load the administrative divisions data for your country setup.
     
 See the uSurvey documentation for further information:
 

@@ -1,12 +1,16 @@
 FROM python:2.7-alpine
 
-# Copy in your requirements file
-ADD pip-freeze.txt /pip-freeze.txt
+RUN export LC_ALL=en_US.UTF-8
+RUN export LANG=en_US.UTF-8
 
-# Install build deps, then run `pip install`, then remove unneeded build deps all in a single step. Correct the path to your production requirements file, if needed.
+# Copy in your requirements file
+ADD pip-requires.txt /pip-requires.txt
+
+# Install host server dependencies.
 RUN set -ex \
-    && apk add  --update alpine-sdk --no-cache \
+    && apk add  --update alpine-sdk \
             gcc \
+            g++ \
             make \
             libc-dev \
             musl-dev \
@@ -19,9 +23,11 @@ RUN set -ex \
             libxslt-dev \
             zlib-dev \
             libffi-dev \
-            postgresql-client \
-    && LIBRARY_PATH=/lib:/usr/lib /bin/sh -c "pip install -U pip" \
-    && LIBRARY_PATH=/lib:/usr/lib /bin/sh -c "pip install -r /pip-freeze.txt"
+            postgresql-client
+
+# now install python specific dependencies
+RUN  LIBRARY_PATH=/lib:/usr/lib /bin/sh -c "pip install -U pip" \
+    && LIBRARY_PATH=/lib:/usr/lib /bin/sh -c "pip install -r /pip-requires.txt"
 
 
 # Copy application code to the container
@@ -34,21 +40,14 @@ RUN mkdir -p /src/files/submissions/
 RUN mkdir -p /src/files/answerFiles/
 
 # create log dir
-RUN mkdir /src/logs
+RUN mkdir -p /src/logs
 
 # setup the project
 RUN cp survey/interviewer_configs.py.example survey/interviewer_configs.py
 
-# Gunicorn will listen on this port
-EXPOSE 8080 8082 9001
-
-RUN export LD_LIBRARY_PATH=/usr/local/pgsql/lib:$LD_LIBRARY_PATH
-
 # Add any custom, static environment variables needed by Django or your settings file here:
 ENV DJANGO_SETTINGS_MODULE=mics.settings
-
 RUN DATABASE_URL=none python manage.py collectstatic --noinput
-
 
 
 # Make entry point executable
